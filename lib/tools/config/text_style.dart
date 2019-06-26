@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 
 import '../theme_color.dart';
 
-const String fontFamily = "Ekkamai"; //Supermarket
+const String fontFamily = "";//"Ekkamai"; //Supermarket//Ekkamai
 
 class TextStyleCustom {
   static const TextStyle STYLE_APPBAR = TextStyle(
-      color: COLOR_WHITE,
+      color: COLOR_BLACK,
       fontSize: 24,
-      height: 1.2,
+      // height: 1.2,
       letterSpacing: 2.0,
       fontFamily: fontFamily,
       fontWeight: FontWeight.w500);
 
   static const TextStyle STYLE_TITLE = TextStyle(
-      color: COLOR_WHITE,
+      color: COLOR_BLACK,
       height: 1.2,
       fontSize: 18.0,
       letterSpacing: 2,
@@ -22,24 +22,24 @@ class TextStyleCustom {
       fontWeight: FontWeight.w900);
 
   static const TextStyle STYLE_CONTENT = TextStyle(
-      color: COLOR_WHITE,
+      color: COLOR_GREY,
       height: 1.2,
       letterSpacing: 2,
-      fontSize: 14.0,
+      fontSize: 16.0,
       fontFamily: fontFamily);
 
   static const TextStyle STYLE_LABEL = TextStyle(
-      color: COLOR_WHITE,
+      color: COLOR_BLACK,
       height: 1.2,
       letterSpacing: 2,
-      fontSize: 14.0,
+      fontSize: 16.0,
       fontFamily: fontFamily);
 
   static const TextStyle STYLE_LABEL_BOLD = TextStyle(
-      color: COLOR_WHITE,
+      color: COLOR_BLACK,
       height: 1.2,
       letterSpacing: 2,
-      fontSize: 14.0,
+      fontSize: 16.0,
       fontFamily: fontFamily,
       fontWeight: FontWeight.w700);
 

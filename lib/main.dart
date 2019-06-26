@@ -65,7 +65,8 @@ class _MyHomePageState extends State<MyHomePage> {
           primarySwatch: Colors.teal,
           // primaryColor: Colors.white,
           scaffoldBackgroundColor: Colors.white,
-          fontFamily: "Ekkamai"), //Supermarket
+          // fontFamily: "Ekkamai"
+          ), //Supermarket
       home: SplashScreenPage(),
     );
   }

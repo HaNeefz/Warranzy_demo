@@ -9,13 +9,13 @@ class ButtonBuilder {
       {@required BuildContext context,
       @required String label,
       TextStyle labelStyle,
-      double height = 50.0,
+      double height = 55.0,
       Color colorsButton,
       double elevation = 0.0,
-      double cornerRadius = 10.0,
+      double cornerRadius = 25.0,
       Function onPressed}) {
     return Padding(
-      padding: const EdgeInsets.all(6.0),
+      padding: const EdgeInsets.only(left: 20, right: 20),
       child: Container(
         width: MediaQuery.of(context).size.width,
         height: height,
@@ -23,10 +23,15 @@ class ButtonBuilder {
             border: colorsButton == null
                 ? Border.all(width: 0.5, color: COLOR_THEME_APP)
                 : null,
+            gradient: LinearGradient(colors: <Color>[
+              Colors.teal[300],
+              Colors.teal[200],
+              Colors.teal[100]
+            ]),
             borderRadius: BorderRadius.circular(cornerRadius)),
         child: RaisedButton(
-          splashColor: COLOR_THEME_APP,
-          color: colorsButton ?? COLOR_TRANSPARENT,
+          splashColor: Colors.teal[300],
+          // color: colorsButton ?? COLOR_TRANSPARENT,
           elevation: elevation,
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(cornerRadius)),
@@ -37,25 +42,44 @@ class ButtonBuilder {
         ),
       ),
     );
-    // Padding(
-    //   padding: const EdgeInsets.all(6.0),
-    //   child: InkWell(
-    //     onTap: onPressed,
-    //     child: Container(
-    //       width: MediaQuery.of(context).size.width,
-    //       decoration: BoxDecoration(
-    //           border: Border.all(width: 0.5, color: COLOR_THEME_APP),
-    //           color: colorsButton ??= COLOR_TRANSPARENT,
-    //           borderRadius: BorderRadius.circular(cornerRadius)),
-    //       height: height,
-    //       child: Center(
-    //         child: TextBuilder.build(
-    //             title: label,
-    //             style: labelStyle ?? TextStyleCustom.STYLE_LABEL_BOLD),
-    //       ),
-    //     ),
-    //   ),
-    // );
+  }
+
+  static Widget buttonCustom(
+      {@required BuildContext context,
+      @required String label,
+      TextStyle labelStyle,
+      double height = 55.0,
+      Color colorsButton,
+      double elevation = 0.0,
+      double cornerRadius = 25.0,
+      Function onPressed}) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 50.0),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(cornerRadius),
+        splashColor: Colors.white,
+        onTap: onPressed,
+        child: Container(
+          height: 55,
+          width: MediaQuery.of(context).size.width,
+          decoration: BoxDecoration(
+              border: Border.all(width: 0.5, color: Colors.teal[300]),
+              borderRadius: BorderRadius.circular(cornerRadius),
+              gradient: colorsButton == null
+                  ? LinearGradient(
+                      colors: <Color>[Colors.teal[300], Colors.teal[100]])
+                  : null),
+          child: Center(
+              child: TextBuilder.build(
+                  title: label,
+                  style: labelStyle ??
+                      TextStyleCustom.STYLE_LABEL_BOLD.copyWith(
+                          color: colorsButton == null
+                              ? COLOR_WHITE
+                              : Colors.teal[300]))),
+        ),
+      ),
+    );
   }
 }
 

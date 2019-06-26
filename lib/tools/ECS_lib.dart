@@ -6,12 +6,14 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 import 'package:page_transition/page_transition.dart';
 
+import 'assets.dart';
+
 class ECSLib {
-  Widget logoApp({double size = 100}) {
-    return FlutterLogo(
-      size: size,
-      colors: Colors.teal,
-      curve: Curves.fastOutSlowIn,
+  Widget logoApp({double width = 300, double height = 300}) {
+    return Image.asset(
+      Assets.ICON_APP_TRANSPARENT,
+      width: width,
+      height: height,
     );
   }
 
@@ -26,9 +28,8 @@ class ECSLib {
       {@required BuildContext context,
       @required Widget pageWidget,
       @required PageTransitionType animationType}) async {
-    final result = await Navigator.of(context).push(PageTransition(
-        type: animationType,
-        child: pageWidget));
+    final result = await Navigator.of(context)
+        .push(PageTransition(type: animationType, child: pageWidget));
     return result;
   }
 
