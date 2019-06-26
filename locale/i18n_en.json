@@ -1,0 +1,127 @@
+{
+    "app_title": "My Application Title",
+    "welcome_to" : "Welcome to",
+    "main_title": "My Main Title",
+    "main_body": "My Main Body",
+    "register": "Register",
+    "login": "LOGIN",
+    "sign_up":"SIGN UP",
+    "change_device":"Change device",
+    "or":"or",
+    "country_code":"Country Code",
+
+
+    "------_comment OTP": " OTP-----------",
+    "title_confirm_otp": "Confirm OTP",
+    "title_sms": "Enter the OTP from SMS.",
+    "otp_code": "OTP Code",
+    "otp_code_placeholder": "Enter the OTP code",
+    "otp_button_otp": "Send OTP again",
+    "otp_button_next": "Next",
+
+
+    "------_comment Register": " REGUSTER-----------",
+    "username": "Username",
+    "lastname": "Lastname",
+    "password": "Password",
+    "cpassword": "Confirm-Password",
+    "address": "Address",
+    "email": "Email",
+    "telephone": "Phone Number",
+    "pin_code":"PIN Code",
+    "cPin_code":"Confirm PIN Code",
+
+    "-----------hint textFeild--------------":"hint TEXTFEILD",
+    "hint_name" : "Your name is :",
+    "hint_lastname" : "Your lastname is :",
+    "hint_email" : "example@gmail.com",
+    "hint_phoneNumber" : "Ex. 0888888888",
+
+
+    "------_comment Main": " Main-----------",
+    "balance": "Balance",
+    "my_lotto": "My Lotto",
+    "buy": "Buy Lotto",
+    "chart": "Chart",
+    "gift": "Gift",
+    "news": "News",
+    "live": "Live",
+    "check_lotto": "Check Lotto",
+    "hot_number": "Hot Number",
+    "setting": "Setting",
+
+
+    "------_comment My_Lotto": " My Lotto-----------",
+    "year" : "Year",
+    "order" : "Order",
+    "period" : "Period",
+    "detail" : "Detail Lotto",
+    "edit_image" : "Edit Image",
+    "save" : "Save",
+    "add" : "Add",
+    "no_image" : "No Image",
+    "no_data" : "No Data, Please press button to add lotto.",
+    "add_lotto" : "Add Lotto",
+    "choose_image" : "Choose Image from Gallery or Capture.",
+    "take_photo" : "Take a photo",
+    "gallery" : "Gallery",
+
+
+    "------_comment Check_Lotto": " Check Lotto-----------",
+    "title_check_lotto" : "Check Lotto",
+    "title_choose_date" : "Click, Choose BirthDay.",
+    "selected_date" : "Selected Date : ",
+    "title_input_number" : "Please input number, Or scan.",
+    "placeholder_input_number" : "Input Number 6 digit",
+    "label_scan" : "Scan",
+    "show_detail_award" : "Show detail Award!",
+    "result_input" : "Your number is",
+
+
+    "------_comment Hot_Number": " Hot Number-----------",
+    "score" : "Score",
+    
+    "------_comment Setting": " Setting-----------",
+    "profile" : "Profile",
+    "about" : "About",
+    "language" : "Language",
+    "logout" : "Logout",
+
+    "------_comment Language": " Language-----------",
+    "title_change_language" : "Change Language.",
+    "content_change" : "Are you sure change",
+    "thai" : "Thai Language",
+    "eng" : "Englist Language",
+
+    "------_comment Others": " Others-----------",
+    "yes" : "Yes",
+    "no" : "No",
+    "ok" : "OK",
+    "close" : "Close",
+    "cancel" : "Cancel",
+    "done" : "Done",
+    "submit" : "Submit",
+
+    "------_comment Aert" : "Alert------------",
+    "title_award" : "AWARD LOTTO.",
+    "title_fail_lotto" : "Sorry, Fail Lotto",
+    "title_invalide_number" : "INVALID NUMBER",
+    "content_input_number" : "Please input number",
+    "title_registerd" : "REGISTERD.",
+    "content_registered" : "This phone has been registered. Please Login OR call contact center.",
+    "title_register" : "REGISTER.",
+    "content_register" : "Please register before login.",
+
+    "title_delete" : "Delete Lotto.",
+    "content_delete" : "Are you sure delete this lotto ?",
+
+    "content_used_language" : "is currently in use.",
+    "forgot_password" : "Forgot password",
+    "loading" : "Please waiting...",
+
+    "pin_incorrect" : "Pin Incorrect"
+
+
+    
+
+}

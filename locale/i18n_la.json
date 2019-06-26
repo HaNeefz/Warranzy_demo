@@ -1,0 +1,70 @@
+{
+    "app_title": "My Application Title",
+    "main_title": "My Main Title",
+    "main_body": "My Main Body",
+    "register": "Register",
+    "login": "Login",
+
+
+    "------_commend OTP": " OTP-----------",
+    "title_confirm_otp": "Confirm OTP",
+    "title_sms": "Enter the OTP from SMS.",
+    "otp_code": "OTP Code",
+    "otp_code_placeholder": "Enter the OTP code",
+    "otp_button_otp": "Send OTP again",
+    "otp_button_next": "Next",
+
+
+    "------_commend Register": " REGUSTER-----------",
+    "username": "Username",
+    "lastname": "Lastname",
+    "password": "Password",
+    "cpassword": "Confirm-Password",
+    "address": "Address",
+    "telephone": "Telephone",
+
+
+    "------_commend Main": " Main-----------",
+    "balance": "Balance",
+    "my_lotto": "My Lotto",
+    "buy": "Buy Lotto",
+    "chart": "Chart",
+    "gift": "Gift",
+    "news": "News",
+    "live": "Live",
+    "check_lotto": "Check Lotto",
+    "hot_number": "Hot Number",
+    "setting": "Setting",
+
+
+    "------_commend My_Lotto": " My Lotto-----------",
+    "year" : "Year",
+    "order" : "Order",
+    "period" : "Period",
+    "detail" : "Detail",
+    "edt_image" : "Edit Image",
+    "save" : "Save",
+    "add" : "Add",
+    "no_image" : "No Image",
+
+
+    "------_commend Check_Lotto": " Check Lotto-----------",
+    "title_check_lotto" : "Check Lotto",
+    "title_choose_date" : "Click, Choose Date.",
+    "button_click_date" : "Clickd, Choose Date.",
+    "title_input_number" : "Please input number, Or scan.",
+    "placeholder_input_number" : "Input Number 6 digit",
+    "label_scan" : "Scan",
+    "show_detail_award" : "Show detail Award!",
+
+
+    "------_commend Hot_Number": " Hot Number-----------",
+    "score" : "Score",
+    
+    "------_commend Setting": " Setting-----------",
+    "profile" : "Profile",
+    "about" : "About",
+    "language" : "Language",
+    "logout" : "Logout"
+
+}
