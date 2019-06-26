@@ -5,7 +5,7 @@ import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 
-import 'splash_screen/splash_screen.dart';
+import 'page/splash_screen/scSplash_screen.dart';
 
 var getIt = GetIt();
 void main() {
@@ -23,21 +23,8 @@ void main() {
       // ChangeNotifierProvider<ImageDataState>(
       //   builder: (_) => ImageDataState(),
       // )
-    ], child: MyApp()));
+    ], child: MyHomePage()));
   });
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(),
-    );
-  }
 }
 
 class MyHomePage extends StatefulWidget {
@@ -77,9 +64,9 @@ class _MyHomePageState extends State<MyHomePage> {
       theme: ThemeData(
           primarySwatch: Colors.teal,
           // primaryColor: Colors.white,
-          scaffoldBackgroundColor: Colors.black,
+          scaffoldBackgroundColor: Colors.white,
           fontFamily: "Ekkamai"), //Supermarket
-      home: SplashScreen(),
+      home: SplashScreenPage(),
     );
   }
 
