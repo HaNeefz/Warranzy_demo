@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:warranzy_demo/tools/config/text_style.dart';
-import 'package:warranzy_demo/tools/export_lib.dart';
-import 'package:warranzy_demo/tools/theme_color.dart';
-import 'package:warranzy_demo/tools/widget_ui_custom/button_builder.dart';
-import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
+import '../../page/register/scRegister.dart';
+import '../../tools/config/text_style.dart';
+import '../../tools/export_lib.dart';
+import '../../tools/theme_color.dart';
+import '../../tools/widget_ui_custom/button_builder.dart';
+import '../../tools/widget_ui_custom/text_builder.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -19,7 +20,7 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.only(top: 80.0),
-        child: Column(        
+        child: Column(
           children: <Widget>[
             Container(child: ecsLib.logoApp()),
             TextBuilder.build(
@@ -48,7 +49,10 @@ class _LoginPageState extends State<LoginPage> {
                 label: allTranslations.text("register"),
                 colorsButton: COLOR_WHITE,
                 onPressed: () {
-                  print("Tap");
+                  ecsLib.pushPage(
+                    context: context,
+                    pageWidget: Register(),
+                  );
                 }),
           ],
         ),
