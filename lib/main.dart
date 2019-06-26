@@ -1,6 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:get_it/get_it.dart';
+import 'package:provider/provider.dart';
+import 'package:warranzy_demo/tools/export_lib.dart';
 
-void main() => runApp(MyApp());
+import 'splash_screen/splash_screen.dart';
+
+var getIt = GetIt();
+void main() {
+  Provider.debugCheckInvalidValueType = null;
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    statusBarColor: Colors.white,
+    statusBarBrightness: Brightness.light,
+  ));
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]).then((_) async {
+    getIt.registerSingleton<ECSLib>(ECSLib());
+    getIt.registerSingleton<GlobalTranslations>(GlobalTranslations());
+    runApp(MultiProvider(providers: [
+      // ChangeNotifierProvider<ImageDataState>(
+      //   builder: (_) => ImageDataState(),
+      // )
+    ], child: MyApp()));
+  });
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -10,54 +35,56 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  final String title;
-
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _initLangeuage("en");
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+    allTranslations.onLocaleChangedCallback = _onLocaleChanged;
   }
+
+  _onLocaleChanged() async {
+    // do anything you need to do if the language changes
+    print('Language has been changed to: ${allTranslations.currentLanguage}');
+  }
+
+  final allTranslations = getIt.get<GlobalTranslations>();
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.display1,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ),
+    return MaterialApp(
+      // showPerformanceOverlay: true,
+
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: allTranslations.supportedLocales(),
+      debugShowCheckedModeBanner: false,
+      title: 'Flutter Demo',
+      theme: ThemeData(
+          primarySwatch: Colors.teal,
+          // primaryColor: Colors.white,
+          scaffoldBackgroundColor: Colors.black,
+          fontFamily: "Ekkamai"), //Supermarket
+      home: SplashScreen(),
     );
+  }
+
+  _initLangeuage(String lang) async {
+    await allTranslations.setNewLanguage(lang);
+    setState(() {});
   }
 }
