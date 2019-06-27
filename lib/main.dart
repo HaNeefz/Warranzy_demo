@@ -11,7 +11,7 @@ var getIt = GetIt();
 void main() {
   Provider.debugCheckInvalidValueType = null;
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-    statusBarColor: Colors.white,
+    statusBarColor: Colors.black,
     statusBarBrightness: Brightness.light,
   ));
   SystemChrome.setPreferredOrientations([
@@ -62,11 +62,11 @@ class _MyHomePageState extends State<MyHomePage> {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
-          primarySwatch: Colors.teal,
-          // primaryColor: Colors.white,
-          scaffoldBackgroundColor: Colors.white,
-          // fontFamily: "Ekkamai"
-          ), //Supermarket
+        primarySwatch: Colors.teal,
+        // primaryColor: Colors.white,
+        scaffoldBackgroundColor: Colors.white,
+        // fontFamily: "Ekkamai"
+      ), //Supermarket
       home: SplashScreenPage(),
     );
   }

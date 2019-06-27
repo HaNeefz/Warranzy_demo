@@ -16,29 +16,29 @@ class TextStyleCustom {
   static const TextStyle STYLE_TITLE = TextStyle(
       color: COLOR_BLACK,
       height: 1.2,
-      fontSize: 18.0,
-      letterSpacing: 2,
+      fontSize: 30.0,
+      letterSpacing: 1,
       fontFamily: fontFamily,
       fontWeight: FontWeight.w900);
 
   static const TextStyle STYLE_CONTENT = TextStyle(
       color: COLOR_GREY,
       height: 1.2,
-      letterSpacing: 2,
+      letterSpacing: 1,
       fontSize: 16.0,
       fontFamily: fontFamily);
 
   static const TextStyle STYLE_LABEL = TextStyle(
       color: COLOR_BLACK,
       height: 1.2,
-      letterSpacing: 2,
+      letterSpacing: 1,
       fontSize: 16.0,
       fontFamily: fontFamily);
 
   static const TextStyle STYLE_LABEL_BOLD = TextStyle(
       color: COLOR_BLACK,
       height: 1.2,
-      letterSpacing: 2,
+      letterSpacing: 1,
       fontSize: 16.0,
       fontFamily: fontFamily,
       fontWeight: FontWeight.w700);

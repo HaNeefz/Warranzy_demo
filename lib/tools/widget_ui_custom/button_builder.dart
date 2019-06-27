@@ -52,9 +52,10 @@ class ButtonBuilder {
       Color colorsButton,
       double elevation = 0.0,
       double cornerRadius = 25.0,
+      double paddingValue = 50.0,
       Function onPressed}) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 50.0),
+      padding: EdgeInsets.symmetric(horizontal: paddingValue),
       child: InkWell(
         borderRadius: BorderRadius.circular(cornerRadius),
         splashColor: Colors.white,
@@ -63,7 +64,9 @@ class ButtonBuilder {
           height: 55,
           width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
-              border: Border.all(width: 0.5, color: Colors.teal[300]),
+              border: colorsButton != null
+                  ? Border.all(width: 0.5, color: Colors.teal[300])
+                  : null,
               borderRadius: BorderRadius.circular(cornerRadius),
               gradient: colorsButton == null
                   ? LinearGradient(

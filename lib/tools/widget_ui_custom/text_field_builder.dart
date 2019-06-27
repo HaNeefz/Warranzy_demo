@@ -10,7 +10,6 @@ class TextFieldBuilder {
       @required validators,
       TextEditingController textContrl,
       String hintText,
-      IconData prefixIcon,
       FocusNode focusNode,
       int maxLength,
       int maxLine,
@@ -19,27 +18,12 @@ class TextFieldBuilder {
       TextInputType keyboardType,
       TextInputAction textInputAction,
       bool readOnly = false}) {
-    return Container(      
-      decoration: BoxDecoration(
-        color: Colors.transparent,
-        border: Border.all(width: 0.5, color: COLOR_THEME_APP),
-        borderRadius: BorderRadius.circular(15.0),
-        // boxShadow: [
-        //   BoxShadow(
-        //     blurRadius: 5,
-        //     color: Colors.teal,
-        //     spreadRadius: 1,
-        //   )
-        // ]
-      ),
-      padding: EdgeInsets.only(top: 5, left: 5, right: 5),
-      margin: EdgeInsets.all(8.0),
-      height: 90.0,
+    return Center(
       child: FormBuilderTextField(
         attribute: key,
         validators: validators,
         controller: textContrl,
-        autovalidate: true,
+        autovalidate: false,
         maxLength: maxLength,
         textAlign: textAlign,
         maxLines: maxLine,
@@ -49,25 +33,18 @@ class TextFieldBuilder {
         textInputAction: textInputAction ??= TextInputAction.done,
         style: TextStyleCustom.STYLE_LABEL.copyWith(fontSize: 18),
         decoration: InputDecoration(
-            border: InputBorder.none,
-            hintText: "\t\t\t" + hintText,
-            hintStyle: TextStyleCustom.STYLE_LABEL,
-            counterStyle: TextStyleCustom.STYLE_LABEL,
-            errorStyle:
-                TextStyleCustom.STYLE_ERROR,
-            prefixIcon: Container(
-                width: 40.0,
-                height: 40.0,
-                margin: EdgeInsets.only(right: 10),                
-                decoration: BoxDecoration(
-                    color: COLOR_THEME_APP,
-                    borderRadius: BorderRadius.horizontal(
-                        left: Radius.circular(10.0),
-                        right: Radius.circular(10.0))),
-                child: Icon(
-                  prefixIcon,
-                  color: Colors.black,
-                ))),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+          border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(30),
+              borderSide: BorderSide(color: Colors.teal[300])),
+          //InputBorder.none,
+          hintText: "\t\t\t" + hintText,
+          hintStyle: TextStyleCustom.STYLE_CONTENT,
+          counterStyle: TextStyleCustom.STYLE_LABEL,
+          errorStyle: TextStyleCustom.STYLE_ERROR,
+        ),
       ),
     );
   }

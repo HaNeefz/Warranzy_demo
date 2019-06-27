@@ -20,41 +20,43 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.only(top: 80.0),
-        child: Column(
-          children: <Widget>[
-            Container(child: ecsLib.logoApp()),
-            TextBuilder.build(
-              title: "Wellome!",
-              style: TextStyleCustom.STYLE_APPBAR
-                  .copyWith(fontWeight: FontWeight.bold, fontSize: 40),
-            ),
-            TextBuilder.build(
-              title: "Sign into your Account",
-              style: TextStyleCustom.STYLE_CONTENT,
-            ),
-            SizedBox(
-              height: 100.0,
-            ),
-            ButtonBuilder.buttonCustom(
-                context: context,
-                label: allTranslations.text("login"),
-                onPressed: () {
-                  print("Tap");
-                }),
-            SizedBox(
-              height: 20.0,
-            ),
-            ButtonBuilder.buttonCustom(
-                context: context,
-                label: allTranslations.text("register"),
-                colorsButton: COLOR_WHITE,
-                onPressed: () {
-                  ecsLib.pushPage(
-                    context: context,
-                    pageWidget: Register(),
-                  );
-                }),
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              Container(child: ecsLib.logoApp()),
+              TextBuilder.build(
+                title: "Wellome!",
+                style: TextStyleCustom.STYLE_APPBAR
+                    .copyWith(fontWeight: FontWeight.bold, fontSize: 40),
+              ),
+              TextBuilder.build(
+                title: "Sign into your Account",
+                style: TextStyleCustom.STYLE_CONTENT,
+              ),
+              SizedBox(
+                height: 100.0,
+              ),
+              ButtonBuilder.buttonCustom(
+                  context: context,
+                  label: allTranslations.text("login"),
+                  onPressed: () {
+                    print("Tap");
+                  }),
+              SizedBox(
+                height: 20.0,
+              ),
+              ButtonBuilder.buttonCustom(
+                  context: context,
+                  label: allTranslations.text("register"),
+                  colorsButton: COLOR_WHITE,
+                  onPressed: () {
+                    ecsLib.pushPage(
+                      context: context,
+                      pageWidget: Register(),
+                    );
+                  }),
+            ],
+          ),
         ),
       ),
     );
