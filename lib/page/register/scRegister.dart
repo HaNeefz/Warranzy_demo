@@ -18,49 +18,58 @@ class _RegisterState extends State<Register> {
   final ecsLib = getIt.get<ECSLib>();
   final allTranslations = getIt.get<GlobalTranslations>();
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
+  List<TextEditingController> _txtCtrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _txtCtrl = List<TextEditingController>();
+    for (int i = 0; i < 6; i++) {
+      _txtCtrl.add(TextEditingController());
+    }
+  }
 
   bool agree = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBarThemes.appBarStyle(context: context),
-      body: Container(
-        child: SingleChildScrollView(
-          child: FormBuilder(
-            key: _fbKey,
-            autovalidate: false,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                ecsLib.logoApp(width: 200, height: 200),
-                TextBuilder.build(
-                    title: "Registeration", style: TextStyleCustom.STYLE_TITLE),
-                space(10),
-                TextBuilder.build(
-                    title: "Create your account to member",
-                    style: TextStyleCustom.STYLE_CONTENT),
-                space(50),
-                buildFormUserID(),
-                buildFormFullName(),
-                buildFormAddress(),
-                buildFormCountryCode(),
-                buildFormEmail(),
-                buildFormMobileNumber(),
-                buildChackAgree(),
-                space(40),
-                ButtonBuilder.buttonCustom(
-                    paddingValue: 20.0,
-                    context: context,
-                    label: allTranslations.text("continue"),
-                    onPressed: () {
-                      _fbKey.currentState.save();
-                      if (_fbKey.currentState.validate()) {
-                        print("OK");
+      body: SingleChildScrollView(
+        child: FormBuilder(
+          key: _fbKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              ecsLib.logoApp(width: 200, height: 200),
+              TextBuilder.build(
+                  title: "Registeration", style: TextStyleCustom.STYLE_TITLE),
+              space(10),
+              TextBuilder.build(
+                  title: "Create your account to member",
+                  style: TextStyleCustom.STYLE_CONTENT),
+              space(50),
+              buildFormUserID(),
+              buildFormFullName(),
+              buildFormAddress(),
+              buildFormCountryCode(),
+              buildFormEmail(),
+              buildFormMobileNumber(),
+              buildChackAgree(),
+              space(40),
+              ButtonBuilder.buttonCustom(
+                  paddingValue: 20.0,
+                  context: context,
+                  colorsButton: agree == false ? Colors.grey.shade200 : null,
+                  label: allTranslations.text("continue"),
+                  onPressed: () {
+                    if (_fbKey.currentState.validate()) {
+                      for (var value in _txtCtrl) {
+                        print(value.text);
                       }
-                    }),
-                space(50),
-              ],
-            ),
+                    }
+                  }),
+              space(50),
+            ],
           ),
         ),
       ),
@@ -102,7 +111,7 @@ class _RegisterState extends State<Register> {
 
   Widget paddingWidget({@required Widget child}) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 30,vertical: 5),
+      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 5),
       child: child,
     );
   }
@@ -111,6 +120,7 @@ class _RegisterState extends State<Register> {
     return paddingWidget(
       child: TextFieldBuilder.enterInformation(
           key: "userID",
+          textContrl: _txtCtrl[0],
           hintText: "User ID",
           validators: [
             FormBuilderValidators.required(errorText: "Invalide User ID")
@@ -122,6 +132,7 @@ class _RegisterState extends State<Register> {
     return paddingWidget(
       child: TextFieldBuilder.enterInformation(
           key: "fullName",
+          textContrl: _txtCtrl[1],
           hintText: "Full Name",
           validators: [
             FormBuilderValidators.required(errorText: "Invalide Full name")
@@ -133,6 +144,7 @@ class _RegisterState extends State<Register> {
     return paddingWidget(
       child: TextFieldBuilder.enterInformation(
           key: "address",
+          textContrl: _txtCtrl[2],
           hintText: "Address",
           validators: [
             FormBuilderValidators.required(errorText: "Invalide Address")
@@ -144,6 +156,7 @@ class _RegisterState extends State<Register> {
     return paddingWidget(
       child: TextFieldBuilder.enterInformation(
           key: "countryCode",
+          textContrl: _txtCtrl[3],
           hintText: "Country Code",
           validators: [
             FormBuilderValidators.required(errorText: "Invalide Country Code")
@@ -155,6 +168,7 @@ class _RegisterState extends State<Register> {
     return paddingWidget(
       child: TextFieldBuilder.enterInformation(
           key: "email",
+          textContrl: _txtCtrl[4],
           hintText: "${allTranslations.text("email")}",
           keyboardType: TextInputType.emailAddress,
           validators: [
@@ -169,6 +183,7 @@ class _RegisterState extends State<Register> {
     return paddingWidget(
       child: TextFieldBuilder.enterInformation(
           key: "mobileNumber",
+          textContrl: _txtCtrl[5],
           hintText: "Mobile Number",
           keyboardType: TextInputType.number,
           textInputAction: TextInputAction.next,

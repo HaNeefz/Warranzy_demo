@@ -64,13 +64,14 @@ class ButtonBuilder {
           height: 55,
           width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
+            color: colorsButton??Colors.white,
               border: colorsButton != null
-                  ? Border.all(width: 0.5, color: Colors.teal[300])
+                  ? Border.all(width: 0.5, color: Colors.teal[400])
                   : null,
               borderRadius: BorderRadius.circular(cornerRadius),
               gradient: colorsButton == null
                   ? LinearGradient(
-                      colors: <Color>[Colors.teal[300], Colors.teal[100]])
+                      colors: <Color>[Colors.teal[400], Colors.teal[100]])
                   : null),
           child: Center(
               child: TextBuilder.build(
