@@ -9,9 +9,9 @@ class TextStyleCustom {
       color: COLOR_BLACK,
       fontSize: 24,
       // height: 1.2,
-      letterSpacing: 2.0,
+      letterSpacing: 1.0,
       fontFamily: fontFamily,
-      fontWeight: FontWeight.w500);
+      fontWeight: FontWeight.bold);
 
   static const TextStyle STYLE_TITLE = TextStyle(
       color: COLOR_BLACK,
@@ -46,7 +46,7 @@ class TextStyleCustom {
   static const TextStyle STYLE_DESCRIPTION = TextStyle(
       color: COLOR_GREY,
       height: 1.2,
-      letterSpacing: 2,
+      letterSpacing: 1,
       fontSize: 14.0,
       fontFamily: fontFamily);
 
