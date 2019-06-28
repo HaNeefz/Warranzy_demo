@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fancy_bottom_navigation/fancy_bottom_navigation.dart';
 import 'package:warranzy_demo/page/asset_page/scAssets.dart';
-import 'package:warranzy_demo/page/service_page/scService_page.dart';
+import 'package:warranzy_demo/page/service_page/scService.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 
 class MainPage extends StatefulWidget {

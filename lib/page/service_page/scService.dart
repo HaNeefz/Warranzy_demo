@@ -3,6 +3,9 @@ import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 
+import 'scHistory.dart';
+import 'scProcess.dart';
+
 class ClaimAndServicePage extends StatefulWidget {
   @override
   _ClaimAndServicePageState createState() => _ClaimAndServicePageState();
@@ -32,10 +35,8 @@ class _ClaimAndServicePageState extends State<ClaimAndServicePage> {
         body: Container(
           child: TabBarView(
             children: <Widget>[
-              TextBuilder.build(
-                  title: "Process", style: TextStyleCustom.STYLE_LABEL_BOLD),
-              TextBuilder.build(
-                  title: "History", style: TextStyleCustom.STYLE_LABEL_BOLD),
+              ProcessPage(),
+              HistoryPage(),
             ],
           ),
         ),
@@ -43,3 +44,8 @@ class _ClaimAndServicePageState extends State<ClaimAndServicePage> {
     );
   }
 }
+
+
+
+
+
