@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:warranzy_demo/page/pin_code/scPin_code.dart';
 import '../../page/register/scRegister.dart';
 import '../../tools/config/text_style.dart';
 import '../../tools/export_lib.dart';
@@ -40,7 +41,10 @@ class _LoginPageState extends State<LoginPage> {
                   context: context,
                   label: allTranslations.text("login"),
                   onPressed: () {
-                    print("Tap");
+                    ecsLib.pushPage(
+                      context: context,
+                      pageWidget: LoginByScan(),
+                    );
                   }),
               SizedBox(
                 height: 20.0,

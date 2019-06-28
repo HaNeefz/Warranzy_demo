@@ -60,6 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ],
       supportedLocales: allTranslations.supportedLocales(),
       debugShowCheckedModeBanner: false,
+      initialRoute: '/',
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.teal,

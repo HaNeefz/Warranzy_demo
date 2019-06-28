@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:warranzy_demo/page/main_page/scMain_page.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/app_bar_builder.dart';
@@ -13,39 +14,51 @@ class LoginByScan extends StatefulWidget {
 }
 
 class _LoginByScanState extends State<LoginByScan> {
+  final ecsLib = getIt.get<ECSLib>();
+  final allTranslations = getIt.get<GlobalTranslations>();
+
+  gotoMainPage() => ecsLib.pushPageAndClearAllScene(
+        context: context,
+        pageWidget: MainPage(),
+      );
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.only(top: 200),
-      child: Column(
-        children: <Widget>[
-          TextBuilder.build(
-              title: "Use another verification",
-              style: TextStyleCustom.STYLE_CONTENT),
-          SizedBox(
-            height: 20,
-          ),
-          ButtonBuilder.buttonCustom(
-              context: context, label: "Scan fingerprint", onPressed: () {}),
-          Padding(
-            padding: const EdgeInsets.only(top: 40.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                TextBuilder.build(
-                    title: "Forgot password",
-                    style: TextStyleCustom.STYLE_CONTENT),
-                TextBuilder.build(title: "\t\t|\t\t"),
-                TextBuilder.build(
-                    title: "Change Account",
-                    style: TextStyleCustom.STYLE_CONTENT)
-              ],
+    return Scaffold(
+      body: Container(
+        padding: EdgeInsets.only(top: 200),
+        child: Column(
+          children: <Widget>[
+            TextBuilder.build(
+                title: "Use another verification",
+                style: TextStyleCustom.STYLE_CONTENT),
+            SizedBox(
+              height: 20,
             ),
-          ),
-          SizedBox(
-            height: 50.0,
-          ),
-        ],
+            ButtonBuilder.buttonCustom(
+                context: context,
+                label: "Scan fingerprint",
+                onPressed: gotoMainPage),
+            Padding(
+              padding: const EdgeInsets.only(top: 40.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  TextBuilder.build(
+                      title: "Forgot password",
+                      style: TextStyleCustom.STYLE_CONTENT),
+                  TextBuilder.build(title: "\t\t|\t\t"),
+                  TextBuilder.build(
+                      title: "Change Account",
+                      style: TextStyleCustom.STYLE_CONTENT)
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 50.0,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -68,8 +81,8 @@ class _PinCodePageState extends State<PinCodePage> {
   List<Widget> listDot = List<Widget>(6);
   List<int> listPinTemp = List<int>();
   List<int> listPinCorrect = [0, 0, 0, 0, 0, 0];
-  bool get setPinCodePage => widget.setPin;
-  bool usedFingerprintOrFaceID = false;
+  // bool get setPinCodePage => widget.setPin;
+  // bool usedFingerprintOrFaceID = false;
 
   @override
   void initState() {
@@ -88,32 +101,14 @@ class _PinCodePageState extends State<PinCodePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            usedFingerprintOrFaceID == false
-                ? ecsLib.logoApp(width: 150, height: 150)
-                : Padding(
-                    padding: EdgeInsets.symmetric(vertical: 30),
-                    child: Container(
-                      width: 100.0,
-                      height: 100.0,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          width: 3,
-                        ),
-                      ),
-                    )),
+            ecsLib.logoApp(width: 150, height: 150),
             TextBuilder.build(
-                title:
-                    listPinTemp.length == 6 && usedFingerprintOrFaceID == false
-                        ? "Confirm Pin Code"
-                        : usedFingerprintOrFaceID == false
-                            ? "Set Pin Code"
-                            : "Username",
+                title: listPinTemp.length == 6
+                    ? "Confirm Pin Code"
+                    : "Set Pin Code",
                 style: TextStyleCustom.STYLE_TITLE),
             showDot(),
-            usedFingerprintOrFaceID == false
-                ? buttonGrideNumber()
-                : LoginByScan(),
+            buttonGrideNumber(),
             buildButtonConfirm(context)
           ],
         ),
@@ -122,7 +117,7 @@ class _PinCodePageState extends State<PinCodePage> {
   }
 
   Widget buildButtonConfirm(BuildContext context) {
-    if (listPinTemp.length == 6 && setPinCodePage == true)
+    if (listPinTemp.length == 6)
       return ButtonBuilder.buttonCustom(
           context: context,
           label: allTranslations.text("continue"),
@@ -143,8 +138,8 @@ class _PinCodePageState extends State<PinCodePage> {
                 .then((response) {
               if (response == true) {
                 setState(() {
-                  usedFingerprintOrFaceID = true;
                   listPinTemp.clear();
+                  ecsLib.pushPageAndClearAllScene(context: context, pageWidget: LoginByScan(),);
                 });
               } else {}
             });
