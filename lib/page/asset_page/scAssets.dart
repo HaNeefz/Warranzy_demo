@@ -159,7 +159,6 @@ class ModelAsset extends StatelessWidget {
   final String expire;
   final String category;
   final Widget image;
-  final StatusAsset statusAsset;
   const ModelAsset({
     Key key,
     this.id,
@@ -168,7 +167,6 @@ class ModelAsset extends StatelessWidget {
     this.content,
     this.expire,
     this.category,
-    this.statusAsset = StatusAsset.none,
   }) : super(key: key);
 
   @override
@@ -182,7 +180,6 @@ class ModelAsset extends StatelessWidget {
           splashColor: Colors.teal[200],
           onTap: () {
             print(id);
-            print(statusAsset == StatusAsset.none);
           },
           child: Row(
             children: <Widget>[
@@ -209,34 +206,6 @@ class ModelAsset extends StatelessWidget {
                               ),
                         ),
                       ),
-                      (statusAsset == StatusAsset.delivery)
-                          ? Align(
-                              alignment: Alignment.bottomCenter,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    color: COLOR_THEME_APP,
-                                    borderRadius: BorderRadius.only(
-                                        bottomLeft: Radius.circular(9.0),
-                                        bottomRight: Radius.circular(9.0))),
-                                child: Row(
-                                  // mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: <Widget>[
-                                    Icon(
-                                      Icons.drive_eta,
-                                      size: 20,
-                                    ),
-                                    TextBuilder.build(
-                                        title: "Delivery",
-                                        style: TextStyleCustom.STYLE_LABEL
-                                            .copyWith(
-                                                letterSpacing: 0, fontSize: 14))
-                                  ],
-                                ),
-                              ),
-                            )
-                          : Container()
                     ],
                   )),
                 ),
