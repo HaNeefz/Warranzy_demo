@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:warranzy_demo/page/pin_code/scPin_code.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/const.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
@@ -66,6 +67,10 @@ class _RegisterState extends State<Register> {
                       for (var value in _txtCtrl) {
                         print(value.text);
                       }
+                      ecsLib.pushPage(
+                        context: context,
+                        pageWidget: PinCodePage(),
+                      );
                     }
                   }),
               space(50),
@@ -157,6 +162,7 @@ class _RegisterState extends State<Register> {
       child: TextFieldBuilder.enterInformation(
           key: "countryCode",
           textContrl: _txtCtrl[3],
+          keyboardType: TextInputType.number,
           hintText: "Country Code",
           validators: [
             FormBuilderValidators.required(errorText: "Invalide Country Code")
