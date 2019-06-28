@@ -95,23 +95,21 @@ class _PinCodePageState extends State<PinCodePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBarThemes.appBarStyle(context: context),
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            ecsLib.logoApp(width: 150, height: 150),
-            TextBuilder.build(
-                title: listPinTemp.length == 6
-                    ? "Confirm Pin Code"
-                    : "Set Pin Code",
-                style: TextStyleCustom.STYLE_TITLE),
-            showDot(),
-            buttonGrideNumber(),
-            buildButtonConfirm(context)
-          ],
-        ),
+      body: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          ecsLib.logoApp(width: 150, height: 150),
+          TextBuilder.build(
+              title: listPinTemp.length == 6
+                  ? "Confirm Pin Code"
+                  : "Set Pin Code",
+              style: TextStyleCustom.STYLE_TITLE),
+          showDot(),
+          buttonGrideNumber(),
+          buildButtonConfirm(context)
+        ],
       ),
     );
   }
@@ -139,7 +137,10 @@ class _PinCodePageState extends State<PinCodePage> {
               if (response == true) {
                 setState(() {
                   listPinTemp.clear();
-                  ecsLib.pushPageAndClearAllScene(context: context, pageWidget: LoginByScan(),);
+                  ecsLib.pushPageAndClearAllScene(
+                    context: context,
+                    pageWidget: LoginByScan(),
+                  );
                 });
               } else {}
             });
@@ -233,29 +234,40 @@ class _PinCodePageState extends State<PinCodePage> {
     );
   }
 
-  Widget buttonGrideNumber() {
-    final number = 12;
+  Widget buttonGrideNumber() {    
     return Container(
-      padding: EdgeInsets.symmetric(
-        vertical: 20.0,
-        horizontal: 70.0,
-      ),
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height / 2,
-      child: GridView.builder(
-        itemCount: number,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3, mainAxisSpacing: 20, crossAxisSpacing: 20),
-        itemBuilder: (BuildContext context, int index) {
-          return buttonNumbers(
-            number: index,
-            onpressed: () {
-              checkedButton(index: index + 1);
-            },
-          );
-        },
-      ),
-    );
+        padding: EdgeInsets.symmetric(
+          vertical: 20.0,
+          horizontal: 70.0,
+        ),
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height / 2,
+        child: GridView(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3, mainAxisSpacing: 20, crossAxisSpacing: 20),
+          children: Iterable.generate(
+              12,
+              (index) => buttonNumbers(
+                    number: index,
+                    onpressed: () {
+                      checkedButton(index: index + 1);
+                    },
+                  )).toList(),
+        )
+        // GridView.builder(
+        //   itemCount: number,
+        //   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        //       crossAxisCount: 3, mainAxisSpacing: 20, crossAxisSpacing: 20),
+        //   itemBuilder: (BuildContext context, int index) {
+        //     return buttonNumbers(
+        //       number: index,
+        //       onpressed: () {
+        //         checkedButton(index: index + 1);
+        //       },
+        //     );
+        //   },
+        // ),
+        );
   }
 
   void checkedButton({int index}) {
