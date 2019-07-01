@@ -26,8 +26,7 @@ class _MainPageState extends State<MainPage>
   void initState() {
     super.initState();
     _tabController =
-        TabController(length: 4, vsync: this, initialIndex: currentPageBar)
-          ..animateTo(currentPageBar);
+        TabController(length: 4, vsync: this, initialIndex: currentPageBar);
   }
 
   @override
@@ -40,48 +39,52 @@ class _MainPageState extends State<MainPage>
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 4,
+      initialIndex: currentPageBar,
       child: Scaffold(
-          body: SafeArea(
-            child: TabBarView(
-              // controller: _tabController,
-              children: <Widget>[
-                AssetPage(),
-                ClaimAndServicePage(),
-                TradePage(),
-                NotificationPage()
-              ],
-            ),
+        body: SafeArea(
+          child: TabBarView(
+            controller: _tabController,
+            children: <Widget>[
+              AssetPage(),
+              ClaimAndServicePage(),
+              TradePage(),
+              NotificationPage()
+            ],
           ),
-          bottomNavigationBar: Container(
-            // color: Colors.black,
-            decoration: BoxDecoration(
-              color: COLOR_WHITE,
-              borderRadius: BorderRadius.circular(40),
-            ),
-            child: TabBar(
-              tabs: <Widget>[
-                tabWidget(icons: Icons.card_giftcard, text: "Asset"),
-                tabWidget(icons: Icons.card_giftcard, text: "Asset"),
-                tabWidget(icons: Icons.card_giftcard, text: "Asset"),
-                tabWidget(icons: Icons.card_giftcard, text: "Asset"),
-              ],
-            ),
-          )
-          // FancyBottomNavigation(
-          //   tabs: [
-          //     TabData(iconData: Icons.card_giftcard, title: "Asset"),
-          //     TabData(iconData: Icons.timeline, title: "Service"),
-          //     TabData(iconData: Icons.account_balance, title: "Trade"),
-          //     TabData(iconData: Icons.notifications_active, title: "Notification"),
-          //   ],
-          //   onTabChangedListener: (position) {
-          //     setState(() {
-          //       currentPageBar = position;
-          //       _tabController.animateTo(currentPageBar);
-          //     });
-          //   },
-          // ),
-          ),
+        ),
+        bottomNavigationBar:
+            // Container(
+            //   // color: Colors.black,
+            //   decoration: BoxDecoration(
+            //     color: COLOR_WHITE,
+            //     borderRadius: BorderRadius.circular(40),
+            //   ),
+            //   child: TabBar(
+            //     tabs: <Widget>[
+            //       tabWidget(icons: Icons.card_giftcard, text: "Asset"),
+            //       tabWidget(icons: Icons.timeline, text: "Service"),
+            //       tabWidget(icons: Icons.account_balance, text: "Trade"),
+            //       tabWidget(
+            //           icons: Icons.notifications_active, text: "Notification"),
+            //     ],
+            //   ),
+            // )
+            FancyBottomNavigation(
+          tabs: [
+            TabData(iconData: Icons.card_giftcard, title: "Asset"),
+            TabData(iconData: Icons.timeline, title: "Service"),
+            TabData(iconData: Icons.account_balance, title: "Trade"),
+            TabData(
+                iconData: Icons.notifications_active, title: "Notification"),
+          ],
+          onTabChangedListener: (position) {
+            setState(() {
+              currentPageBar = position;
+              _tabController.animateTo(currentPageBar);
+            });
+          },
+        ),
+      ),
     );
   }
 
@@ -91,8 +94,9 @@ class _MainPageState extends State<MainPage>
         icons,
         color: COLOR_THEME_APP,
       ),
-      child:
-          TextBuilder.build(title: "$text", style: TextStyleCustom.STYLE_LABEL),
+      child: TextBuilder.build(
+          title: "$text",
+          style: TextStyleCustom.STYLE_LABEL.copyWith(fontSize: 10)),
     );
   }
 }

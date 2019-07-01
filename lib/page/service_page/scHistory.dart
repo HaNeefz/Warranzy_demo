@@ -12,17 +12,7 @@ class _HistoryPageState extends State<HistoryPage> {
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 4,
-      child: Scaffold(
-        appBar: AppBar(
-          bottom: TabBar(
-            tabs: <Widget>[
-              TextBuilder.build(title: "Popular",style: TextStyleCustom.STYLE_LABEL_BOLD),
-              TextBuilder.build(title: "Electronics",style: TextStyleCustom.STYLE_LABEL_BOLD),
-              TextBuilder.build(title: "Tablet",style: TextStyleCustom.STYLE_LABEL_BOLD),
-              TextBuilder.build(title: "Cleaning",style: TextStyleCustom.STYLE_LABEL_BOLD),
-            ],
-          ),
-        ),
+      child: Scaffold(        
         body: Container(
           child: Center(child: TextBuilder.build(title: "History")),
         ),

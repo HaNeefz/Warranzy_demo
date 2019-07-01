@@ -12,7 +12,7 @@ void main() {
   Provider.debugCheckInvalidValueType = null;
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarColor: Colors.black,
-    statusBarBrightness: Brightness.light,
+    // statusBarBrightness: Brightness.light,
   ));
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -63,7 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
       initialRoute: '/',
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.teal,
+        primarySwatch: Colors.teal,        
         // primaryColor: Colors.white,
         scaffoldBackgroundColor: Colors.white,
         // fontFamily: "Ekkamai"

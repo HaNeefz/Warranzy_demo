@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
+import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 
 class NotificationPage extends StatefulWidget {
@@ -12,6 +13,7 @@ class _NotificationPageState extends State<NotificationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: COLOR_WHITE,
         title: TextBuilder.build(
             title: "Notification", style: TextStyleCustom.STYLE_APPBAR),
       ),
