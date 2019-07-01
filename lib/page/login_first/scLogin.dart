@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:warranzy_demo/page/pin_code/scPinCode.dart';
 import 'package:warranzy_demo/page/pin_code/scPin_code.dart';
+import 'package:warranzy_demo/tools/const.dart';
 import '../../page/register/scRegister.dart';
 import '../../tools/config/text_style.dart';
 import '../../tools/export_lib.dart';
@@ -43,7 +45,9 @@ class _LoginPageState extends State<LoginPage> {
                   onPressed: () {
                     ecsLib.pushPage(
                       context: context,
-                      pageWidget: LoginByScan(),
+                      pageWidget: PinCodePageUpdate(
+                        type: PageType.login,
+                      ),
                     );
                   }),
               SizedBox(

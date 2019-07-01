@@ -22,3 +22,5 @@ enum StatusAsset{
   delivery,
   none
 }
+
+enum PageType { setPin, login }

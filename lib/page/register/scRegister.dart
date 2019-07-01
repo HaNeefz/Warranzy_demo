@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:warranzy_demo/page/pin_code/scPin_code.dart';
+import 'package:warranzy_demo/page/pin_code/scPinCode.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/const.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
@@ -69,7 +69,9 @@ class _RegisterState extends State<Register> {
                       }
                       ecsLib.pushPage(
                         context: context,
-                        pageWidget: PinCodePage(),
+                        pageWidget: PinCodePageUpdate(
+                          type: PageType.setPin,
+                        ),
                       );
                     }
                   }),
