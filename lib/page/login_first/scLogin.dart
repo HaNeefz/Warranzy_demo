@@ -28,7 +28,7 @@ class _LoginPageState extends State<LoginPage> {
             children: <Widget>[
               Container(child: ecsLib.logoApp()),
               TextBuilder.build(
-                title: "Wellome!",
+                title: "Wellcome!",
                 style: TextStyleCustom.STYLE_APPBAR
                     .copyWith(fontWeight: FontWeight.bold, fontSize: 40),
               ),
@@ -47,6 +47,7 @@ class _LoginPageState extends State<LoginPage> {
                       context: context,
                       pageWidget: PinCodePageUpdate(
                         type: PageType.login,
+                        usedPin: false,
                       ),
                     );
                   }),

@@ -11,7 +11,9 @@ import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 
 class PinCodePageUpdate extends StatefulWidget {
   final PageType type;
-  const PinCodePageUpdate({Key key, @required this.type}) : super(key: key);
+  final bool usedPin;
+  const PinCodePageUpdate({Key key, @required this.type, this.usedPin = false})
+      : super(key: key);
   @override
   _PinCodePageUpdateState createState() => _PinCodePageUpdateState();
 }
@@ -25,6 +27,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
   // bool get setPinCodePage => widget.setPin;
   // bool usedFingerprintOrFaceID = false;
   PageType get type => widget.type;
+  bool get usedPin => widget.usedPin;
 
   gotoMainPage() => ecsLib.pushPageAndClearAllScene(
         context: context,
@@ -36,7 +39,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
     super.initState();
   }
 
-  bool pinCorrect() => listEquals(listPinTemp, listPinCorrect);
+  bool get pinCorrect => listEquals(listPinTemp, listPinCorrect);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -207,20 +210,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
       ),
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height / 2,
-      child:
-          // GridView(
-          //   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          //       crossAxisCount: 3, mainAxisSpacing: 20, crossAxisSpacing: 20),
-          //   children: Iterable.generate(
-          //       12,
-          //       (index) => buttonNumbers(
-          //             number: index,
-          //             onpressed: () {
-          //               checkedButton(index: index + 1);
-          //             },
-          //           )).toList(),
-          // )
-          GridView.builder(
+      child: GridView.builder(
         itemCount: 12,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 3, mainAxisSpacing: 20, crossAxisSpacing: 20),
@@ -266,39 +256,42 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
 
 //------button Scan for sign in-------------------------
   Widget buildButtonScanForLogin() {
-    return Container(
-        padding:
-            EdgeInsets.only(top: MediaQuery.of(context).size.height / 2 - 100),
-        child: Column(children: <Widget>[
-          TextBuilder.build(
-              title: "Use another verification",
-              style: TextStyleCustom.STYLE_CONTENT),
-          SizedBox(
-            height: 20,
-          ),
-          ButtonBuilder.buttonCustom(
-              context: context,
-              label: "Scan fingerprint",
-              onPressed: () => gotoMainPage()),
-          Padding(
-            padding: const EdgeInsets.only(top: 40.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                TextBuilder.build(
-                    title: "Forgot password",
-                    style: TextStyleCustom.STYLE_CONTENT),
-                TextBuilder.build(title: "\t\t|\t\t"),
-                TextBuilder.build(
-                    title: "Change Account",
-                    style: TextStyleCustom.STYLE_CONTENT)
-              ],
+    if (usedPin == false)
+      return Container(
+          padding: EdgeInsets.only(
+              top: MediaQuery.of(context).size.height / 2 - 100),
+          child: Column(children: <Widget>[
+            TextBuilder.build(
+                title: "Use another verification",
+                style: TextStyleCustom.STYLE_CONTENT),
+            SizedBox(
+              height: 20,
             ),
-          ),
-          SizedBox(
-            height: 50.0,
-          )
-        ]));
+            ButtonBuilder.buttonCustom(
+                context: context,
+                label: "Scan fingerprint",
+                onPressed: () => gotoMainPage()),
+            Padding(
+              padding: const EdgeInsets.only(top: 40.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  TextBuilder.build(
+                      title: "Forgot password",
+                      style: TextStyleCustom.STYLE_CONTENT),
+                  TextBuilder.build(title: "\t\t|\t\t"),
+                  TextBuilder.build(
+                      title: "Change Account",
+                      style: TextStyleCustom.STYLE_CONTENT)
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 50.0,
+            )
+          ]));
+    else
+      return buttonGrideNumber();
   }
 
 //-------------------------Show Button Number
@@ -339,6 +332,32 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
       removeStepCounter();
     } else {
       onClickedNumber(index: index);
+      checkPINCorrect();
+    }
+  }
+
+  checkPINCorrect() {
+    if (usedPin == true && listPinTemp.length == 6) {
+      if (pinCorrect == true) {
+        print("Correct");
+        ecsLib.pushPageReplacement(
+          context: context,
+          pageWidget: MainPage(),
+        );
+      } else {
+        print("In Correct");
+        ecsLib
+            .showDialogLib(
+                context: context,
+                title: "PIN",
+                content: allTranslations.text("pin_incorrect"),
+                textOnButton: allTranslations.text("close"))
+            .whenComplete(() {
+          setState(() {
+            listPinTemp.clear();
+          });
+        });
+      }
     }
   }
 
