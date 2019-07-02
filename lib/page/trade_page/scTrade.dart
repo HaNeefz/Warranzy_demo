@@ -98,7 +98,7 @@ class _TradePageState extends State<TradePage> {
                         price: "1,000 B",
                         title: "Dyson V7 Trigger",
                         subTitle:
-                            "Simply dummy text of the printing and ba ba ba ba",
+                            "Simply dummy text of the printing and df;isdfsdalf;sdfhasd",
                         category: "Cleaning",
                       );
                     },

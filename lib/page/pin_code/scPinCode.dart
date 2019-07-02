@@ -101,7 +101,8 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
                       ecsLib.pushPage(
                         context: context,
                         pageWidget: PinCodePageUpdate(
-                          type: PageType.setPin,
+                          type: PageType.login,
+                          usedPin: true,
                         ),
                       );
                     });
