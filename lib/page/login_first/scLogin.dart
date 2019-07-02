@@ -28,9 +28,9 @@ class _LoginPageState extends State<LoginPage> {
             children: <Widget>[
               Container(child: ecsLib.logoApp()),
               TextBuilder.build(
-                title: "Wellcome!",
+                title: "Don't worry be Warranzy!!",
                 style: TextStyleCustom.STYLE_APPBAR
-                    .copyWith(fontWeight: FontWeight.bold, fontSize: 40),
+                    .copyWith(fontWeight: FontWeight.bold, fontSize: 25),
               ),
               TextBuilder.build(
                 title: "Sign into your Account",
@@ -63,7 +63,7 @@ class _LoginPageState extends State<LoginPage> {
                       context: context,
                       pageWidget: Register(),
                     );
-                  }),
+                  }),                
             ],
           ),
         ),

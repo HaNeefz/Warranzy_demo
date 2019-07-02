@@ -95,7 +95,17 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
                         ),
                       );
                     });
-                  } else {}
+                  } else {
+                    setState(() {
+                      listPinTemp.clear();
+                      ecsLib.pushPage(
+                        context: context,
+                        pageWidget: PinCodePageUpdate(
+                          type: PageType.setPin,
+                        ),
+                      );
+                    });
+                  }
                 });
                 // await _onAlert2ButtonsPressed(context).then((_) async {
                 //   await _onAlertButtonPressed(context);
