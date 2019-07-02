@@ -18,8 +18,8 @@ class TextFieldBuilder {
       TextInputType keyboardType,
       TextInputAction textInputAction,
       bool readOnly = false}) {
-    return Center(
-      child: FormBuilderTextField(
+    return Container(      
+      child: FormBuilderTextField(        
         attribute: key,
         validators: validators,
         controller: textContrl,
