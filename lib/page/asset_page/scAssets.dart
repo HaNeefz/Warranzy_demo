@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:warranzy_demo/page/profile_page/scProfile.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/const.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
@@ -133,15 +134,28 @@ class _AssetPageState extends State<AssetPage> {
             ),
           ),
           Expanded(
-            child: Container(
-              width: 50.0,
-              height: 50.0,
-              decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(width: 3, color: COLOR_THEME_APP)),
-              child: Center(
-                child: FlutterLogo(
-                  colors: COLOR_THEME_APP,
+            child: GestureDetector(
+              onTap: () {
+                ecsLib.pushPage(
+                  context: context,
+                  pageWidget: ProfilePage(
+                    heroTag: "PhotoProfile",
+                  ),
+                );
+              },
+              child: Container(
+                width: 50.0,
+                height: 50.0,
+                decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(width: 3, color: COLOR_THEME_APP)),
+                child: Center(
+                  child: Hero(
+                    child: FlutterLogo(
+                      colors: COLOR_THEME_APP,
+                    ),
+                    tag: "PhotoProfile",
+                  ),
                 ),
               ),
             ),
