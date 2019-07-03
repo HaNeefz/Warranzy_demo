@@ -31,15 +31,16 @@ class TextFieldBuilder {
         keyboardType: keyboardType ??= TextInputType.text,
         readonly: readOnly,
         textInputAction: textInputAction ??= TextInputAction.done,
-        style: TextStyleCustom.STYLE_LABEL.copyWith(fontSize: 18),
+        style: TextStyleCustom.STYLE_LABEL.copyWith(fontSize: 15),
         decoration: InputDecoration(
-          errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30),
-          ),
+          contentPadding: EdgeInsets.all(12),
           border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
               borderSide: BorderSide(color: Colors.teal[300])),
           //InputBorder.none,
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
           hintText: "\t\t\t" + hintText,
           hintStyle: TextStyleCustom.STYLE_CONTENT,
           counterStyle: TextStyleCustom.STYLE_LABEL,
