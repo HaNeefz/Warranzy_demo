@@ -4,6 +4,7 @@ import 'package:warranzy_demo/page/main_page/scMain_page.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/const.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
+import 'package:warranzy_demo/tools/localAuth.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/app_bar_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/button_builder.dart';
@@ -29,9 +30,20 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
   PageType get type => widget.type;
   bool get usedPin => widget.usedPin;
 
+  Future _localAuth() async {
+    await Future.delayed(
+        Duration(milliseconds: 400),
+        () => localAuth.authenticate().then((_authorized) {
+              if (_authorized) {
+                ecsLib.pushPageAndClearAllScene(
+                    context: context, pageWidget: MainPage());
+              }
+            }));
+  }
+
   gotoMainPage() => ecsLib.pushPageAndClearAllScene(
         context: context,
-        pageWidget: MainPage(),
+        pageWidget: MainPage(), 
       );
 
   @override
@@ -281,7 +293,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
             ButtonBuilder.buttonCustom(
                 context: context,
                 label: "Scan fingerprint",
-                onPressed: () => gotoMainPage()),
+                onPressed: () => _localAuth()),
             Padding(
               padding: const EdgeInsets.only(top: 40.0),
               child: Row(

@@ -22,6 +22,14 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Camera permission is required for take a photo and scaning QR code.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Please use the faceID for safety</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Microphone permission is required for recording.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>PhotoLibrary permission is required for get Picture.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
