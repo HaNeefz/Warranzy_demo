@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:warranzy_demo/page/login_first/scLogin.dart';
 import 'package:warranzy_demo/tools/assets.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
+import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 
@@ -13,6 +15,9 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  final ecsLib = getIt.get<ECSLib>();
+  final allTranslations = getIt.get<GlobalTranslations>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,6 +35,21 @@ class _ProfilePageState extends State<ProfilePage> {
                 Navigator.pop(context);
               },
             ),
+            actions: <Widget>[
+              FlatButton(
+                child: Icon(
+                  Icons.lock_open,
+                  size: 30,
+                  color: COLOR_WHITE,
+                ),
+                onPressed: () {
+                  ecsLib.pushPageAndClearAllScene(
+                    context: context,
+                    pageWidget: LoginPage(),
+                  );
+                },
+              )
+            ],
             elevation: 5,
             forceElevated: true,
             flexibleSpace: Container(
@@ -53,7 +73,10 @@ class _ProfilePageState extends State<ProfilePage> {
                             shape: BoxShape.circle,
                             border: Border.all(width: 3)),
                         child: Center(
-                          child: FlutterLogo(size: 100,colors: COLOR_THEME_APP,),
+                          child: FlutterLogo(
+                            size: 100,
+                            colors: COLOR_THEME_APP,
+                          ),
                         ),
                       ),
                       tag: "PhotoProfile",
