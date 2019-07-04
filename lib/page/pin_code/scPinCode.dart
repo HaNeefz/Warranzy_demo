@@ -43,7 +43,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
 
   gotoMainPage() => ecsLib.pushPageAndClearAllScene(
         context: context,
-        pageWidget: MainPage(), 
+        pageWidget: MainPage(),
       );
 
   @override
