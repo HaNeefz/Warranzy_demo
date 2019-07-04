@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:warranzy_demo/page/login_first/scLogin.dart';
 import 'package:warranzy_demo/tools/assets.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
+import 'package:warranzy_demo/tools/widget_ui_custom/text_field_builder.dart';
 
 class ProfilePage extends StatefulWidget {
   final String heroTag;
@@ -17,110 +19,140 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   final ecsLib = getIt.get<ECSLib>();
   final allTranslations = getIt.get<GlobalTranslations>();
+  final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         resizeToAvoidBottomInset: false,
         resizeToAvoidBottomPadding: false,
-        body: CustomScrollView(slivers: <Widget>[
-          SliverAppBar(
-            automaticallyImplyLeading: false,
-            leading: IconButton(
-              icon: Icon(
-                Icons.arrow_back_ios,
-                color: COLOR_BLACK,
-              ),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-            actions: <Widget>[
-              FlatButton(
-                child: Icon(
-                  Icons.lock_open,
-                  size: 30,
-                  color: COLOR_WHITE,
+        backgroundColor: Colors.grey[400],
+        body: FormBuilder(
+          key: _fbKey,
+          child: CustomScrollView(slivers: <Widget>[
+            SliverAppBar(
+              automaticallyImplyLeading: false,
+              leading: IconButton(
+                icon: Icon(
+                  Icons.arrow_back_ios,
+                  color: COLOR_BLACK,
                 ),
                 onPressed: () {
-                  ecsLib.pushPageAndClearAllScene(
-                    context: context,
-                    pageWidget: LoginPage(),
-                  );
+                  Navigator.pop(context);
                 },
-              )
-            ],
-            elevation: 5,
-            forceElevated: true,
-            flexibleSpace: Container(
-                color: COLOR_WHITE,
-                child: Stack(children: <Widget>[
-                  Container(
-                    width: double.infinity,
-                    height: double.infinity,
-                    child: Image.asset(
-                      Assets.BACK_GROUND_APP,
-                      fit: BoxFit.cover,
-                    ),
+              ),
+              actions: <Widget>[
+                FlatButton(
+                  child: Icon(
+                    Icons.lock_open,
+                    size: 30,
+                    color: COLOR_WHITE,
                   ),
-                  Align(
-                    alignment: Alignment.center,
-                    child: Hero(
-                      child: Container(
-                        width: 150,
-                        height: 150,
-                        decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(width: 3)),
-                        child: Center(
-                          child: FlutterLogo(
-                            size: 100,
-                            colors: COLOR_THEME_APP,
+                  onPressed: () {
+                    ecsLib.pushPageAndClearAllScene(
+                      context: context,
+                      pageWidget: LoginPage(),
+                    );
+                  },
+                )
+              ],
+              elevation: 5,
+              forceElevated: true,
+              flexibleSpace: Container(
+                  color: COLOR_WHITE,
+                  child: Stack(children: <Widget>[
+                    Container(
+                      width: double.infinity,
+                      height: double.infinity,
+                      child: Image.asset(
+                        Assets.BACK_GROUND_APP,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.center,
+                      child: Hero(
+                        child: Container(
+                          width: 150,
+                          height: 150,
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(width: 3)),
+                          child: Center(
+                            child: FlutterLogo(
+                              size: 100,
+                              colors: COLOR_THEME_APP,
+                            ),
                           ),
                         ),
+                        tag: "PhotoProfile",
                       ),
-                      tag: "PhotoProfile",
                     ),
+                    Align(
+                      alignment: Alignment.center,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 200.0),
+                        child: TextBuilder.build(
+                            title: "Username",
+                            style: TextStyleCustom.STYLE_APPBAR
+                                .copyWith(color: COLOR_WHITE)),
+                      ),
+                    )
+                  ])
+                  // child: Image.asset(Assets.BACK_GROUND_APP,fit: BoxFit.cover,),
                   ),
-                  Align(
-                    alignment: Alignment.center,
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 200.0),
-                      child: TextBuilder.build(
-                          title: "Username",
-                          style: TextStyleCustom.STYLE_APPBAR
-                              .copyWith(color: COLOR_WHITE)),
-                    ),
-                  )
-                ])
-                // child: Image.asset(Assets.BACK_GROUND_APP,fit: BoxFit.cover,),
-                ),
-            // pinned: true,
-            snap: true,
-            floating: true,
-            expandedHeight: 300,
+              // pinned: true,
+              snap: true,
+              floating: true,
+              expandedHeight: 300,
 
-            // title: TextBuilder.build(
-            //     title: "Profile", style: TextStyleCustom.STYLE_APPBAR),
-          ),
-          SliverList(
-              delegate: SliverChildListDelegate(
-            [],
-          )),
-          SliverFixedExtentList(
-            itemExtent: 150.0,
-            delegate: SliverChildListDelegate([
-              Container(color: Colors.red),
-              Container(color: Colors.green),
-              Container(color: Colors.blue),
-              Container(color: Colors.pink),
-              Container(color: Colors.yellow),
-              Container(color: Colors.orange),
-              Container(color: Colors.purple),
-              Container(color: Colors.black),
-              Container(color: Colors.grey),
-            ]),
-          )
-        ]));
+              // title: TextBuilder.build(
+              //     title: "Profile", style: TextStyleCustom.STYLE_APPBAR),
+            ),
+            SliverList(
+                delegate: SliverChildListDelegate(
+              [
+                TextFieldBuilder.enterInformation(
+                    key: "ID",
+                    initialValue: "ID",                    
+                    readOnly: true,
+                    borderOutLine: false,
+                    validators: [FormBuilderValidators.required()]),
+                TextFieldBuilder.enterInformation(
+                    key: "fullName",
+                    initialValue: "Name",
+                    borderOutLine: false,
+                    readOnly: true,
+                    validators: [FormBuilderValidators.required()]),
+                TextFieldBuilder.enterInformation(
+                    key: "address",
+                    initialValue: "Address",
+                    borderOutLine: false,
+                    readOnly: true,
+                    validators: [FormBuilderValidators.required()]),
+                TextFieldBuilder.enterInformation(
+                    key: "pin",
+                    initialValue: "******",
+                    borderOutLine: false,
+                    readOnly: true,
+                    validators: [FormBuilderValidators.required()]),
+              ],
+            )),
+            // SliverFixedExtentList(
+            //   itemExtent: 150.0,
+            //   delegate: SliverChildListDelegate([
+            //     Container(color: Colors.red),
+            //     Container(color: Colors.green),
+            //     Container(color: Colors.blue),
+            //     Container(color: Colors.pink),
+            //     Container(color: Colors.yellow),
+            //     Container(color: Colors.orange),
+            //     Container(color: Colors.purple),
+            //     Container(color: Colors.black),
+            //     Container(color: Colors.grey),
+            //   ]),
+            // )
+          ]),
+        ));
   }
 }

@@ -9,6 +9,7 @@ class TextFieldBuilder {
       {@required String key,
       @required validators,
       TextEditingController textContrl,
+      String label,
       String hintText,
       FocusNode focusNode,
       int maxLength,
@@ -17,9 +18,11 @@ class TextFieldBuilder {
       bool obsecure = false,
       TextInputType keyboardType,
       TextInputAction textInputAction,
+      bool borderOutLine = true,
+      String initialValue,
       bool readOnly = false}) {
-    return Container(      
-      child: FormBuilderTextField(        
+    return Container(
+      child: FormBuilderTextField(
         attribute: key,
         validators: validators,
         controller: textContrl,
@@ -28,20 +31,31 @@ class TextFieldBuilder {
         textAlign: textAlign,
         maxLines: maxLine,
         obscureText: obsecure,
+        initialValue: initialValue ?? null,
         keyboardType: keyboardType ??= TextInputType.text,
         readonly: readOnly,
         textInputAction: textInputAction ??= TextInputAction.done,
         style: TextStyleCustom.STYLE_LABEL.copyWith(fontSize: 15),
         decoration: InputDecoration(
           contentPadding: EdgeInsets.all(12),
-          border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30),
-              borderSide: BorderSide(color: Colors.teal[300])),
+          border: borderOutLine
+              ? OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide(color: Colors.teal[300]))
+              : UnderlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide(color: Colors.teal[300])),
           //InputBorder.none,
-          errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30),
-          ),
-          hintText: "\t\t\t" + hintText,
+          errorBorder: borderOutLine
+              ? OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide(color: Colors.teal[300]))
+              : UnderlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide(color: Colors.teal[300])),
+          labelText: label != null ? label : null,
+          labelStyle: TextStyleCustom.STYLE_LABEL,
+          hintText: "\t\t\t ${hintText ?? ""}",
           hintStyle: TextStyleCustom.STYLE_CONTENT,
           counterStyle: TextStyleCustom.STYLE_LABEL,
           errorStyle: TextStyleCustom.STYLE_ERROR,

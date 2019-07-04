@@ -48,6 +48,7 @@ class _RegisterState extends State<Register> {
               TextBuilder.build(
                   title: "Create your account to member",
                   style: TextStyleCustom.STYLE_CONTENT),
+              space(10),
               buildFormUserID(),
               buildFormFullName(),
               buildFormAddress(),
