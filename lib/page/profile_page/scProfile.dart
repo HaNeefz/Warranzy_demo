@@ -114,14 +114,16 @@ class _ProfilePageState extends State<ProfilePage> {
               [
                 TextFieldBuilder.enterInformation(
                     key: "ID",
-                    initialValue: "ID",                    
+                    initialValue: "ID",
                     readOnly: true,
                     borderOutLine: false,
+                    size: 20,
                     validators: [FormBuilderValidators.required()]),
                 TextFieldBuilder.enterInformation(
                     key: "fullName",
                     initialValue: "Name",
                     borderOutLine: false,
+                    size: 20,
                     readOnly: true,
                     validators: [FormBuilderValidators.required()]),
                 TextFieldBuilder.enterInformation(
@@ -129,11 +131,13 @@ class _ProfilePageState extends State<ProfilePage> {
                     initialValue: "Address",
                     borderOutLine: false,
                     readOnly: true,
+                    size: 20,
                     validators: [FormBuilderValidators.required()]),
                 TextFieldBuilder.enterInformation(
                     key: "pin",
                     initialValue: "******",
                     borderOutLine: false,
+                    size: 20,
                     readOnly: true,
                     validators: [FormBuilderValidators.required()]),
               ],

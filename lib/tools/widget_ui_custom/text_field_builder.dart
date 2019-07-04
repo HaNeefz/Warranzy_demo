@@ -18,6 +18,7 @@ class TextFieldBuilder {
       bool obsecure = false,
       TextInputType keyboardType,
       TextInputAction textInputAction,
+      double size = 12,
       bool borderOutLine = true,
       String initialValue,
       bool readOnly = false}) {
@@ -37,7 +38,7 @@ class TextFieldBuilder {
         textInputAction: textInputAction ??= TextInputAction.done,
         style: TextStyleCustom.STYLE_LABEL.copyWith(fontSize: 15),
         decoration: InputDecoration(
-          contentPadding: EdgeInsets.all(12),
+          contentPadding: EdgeInsets.all(size),
           border: borderOutLine
               ? OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30),
