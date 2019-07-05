@@ -3,8 +3,11 @@ import 'package:warranzy_demo/page/profile_page/scProfile.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/const.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
+import 'package:warranzy_demo/tools/method/scan_qr.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
+
+import 'detail_asset_page/scDetailAsset.dart';
 
 class AssetPage extends StatefulWidget {
   @override
@@ -14,6 +17,23 @@ class AssetPage extends StatefulWidget {
 class _AssetPageState extends State<AssetPage> {
   final ecsLib = getIt.get<ECSLib>();
   final allTranslations = getIt.get<GlobalTranslations>();
+  List<ModelAssetData> modelAsset = List<ModelAssetData>();
+
+  @override
+  void initState() {
+    super.initState();
+    for (var i = 0; i < 10; i++) {
+      modelAsset.add(ModelAssetData(
+          id: i,
+          title: "Dyson V7 Trigger",
+          content:
+              "Simply dummy text of the printing and typeseting industy asduasdljb u iuabsldkj ",
+          expire: "Warranty Date : 24.05.2019 - 24.05.2020",
+          category: "Category",
+          image: null));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,8 +50,8 @@ class _AssetPageState extends State<AssetPage> {
 
   Column buildYourAssets() {
     return Column(
-      children: Iterable.generate(10, (i) {
-        return Container(height: 140, child: ModelAsset(id: i));
+      children: Iterable.generate(modelAsset.length, (index) {
+        return ModelAssetWidget(modelAsset[index]);
       }).toList(),
     );
   }
@@ -166,23 +186,26 @@ class _AssetPageState extends State<AssetPage> {
   }
 }
 
-class ModelAsset extends StatelessWidget {
+class ModelAssetData {
   final int id;
   final String title;
   final String content;
   final String expire;
   final String category;
   final Widget image;
-  const ModelAsset({
-    Key key,
-    this.id,
-    this.image,
-    this.title,
-    this.content,
-    this.expire,
-    this.category,
-  }) : super(key: key);
 
+  ModelAssetData(
+      {this.id,
+      this.title,
+      this.content,
+      this.expire,
+      this.category,
+      this.image});
+}
+
+class ModelAssetWidget extends StatelessWidget {
+  final assetData;
+  ModelAssetWidget(this.assetData);
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -193,7 +216,16 @@ class ModelAsset extends StatelessWidget {
           borderRadius: BorderRadius.circular(10.0),
           splashColor: Colors.teal[200],
           onTap: () {
-            print(id);
+            ecsLib.pushPage(
+                context: context,
+                pageWidget: DetailAsset(
+                  id: assetData.id,
+                  title: assetData.title,
+                  content: assetData.content,
+                  expire: assetData.expire,
+                  category: assetData.category,
+                  image: null,
+                ));
           },
           child: Row(
             children: <Widget>[
@@ -214,10 +246,13 @@ class ModelAsset extends StatelessWidget {
                         child: Container(
                           width: 100.0,
                           height: 150,
-                          child: image ??
-                              FlutterLogo(
-                                colors: COLOR_THEME_APP,
-                              ),
+                          child: Hero(
+                            tag: "thumbnail_${assetData.id}",
+                            child: assetData.image ??
+                                FlutterLogo(
+                                  colors: COLOR_THEME_APP,
+                                ),
+                          ),
                         ),
                       ),
                     ],
@@ -233,23 +268,22 @@ class ModelAsset extends StatelessWidget {
                     children: <Widget>[
                       TextBuilder.build(
                           //------------------Title------------
-                          title: title ?? "Dyson V7 Trigger",
+                          title: assetData.title ?? "Dyson V7 Trigger",
                           style: TextStyleCustom.STYLE_LABEL_BOLD),
                       TextBuilder.build(
                           //------------------detail------------
-                          title: content ??
+                          title: assetData.content ??
                               "Simply dummy text of the printing and typeseting industy ...",
                           style: TextStyleCustom.STYLE_CONTENT
                               .copyWith(fontSize: 14, letterSpacing: 0)),
                       Padding(
                         //------------------Expire------------
                         padding: const EdgeInsets.only(top: 8),
-                        child: expire ??
-                            TextBuilder.build(
-                                title:
-                                    "Warranty Date : 24.05.2019 - 24.05.2020",
-                                style: TextStyleCustom.STYLE_CONTENT
-                                    .copyWith(fontSize: 12, letterSpacing: 0)),
+                        child: TextBuilder.build(
+                            title: assetData.expire ??
+                                "Warranty Date : 24.05.2019 - 24.05.2020",
+                            style: TextStyleCustom.STYLE_CONTENT
+                                .copyWith(fontSize: 12, letterSpacing: 0)),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(top: 5.0),
@@ -263,12 +297,11 @@ class ModelAsset extends StatelessWidget {
                               borderRadius: BorderRadius.circular(15.0)),
                           key: Key("Category"),
                           child: Center(
-                            child: category ??
-                                TextBuilder.build(
-                                    title: "Category",
-                                    style: TextStyleCustom.STYLE_LABEL
-                                        .copyWith(letterSpacing: 0)
-                                        .copyWith(fontSize: 12)),
+                            child: TextBuilder.build(
+                                title: assetData.category ?? "Category",
+                                style: TextStyleCustom.STYLE_LABEL
+                                    .copyWith(letterSpacing: 0)
+                                    .copyWith(fontSize: 12)),
                           ),
                         ),
                       ),
