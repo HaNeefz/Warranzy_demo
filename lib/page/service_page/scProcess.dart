@@ -3,45 +3,100 @@ import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 
+class ModelProcessData {
+  final String title;
+  final String content;
+  final String typeService;
+  final requestDate;
+  final status;
+
+  ModelProcessData(
+      {this.title,
+      this.content,
+      this.typeService,
+      this.requestDate,
+      this.status});
+}
+
 class ProcessPage extends StatefulWidget {
   @override
   _ProcessPageState createState() => _ProcessPageState();
 }
 
 class _ProcessPageState extends State<ProcessPage> {
+  List<ModelProcessData> listModelProcess = List<ModelProcessData>();
+
+  @override
+  void initState() {
+    super.initState();
+    for (var i = 0; i < 10; i++) {
+      listModelProcess.add(ModelProcessData(
+          title: "Dyson V7 Trigger",
+          content: "Simple dummy text of the printing industy...",
+          typeService: "Fix Service",
+          requestDate: "24.05.2019",
+          status: "Pending"));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        margin: EdgeInsets.all(10),
-        child: Column(
-          children: Iterable.generate(2, (index) {
-            return SizedBox(
-              height: 160,
-              child: Card(
-                elevation: 5,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0)),
-                child: InkWell(
-                  onTap: () {
-                    print(index);
-                  },
-                  child: Row(
-                    children: <Widget>[
-                      buildImage(),
-                      buildDetailService(),
-                    ],
+          margin: EdgeInsets.all(10),
+          child: ListView.builder(
+            itemCount: listModelProcess.length,
+            itemBuilder: (BuildContext context, int index) {
+              return SizedBox(
+                height: 160,
+                child: Card(
+                  elevation: 5,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0)),
+                  child: InkWell(
+                    onTap: () {
+                      print(index);
+                    },
+                    child: Row(
+                      children: <Widget>[
+                        buildImage(index),
+                        buildDetailService(index),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            );
-          }).toList(),
-        ),
-      ),
+              );
+            },
+          )
+          // Column(
+          //   children: Iterable.generate(2, (index) {
+          //     return SizedBox(
+          //       height: 160,
+          //       child: Card(
+          //         elevation: 5,
+          //         shape: RoundedRectangleBorder(
+          //             borderRadius: BorderRadius.circular(10.0)),
+          //         child: InkWell(
+          //           onTap: () {
+          //             print(index);
+          //           },
+          //           child: Row(
+          //             children: <Widget>[
+          //               buildImage(),
+          //               buildDetailService(),
+          //             ],
+          //           ),
+          //         ),
+          //       ),
+          //     );
+          //   }).toList(),
+          // ),
+          ),
     );
   }
 
-  Expanded buildImage() {
+  Expanded buildImage(int index) {
+    var listData = listModelProcess[index];
     return Expanded(
       child: Container(
         decoration: BoxDecoration(
@@ -58,8 +113,11 @@ class _ProcessPageState extends State<ProcessPage> {
             Container(
               width: 120,
               height: 130,
-              child: FlutterLogo(
-                colors: COLOR_THEME_APP,
+              child: Hero(
+                tag: "thumnail_sv_$index",
+                child: FlutterLogo(
+                  colors: COLOR_THEME_APP,
+                ),
               ),
             ),
             Align(
@@ -96,7 +154,8 @@ class _ProcessPageState extends State<ProcessPage> {
     );
   }
 
-  Expanded buildDetailService() {
+  Expanded buildDetailService(int index) {
+    var listData = listModelProcess[index];
     return Expanded(
       flex: 2,
       child: Padding(
@@ -105,24 +164,38 @@ class _ProcessPageState extends State<ProcessPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             TextBuilder.build(
-                title: "Dyson V7 Trigger",
+                title: listData.title ?? "Dyson V7 Trigger",
                 style: TextStyleCustom.STYLE_LABEL_BOLD),
             TextBuilder.build(
-                title: "Simple dummy text of the printing industy...",
+                title: listData.content ??
+                    "Simple dummy text of the printing industy...",
                 style: TextStyleCustom.STYLE_CONTENT),
             SizedBox(
               height: 5.0,
             ),
-            textDescription(title: "Type service", description: "Fix Service"),
-            textDescription(title: "Request Date", description: "24.05.2019"),
-            textDescription(title: "Status", description: "Pending"),
+            TextDescriptions(
+                title: "Type service",
+                description: listData.typeService ?? "Fix Service"),
+            TextDescriptions(
+                title: "Request Date",
+                description: listData.requestDate ?? "24.05.2019"),
+            TextDescriptions(
+                title: "Status", description: listData.status ?? "Pending"),
           ],
         ),
       ),
     );
   }
+}
 
-  Widget textDescription({String title, String description}) {
+class TextDescriptions extends StatelessWidget {
+  final String title;
+  final String description;
+
+  const TextDescriptions({Key key, this.title, this.description})
+      : super(key: key);
+  @override
+  Widget build(BuildContext context) {
     return RichText(
       text: TextSpan(
           style: TextStyleCustom.STYLE_CONTENT.copyWith(fontSize: 14),
