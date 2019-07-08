@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fancy_bottom_navigation/fancy_bottom_navigation.dart';
+import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:warranzy_demo/page/asset_page/scAssets.dart';
 import 'package:warranzy_demo/page/notification_page/scNotification.dart';
 import 'package:warranzy_demo/page/service_page/scService.dart';
@@ -37,53 +38,69 @@ class _MainPageState extends State<MainPage>
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 4,
-      initialIndex: currentPageBar,
-      child: Scaffold(
-        body: SafeArea(
-          child: TabBarView(
-            controller: _tabController,
-            children: <Widget>[
-              AssetPage(),
-              ClaimAndServicePage(),
-              TradePage(),
-              NotificationPage()
-            ],
-          ),
-        ),
-        bottomNavigationBar:
-            // Container(
-            //   // color: Colors.black,
-            //   decoration: BoxDecoration(
-            //     color: COLOR_WHITE,
-            //     borderRadius: BorderRadius.circular(40),
-            //   ),
-            //   child: TabBar(
-            //     tabs: <Widget>[
-            //       tabWidget(icons: Icons.card_giftcard, text: "Asset"),
-            //       tabWidget(icons: Icons.timeline, text: "Service"),
-            //       tabWidget(icons: Icons.account_balance, text: "Trade"),
-            //       tabWidget(
-            //           icons: Icons.notifications_active, text: "Notification"),
-            //     ],
-            //   ),
-            // )
-            FancyBottomNavigation(
-          tabs: [
-            TabData(iconData: Icons.card_giftcard, title: "Asset"),
-            TabData(iconData: Icons.timeline, title: "Service"),
-            TabData(iconData: Icons.account_balance, title: "Trade"),
-            TabData(
-                iconData: Icons.notifications_active, title: "Notification"),
+    return Scaffold(
+      body: SafeArea(
+        child: TabBarView(
+          controller: _tabController,
+          children: <Widget>[
+            AssetPage(),
+            ClaimAndServicePage(),
+            TradePage(),
+            NotificationPage()
           ],
-          onTabChangedListener: (position) {
-            setState(() {
-              currentPageBar = position;
-              _tabController.animateTo(currentPageBar);
-            });
-          },
         ),
+      ),
+      bottomNavigationBar:
+          // Container(
+          //   // color: Colors.black,
+          //   decoration: BoxDecoration(
+          //     color: COLOR_WHITE,
+          //     borderRadius: BorderRadius.circular(40),
+          //   ),
+          //   child: TabBar(
+          //     tabs: <Widget>[
+          //       tabWidget(icons: Icons.card_giftcard, text: "Asset"),
+          //       tabWidget(icons: Icons.timeline, text: "Service"),
+          //       tabWidget(icons: Icons.account_balance, text: "Trade"),
+          //       tabWidget(
+          //           icons: Icons.notifications_active, text: "Notification"),
+          //     ],
+          //   ),
+          // )
+          //-------------------------------
+          //     FancyBottomNavigation(
+          //   tabs: [
+          //     TabData(iconData: Icons.card_giftcard, title: "Asset"),
+          //     TabData(iconData: Icons.timeline, title: "Service"),
+          //     TabData(iconData: Icons.account_balance, title: "Trade"),
+          //     TabData(
+          //         iconData: Icons.notifications_active, title: "Notification"),
+          //   ],
+          //   onTabChangedListener: (position) {
+          //     setState(() {
+          //       currentPageBar = position;
+          //       _tabController.animateTo(position);
+          //     });
+          //   },
+          // ),
+          //---------------------------------
+          BottomNavyBar(
+        selectedIndex: currentPageBar,
+        showElevation: true,
+        onItemSelected: (index) => setState(() {
+              currentPageBar = index;
+              _tabController.animateTo(index, curve: Curves.ease);
+            }),
+        items: [
+          BottomNavyBarItem(
+              icon: Icon(Icons.card_giftcard), title: Text("Asset")),
+          BottomNavyBarItem(icon: Icon(Icons.timeline), title: Text("Service")),
+          BottomNavyBarItem(
+              icon: Icon(Icons.account_balance), title: Text("Trade")),
+          BottomNavyBarItem(
+              icon: Icon(Icons.notifications_active),
+              title: Text("Notification")),
+        ],
       ),
     );
   }
