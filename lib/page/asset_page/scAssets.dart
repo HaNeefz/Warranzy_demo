@@ -5,6 +5,7 @@ import 'package:warranzy_demo/tools/const.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/method/scan_qr.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
+import 'package:warranzy_demo/tools/widget_ui_custom/floating_action_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 
 import 'detail_asset_page/scDetailAsset.dart';
