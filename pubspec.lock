@@ -153,13 +153,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.2.7"
-  flutter_image_compress:
-    dependency: "direct main"
-    description:
-      name: flutter_image_compress
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.5.2"
   flutter_launcher_icons:
     dependency: "direct main"
     description:

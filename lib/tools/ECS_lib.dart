@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
+// import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 import 'package:page_transition/page_transition.dart';
 
@@ -293,22 +293,22 @@ class ECSLib {
     }
   }
 
-  Future<File> compressFile(
-      {@required File file,
-      @required String targetPath,
-      int quality = 60,
-      int minWidth = 800,
-      int minHeight = 600,
-      int rotate = 0}) async {
-    var result = await FlutterImageCompress.compressAndGetFile(
-        file.absolute.path, targetPath,
-        quality: quality,
-        minWidth: minWidth,
-        minHeight: minHeight,
-        rotate: rotate);
+  // Future<File> compressFile(
+  //     {@required File file,
+  //     @required String targetPath,
+  //     int quality = 60,
+  //     int minWidth = 800,
+  //     int minHeight = 600,
+  //     int rotate = 0}) async {
+  //   var result = await FlutterImageCompress.compressAndGetFile(
+  //       file.absolute.path, targetPath,
+  //       quality: quality,
+  //       minWidth: minWidth,
+  //       minHeight: minHeight,
+  //       rotate: rotate);
 
-    print("Image file Original : " + "${file.lengthSync()}");
-    print("Image file Compress : " + "${result.lengthSync()}");
-    return result;
-  }
+  //   print("Image file Original : " + "${file.lengthSync()}");
+  //   print("Image file Compress : " + "${result.lengthSync()}");
+  //   return result;
+  // }
 }
