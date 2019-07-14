@@ -206,6 +206,7 @@ class ModelAssetData {
 
 class ModelAssetWidget extends StatelessWidget {
   final assetData;
+  final ecsLib = getIt.get<ECSLib>();
   ModelAssetWidget(this.assetData);
   @override
   Widget build(BuildContext context) {
