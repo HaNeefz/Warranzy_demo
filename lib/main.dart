@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get_it/get_it.dart';
+import 'package:onesignal/onesignal.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 
 import 'page/splash_screen/scSplash_screen.dart';
-
 
 var getIt = GetIt();
 void main() {
@@ -38,23 +38,25 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    // initnoti();
+    initnotification();
     _initLangeuage("en");
 
     allTranslations.onLocaleChangedCallback = _onLocaleChanged;
   }
-  // initnotification() async {
-  //   // OneSignal.shared.setLogLevel(OSLogLevel.verbose, OSLogLevel.none);
-  //   var settings = {
-  //     OSiOSSettings.autoPrompt: true,
-  //     OSiOSSettings.promptBeforeOpeningPushUrl: true
-  //   };
-  //   await OneSignal.shared.init("3f76726a-3e96-48b1-af7d-c3af04693f45");
-  //   await OneSignal.shared
-  //       .init("3f76726a-3e96-48b1-af7d-c3af04693f45", iOSSettings: settings);
-  //   OneSignal.shared
-  //       .setInFocusDisplayType(OSNotificationDisplayType.notification);
-  // }
+
+  initnotification() async {
+    // OneSignal.shared.setLogLevel(OSLogLevel.verbose, OSLogLevel.none);
+    var settings = {
+      OSiOSSettings.autoPrompt: true,
+      OSiOSSettings.promptBeforeOpeningPushUrl: true
+    };
+    await OneSignal.shared.getPermissionSubscriptionState();
+    await OneSignal.shared.init("138414dc-cb53-43e0-bc67-49fc9b7a99f4");
+    await OneSignal.shared
+        .init("138414dc-cb53-43e0-bc67-49fc9b7a99f4", iOSSettings: settings);
+    OneSignal.shared
+        .setInFocusDisplayType(OSNotificationDisplayType.notification);
+  }
 
   // initnoti() async {
   //   var settings = {
