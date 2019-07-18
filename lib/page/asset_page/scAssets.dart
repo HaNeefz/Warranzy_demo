@@ -1,3 +1,4 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:warranzy_demo/page/profile_page/scProfile.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
@@ -101,34 +102,26 @@ class _AssetPageState extends State<AssetPage> {
 
   Container buildAds() {
     return Container(
-      height: 280,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15.0),
-        // color: Colors.red
-      ),
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: 5,
-        itemBuilder: (BuildContext context, int index) {
-          return Center(
-            child: Container(
-              margin: EdgeInsets.only(left: 10.0),
-              width: MediaQuery.of(context).size.width - 50,
-              height: 250,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15.0),
-                  color: Colors.black,
-                  boxShadow: [
-                    BoxShadow(
-                      offset: Offset(2, 5),
-                      blurRadius: 8.0,
-                      spreadRadius: 2.0,
-                      color: COLOR_GREY,
-                    )
-                  ]),
+      child: CarouselSlider(
+        autoPlay: true,
+        viewportFraction: 0.9,
+        enlargeCenterPage: true,
+        height: 100,
+        autoPlayCurve: Curves.elasticOut,
+        items: [1, 2, 3, 4, 5].map((i) {
+          return Container(
+            margin: EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+            decoration: BoxDecoration(
+                color: Colors.black, borderRadius: BorderRadius.circular(10)),
+            width: MediaQuery.of(context).size.width,
+            child: Center(
+              child: TextBuilder.build(
+                  title: "$i",
+                  style:
+                      TextStyleCustom.STYLE_LABEL.copyWith(color: COLOR_WHITE)),
             ),
           );
-        },
+        }).toList(),
       ),
     );
   }
