@@ -7,7 +7,7 @@ import 'text_builder.dart';
 class AppBarThemes {
   static AppBar appBarStyle(
       {@required BuildContext context,
-      String title="",
+      String title = "",
       TextStyle style,
       Color background,
       List<Widget> actions}) {
@@ -16,6 +16,7 @@ class AppBarThemes {
           title: title, style: TextStyleCustom.STYLE_LABEL_BOLD),
       backgroundColor: Colors.white,
       elevation: 0.0,
+      actions: actions,
       flexibleSpace: Stack(
         children: <Widget>[
           Container(

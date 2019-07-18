@@ -12,8 +12,8 @@ import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 
 class PinCodePageUpdate extends StatefulWidget {
   final PageType type;
-  final bool usedPin;
-  const PinCodePageUpdate({Key key, @required this.type, this.usedPin = false})
+  bool usedPin;
+  PinCodePageUpdate({Key key, @required this.type, this.usedPin = false})
       : super(key: key);
   @override
   _PinCodePageUpdateState createState() => _PinCodePageUpdateState();
@@ -35,8 +35,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
         Duration(milliseconds: 400),
         () => localAuth.authenticate().then((_authorized) {
               if (_authorized) {
-                ecsLib.pushPageAndClearAllScene(
-                    context: context, pageWidget: MainPage());
+                gotoMainPage();
               }
             }));
   }
@@ -55,7 +54,23 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBarThemes.appBarStyle(context: context),
+      appBar: AppBarThemes.appBarStyle(
+        context: context,
+        actions: [
+          Switch(
+            onChanged: (bool value) {
+              setState(() {
+                widget.usedPin = value;
+              });
+            },
+            value: widget.usedPin,
+          ),
+          FlatButton(
+              child: TextBuilder.build(
+                  title: widget.usedPin == true ? "PIN" : "Scan"),
+              onPressed: null)
+        ],
+      ),
       body: SingleChildScrollView(
         child: Center(
           child: Column(
@@ -363,10 +378,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
     if (usedPin == true && listPinTemp.length == 6) {
       if (pinCorrect == true) {
         print("Correct");
-        ecsLib.pushPageReplacement(
-          context: context,
-          pageWidget: MainPage(),
-        );
+        gotoMainPage();
       } else {
         print("In Correct");
         ecsLib
