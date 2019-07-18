@@ -16,9 +16,11 @@ class NotificationState extends ChangeNotifier {
 
   bool get emptyMessage => _counterMessage == 0;
 
-  decrementCounter() {
-    _counterMessage--;
-    notifyListeners();
+  decrementCounter(index) {
+    if (_messageList[index].active == false && _counterMessage > 0) {
+      _counterMessage--;
+      notifyListeners();
+    }
   }
 
   clearAllMessage() {
