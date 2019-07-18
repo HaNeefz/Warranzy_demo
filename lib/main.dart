@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 
 import 'page/splash_screen/scSplash_screen.dart';
+import 'services/providers/notification_state.dart';
 
 var getIt = GetIt();
 void main() {
@@ -21,51 +22,38 @@ void main() {
   ]).then((_) async {
     getIt.registerSingleton<ECSLib>(ECSLib());
     getIt.registerSingleton<GlobalTranslations>(GlobalTranslations());
-    runApp(MultiProvider(providers: [
-      // ChangeNotifierProvider<ImageDataState>(
-      //   builder: (_) => ImageDataState(),
-      // )
-    ], child: MyHomePage()));
+    getIt.registerSingleton<NotificationState>(NotificationState());
+    runApp(MultiProvider(
+        providers: [
+          ChangeNotifierProvider<NotificationState>(
+            builder: (_) => NotificationState(),
+          )
+        ],
+        child: Consumer<NotificationState>(
+          builder: (BuildContext context, _notitState, _) => MyHomePage(
+            notiState: _notitState,
+          ),
+        )));
   });
 }
 
 class MyHomePage extends StatefulWidget {
+  final NotificationState notiState;
+
+  const MyHomePage({Key key, @required this.notiState}) : super(key: key);
+
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  NotificationState get notiState => widget.notiState;
   @override
   void initState() {
     super.initState();
-    initnotification();
     _initLangeuage("en");
-
+    notiState.initNotification();
     allTranslations.onLocaleChangedCallback = _onLocaleChanged;
-  }
-
-  initnotification() async {
-    // OneSignal.shared.setLogLevel(OSLogLevel.verbose, OSLogLevel.none);
-    var settings = {
-      OSiOSSettings.autoPrompt: true,
-      OSiOSSettings.promptBeforeOpeningPushUrl: true
-    };
-    await OneSignal.shared.getPermissionSubscriptionState();
-    await OneSignal.shared.init("138414dc-cb53-43e0-bc67-49fc9b7a99f4");
-    await OneSignal.shared
-        .init("138414dc-cb53-43e0-bc67-49fc9b7a99f4", iOSSettings: settings);
-    OneSignal.shared
-        .setInFocusDisplayType(OSNotificationDisplayType.notification);
-    OneSignal.shared
-        .setNotificationReceivedHandler((OSNotification notification) {
-      // will be called whenever a notification is received
-      print("ReceiveHandler => ${notification.payload}");
-    });
-    OneSignal.shared
-        .setNotificationOpenedHandler((OSNotificationOpenedResult result) {
-      // will be called whenever a notification is opened/button pressed.
-      print("OpenedHandler $result");
-    });
   }
 
   // initnoti() async {
