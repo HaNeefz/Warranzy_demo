@@ -10,6 +10,8 @@ dependencies:
     sdk: flutter
   bottom_navy_bar: ^5.1.0
   onesignal: ^1.1.0
+  intl: ^0.15.8
+  badges: ^1.1.0
 
   flutter_localizations:
       sdk: flutter

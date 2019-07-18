@@ -1,13 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fancy_bottom_navigation/fancy_bottom_navigation.dart';
+import 'package:provider/provider.dart';
 import 'package:warranzy_demo/page/asset_page/scAssets.dart';
 import 'package:warranzy_demo/page/notification_page/scNotification.dart';
 import 'package:warranzy_demo/page/service_page/scService.dart';
 import 'package:warranzy_demo/page/trade_page/scTrade.dart';
+import 'package:warranzy_demo/services/providers/notification_state.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 
 class MainPage extends StatefulWidget {
+  int currentPage;
+
+  MainPage({Key key, this.currentPage = 0}) : super(key: key);
   @override
   _MainPageState createState() => _MainPageState();
 }
@@ -16,7 +21,9 @@ class _MainPageState extends State<MainPage>
     with SingleTickerProviderStateMixin {
   final ecsLib = getIt.get<ECSLib>();
   final allTranslations = getIt.get<GlobalTranslations>();
-  int currentPageBar = 0;
+  int get currentPage => widget.currentPage;
+  set setPage(newPage) => widget.currentPage = newPage;
+  // int currentPageBar = 0;
   PageController pagesController;
   final List<Widget> pageTabBar = [
     AssetPage(),
@@ -27,8 +34,9 @@ class _MainPageState extends State<MainPage>
 
   @override
   Widget build(BuildContext context) {
+    final NotificationState notiState = Provider.of<NotificationState>(context);
     return Scaffold(
-        body: SafeArea(child: pageTabBar[currentPageBar]),
+        body: SafeArea(child: pageTabBar[currentPage]),
         bottomNavigationBar: FancyBottomNavigation(
           tabs: [
             TabData(iconData: Icons.card_giftcard, title: "Asset"),
@@ -39,7 +47,7 @@ class _MainPageState extends State<MainPage>
           ],
           onTabChangedListener: (position) {
             setState(() {
-              currentPageBar = position;
+              setPage = position;
             });
           },
         ));

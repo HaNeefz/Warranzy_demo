@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
+import 'package:warranzy_demo/services/providers/notification_state.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
@@ -18,8 +21,75 @@ class _NotificationPageState extends State<NotificationPage> {
         title: TextBuilder.build(
             title: "Notification", style: TextStyleCustom.STYLE_APPBAR),
       ),
-      body: Container(child: NotificationWidget()),
+      body: Container(child: ShowMessage()),
     );
+  }
+}
+
+class ShowMessage extends StatelessWidget {
+  const ShowMessage({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<NotificationState>(
+        builder: (BuildContext context, NotificationState message, _) {
+      if (message.messageList.length > 0)
+        return ListView.separated(
+          itemCount: message.messageList.length,
+          itemBuilder: (BuildContext context, int index) {
+            bool actived = message.messageList[index].active == true;
+            return ListTile(
+              title: Row(
+                children: <Widget>[
+                  actived == false
+                      ? Container(
+                          width: 15,
+                          height: 15,
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle, color: Colors.red),
+                        )
+                      : Container(),
+                  actived == false
+                      ? SizedBox(
+                          width: 5,
+                        )
+                      : Container(),
+                  TextBuilder.build(
+                      title: "${message.messageList[index].title}",
+                      style: TextStyleCustom.STYLE_LABEL_BOLD),
+                ],
+              ),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  TextBuilder.build(
+                      title: "${message.messageList[index].body}",
+                      style: TextStyleCustom.STYLE_CONTENT
+                          .copyWith(color: COLOR_BLACK)),
+                  TextBuilder.build(
+                      title: "${message.messageList[index].dateTime}",
+                      style:
+                          TextStyleCustom.STYLE_CONTENT.copyWith(fontSize: 14)),
+                ],
+              ),
+              onTap: () {
+                message.activeChange(index);
+              },
+            );
+          },
+          separatorBuilder: (BuildContext context, int index) {
+            return Divider(
+              color: COLOR_GREY,
+            );
+          },
+        );
+      else
+        return Center(
+          child: TextBuilder.build(title: "Empty message"),
+        );
+    });
   }
 }
 
