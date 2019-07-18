@@ -6,6 +6,20 @@ import 'package:warranzy_demo/models/receive_message_model.dart';
 class NotificationState extends ChangeNotifier {
   List<MessageModel> _messageList = [];
   List<MessageModel> get messageList => _messageList;
+  int _counterMessage = 0;
+
+  int get counterMessage => _counterMessage;
+  resetCounterMessage() {
+    _counterMessage = 0;
+    notifyListeners();
+  }
+
+  bool get emptyMessage => _counterMessage == 0;
+
+  decrementCounter() {
+    _counterMessage--;
+    notifyListeners();
+  }
 
   clearAllMessage() {
     _messageList.clear();
@@ -17,6 +31,7 @@ class NotificationState extends ChangeNotifier {
     var dateTime = DateFormat("EEE 'at' H:mm a, M/d/y").format(now);
     _messageList
         .add(MessageModel(title: title, body: body, dateTime: dateTime));
+    _counterMessage++;
     notifyListeners();
   }
 

@@ -76,6 +76,7 @@ class ShowMessage extends StatelessWidget {
               ),
               onTap: () {
                 message.activeChange(index);
+                message.decrementCounter();
               },
             );
           },

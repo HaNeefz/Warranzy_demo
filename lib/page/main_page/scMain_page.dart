@@ -1,3 +1,4 @@
+import 'package:badges/badges.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fancy_bottom_navigation/fancy_bottom_navigation.dart';
@@ -7,7 +8,10 @@ import 'package:warranzy_demo/page/notification_page/scNotification.dart';
 import 'package:warranzy_demo/page/service_page/scService.dart';
 import 'package:warranzy_demo/page/trade_page/scTrade.dart';
 import 'package:warranzy_demo/services/providers/notification_state.dart';
+import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
+import 'package:warranzy_demo/tools/theme_color.dart';
+import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 
 class MainPage extends StatefulWidget {
   int currentPage;
@@ -35,21 +39,63 @@ class _MainPageState extends State<MainPage>
   @override
   Widget build(BuildContext context) {
     final NotificationState notiState = Provider.of<NotificationState>(context);
+    var textStyle = TextStyleCustom.STYLE_LABEL_BOLD.copyWith(fontSize: 14);
     return Scaffold(
         body: SafeArea(child: pageTabBar[currentPage]),
-        bottomNavigationBar: FancyBottomNavigation(
-          tabs: [
-            TabData(iconData: Icons.card_giftcard, title: "Asset"),
-            TabData(iconData: Icons.timeline, title: "Service"),
-            TabData(iconData: Icons.account_balance, title: "Trade"),
-            TabData(
-                iconData: Icons.notifications_active, title: "Notification"),
+        bottomNavigationBar: BottomNavigationBar(
+          items: <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+                title: TextBuilder.build(title: "Asset", style: textStyle),
+                icon: Icon(
+                  Icons.card_giftcard,
+                  color: COLOR_BLACK,
+                )),
+            BottomNavigationBarItem(
+                title: TextBuilder.build(title: "Service", style: textStyle),
+                icon: Icon(Icons.timeline, color: COLOR_BLACK)),
+            BottomNavigationBarItem(
+                title: TextBuilder.build(title: "Trade", style: textStyle),
+                icon: Icon(Icons.account_balance, color: COLOR_BLACK)),
+            BottomNavigationBarItem(
+              title: TextBuilder.build(title: "Notification", style: textStyle),
+              icon: notiState.emptyMessage
+                  ? Icon(Icons.notifications, color: COLOR_BLACK)
+                  : Badge(
+                      badgeContent: TextBuilder.build(
+                          title: "${notiState.counterMessage}",
+                          style: textStyle.copyWith(color: COLOR_WHITE)),
+                      child: Icon(Icons.notifications_active),
+                    ),
+            ),
           ],
-          onTabChangedListener: (position) {
+          currentIndex: currentPage,
+          type: BottomNavigationBarType.fixed,
+          onTap: (position) {
             setState(() {
               setPage = position;
             });
           },
-        ));
+        )
+        // FancyBottomNavigation(
+        //   tabs: [
+        //     TabData(iconData: Icons.card_giftcard, title: "Asset"),
+        //     TabData(iconData: Icons.timeline, title: "Service"),
+        //     TabData(iconData: Icons.account_balance, title: "Trade"),
+        //     TabData(
+        //         iconData: iconsWithBadges(notiState), title: "Notification"),
+        //   ],
+        //   onTabChangedListener: (position) {
+        //     setState(() {
+        //       setPage = position;
+        //     });
+        //   },
+        // )
+        );
+  }
+
+  IconData iconsWithBadges(NotificationState notiState) {
+    return notiState.emptyMessage
+        ? Icons.notifications
+        : Icons.notifications_active;
   }
 }
