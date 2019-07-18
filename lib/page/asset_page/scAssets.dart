@@ -107,7 +107,7 @@ class _AssetPageState extends State<AssetPage> {
         viewportFraction: 0.9,
         enlargeCenterPage: true,
         height: 100,
-        autoPlayCurve: Curves.elasticOut,
+        // autoPlayCurve: Curves.elasticOut,
         items: [1, 2, 3, 4, 5].map((i) {
           return Container(
             margin: EdgeInsets.symmetric(horizontal: 2, vertical: 2),

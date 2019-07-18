@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:warranzy_demo/page/login_first/scLogin.dart';
+import 'package:warranzy_demo/services/calls_and_message/calls_and_message.dart';
 import 'package:warranzy_demo/tools/assets.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
@@ -20,13 +21,14 @@ class _ProfilePageState extends State<ProfilePage> {
   final ecsLib = getIt.get<ECSLib>();
   final allTranslations = getIt.get<GlobalTranslations>();
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
+  final CallsAndMessageService _service = CallsAndMessageService();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         resizeToAvoidBottomInset: false,
         resizeToAvoidBottomPadding: false,
-        backgroundColor: Colors.grey[400],
+        // backgroundColor: Colors.grey[400],
         body: FormBuilder(
           key: _fbKey,
           child: CustomScrollView(slivers: <Widget>[
@@ -140,6 +142,17 @@ class _ProfilePageState extends State<ProfilePage> {
                     size: 20,
                     readOnly: true,
                     validators: [FormBuilderValidators.required()]),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: <Widget>[
+                    buttonContact(Icons.call, "Call Center", Colors.green,
+                        () => _service.call("0970323455")),
+                    buttonContact(Icons.sms, "Send Sms", Colors.blue,
+                        () => _service.sendSms("0970323455")),
+                    buttonContact(Icons.email, "Email us", Colors.redAccent,
+                        () => _service.sendEmail("wpoungchoo@gmail.com")),
+                  ],
+                ),
               ],
             )),
             // SliverFixedExtentList(
@@ -158,5 +171,20 @@ class _ProfilePageState extends State<ProfilePage> {
             // )
           ]),
         ));
+  }
+
+  Widget buttonContact(
+      [IconData icons, String title, Color colors, Function onPressed]) {
+    return RaisedButton.icon(
+      color: colors,
+      elevation: 5,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      icon: Icon(icons),
+      label: TextBuilder.build(
+          title: title,
+          textAlign: TextAlign.center,
+          style: TextStyleCustom.STYLE_LABEL.copyWith(fontSize: 12)),
+      onPressed: onPressed,
+    );
   }
 }
