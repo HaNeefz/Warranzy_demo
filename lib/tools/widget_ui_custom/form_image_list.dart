@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:warranzy_demo/services/providers/provier_image.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
-import 'package:warranzy_demo/tools/provider_image/provier_image.dart';
 
 import '../theme_color.dart';
 import 'image_builder.dart';

@@ -1,8 +1,7 @@
 import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import '../export_lib.dart';
+import 'package:warranzy_demo/tools/export_lib.dart';
 
 final ecsLib = getIt.get<ECSLib>();
 final allTranslations = getIt.get<GlobalTranslations>();
