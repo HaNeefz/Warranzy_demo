@@ -39,7 +39,8 @@ class _AssetPageState extends State<AssetPage> {
       body: ListView(
         children: <Widget>[
           buildHeaderAndProfile(),
-          buildAds(),
+          // buildAds(),
+          CarouselWithIndicator(),
           buildLabelAndSeeAll(),
           buildYourAssets()
         ],
@@ -100,31 +101,31 @@ class _AssetPageState extends State<AssetPage> {
     );
   }
 
-  Container buildAds() {
-    return Container(
-      child: CarouselSlider(
-        autoPlay: true,
-        viewportFraction: 0.9,
-        enlargeCenterPage: true,
-        height: 100,
-        // autoPlayCurve: Curves.elasticOut,
-        items: [1, 2, 3, 4, 5].map((i) {
-          return Container(
-            margin: EdgeInsets.symmetric(horizontal: 2, vertical: 2),
-            decoration: BoxDecoration(
-                color: Colors.black, borderRadius: BorderRadius.circular(10)),
-            width: MediaQuery.of(context).size.width,
-            child: Center(
-              child: TextBuilder.build(
-                  title: "$i",
-                  style:
-                      TextStyleCustom.STYLE_LABEL.copyWith(color: COLOR_WHITE)),
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
+  // Container buildAds() {
+  //   return Container(
+  //     child: CarouselSlider(
+  //       autoPlay: true,
+  //       viewportFraction: 0.9,
+  //       enlargeCenterPage: true,
+  //       height: 100,
+  //       // autoPlayCurve: Curves.elasticOut,
+  //       items: [1, 2, 3, 4, 5].map((i) {
+  //         return Container(
+  //           margin: EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+  //           decoration: BoxDecoration(
+  //               color: Colors.black, borderRadius: BorderRadius.circular(10)),
+  //           width: MediaQuery.of(context).size.width,
+  //           child: Center(
+  //             child: TextBuilder.build(
+  //                 title: "$i",
+  //                 style:
+  //                     TextStyleCustom.STYLE_LABEL.copyWith(color: COLOR_WHITE)),
+  //           ),
+  //         );
+  //       }).toList(),
+  //     ),
+  //   );
+  // }
 
   Widget buildHeaderAndProfile() {
     return Padding(
@@ -306,5 +307,66 @@ class ModelAssetWidget extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class CarouselWithIndicator extends StatefulWidget {
+  @override
+  _CarouselWithIndicatorState createState() => _CarouselWithIndicatorState();
+}
+
+class _CarouselWithIndicatorState extends State<CarouselWithIndicator> {
+  int _current = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(children: [
+      CarouselSlider(
+        items: [1, 2, 3, 4, 5].map((i) {
+          return Container(
+            margin: EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+            decoration: BoxDecoration(
+                color: COLOR_THEME_APP,
+                borderRadius: BorderRadius.circular(10)),
+            width: MediaQuery.of(context).size.width,
+            child: Center(
+              child: TextBuilder.build(
+                  title: "$i",
+                  style:
+                      TextStyleCustom.STYLE_LABEL.copyWith(color: COLOR_WHITE)),
+            ),
+          );
+        }).toList(),
+        autoPlay: true,
+        aspectRatio: 2.0,
+        viewportFraction: 0.9,
+        enlargeCenterPage: true,
+        height: 100,
+        onPageChanged: (index) {
+          setState(() {
+            _current = index;
+          });
+        },
+      ),
+      Positioned(
+          bottom: 0.0,
+          left: 0.0,
+          right: 0.0,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: Iterable.generate(5, (index) {
+              return Container(
+                width: 8.0,
+                height: 8.0,
+                margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
+                decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: _current == index
+                        ? Color.fromRGBO(0, 0, 0, 0.9)
+                        : Color.fromRGBO(0, 0, 0, 0.4)),
+              );
+            }).toList(),
+          ))
+    ]);
   }
 }
