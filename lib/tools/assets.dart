@@ -8,5 +8,5 @@ class Assets {
   static const String ICON_SCANNER = "assets/icons/scanner.png";
 
   static const String ICON_APP_TRANSPARENT = "assets/logo/warranzy_logo_transparent.png";
-  static const String ICON_APP = "assets/logo/warranzy_logo.jpg";
+  static const String ICON_APP = "assets/logo/warranzy_logo_new.jpg";
 }
