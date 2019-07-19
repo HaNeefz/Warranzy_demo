@@ -22,7 +22,13 @@ class _ProfilePageState extends State<ProfilePage> {
   final allTranslations = getIt.get<GlobalTranslations>();
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
   final CallsAndMessageService _service = CallsAndMessageService();
-
+  bool checkInformationChange = false;
+  Map<String, bool> enableRead = {
+    "id": true,
+    "name": true,
+    "address": true,
+    "pin": true
+  };
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,13 +37,16 @@ class _ProfilePageState extends State<ProfilePage> {
         // backgroundColor: Colors.grey[400],
         body: FormBuilder(
           key: _fbKey,
+          onChanged: (data) {
+            print(data);
+          },
           child: CustomScrollView(slivers: <Widget>[
             SliverAppBar(
               automaticallyImplyLeading: false,
               leading: IconButton(
                 icon: Icon(
                   Icons.arrow_back_ios,
-                  color: COLOR_BLACK,
+                  color: COLOR_WHITE,
                 ),
                 onPressed: () {
                   Navigator.pop(context);
@@ -104,8 +113,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   // child: Image.asset(Assets.BACK_GROUND_APP,fit: BoxFit.cover,),
                   ),
               // pinned: true,
-              snap: true,
-              floating: true,
+              // snap: true,
+              // floating: true,
               expandedHeight: 300,
 
               // title: TextBuilder.build(
@@ -114,34 +123,61 @@ class _ProfilePageState extends State<ProfilePage> {
             SliverList(
                 delegate: SliverChildListDelegate(
               [
-                TextFieldBuilder.enterInformation(
-                    key: "ID",
-                    initialValue: "ID",
-                    readOnly: true,
-                    borderOutLine: false,
-                    size: 20,
-                    validators: [FormBuilderValidators.required()]),
-                TextFieldBuilder.enterInformation(
-                    key: "fullName",
-                    initialValue: "Name",
-                    borderOutLine: false,
-                    size: 20,
-                    readOnly: true,
-                    validators: [FormBuilderValidators.required()]),
-                TextFieldBuilder.enterInformation(
-                    key: "address",
-                    initialValue: "Address",
-                    borderOutLine: false,
-                    readOnly: true,
-                    size: 20,
-                    validators: [FormBuilderValidators.required()]),
-                TextFieldBuilder.enterInformation(
-                    key: "pin",
-                    initialValue: "******",
-                    borderOutLine: false,
-                    size: 20,
-                    readOnly: true,
-                    validators: [FormBuilderValidators.required()]),
+                formInformation(
+                    "ID",
+                    TextFieldBuilder.enterInformation(
+                        key: "ID",
+                        initialValue: "IdTesting",
+                        readOnly: true, //enableRead['id'],
+                        borderOutLine: false,
+                        size: 20,
+                        validators: [FormBuilderValidators.required()]),
+                    showTextReadOnly: true,
+                    editAble: false //enableRead['id'],
+                    ),
+                formInformation(
+                    "Name",
+                    TextFieldBuilder.enterInformation(
+                        key: "fullName",
+                        initialValue: "Name",
+                        borderOutLine: false,
+                        size: 20,
+                        readOnly: true, //enableRead['name'],
+                        validators: [FormBuilderValidators.required()]),
+                    showTextReadOnly: true,
+                    editAble: false //enableRead['name'],
+                    ),
+                formInformation(
+                    "Address",
+                    TextFieldBuilder.enterInformation(
+                        key: "address",
+                        initialValue: "Address",
+                        borderOutLine: false,
+                        readOnly: enableRead['address'],
+                        size: 20,
+                        validators: [FormBuilderValidators.required()]),
+                    showTextReadOnly: false,
+                    editAble: true, onTapEdit: () {
+                  setState(() {
+                    enableRead['address'] = !enableRead['address'];
+                  });
+                }),
+                formInformation(
+                    "PIN",
+                    TextFieldBuilder.enterInformation(
+                        key: "pin",
+                        initialValue: "******",
+                        borderOutLine: false,
+                        obsecure: true,
+                        size: 20,
+                        readOnly: enableRead['pin'],
+                        validators: [FormBuilderValidators.required()]),
+                    showTextReadOnly: false,
+                    editAble: true, onTapEdit: () {
+                  setState(() {
+                    enableRead['pin'] = !enableRead['pin'];
+                  });
+                }),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: <Widget>[
@@ -153,22 +189,31 @@ class _ProfilePageState extends State<ProfilePage> {
                         () => _service.sendEmail("wpoungchoo@gmail.com")),
                   ],
                 ),
+                RaisedButton(
+                  child: Icon(Icons.check),
+                  onPressed: () {
+                    _fbKey.currentState.save();
+                    if (_fbKey.currentState.validate()) {
+                      print(_fbKey.currentState.value);
+                    }
+                  },
+                )
               ],
             )),
-            // SliverFixedExtentList(
-            //   itemExtent: 150.0,
-            //   delegate: SliverChildListDelegate([
-            //     Container(color: Colors.red),
-            //     Container(color: Colors.green),
-            //     Container(color: Colors.blue),
-            //     Container(color: Colors.pink),
-            //     Container(color: Colors.yellow),
-            //     Container(color: Colors.orange),
-            //     Container(color: Colors.purple),
-            //     Container(color: Colors.black),
-            //     Container(color: Colors.grey),
-            //   ]),
-            // )
+            SliverFixedExtentList(
+              itemExtent: 150.0,
+              delegate: SliverChildListDelegate([
+                Container(color: Colors.red),
+                Container(color: Colors.green),
+                Container(color: Colors.blue),
+                Container(color: Colors.pink),
+                Container(color: Colors.yellow),
+                Container(color: Colors.orange),
+                Container(color: Colors.purple),
+                Container(color: Colors.black),
+                Container(color: Colors.grey),
+              ]),
+            )
           ]),
         ));
   }
@@ -185,6 +230,38 @@ class _ProfilePageState extends State<ProfilePage> {
           textAlign: TextAlign.center,
           style: TextStyleCustom.STYLE_LABEL.copyWith(fontSize: 12)),
       onPressed: onPressed,
+    );
+  }
+
+  Widget formInformation(title, widget,
+      {@required bool showTextReadOnly,
+      @required bool editAble,
+      Function onTapEdit}) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: <Widget>[
+          Expanded(
+              child: RichText(
+            text: TextSpan(children: [
+              TextSpan(text: title, style: TextStyleCustom.STYLE_LABEL),
+              showTextReadOnly == true ? TextSpan(text: '\n') : TextSpan(),
+              showTextReadOnly == true
+                  ? TextSpan(
+                      text: "(ReadOnly)",
+                      style: TextStyleCustom.STYLE_ERROR.copyWith(fontSize: 10))
+                  : TextSpan()
+            ]),
+          )),
+          Expanded(flex: 3, child: widget),
+          editAble == true
+              ? IconButton(
+                  icon: Icon(Icons.edit),
+                  onPressed: onTapEdit,
+                )
+              : Container()
+        ],
+      ),
     );
   }
 }

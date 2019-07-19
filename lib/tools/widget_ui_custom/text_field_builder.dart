@@ -21,6 +21,8 @@ class TextFieldBuilder {
       double size = 12,
       bool borderOutLine = true,
       String initialValue,
+      Widget prefix,
+      Widget suffix,
       bool readOnly = false}) {
     return Container(
       child: FormBuilderTextField(
@@ -38,29 +40,30 @@ class TextFieldBuilder {
         textInputAction: textInputAction ??= TextInputAction.done,
         style: TextStyleCustom.STYLE_LABEL.copyWith(fontSize: 15),
         decoration: InputDecoration(
-          contentPadding: EdgeInsets.all(size),
-          border: borderOutLine
-              ? OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide(color: Colors.teal[300]))
-              : UnderlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide(color: Colors.teal[300])),
-          //InputBorder.none,
-          errorBorder: borderOutLine
-              ? OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide(color: Colors.teal[300]))
-              : UnderlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide(color: Colors.teal[300])),
-          labelText: label != null ? label : null,
-          labelStyle: TextStyleCustom.STYLE_LABEL,
-          hintText: "\t\t\t ${hintText ?? ""}",
-          hintStyle: TextStyleCustom.STYLE_CONTENT,
-          counterStyle: TextStyleCustom.STYLE_LABEL,
-          errorStyle: TextStyleCustom.STYLE_ERROR,
-        ),
+            contentPadding: EdgeInsets.all(size),
+            border: borderOutLine
+                ? OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: BorderSide(color: Colors.teal[300]))
+                : UnderlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: BorderSide(color: Colors.teal[300])),
+            //InputBorder.none,
+            errorBorder: borderOutLine
+                ? OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: BorderSide(color: Colors.teal[300]))
+                : UnderlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: BorderSide(color: Colors.teal[300])),
+            labelText: label != null ? label : null,
+            labelStyle: TextStyleCustom.STYLE_LABEL,
+            hintText: "\t\t\t ${hintText ?? ""}",
+            hintStyle: TextStyleCustom.STYLE_CONTENT,
+            counterStyle: TextStyleCustom.STYLE_LABEL,
+            errorStyle: TextStyleCustom.STYLE_ERROR,
+            prefixIcon: prefix,
+            suffixIcon: suffix),
       ),
     );
   }
