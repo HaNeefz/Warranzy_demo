@@ -8,6 +8,8 @@ import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 
 import 'detail_asset_page/scDetailAsset.dart';
+import 'scAssetsAll.dart';
+import 'widget_assets/widget_asset.dart';
 
 class AssetPage extends StatefulWidget {
   @override
@@ -17,21 +19,13 @@ class AssetPage extends StatefulWidget {
 class _AssetPageState extends State<AssetPage> {
   final ecsLib = getIt.get<ECSLib>();
   final allTranslations = getIt.get<GlobalTranslations>();
-  List<ModelAssetData> modelAsset = List<ModelAssetData>();
+  ModelAssetData assetData = ModelAssetData();
+  List<ModelAssetData> listAssetData;
 
   @override
   void initState() {
     super.initState();
-    for (var i = 0; i < 10; i++) {
-      modelAsset.add(ModelAssetData(
-          id: i,
-          title: "Dyson V7 Trigger",
-          content:
-              "Simply dummy text of the printing and typeseting industy asduasdljb u iuabsldkj ",
-          expire: "Warranty Date : 24.05.2019 - 24.05.2020",
-          category: "Category",
-          image: null));
-    }
+    listAssetData = assetData.pushData();
   }
 
   @override
@@ -40,7 +34,6 @@ class _AssetPageState extends State<AssetPage> {
       body: ListView(
         children: <Widget>[
           buildHeaderAndProfile(),
-          // buildAds(),
           CarouselWithIndicator(),
           buildLabelAndSeeAll(),
           buildYourAssets()
@@ -51,8 +44,11 @@ class _AssetPageState extends State<AssetPage> {
 
   Column buildYourAssets() {
     return Column(
-      children: Iterable.generate(modelAsset.length, (index) {
-        return ModelAssetWidget(modelAsset[index]);
+      children: listAssetData.map((i) {
+        if (i.id < 6)
+          return ModelAssetWidget(i);
+        else
+          return Container();
       }).toList(),
     );
   }
@@ -70,63 +66,44 @@ class _AssetPageState extends State<AssetPage> {
         Expanded(
             child: Padding(
           padding: const EdgeInsets.only(right: 10.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: <Widget>[
-              TextBuilder.build(
-                  title: "See All", style: TextStyleCustom.STYLE_CONTENT),
-              SizedBox(
-                width: 10.0,
-              ),
-              Container(
-                width: 20,
-                height: 20,
-                decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      width: 2,
-                      color: COLOR_THEME_APP,
-                    )),
-                child: Center(
-                  child: Icon(
-                    Icons.arrow_forward_ios,
-                    size: 10,
-                    color: COLOR_THEME_APP,
-                  ),
+          child: GestureDetector(
+            onTap: () => ecsLib.pushPage(
+                context: context,
+                pageWidget: AssetsAll(
+                  listData: listAssetData,
+                )),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                TextBuilder.build(
+                    title: "See All", style: TextStyleCustom.STYLE_CONTENT),
+                SizedBox(
+                  width: 10.0,
                 ),
-              )
-            ],
+                Container(
+                  width: 20,
+                  height: 20,
+                  decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        width: 2,
+                        color: COLOR_THEME_APP,
+                      )),
+                  child: Center(
+                    child: Icon(
+                      Icons.arrow_forward_ios,
+                      size: 10,
+                      color: COLOR_THEME_APP,
+                    ),
+                  ),
+                )
+              ],
+            ),
           ),
         )),
       ],
     );
   }
-
-  // Container buildAds() {
-  //   return Container(
-  //     child: CarouselSlider(
-  //       autoPlay: true,
-  //       viewportFraction: 0.9,
-  //       enlargeCenterPage: true,
-  //       height: 100,
-  //       // autoPlayCurve: Curves.elasticOut,
-  //       items: [1, 2, 3, 4, 5].map((i) {
-  //         return Container(
-  //           margin: EdgeInsets.symmetric(horizontal: 2, vertical: 2),
-  //           decoration: BoxDecoration(
-  //               color: Colors.black, borderRadius: BorderRadius.circular(10)),
-  //           width: MediaQuery.of(context).size.width,
-  //           child: Center(
-  //             child: TextBuilder.build(
-  //                 title: "$i",
-  //                 style:
-  //                     TextStyleCustom.STYLE_LABEL.copyWith(color: COLOR_WHITE)),
-  //           ),
-  //         );
-  //       }).toList(),
-  //     ),
-  //   );
-  // }
 
   Widget buildHeaderAndProfile() {
     var dateTime = DateTime.now();
@@ -140,7 +117,8 @@ class _AssetPageState extends State<AssetPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                TextBuilder.build(title: date),
+                TextBuilder.build(
+                    title: date, style: TextStyleCustom.STYLE_LABEL_BOLD),
                 TextBuilder.build(
                     title: "Hello, Username",
                     style:
@@ -196,120 +174,20 @@ class ModelAssetData {
       this.expire,
       this.category,
       this.image});
-}
 
-class ModelAssetWidget extends StatelessWidget {
-  final assetData;
-  final ecsLib = getIt.get<ECSLib>();
-  ModelAssetWidget(this.assetData);
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 5,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-      child: Container(
-        child: InkWell(
-          borderRadius: BorderRadius.circular(10.0),
-          splashColor: Colors.teal[200],
-          onTap: () {
-            ecsLib.pushPage(
-                context: context,
-                pageWidget: DetailAsset(
-                  id: assetData.id,
-                  title: assetData.title,
-                  content: assetData.content,
-                  expire: assetData.expire,
-                  category: assetData.category,
-                  image: null,
-                ));
-          },
-          child: Row(
-            children: <Widget>[
-              Expanded(
-                //------------------Image------------
-                flex: 1,
-                child: Container(
-                  margin: EdgeInsets.all(10.0),
-                  width: 100.0,
-                  height: 150.0,
-                  decoration: BoxDecoration(
-                      border: Border.all(width: 0.5),
-                      borderRadius: BorderRadius.circular(10.0)),
-                  child: Container(
-                      child: Stack(
-                    children: <Widget>[
-                      Center(
-                        child: Container(
-                          width: 100.0,
-                          height: 150,
-                          child: Hero(
-                            tag: "thumbnail_${assetData.id}",
-                            child: assetData.image ??
-                                FlutterLogo(
-                                  colors: COLOR_THEME_APP,
-                                ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  )),
-                ),
-              ),
-              Expanded(
-                //------------------Detail------------
-                flex: 2,
-                child: Container(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      TextBuilder.build(
-                          //------------------Title------------
-                          title: assetData.title ?? "Dyson V7 Trigger",
-                          style: TextStyleCustom.STYLE_LABEL_BOLD),
-                      TextBuilder.build(
-                          //------------------detail------------
-                          title: assetData.content ??
-                              "Simply dummy text of the printing and typeseting industy ...",
-                          style: TextStyleCustom.STYLE_CONTENT
-                              .copyWith(fontSize: 14, letterSpacing: 0)),
-                      Padding(
-                        //------------------Expire------------
-                        padding: const EdgeInsets.only(top: 8),
-                        child: TextBuilder.build(
-                            title: assetData.expire ??
-                                "Warranty Date : 24.05.2019 - 24.05.2020",
-                            style: TextStyleCustom.STYLE_CONTENT
-                                .copyWith(fontSize: 12, letterSpacing: 0)),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 5.0),
-                        child: Container(
-                          //------------------Categotry------------
-                          width: 80,
-                          height: 30,
-                          padding: EdgeInsets.all(2),
-                          decoration: BoxDecoration(
-                              color: COLOR_GREY.withOpacity(0.5),
-                              borderRadius: BorderRadius.circular(15.0)),
-                          key: Key("Category"),
-                          child: Center(
-                            child: TextBuilder.build(
-                                title: assetData.category ?? "Category",
-                                style: TextStyleCustom.STYLE_LABEL
-                                    .copyWith(letterSpacing: 0)
-                                    .copyWith(fontSize: 12)),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+  List<ModelAssetData> listModelData = [];
+  List<ModelAssetData> pushData() {
+    for (var i = 0; i < 10; i++) {
+      listModelData.add(ModelAssetData(
+          id: i,
+          title: "Dyson V7 Trigger",
+          content:
+              "Simply dummy text of the printing and typeseting industy asduasdljb u iuabsldkj ",
+          expire: "Warranty Date : 24.05.2019 - 24.05.2020",
+          category: "Category",
+          image: null));
+    }
+    return listModelData;
   }
 }
 
