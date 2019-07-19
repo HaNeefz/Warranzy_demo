@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:warranzy_demo/page/profile_page/scProfile.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
@@ -128,6 +129,8 @@ class _AssetPageState extends State<AssetPage> {
   // }
 
   Widget buildHeaderAndProfile() {
+    var dateTime = DateTime.now();
+    String date = DateFormat('EEEE, d MMMM').format(dateTime);
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Row(
@@ -137,7 +140,7 @@ class _AssetPageState extends State<AssetPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                TextBuilder.build(title: "Wed, 24 May"),
+                TextBuilder.build(title: date),
                 TextBuilder.build(
                     title: "Hello, Username",
                     style:
