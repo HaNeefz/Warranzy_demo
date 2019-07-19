@@ -182,9 +182,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: <Widget>[
                     buttonContact(Icons.call, "Call Center", Colors.green,
-                        () => _service.call("0970323455")),
+                        () => _service.call("0123456789")),
                     buttonContact(Icons.sms, "Send Sms", Colors.blue,
-                        () => _service.sendSms("0970323455")),
+                        () => _service.sendSms("0123456789")),
                     buttonContact(Icons.email, "Email us", Colors.redAccent,
                         () => _service.sendEmail("wpoungchoo@gmail.com")),
                   ],
