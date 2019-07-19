@@ -56,20 +56,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
     return Scaffold(
       appBar: AppBarThemes.appBarStyle(
         context: context,
-        actions: [
-          Switch(
-            onChanged: (bool value) {
-              setState(() {
-                widget.usedPin = value;
-              });
-            },
-            value: widget.usedPin,
-          ),
-          FlatButton(
-              child: TextBuilder.build(
-                  title: widget.usedPin == true ? "PIN" : "Scan"),
-              onPressed: null)
-        ],
+        actions: [switchUsedPin()],
       ),
       body: SingleChildScrollView(
         child: Center(
@@ -87,6 +74,35 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
         ),
       ),
     );
+  }
+
+  Widget switchUsedPin() {
+    Widget switchWidget = Container();
+    switch (type) {
+      case PageType.login:
+        switchWidget = Row(
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                Switch(
+                  onChanged: (bool value) {
+                    setState(() {
+                      widget.usedPin = value;
+                    });
+                  },
+                  value: widget.usedPin,
+                ),
+                FlatButton(
+                    child: TextBuilder.build(title: "Use PIN"), onPressed: null)
+              ],
+            )
+          ],
+        );
+        break;
+      default:
+        switchWidget = Container();
+    }
+    return switchWidget;
   }
 
   Widget buildButtonConfirmPinForSetPin() {
