@@ -48,18 +48,23 @@ class _MainPageState extends State<MainPage>
                 title: TextBuilder.build(title: "Asset", style: textStyle),
                 icon: Icon(
                   Icons.card_giftcard,
-                  color: COLOR_BLACK,
                 )),
             BottomNavigationBarItem(
                 title: TextBuilder.build(title: "Service", style: textStyle),
-                icon: Icon(Icons.timeline, color: COLOR_BLACK)),
+                icon: Icon(
+                  Icons.timeline,
+                )),
             BottomNavigationBarItem(
                 title: TextBuilder.build(title: "Trade", style: textStyle),
-                icon: Icon(Icons.account_balance, color: COLOR_BLACK)),
+                icon: Icon(
+                  Icons.account_balance,
+                )),
             BottomNavigationBarItem(
               title: TextBuilder.build(title: "Notification", style: textStyle),
               icon: notiState.emptyMessage
-                  ? Icon(Icons.notifications, color: COLOR_BLACK)
+                  ? Icon(
+                      Icons.notifications,
+                    )
                   : Badge(
                       badgeContent: TextBuilder.build(
                           title: "${notiState.counterMessage}",
@@ -70,6 +75,9 @@ class _MainPageState extends State<MainPage>
           ],
           currentIndex: currentPage,
           type: BottomNavigationBarType.fixed,
+          selectedItemColor: COLOR_THEME_APP,
+          unselectedItemColor: COLOR_BLACK,
+          selectedFontSize: 15,          
           onTap: (position) {
             setState(() {
               setPage = position;
