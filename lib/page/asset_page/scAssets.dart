@@ -7,8 +7,7 @@ import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 
-import 'detail_asset_page/scDetailAsset.dart';
-import 'scAssetsAll.dart';
+import 'all_asset_page/scAssetsAll.dart';
 import 'widget_assets/widget_asset.dart';
 
 class AssetPage extends StatefulWidget {
