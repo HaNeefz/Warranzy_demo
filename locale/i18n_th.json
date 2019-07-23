@@ -92,9 +92,11 @@
     "ok": "ตกลง",
     "close": "ปิด",
     "cancel": "ยกเลิก",
-    "done": "สำเร็จ",
+    "done": "เสร็จเเล้ว",
     "submit" : "ยืนยัน",
     "continue":"ต่อไป",
+    "finish" :"เรียบร้อย",
+    "success": "สำเร็จ",
     
     "------_comment Aert": "Alert------------",
     "title_award": "รางวัลหวย",

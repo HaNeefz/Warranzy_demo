@@ -102,6 +102,8 @@
     "done" : "Done",
     "submit" : "Submit",
     "continue":"Continue",
+    "finish" :"Finish",
+    "success": "Success",
 
     "------_comment Aert" : "Alert------------",
     "title_award" : "AWARD LOTTO.",
