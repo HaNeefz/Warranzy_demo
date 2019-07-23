@@ -1,23 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
+import 'package:warranzy_demo/tools/const.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/button_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 
-import '../scAdd_image.dart';
+import 'scAdd_image.dart';
 
-class ShowDetailProductAfterScanQR extends StatefulWidget {
+class InputInformation extends StatefulWidget {
+  final PageAction page;
+
+  const InputInformation({Key key, this.page}) : super(key: key);
   @override
-  _ShowDetailProductAfterScanQRState createState() =>
-      _ShowDetailProductAfterScanQRState();
+  _InputInformationState createState() => _InputInformationState();
 }
 
-class _ShowDetailProductAfterScanQRState
-    extends State<ShowDetailProductAfterScanQR> {
+class _InputInformationState extends State<InputInformation> {
   final ecsLib = getIt.get<ECSLib>();
   final allTranslations = getIt.get<GlobalTranslations>();
+  var valueBrandName = "DysonElectric";
+  List<String> _dataBrandNameDD = [
+    "Dyson Electric",
+    "Dyson Phone",
+    "Doyson TV"
+  ];
+  var valueMenufacturer = "Dyson V7 Trigger";
+  List<String> _dataMenufacturerDD = [
+    "Dyson V7 Trigger",
+    "Dyson V6 Trigger",
+    "Dyson V5 Trigger"
+  ];
+
+  PageAction get page => widget.page;
   @override
   Widget build(BuildContext context) {
     List<String> _title = [
@@ -38,6 +54,7 @@ class _ShowDetailProductAfterScanQRState
       "${DateFormat("d.MM.yy").format(DateTime.now())}",
       "${DateFormat("dd.MM.yy").format(DateTime.utc(2019, 9, 12))}"
     ];
+
     return Scaffold(
       appBar: AppBar(
         title: TextBuilder.build(
@@ -51,11 +68,38 @@ class _ShowDetailProductAfterScanQRState
             SizedBox(
               height: 20,
             ),
-            // for (var _title in title)
-            //   buildInformation(title: _title, data: data[_title.]),
-            buildInformation(title: "Brand Name", data: "Dyson Electric"),
-            buildInformation(
-                title: "Manufacturer Name", data: "Dyson V7 Trigger"),
+            if (page == PageAction.SCAN_QR_CODE)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  buildInformation(title: "Brand Name", data: "Dyson Electric"),
+                  buildInformation(
+                      title: "Manufacturer Name", data: "Dyson V7 Trigger"),
+                ],
+              )
+            else
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  buildInformation(title: "Brand Name Change is ", data: "Dyson Electric"),
+                  buildInformation(
+                      title: "Manufacturer Name", data: "Dyson V7 Trigger"),
+                ],
+              ),
+            // DropdownButton<String>(
+            //   value: valueBrandName,
+            //   items: <String>["1", "0", "2", "3"].map<DropdownMenuItem<String>>((data) {
+            //     return DropdownMenuItem<String>(
+            //       value: data,
+            //       child: TextBuilder.build(title: data),
+            //     );
+            //   }).toList(),
+            //   onChanged: (value) {
+            //     setState(() {
+            //       valueBrandName = value;
+            //     });
+            //   },
+            // ),
             buildInformation(
                 title: "Manufacturer Product ID", data: "Dyson123456"),
             buildInformation(title: "Serial No.", data: "DS12345678"),
@@ -66,13 +110,64 @@ class _ShowDetailProductAfterScanQRState
             buildInformation(
                 title: "Expire Date",
                 data: DateFormat("dd.MM.yy").format(DateTime.utc(2019, 9, 12))),
-
-            buildProductImage(),
-            buildDetailProduct(),
+            if (page == PageAction.SCAN_QR_CODE)
+              Column(
+                children: <Widget>[
+                  buildProductImage(),
+                  buildDetailProduct(),
+                ],
+              ),
             buildContinue(context)
           ],
         ),
       ),
+    );
+  }
+
+  Widget buildBrandAndMenufacturer() {
+    return Column(
+      children: <Widget>[
+        Container(
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+              border: Border.all(width: 0.3, color: COLOR_GREY),
+              borderRadius: BorderRadius.circular(5)),
+          child: DropdownButton<String>(
+            isExpanded: true,
+            value: valueBrandName,
+            items: ["Dyson Electric", "Dyson Phone", "Doyson TV"]
+                .map<DropdownMenuItem<String>>((data) {
+              return DropdownMenuItem<String>(
+                value: data,
+                child: TextBuilder.build(title: data),
+              );
+            }).toList(),
+            onChanged: (value) {
+              valueBrandName = value;
+            },
+          ),
+        ),
+        Container(
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+              border: Border.all(width: 0.3, color: COLOR_GREY),
+              borderRadius: BorderRadius.circular(5)),
+          child: DropdownButton<String>(
+            isExpanded: true,
+            value: valueMenufacturer,
+            items: ["Dyson V7 Trigger", "Dyson V6 Trigger", "Dyson V5 Trigger"]
+                .map<DropdownMenuItem<String>>((data) {
+              return DropdownMenuItem<String>(
+                value: data,
+                child: TextBuilder.build(title: data),
+              );
+            }).toList(),
+            onChanged: (value) {
+              valueMenufacturer = value;
+            },
+          ),
+        ),
+      ],
     );
   }
 

@@ -4,10 +4,11 @@ import 'package:warranzy_demo/page/asset_page/widget_assets/widget_asset.dart';
 import 'package:warranzy_demo/services/method/scan_qr.dart';
 import 'package:warranzy_demo/tools/assets.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
+import 'package:warranzy_demo/tools/const.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 
-import 'add_assets_page/scan_qr_asset_page/scShow_detail_product.dart';
+import 'add_assets_page/scShow_detail_product.dart';
 
 class AssetsAll extends StatefulWidget {
   final List<ModelAssetData> listData;
@@ -69,10 +70,13 @@ class _AssetsAllState extends State<AssetsAll> {
               title: TextBuilder.build(title: "Scan QR Code"),
               onTap: () async {
                 var res = await MethodLib.scanQR(context);
+                print("Scan QR Code");
                 if (res.isNotEmpty) Navigator.pop(context);
                 ecsLib.pushPage(
                   context: context,
-                  pageWidget: ShowDetailProductAfterScanQR(),
+                  pageWidget: InputInformation(
+                    page: PageAction.SCAN_QR_CODE,
+                  ),
                 );
               },
             ),
@@ -85,7 +89,14 @@ class _AssetsAllState extends State<AssetsAll> {
               ),
               title: TextBuilder.build(title: "Manaul Add Asset"),
               onTap: () {
-                print("tap");
+                print("Manual Add Asset");
+                Navigator.pop(context);
+                ecsLib.pushPage(
+                  context: context,
+                  pageWidget: InputInformation(
+                    page: PageAction.MANUAL_ADD,
+                  ),
+                );
               },
             ),
           ],

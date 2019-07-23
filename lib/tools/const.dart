@@ -18,9 +18,7 @@ final androidStrings = AndroidAuthMessages(
 final Pattern pattern =
     r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
 
-enum StatusAsset{
-  delivery,
-  none
-}
+enum StatusAsset { delivery, none }
 
 enum PageType { setPin, login }
+enum PageAction { SCAN_QR_CODE, MANUAL_ADD }
