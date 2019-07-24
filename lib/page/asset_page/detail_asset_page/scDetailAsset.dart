@@ -10,6 +10,7 @@ import 'package:warranzy_demo/tools/widget_ui_custom/carouselImage.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 
 import 'scRequest_service.dart';
+import 'scTrade_asset.dart';
 
 class DetailAsset extends StatefulWidget {
   final ModelAssetsData assetsData;
@@ -121,14 +122,23 @@ class _DetailAssetState extends State<DetailAsset> {
                             Navigator.pop(context);
                             ecsLib.pushPage(
                               context: context,
-                              pageWidget: RequestService(assetName: _assetsData.manuFacturerName),
+                              pageWidget: RequestService(
+                                  assetName: _assetsData.manuFacturerName),
                             );
                           }),
                       Divider(),
                       buildModelDataOfButtonSheet(
                           icons: Icons.store,
                           title: "Trade asset",
-                          onTap: () {}),
+                          onTap: () {
+                            Navigator.pop(context);
+                            ecsLib.pushPage(
+                              context: context,
+                              pageWidget:
+                                  TradeInformation(assetsData: _assetsData),
+                            );
+                            //TradeInformation
+                          }),
                       Divider(),
                       buildModelDataOfButtonSheet(
                           icons: Icons.repeat,
