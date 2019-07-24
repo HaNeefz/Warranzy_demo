@@ -315,26 +315,22 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
           padding: EdgeInsets.only(
               top: MediaQuery.of(context).size.height / 2 - 100),
           child: Column(children: <Widget>[
-            TextBuilder.build(
-                title: "Use another verification",
-                style: TextStyleCustom.STYLE_CONTENT),
-            SizedBox(
-              height: 20,
-            ),
             ButtonBuilder.buttonCustom(
                 context: context,
                 label: "Scan fingerprint",
                 onPressed: () => _localAuth()),
             Padding(
-                padding: const EdgeInsets.only(top: 40.0),
-                child: ButtonBuilder.buttonCustom(
-                    context: context,
-                    label: allTranslations.text("forgot_pin"),
-                    onPressed: () {
-                      setState(() {
-                        widget.usedPin = !widget.usedPin;
-                      });
-                    })),
+              padding: const EdgeInsets.only(top: 20.0),
+              child: GestureDetector(
+                child: TextBuilder.build(
+                    title: allTranslations.text("forgot_pin"),
+                    style: TextStyleCustom.STYLE_LABEL
+                        .copyWith(color: COLOR_THEME_APP)),
+                onTap: () => setState(() {
+                  widget.usedPin = !widget.usedPin;
+                }),
+              ),
+            ),
             SizedBox(
               height: 50.0,
             )
