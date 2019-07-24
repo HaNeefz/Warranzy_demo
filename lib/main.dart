@@ -4,6 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
+import 'package:warranzy_demo/tools/theme_color.dart';
 
 import 'page/splash_screen/scSplash_screen.dart';
 import 'services/providers/notification_state.dart';
@@ -100,12 +101,13 @@ class _MyHomePageState extends State<MyHomePage> {
       initialRoute: '/',
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.teal,
-        // primaryColor: Colors.white,
-        scaffoldBackgroundColor: Colors.white,
-        appBarTheme: AppBarTheme(),
-        // fontFamily: "Ekkamai"
-      ), //Supermarket
+          primarySwatch: Colors.teal,
+          // primaryColor: Colors.white,
+          scaffoldBackgroundColor: Colors.white,
+          appBarTheme: AppBarTheme(),
+          iconTheme: IconThemeData(color: COLOR_THEME_APP)
+          // fontFamily: "Ekkamai"
+          ), //Supermarket
       home: SplashScreenPage(),
     );
   }

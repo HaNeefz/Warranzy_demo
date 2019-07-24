@@ -79,6 +79,45 @@ class _DetailAssetState extends State<DetailAsset> {
                       SizedBox(
                         height: 20,
                       ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          TextBuilder.build(
+                              title: _assetsData.manuFacturerName,
+                              style: TextStyleCustom.STYLE_TITLE),
+                          IconButton(
+                            icon: Icon(Icons.more_vert),
+                            onPressed: () {
+                              showModalBottomSheet(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return Container(
+                                    height: 250,
+                                    child: Column(
+                                      children: <Widget>[
+                                        buildModelDataOfButtonSheet(
+                                            icons: Icons.timeline,
+                                            title: "Request service",
+                                            onTap: () {}),
+                                        Divider(),
+                                        buildModelDataOfButtonSheet(
+                                            icons: Icons.store,
+                                            title: "Trade asset",
+                                            onTap: () {}),
+                                        Divider(),
+                                        buildModelDataOfButtonSheet(
+                                            icons: Icons.repeat,
+                                            title: "Tranfer asset",
+                                            onTap: () {}),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          )
+                        ],
+                      ),
                       buildAssetInformation(),
                       buildProductPhotoByCustomer(),
                       buildLastAssetInformation(),
@@ -91,6 +130,15 @@ class _DetailAssetState extends State<DetailAsset> {
           ],
         ),
       ),
+    );
+  }
+
+  ListTile buildModelDataOfButtonSheet(
+      {IconData icons, String title, Function onTap}) {
+    return ListTile(
+      leading: Icon(icons),
+      title: TextBuilder.build(title: title),
+      onTap: onTap,
     );
   }
 
@@ -189,9 +237,7 @@ class _DetailAssetState extends State<DetailAsset> {
       text: TextSpan(
         style: TextStyleCustom.STYLE_CONTENT,
         children: [
-          TextSpan(
-              text: _assetsData.manuFacturerName + "\n",
-              style: TextStyleCustom.STYLE_TITLE), // MenuFacturerName
+          // MenuFacturerName
           TextSpan(text: _assetsData.note + "\n\n"), // Note
           TextSpan(
               text: "Product Price : " +
