@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 import '../theme_color.dart';
 
-const String fontFamily = "";//"Ekkamai"; //Supermarket//Ekkamai
+const String fontFamily = ""; //"Ekkamai"; //Supermarket//Ekkamai
 
 class TextStyleCustom {
   static const TextStyle STYLE_APPBAR = TextStyle(
-      color: COLOR_BLACK,
+      color: COLOR_WHITE,
       fontSize: 24,
       // height: 1.2,
       // letterSpacing: 1.0,

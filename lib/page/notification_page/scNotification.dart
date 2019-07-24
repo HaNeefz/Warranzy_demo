@@ -19,7 +19,8 @@ class _NotificationPageState extends State<NotificationPage> {
         backgroundColor: COLOR_WHITE,
         elevation: 0.0,
         title: TextBuilder.build(
-            title: "Notification", style: TextStyleCustom.STYLE_APPBAR),
+            title: "Notification",
+            style: TextStyleCustom.STYLE_APPBAR.copyWith(color: COLOR_BLACK)),
       ),
       body: Container(child: ShowMessage()),
     );

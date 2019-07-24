@@ -45,7 +45,8 @@ class _TradePageState extends State<TradePage> {
             )
           ],
           title: TextBuilder.build(
-              title: "Trade Market", style: TextStyleCustom.STYLE_APPBAR),
+              title: "Trade Market",
+              style: TextStyleCustom.STYLE_APPBAR.copyWith(color: COLOR_BLACK)),
           bottom: TabBar(
             indicatorColor: COLOR_THEME_APP,
             onTap: (i) {

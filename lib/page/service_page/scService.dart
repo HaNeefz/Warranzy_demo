@@ -20,7 +20,8 @@ class _ClaimAndServicePageState extends State<ClaimAndServicePage> {
         appBar: AppBar(
           backgroundColor: COLOR_WHITE,
           title: TextBuilder.build(
-              title: "Claim & Service", style: TextStyleCustom.STYLE_APPBAR),
+              title: "Claim & Service",
+              style: TextStyleCustom.STYLE_APPBAR.copyWith(color: COLOR_BLACK)),
           bottom: TabBar(
             indicatorColor: COLOR_THEME_APP,
             labelPadding: EdgeInsets.symmetric(vertical: 10),
@@ -44,8 +45,3 @@ class _ClaimAndServicePageState extends State<ClaimAndServicePage> {
     );
   }
 }
-
-
-
-
-
