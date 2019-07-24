@@ -3,13 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:warranzy_demo/models/model_asset_data.dart';
 import 'package:warranzy_demo/page/profile_page/scProfile.dart';
+import 'package:warranzy_demo/services/method/scan_qr.dart';
+import 'package:warranzy_demo/tools/assets.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
+import 'package:warranzy_demo/tools/const.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/carouselImage.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 
-import 'all_asset_page/scAssetsAll.dart';
+import 'add_assets_page/scShow_detail_product.dart';
 import 'widget_assets/widget_asset.dart';
 
 class AssetPage extends StatefulWidget {
@@ -31,16 +34,18 @@ class _AssetPageState extends State<AssetPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: ListView(
-        children: <Widget>[
-          buildHeaderAndProfile(),
-          CarouselWithIndicator(
-            items: ["1", "2", "3", "5"],
-          ),
-          buildLabelAndSeeAll(),
-          buildYourAssets()
-        ],
+    return SafeArea(
+      child: Scaffold(
+        body: ListView(
+          children: <Widget>[
+            buildHeaderAndProfile(),
+            CarouselWithIndicator(
+              items: ["1", "2", "3", "5"],
+            ),
+            buildLabelAndSeeAll(),
+            buildYourAssets()
+          ],
+        ),
       ),
     );
   }
@@ -48,10 +53,7 @@ class _AssetPageState extends State<AssetPage> {
   Column buildYourAssets() {
     return Column(
       children: listAssetData.map((i) {
-        if (i.id < 6)
-          return ModelAssetWidget(i);
-        else
-          return Container();
+        return ModelAssetWidget(i);
       }).toList(),
     );
   }
@@ -69,39 +71,20 @@ class _AssetPageState extends State<AssetPage> {
         Expanded(
             child: Padding(
           padding: const EdgeInsets.only(right: 10.0),
-          child: GestureDetector(
-            onTap: () => ecsLib.pushPage(
-                context: context,
-                pageWidget: AssetsAll(
-                  listData: listAssetData,
-                )),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                TextBuilder.build(
-                    title: "See All", style: TextStyleCustom.STYLE_CONTENT),
-                SizedBox(
-                  width: 10.0,
-                ),
-                Container(
-                  width: 20,
-                  height: 20,
-                  decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        width: 2,
-                        color: COLOR_THEME_APP,
-                      )),
-                  child: Center(
-                    child: Icon(
-                      Icons.arrow_forward_ios,
-                      size: 10,
-                      color: COLOR_THEME_APP,
-                    ),
-                  ),
-                )
-              ],
-            ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              IconButton(
+                icon: Icon(Icons.add_circle),
+                tooltip: "Add Asset",
+                onPressed: () => buildShowModalBottomSheet(context),
+              ),
+              IconButton(
+                icon: Icon(Icons.sort),
+                tooltip: "Sort Asset",
+                onPressed: () {},
+              ),
+            ],
           ),
         )),
       ],
@@ -157,6 +140,58 @@ class _AssetPageState extends State<AssetPage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Future buildShowModalBottomSheet(BuildContext context) {
+    return showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) => Container(
+        height: 200,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            ListTile(
+              leading: SizedBox(
+                width: 30,
+                height: 30,
+                child: Image.asset(Assets.ICON_SCANNER),
+              ),
+              title: TextBuilder.build(title: "Scan QR Code"),
+              onTap: () async {
+                var res = await MethodLib.scanQR(context);
+                print("Scan QR Code");
+                if (res.isNotEmpty) Navigator.pop(context);
+                ecsLib.pushPage(
+                  context: context,
+                  pageWidget: InputInformation(
+                    onClickAddAssetPage: PageAction.SCAN_QR_CODE,
+                  ),
+                );
+              },
+            ),
+            Divider(),
+            ListTile(
+              leading: Icon(
+                Icons.playlist_add,
+                color: COLOR_BLACK,
+                size: 35,
+              ),
+              title: TextBuilder.build(title: "Manaul Add Asset"),
+              onTap: () {
+                print("Manual Add Asset");
+                Navigator.pop(context);
+                ecsLib.pushPage(
+                  context: context,
+                  pageWidget: InputInformation(
+                    onClickAddAssetPage: PageAction.MANUAL_ADD,
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

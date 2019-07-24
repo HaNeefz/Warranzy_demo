@@ -22,3 +22,4 @@ enum StatusAsset { delivery, none }
 
 enum PageType { setPin, login }
 enum PageAction { SCAN_QR_CODE, MANUAL_ADD }
+enum PageAsset { EDIT_ABLE, NEW_ASSET }

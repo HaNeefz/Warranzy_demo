@@ -1,4 +1,3 @@
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:warranzy_demo/models/model_asset_data.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
@@ -6,7 +5,6 @@ import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/button_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/carouselImage.dart';
-import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 
 class DetailAsset extends StatefulWidget {
   final ModelAssetsData assetsData;

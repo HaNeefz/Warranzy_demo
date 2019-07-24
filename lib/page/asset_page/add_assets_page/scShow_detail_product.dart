@@ -10,9 +10,14 @@ import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 import 'scAdd_image.dart';
 
 class InputInformation extends StatefulWidget {
-  final PageAction page;
+  final PageAction onClickAddAssetPage;
+  final PageAsset forEditableInformation;
 
-  const InputInformation({Key key, this.page}) : super(key: key);
+  InputInformation(
+      {Key key,
+      this.onClickAddAssetPage,
+      this.forEditableInformation = PageAsset.NEW_ASSET})
+      : super(key: key);
   @override
   _InputInformationState createState() => _InputInformationState();
 }
@@ -33,7 +38,10 @@ class _InputInformationState extends State<InputInformation> {
     "Dyson V5 Trigger"
   ];
 
-  PageAction get page => widget.page;
+  PageAction get page => widget.onClickAddAssetPage;
+  PageAsset get forEditAbleInformation => widget.forEditableInformation;
+
+  bool get editAble => forEditAbleInformation == PageAsset.EDIT_ABLE;
   @override
   Widget build(BuildContext context) {
     List<String> _title = [
@@ -58,7 +66,8 @@ class _InputInformationState extends State<InputInformation> {
     return Scaffold(
       appBar: AppBar(
         title: TextBuilder.build(
-            title: "New Asset", style: TextStyleCustom.STYLE_APPBAR),
+            title: editAble ? "Edit Asset" : "New Asset",
+            style: TextStyleCustom.STYLE_APPBAR),
       ),
       body: Padding(
         padding: const EdgeInsets.only(left: 15.0, right: 10, top: 20),
@@ -81,7 +90,8 @@ class _InputInformationState extends State<InputInformation> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  buildInformation(title: "Brand Name Change is ", data: "Dyson Electric"),
+                  buildInformation(
+                      title: "Brand Name Change is ", data: "Dyson Electric"),
                   buildInformation(
                       title: "Manufacturer Name", data: "Dyson V7 Trigger"),
                 ],
