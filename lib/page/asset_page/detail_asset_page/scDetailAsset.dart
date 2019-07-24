@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:warranzy_demo/models/model_asset_data.dart';
 import 'package:warranzy_demo/page/asset_page/add_assets_page/scShow_detail_product.dart';
+import 'package:warranzy_demo/page/asset_page/detail_asset_page/scTranfer_asset.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/const.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
@@ -143,7 +144,15 @@ class _DetailAssetState extends State<DetailAsset> {
                       buildModelDataOfButtonSheet(
                           icons: Icons.repeat,
                           title: "Tranfer asset",
-                          onTap: () {}),
+                          onTap: () {
+                            Navigator.pop(context);
+                            ecsLib.pushPage(
+                              context: context,
+                              pageWidget:
+                                  TranfersInformation(assetsData: _assetsData),
+                            );
+                            //TradeI
+                          }),
                     ],
                   ),
                 );
