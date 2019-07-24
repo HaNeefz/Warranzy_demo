@@ -121,6 +121,7 @@
 
     "content_used_language" : "is currently in use.",
     "forgot_password" : "Forgot password",
+    "forgot_pin":"Forgot PIN",
     "loading" : "Please waiting...",
 
     "pin_incorrect" : "Pin Incorrect"

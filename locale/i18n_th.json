@@ -112,6 +112,7 @@
     "content_delete": "คุณเเน่ใจว่าต้องการลบหวยหรือไม่ ?",
     "content_used_language": "กำลังใช้งานอยู่ในปัจจุบัน",
     "forgot_password": "ลืมรหัสผ่าน",
+    "forgot_pin":"ลืม PIN",
     "loading" : "กรุณารอสักครู่...",
 
     "pin_incorrect" : "Pin ไม่ถูกต้อง"

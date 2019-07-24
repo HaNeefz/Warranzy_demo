@@ -32,7 +32,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
 
   Future _localAuth() async {
     await Future.delayed(
-        Duration(milliseconds: 400),
+        Duration(milliseconds: 300),
         () => localAuth.authenticate().then((_authorized) {
               if (_authorized) {
                 gotoMainPage();
@@ -56,7 +56,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
     return Scaffold(
       appBar: AppBarThemes.appBarStyle(
         context: context,
-        actions: [switchUsedPin()],
+        // actions: [switchUsedPin()],
       ),
       body: SingleChildScrollView(
         child: Center(
@@ -326,20 +326,15 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
                 label: "Scan fingerprint",
                 onPressed: () => _localAuth()),
             Padding(
-              padding: const EdgeInsets.only(top: 40.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  TextBuilder.build(
-                      title: "Forgot password",
-                      style: TextStyleCustom.STYLE_CONTENT),
-                  TextBuilder.build(title: "\t\t|\t\t"),
-                  TextBuilder.build(
-                      title: "Change Account",
-                      style: TextStyleCustom.STYLE_CONTENT)
-                ],
-              ),
-            ),
+                padding: const EdgeInsets.only(top: 40.0),
+                child: ButtonBuilder.buttonCustom(
+                    context: context,
+                    label: allTranslations.text("forgot_pin"),
+                    onPressed: () {
+                      setState(() {
+                        widget.usedPin = !widget.usedPin;
+                      });
+                    })),
             SizedBox(
               height: 50.0,
             )
