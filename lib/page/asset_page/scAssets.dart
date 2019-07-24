@@ -167,6 +167,7 @@ class _AssetPageState extends State<AssetPage> {
                   context: context,
                   pageWidget: InputInformation(
                     onClickAddAssetPage: PageAction.SCAN_QR_CODE,
+                    hasDataAssetAlready: false,
                   ),
                 );
               },

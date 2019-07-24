@@ -11,12 +11,10 @@ import 'scAdd_image.dart';
 
 class InputInformation extends StatefulWidget {
   final PageAction onClickAddAssetPage;
-  final PageAsset forEditableInformation;
+  final bool hasDataAssetAlready;
 
   InputInformation(
-      {Key key,
-      this.onClickAddAssetPage,
-      this.forEditableInformation = PageAsset.NEW_ASSET})
+      {Key key, this.onClickAddAssetPage, this.hasDataAssetAlready = false})
       : super(key: key);
   @override
   _InputInformationState createState() => _InputInformationState();
@@ -39,9 +37,6 @@ class _InputInformationState extends State<InputInformation> {
   ];
 
   PageAction get page => widget.onClickAddAssetPage;
-  PageAsset get forEditAbleInformation => widget.forEditableInformation;
-
-  bool get editAble => forEditAbleInformation == PageAsset.EDIT_ABLE;
   @override
   Widget build(BuildContext context) {
     List<String> _title = [
@@ -66,7 +61,9 @@ class _InputInformationState extends State<InputInformation> {
     return Scaffold(
       appBar: AppBar(
         title: TextBuilder.build(
-            title: editAble ? "Edit Asset" : "New Asset",
+            title: widget.hasDataAssetAlready == true
+                ? "Edit Asset"
+                : "New Asset",
             style: TextStyleCustom.STYLE_APPBAR),
       ),
       body: Padding(
@@ -192,7 +189,9 @@ class _InputInformationState extends State<InputInformation> {
             print("tap");
             ecsLib.pushPage(
               context: context,
-              pageWidget: AddImage(),
+              pageWidget: AddImage(
+                hasDataAssetAlready: widget.hasDataAssetAlready,
+              ),
             );
           }),
     );

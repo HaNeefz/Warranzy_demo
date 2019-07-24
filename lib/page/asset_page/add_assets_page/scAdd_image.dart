@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
+import 'package:warranzy_demo/tools/const.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/button_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
@@ -7,21 +8,26 @@ import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 import 'scMoreInfoAsset.dart';
 
 class AddImage extends StatefulWidget {
+  final bool hasDataAssetAlready;
+
+  AddImage({Key key, this.hasDataAssetAlready = false}) : super(key: key);
   @override
   _AddImageState createState() => _AddImageState();
 }
 
 class _AddImageState extends State<AddImage> {
-  @override
   int counterImage = 0;
   final ecsLib = getIt.get<ECSLib>();
   final allTranslations = getIt.get<GlobalTranslations>();
 
+  bool get hasDataAssetAlready => widget.hasDataAssetAlready == true;
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: TextBuilder.build(
-            title: "New Asset", style: TextStyleCustom.STYLE_APPBAR),
+            title: hasDataAssetAlready ? "Edit Asset" : "New Asset",
+            style: TextStyleCustom.STYLE_APPBAR),
       ),
       body: Padding(
         padding: const EdgeInsets.all(15.0),
@@ -57,7 +63,9 @@ class _AddImageState extends State<AddImage> {
                 counterImage = 0;
                 ecsLib.pushPage(
                   context: context,
-                  pageWidget: AddMoreInformationAsset(),
+                  pageWidget: AddMoreInformationAsset(
+                    hasDataAssetAlready: widget.hasDataAssetAlready,
+                  ),
                 );
               }
             });

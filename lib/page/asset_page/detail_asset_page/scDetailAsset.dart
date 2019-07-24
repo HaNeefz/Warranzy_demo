@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:warranzy_demo/models/model_asset_data.dart';
+import 'package:warranzy_demo/page/asset_page/add_assets_page/scShow_detail_product.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
+import 'package:warranzy_demo/tools/const.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/button_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/carouselImage.dart';
+import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 
 class DetailAsset extends StatefulWidget {
   final ModelAssetsData assetsData;
@@ -37,6 +40,22 @@ class _DetailAssetState extends State<DetailAsset> {
                 ),
                 onPressed: () => Navigator.pop(context),
               ),
+              actions: <Widget>[
+                FlatButton(
+                  child: TextBuilder.build(
+                      title: "Edit",
+                      style: TextStyleCustom.STYLE_LABEL
+                          .copyWith(color: COLOR_WHITE)),
+                  onPressed: () {
+                    ecsLib.pushPage(
+                        context: context,
+                        pageWidget: InputInformation(
+                          onClickAddAssetPage: PageAction.SCAN_QR_CODE,
+                          hasDataAssetAlready: true,
+                        ));
+                  },
+                )
+              ],
               flexibleSpace: CarouselWithIndicator(
                 autoPlay: false,
                 height: 400,

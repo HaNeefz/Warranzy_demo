@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
+import 'package:warranzy_demo/tools/const.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/button_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 
 class AddMoreInformationAsset extends StatefulWidget {
+  final bool hasDataAssetAlready;
+
+  const AddMoreInformationAsset({Key key, this.hasDataAssetAlready = false})
+      : super(key: key);
   @override
   _AddMoreInformationAssetState createState() =>
       _AddMoreInformationAssetState();
@@ -24,6 +29,7 @@ enum TITLE_KEY_TYPE {
 class _AddMoreInformationAssetState extends State<AddMoreInformationAsset> {
   final ecsLib = getIt.get<ECSLib>();
   final allTranslations = getIt.get<GlobalTranslations>();
+
   Map<TITLE_KEY_TYPE, String> dropDownValue = {
     TITLE_KEY_TYPE.SHOPFORSALES: "Central",
     TITLE_KEY_TYPE.SHOPBRANCH: "Powerbuy",
@@ -59,7 +65,9 @@ class _AddMoreInformationAssetState extends State<AddMoreInformationAsset> {
     return Scaffold(
       appBar: AppBar(
         title: TextBuilder.build(
-            title: "New Asset", style: TextStyleCustom.STYLE_APPBAR),
+            title:
+                widget.hasDataAssetAlready == true ? "Edit Asset" : "New Asset",
+            style: TextStyleCustom.STYLE_APPBAR),
       ),
       body: Padding(
         padding: EdgeInsets.fromLTRB(15, 15, 10, 10),
@@ -255,20 +263,34 @@ class _AddMoreInformationAssetState extends State<AddMoreInformationAsset> {
                 label: allTranslations.text("success"),
                 paddingValue: 5,
                 onPressed: () {
-                  ecsLib
-                      .showDialogAction(
-                          context: context,
-                          title: "ADD ASSET",
-                          content: allTranslations.text("finish"),
-                          textOk: allTranslations.text("ok"),
-                          textCancel: "")
-                      .then((res) {
-                    if (res == true) {
-                      Navigator.pop(context);
-                      Navigator.pop(context);
-                      Navigator.pop(context);
-                    }
-                  });
+                  widget.hasDataAssetAlready == true
+                      ? ecsLib
+                          .showDialogLib(
+                              context: context,
+                              title: "EDIT ASSET",
+                              content: "Edit Asset Success!",
+                              textOnButton: allTranslations.text("ok"))
+                          .then((respone) {
+                          if (respone == true) {
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+                          }
+                        })
+                      : ecsLib
+                          .showDialogAction(
+                              context: context,
+                              title: "ADD ASSET",
+                              content: allTranslations.text("finish"),
+                              textOk: allTranslations.text("ok"),
+                              textCancel: "")
+                          .then((res) {
+                          if (res == true) {
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+                          }
+                        });
                 })
           ],
         ),
