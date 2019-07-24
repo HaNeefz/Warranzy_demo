@@ -59,12 +59,12 @@ class ButtonBuilder {
       child: InkWell(
         borderRadius: BorderRadius.circular(cornerRadius),
         splashColor: Colors.white,
-        onTap: onPressed,
+        onTap: onPressed == null ? null : onPressed,
         child: Container(
           height: 55,
           width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
-            color: colorsButton??Colors.white,
+              color: colorsButton ?? Colors.white,
               border: colorsButton != null
                   ? Border.all(width: 0.5, color: Colors.teal[400])
                   : null,

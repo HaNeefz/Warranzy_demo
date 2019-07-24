@@ -9,6 +9,8 @@ import 'package:warranzy_demo/tools/widget_ui_custom/button_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/carouselImage.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 
+import 'scRequest_service.dart';
+
 class DetailAsset extends StatefulWidget {
   final ModelAssetsData assetsData;
   final String heroTag;
@@ -79,45 +81,7 @@ class _DetailAssetState extends State<DetailAsset> {
                       SizedBox(
                         height: 20,
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          TextBuilder.build(
-                              title: _assetsData.manuFacturerName,
-                              style: TextStyleCustom.STYLE_TITLE),
-                          IconButton(
-                            icon: Icon(Icons.more_vert),
-                            onPressed: () {
-                              showModalBottomSheet(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return Container(
-                                    height: 250,
-                                    child: Column(
-                                      children: <Widget>[
-                                        buildModelDataOfButtonSheet(
-                                            icons: Icons.timeline,
-                                            title: "Request service",
-                                            onTap: () {}),
-                                        Divider(),
-                                        buildModelDataOfButtonSheet(
-                                            icons: Icons.store,
-                                            title: "Trade asset",
-                                            onTap: () {}),
-                                        Divider(),
-                                        buildModelDataOfButtonSheet(
-                                            icons: Icons.repeat,
-                                            title: "Tranfer asset",
-                                            onTap: () {}),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              );
-                            },
-                          )
-                        ],
-                      ),
+                      buildHeader(context),
                       buildAssetInformation(),
                       buildProductPhotoByCustomer(),
                       buildLastAssetInformation(),
@@ -130,6 +94,54 @@ class _DetailAssetState extends State<DetailAsset> {
           ],
         ),
       ),
+    );
+  }
+
+  Row buildHeader(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: <Widget>[
+        TextBuilder.build(
+            title: _assetsData.manuFacturerName,
+            style: TextStyleCustom.STYLE_TITLE),
+        IconButton(
+          icon: Icon(Icons.more_vert),
+          onPressed: () {
+            showModalBottomSheet(
+              context: context,
+              builder: (BuildContext context) {
+                return Container(
+                  height: 250,
+                  child: Column(
+                    children: <Widget>[
+                      buildModelDataOfButtonSheet(
+                          icons: Icons.timeline,
+                          title: "Request service",
+                          onTap: () {
+                            Navigator.pop(context);
+                            ecsLib.pushPage(
+                              context: context,
+                              pageWidget: RequestService(assetName: _assetsData.manuFacturerName),
+                            );
+                          }),
+                      Divider(),
+                      buildModelDataOfButtonSheet(
+                          icons: Icons.store,
+                          title: "Trade asset",
+                          onTap: () {}),
+                      Divider(),
+                      buildModelDataOfButtonSheet(
+                          icons: Icons.repeat,
+                          title: "Tranfer asset",
+                          onTap: () {}),
+                    ],
+                  ),
+                );
+              },
+            );
+          },
+        )
+      ],
     );
   }
 
