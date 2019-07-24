@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:warranzy_demo/models/model_asset_data.dart';
 import 'package:warranzy_demo/page/asset_page/scAssets.dart';
 import 'package:warranzy_demo/page/asset_page/widget_assets/widget_asset.dart';
 import 'package:warranzy_demo/services/method/scan_qr.dart';
@@ -11,7 +12,7 @@ import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 import 'add_assets_page/scShow_detail_product.dart';
 
 class AssetsAll extends StatefulWidget {
-  final List<ModelAssetData> listData;
+  final List<ModelAssetsData> listData;
 
   const AssetsAll({Key key, this.listData}) : super(key: key);
   @override

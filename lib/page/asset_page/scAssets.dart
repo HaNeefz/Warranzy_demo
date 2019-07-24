@@ -1,6 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:warranzy_demo/models/model_asset_data.dart';
 import 'package:warranzy_demo/page/profile_page/scProfile.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
@@ -19,8 +20,8 @@ class AssetPage extends StatefulWidget {
 class _AssetPageState extends State<AssetPage> {
   final ecsLib = getIt.get<ECSLib>();
   final allTranslations = getIt.get<GlobalTranslations>();
-  ModelAssetData assetData = ModelAssetData();
-  List<ModelAssetData> listAssetData;
+  ModelAssetsData assetData = ModelAssetsData();
+  List<ModelAssetsData> listAssetData;
 
   @override
   void initState() {
@@ -158,37 +159,5 @@ class _AssetPageState extends State<AssetPage> {
         ],
       ),
     );
-  }
-}
-
-class ModelAssetData {
-  final int id;
-  final String title;
-  final String content;
-  final String expire;
-  final String category;
-  final Widget image;
-
-  ModelAssetData(
-      {this.id,
-      this.title,
-      this.content,
-      this.expire,
-      this.category,
-      this.image});
-
-  List<ModelAssetData> listModelData = [];
-  List<ModelAssetData> pushData() {
-    for (var i = 0; i < 10; i++) {
-      listModelData.add(ModelAssetData(
-          id: i,
-          title: "Dyson V7 Trigger",
-          content:
-              "Simply dummy text of the printing and typeseting industy asduasdljb u iuabsldkj ",
-          expire: "Warranty Date : 24.05.2019 - 24.05.2020",
-          category: "Category",
-          image: null));
-    }
-    return listModelData;
   }
 }

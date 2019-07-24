@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:warranzy_demo/models/model_asset_data.dart';
 import 'package:warranzy_demo/page/asset_page/detail_asset_page/scDetailAsset.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
@@ -6,7 +7,7 @@ import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 
 class ModelAssetWidget extends StatelessWidget {
-  final assetData;
+  final ModelAssetsData assetData;
   final ecsLib = getIt.get<ECSLib>();
   ModelAssetWidget(this.assetData);
   @override
@@ -22,12 +23,8 @@ class ModelAssetWidget extends StatelessWidget {
             ecsLib.pushPage(
                 context: context,
                 pageWidget: DetailAsset(
-                  id: assetData.id,
-                  title: assetData.title,
-                  content: assetData.content,
-                  expire: assetData.expire,
-                  category: assetData.category,
-                  image: null,
+                  assetsData: assetData,
+                  heroTag: "thumbnail_${assetData.id}",
                 ));
           },
           child: Row(
@@ -66,16 +63,17 @@ class ModelAssetWidget extends StatelessWidget {
                 //------------------Detail------------
                 flex: 2,
                 child: Container(
+                  padding: EdgeInsets.only(right: 5),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       TextBuilder.build(
                           //------------------Title------------
-                          title: assetData.title ?? "null",
+                          title: assetData.manuFacturerName ?? "null",
                           style: TextStyleCustom.STYLE_LABEL_BOLD),
                       TextBuilder.build(
                           //------------------detail------------
-                          title: assetData.content ?? "null",
+                          title: assetData.productDetail ?? "null",
                           style: TextStyleCustom.STYLE_CONTENT.copyWith(
                             fontSize: 14,
                           ),
@@ -85,14 +83,15 @@ class ModelAssetWidget extends StatelessWidget {
                         //------------------Expire------------
                         padding: const EdgeInsets.only(top: 8),
                         child: TextBuilder.build(
-                            title: assetData.expire ?? "null",
+                            title: "Expire Date : " + assetData.expireDate ??
+                                "null",
                             style: TextStyleCustom.STYLE_CONTENT
                                 .copyWith(fontSize: 12, letterSpacing: 0),
                             textOverflow: TextOverflow.ellipsis,
                             maxLine: 2),
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(top: 5.0),
+                        padding: const EdgeInsets.only(top: 10.0),
                         child: Container(
                           //------------------Categotry------------
                           width: 80,
@@ -104,7 +103,7 @@ class ModelAssetWidget extends StatelessWidget {
                           key: Key("Category"),
                           child: Center(
                             child: TextBuilder.build(
-                                title: assetData.category ?? "Category",
+                                title: assetData.productCategory ?? "Category",
                                 style: TextStyleCustom.STYLE_LABEL
                                     .copyWith(letterSpacing: 0)
                                     .copyWith(fontSize: 12)),
