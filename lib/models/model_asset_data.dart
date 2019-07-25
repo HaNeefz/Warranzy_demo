@@ -1,37 +1,5 @@
 import 'package:flutter/material.dart';
 
-class ModelAssetData {
-  final int id;
-  final String title;
-  final String content;
-  final String expire;
-  final String category;
-  final Widget image;
-
-  ModelAssetData(
-      {this.id,
-      this.title,
-      this.content,
-      this.expire,
-      this.category,
-      this.image});
-
-  List<ModelAssetData> listModelData = [];
-  List<ModelAssetData> pushData() {
-    for (var i = 0; i < 10; i++) {
-      listModelData.add(ModelAssetData(
-          id: i,
-          title: "Dyson V7 Trigger",
-          content:
-              "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
-          expire: "Warranty Date : 24.05.2019 - 24.05.2020",
-          category: "Category",
-          image: null));
-    }
-    return listModelData;
-  }
-}
-
 class ModelAssetsData {
   final int id;
   final String brandName;
