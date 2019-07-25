@@ -75,11 +75,18 @@ class _AssetPageState extends State<AssetPage> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
               RaisedButton.icon(
-                color: Colors.tealAccent,
+                color: COLOR_THEME_APP,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20)),
-                icon: Icon(Icons.add_circle),
-                label: Text("Add asset"),
+                icon: Icon(
+                  Icons.add_circle,
+                  color: COLOR_WHITE,
+                ),
+                label: Text(
+                  "Add asset",
+                  style:
+                      TextStyleCustom.STYLE_LABEL.copyWith(color: COLOR_WHITE),
+                ),
                 onPressed: () => buildShowModalBottomSheet(context),
               ),
               // IconButton(

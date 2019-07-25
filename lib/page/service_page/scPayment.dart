@@ -58,18 +58,18 @@ class _PayMentAboutClaimState extends State<PayMentAboutClaim> {
             //   showBackView:
             //       true, //true when you want to show cvv(back) view
             // ),
-            buildFormdata("Card Number"),
-            buildFormdata("Name on Card"),
+            buildFormdata("Card Number", hint: "1111-2222-3333-4444"),
+            buildFormdata("Name on Card", hint: "Sandy Kim"),
             Row(
               children: <Widget>[
                 Expanded(
-                  child: buildFormdata("Expiry Date"),
+                  child: buildFormdata("Expiry Date", hint: "12/05"),
                 ),
                 SizedBox(
                   width: 20,
                 ),
                 Expanded(
-                  child: buildFormdata("CVV"),
+                  child: buildFormdata("CVV", hint: "243"),
                 ),
               ],
             ),
@@ -148,7 +148,7 @@ class _PayMentAboutClaimState extends State<PayMentAboutClaim> {
         ),
       );
 
-  Container buildFormdata(title) {
+  Container buildFormdata(title, {hint}) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 10),
       padding: EdgeInsets.all(10),
@@ -161,6 +161,8 @@ class _PayMentAboutClaimState extends State<PayMentAboutClaim> {
           TextBuilder.build(title: title, style: TextStyleCustom.STYLE_CONTENT),
           TextField(
             decoration: InputDecoration(
+                hintText: hint,
+                // hintStyle: TextStyleCustom.STYLE_CONTENT,
                 contentPadding: EdgeInsets.symmetric(vertical: 5)),
           ),
         ],
