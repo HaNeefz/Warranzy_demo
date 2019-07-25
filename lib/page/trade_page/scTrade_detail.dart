@@ -29,97 +29,98 @@ class _TradeDetailState extends State<TradeDetail> {
         scrollDirection: Axis.vertical,
         slivers: <Widget>[
           buildSliverAppBar(context),
-          SliverList(
-            delegate: SliverChildListDelegate(
-              [
+          buildSliverBody(styleContent, context)
+        ],
+      ),
+    );
+  }
+
+  SliverList buildSliverBody(TextStyle styleContent, BuildContext context) {
+    return SliverList(
+      delegate: SliverChildListDelegate(
+        [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    TextBuilder.build(
+                        title: assetsData.productPrice,
+                        style: TextStyleCustom.STYLE_TITLE
+                            .copyWith(color: COLOR_THEME_APP)),
+                    IconButton(
+                      icon: Icon(Icons.more_vert),
+                      onPressed: () {},
+                    )
+                  ],
+                ),
+                TextBuilder.build(
+                    title: assetsData.manuFacturerName +
+                        " มือสอง การใช้งาน 3 เดือน",
+                    style: TextStyleCustom.STYLE_LABEL_BOLD.copyWith(
+                      fontSize: 30,
+                      height: 1.0,
+                    )),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+                  padding: const EdgeInsets.symmetric(vertical: 10.0),
+                  child: Row(
+                    children: <Widget>[
+                      Icon(Icons.location_on),
+                      TextBuilder.build(title: "Bangkok", style: styleContent)
+                    ],
+                  ),
+                ),
+                TextBuilder.build(
+                    title:
+                        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
+                    style: styleContent),
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 10),
+                  padding: EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: COLOR_THEME_APP.withOpacity(0.5)),
+                  child: TextBuilder.build(title: assetsData.productCategory),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 15.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          TextBuilder.build(
-                              title: assetsData.productPrice,
-                              style: TextStyleCustom.STYLE_TITLE
-                                  .copyWith(color: COLOR_THEME_APP)),
-                          IconButton(
-                            icon: Icon(Icons.more_vert),
-                            onPressed: () {},
-                          )
-                        ],
-                      ),
-                      TextBuilder.build(
-                          title: assetsData.manuFacturerName +
-                              " มือสอง การใช้งาน 3 เดือน",
-                          style: TextStyleCustom.STYLE_LABEL_BOLD.copyWith(
-                            fontSize: 30,
-                            height: 1.0,
-                          )),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 10.0),
-                        child: Row(
-                          children: <Widget>[
-                            Icon(Icons.location_on),
-                            TextBuilder.build(
-                                title: "Bangkok", style: styleContent)
-                          ],
-                        ),
-                      ),
-                      TextBuilder.build(
-                          title:
-                              "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
-                          style: styleContent),
-                      Container(
-                        margin: EdgeInsets.symmetric(vertical: 10),
-                        padding: EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            color: COLOR_THEME_APP.withOpacity(0.5)),
-                        child: TextBuilder.build(
-                            title: assetsData.productCategory),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 15.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            buildStatus(styleContent, "Status", "Active"),
-                            buildStatus(styleContent, "Create Date",
-                                assetsData.expireDate),
-                          ],
-                        ),
-                      ),
-                      SizedBox(
-                        height: 30,
-                      ),
-                      TextBuilder.build(
-                          title: "About Asset", style: styleContent),
-                      buildAboutOwnerAsset(
-                          textStyleContent: styleContent,
-                          userName: "SandyKim",
-                          userID: "WE865145",
-                          email: "sandy123@gmail.com",
-                          mobileNo: "082-123-1234"),
-                      Divider(),
-                      ListTile(
-                        title: TextBuilder.build(title: "Asset Detail"),
-                        trailing: Icon(Icons.arrow_forward_ios),
-                        onTap: () {
-                          ecsLib.pushPage(
-                            context: context,
-                            pageWidget: DetailAsset(
-                              assetsData: assetsData,
-                              editAble: false,
-                            ),
-                          );
-                        },
-                      ),
-                      Divider(),
+                      buildStatus(styleContent, "Status", "Active"),
+                      buildStatus(
+                          styleContent, "Create Date", assetsData.expireDate),
                     ],
                   ),
-                )
+                ),
+                SizedBox(
+                  height: 30,
+                ),
+                TextBuilder.build(title: "About Asset", style: styleContent),
+                buildAboutOwnerAsset(
+                    textStyleContent: styleContent,
+                    userName: "SandyKim",
+                    userID: "WE865145",
+                    email: "sandy123@gmail.com",
+                    mobileNo: "082-123-1234"),
+                Divider(),
+                ListTile(
+                  title: TextBuilder.build(title: "Asset Detail"),
+                  trailing: Icon(Icons.arrow_forward_ios),
+                  onTap: () {
+                    ecsLib.pushPage(
+                      context: context,
+                      pageWidget: DetailAsset(
+                        assetsData: assetsData,
+                        editAble: false,
+                      ),
+                    );
+                  },
+                ),
+                Divider(),
               ],
             ),
           )
