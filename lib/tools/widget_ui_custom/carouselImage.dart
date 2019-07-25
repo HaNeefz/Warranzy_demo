@@ -10,13 +10,15 @@ class CarouselWithIndicator extends StatefulWidget {
   final double height;
   final bool autoPlay;
   final num viewportFraction;
+  final bool indiCatorIsLight;
 
   CarouselWithIndicator(
       {Key key,
       this.items,
       this.height = 100,
       this.autoPlay = true,
-      this.viewportFraction = 0.9})
+      this.viewportFraction = 0.9,
+      this.indiCatorIsLight = false})
       : super(key: key);
   @override
   _CarouselWithIndicatorState createState() => _CarouselWithIndicatorState();
@@ -75,9 +77,13 @@ class _CarouselWithIndicatorState extends State<CarouselWithIndicator> {
                 margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
                 decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: _current == index
-                        ? Color.fromRGBO(0, 0, 0, 0.9)
-                        : Color.fromRGBO(0, 0, 0, 0.4)),
+                    color: widget.indiCatorIsLight == false
+                        ? _current == index
+                            ? Color.fromRGBO(0, 0, 0, 0.9)
+                            : Color.fromRGBO(0, 0, 0, 0.4)
+                        : _current == index
+                            ? Color.fromRGBO(255, 255, 255, 0.9)
+                            : Color.fromRGBO(255, 255, 255, 0.4)),
               );
             }).toList(),
           ))

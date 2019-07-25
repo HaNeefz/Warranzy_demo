@@ -74,11 +74,19 @@ class _AssetPageState extends State<AssetPage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
-              IconButton(
+              RaisedButton.icon(
+                color: Colors.tealAccent,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20)),
                 icon: Icon(Icons.add_circle),
-                tooltip: "Add Asset",
+                label: Text("Add asset"),
                 onPressed: () => buildShowModalBottomSheet(context),
               ),
+              // IconButton(
+              //   icon: Icon(Icons.add_circle),
+              //   tooltip: "Add Asset",
+              //   onPressed: () => buildShowModalBottomSheet(context),
+              // ),
               IconButton(
                 icon: Icon(Icons.sort),
                 tooltip: "Sort Asset",

@@ -16,8 +16,11 @@ import 'scTrade_asset.dart';
 class DetailAsset extends StatefulWidget {
   final ModelAssetsData assetsData;
   final String heroTag;
+  final bool editAble;
 
-  const DetailAsset({Key key, this.assetsData, this.heroTag}) : super(key: key);
+  const DetailAsset(
+      {Key key, this.assetsData, this.heroTag, this.editAble = true})
+      : super(key: key);
 
   @override
   _DetailAssetState createState() => _DetailAssetState();
@@ -45,20 +48,22 @@ class _DetailAssetState extends State<DetailAsset> {
                 onPressed: () => Navigator.pop(context),
               ),
               actions: <Widget>[
-                FlatButton(
-                  child: TextBuilder.build(
-                      title: "Edit",
-                      style: TextStyleCustom.STYLE_LABEL
-                          .copyWith(color: COLOR_WHITE)),
-                  onPressed: () {
-                    ecsLib.pushPage(
-                        context: context,
-                        pageWidget: InputInformation(
-                          onClickAddAssetPage: PageAction.SCAN_QR_CODE,
-                          hasDataAssetAlready: true,
-                        ));
-                  },
-                )
+                widget.editAble == true
+                    ? FlatButton(
+                        child: TextBuilder.build(
+                            title: "Edit",
+                            style: TextStyleCustom.STYLE_LABEL
+                                .copyWith(color: COLOR_WHITE)),
+                        onPressed: () {
+                          ecsLib.pushPage(
+                              context: context,
+                              pageWidget: InputInformation(
+                                onClickAddAssetPage: PageAction.SCAN_QR_CODE,
+                                hasDataAssetAlready: true,
+                              ));
+                        },
+                      )
+                    : Container()
               ],
               flexibleSpace: CarouselWithIndicator(
                 autoPlay: false,
@@ -87,7 +92,7 @@ class _DetailAssetState extends State<DetailAsset> {
                       buildAssetInformation(),
                       buildProductPhotoByCustomer(),
                       buildLastAssetInformation(),
-                      buildButtonDelete(context)
+                      if (widget.editAble == true) buildButtonDelete(context)
                     ],
                   ),
                 ),
@@ -106,60 +111,63 @@ class _DetailAssetState extends State<DetailAsset> {
         TextBuilder.build(
             title: _assetsData.manuFacturerName,
             style: TextStyleCustom.STYLE_TITLE),
-        IconButton(
-          icon: Icon(Icons.more_vert),
-          onPressed: () {
-            showModalBottomSheet(
-              context: context,
-              builder: (BuildContext context) {
-                return Container(
-                  height: 250,
-                  child: Column(
-                    children: <Widget>[
-                      buildModelDataOfButtonSheet(
-                          icons: Icons.timeline,
-                          title: "Request service",
-                          onTap: () {
-                            Navigator.pop(context);
-                            ecsLib.pushPage(
-                              context: context,
-                              pageWidget: RequestService(
-                                  assetName: _assetsData.manuFacturerName),
-                            );
-                          }),
-                      Divider(),
-                      buildModelDataOfButtonSheet(
-                          icons: Icons.store,
-                          title: "Trade asset",
-                          onTap: () {
-                            Navigator.pop(context);
-                            ecsLib.pushPage(
-                              context: context,
-                              pageWidget:
-                                  TradeInformation(assetsData: _assetsData),
-                            );
-                            //TradeInformation
-                          }),
-                      Divider(),
-                      buildModelDataOfButtonSheet(
-                          icons: Icons.repeat,
-                          title: "Tranfer asset",
-                          onTap: () {
-                            Navigator.pop(context);
-                            ecsLib.pushPage(
-                              context: context,
-                              pageWidget:
-                                  TranfersInformation(assetsData: _assetsData),
-                            );
-                            //TradeI
-                          }),
-                    ],
-                  ),
-                );
-              },
-            );
-          },
-        )
+        widget.editAble == true
+            ? IconButton(
+                icon: Icon(Icons.more_vert),
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return Container(
+                        height: 250,
+                        child: Column(
+                          children: <Widget>[
+                            buildModelDataOfButtonSheet(
+                                icons: Icons.timeline,
+                                title: "Request service",
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  ecsLib.pushPage(
+                                    context: context,
+                                    pageWidget: RequestService(
+                                        assetName:
+                                            _assetsData.manuFacturerName),
+                                  );
+                                }),
+                            Divider(),
+                            buildModelDataOfButtonSheet(
+                                icons: Icons.store,
+                                title: "Trade asset",
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  ecsLib.pushPage(
+                                    context: context,
+                                    pageWidget: TradeInformation(
+                                        assetsData: _assetsData),
+                                  );
+                                  //TradeInformation
+                                }),
+                            Divider(),
+                            buildModelDataOfButtonSheet(
+                                icons: Icons.repeat,
+                                title: "Tranfer asset",
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  ecsLib.pushPage(
+                                    context: context,
+                                    pageWidget: TranfersInformation(
+                                        assetsData: _assetsData),
+                                  );
+                                  //TradeI
+                                }),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
+              )
+            : Container()
       ],
     );
   }

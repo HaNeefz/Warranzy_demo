@@ -8,8 +8,10 @@ import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 
 class TradeInformation extends StatefulWidget {
   final ModelAssetsData assetsData;
+  final bool editAble;
 
-  const TradeInformation({Key key, this.assetsData}) : super(key: key);
+  const TradeInformation({Key key, this.assetsData, this.editAble = false})
+      : super(key: key);
   @override
   _TradeInformationState createState() => _TradeInformationState();
 }
@@ -25,7 +27,8 @@ class _TradeInformationState extends State<TradeInformation> {
     return Scaffold(
       appBar: AppBar(
         title: TextBuilder.build(
-            title: "Add trade asset", style: TextStyleCustom.STYLE_APPBAR),
+            title: widget.editAble ? "Edit trade asset" : "Add trade asset",
+            style: TextStyleCustom.STYLE_APPBAR),
       ),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(15, 0, 15, 15),
@@ -45,15 +48,25 @@ class _TradeInformationState extends State<TradeInformation> {
                   label: "Publish",
                   paddingValue: 0,
                   onPressed: () {
-                    ecsLib
-                        .showDialogLib(
-                            context: context,
-                            title: "ADD TRADE",
-                            content: "Add Trade Success!",
-                            textOnButton: allTranslations.text("success"))
-                        .then((response) {
-                      if (response) Navigator.pop(context);
-                    });
+                    widget.editAble
+                        ? ecsLib
+                            .showDialogLib(
+                                context: context,
+                                title: "EDIT TRADE",
+                                content: "Edit Trade Success!",
+                                textOnButton: allTranslations.text("success"))
+                            .then((response) {
+                            if (response) Navigator.pop(context);
+                          })
+                        : ecsLib
+                            .showDialogLib(
+                                context: context,
+                                title: "ADD TRADE",
+                                content: "Add Trade Success!",
+                                textOnButton: allTranslations.text("success"))
+                            .then((response) {
+                            if (response) Navigator.pop(context);
+                          });
                   }),
             )
           ],
@@ -171,8 +184,8 @@ class _TradeInformationState extends State<TradeInformation> {
       child: RichText(
         text: TextSpan(
           children: [
-            TextSpan(text: title + "\n", style: TextStyleCustom.STYLE_CONTENT),
-            TextSpan(text: data + "\n", style: TextStyleCustom.STYLE_LABEL),
+            TextSpan(text: "$title\n", style: TextStyleCustom.STYLE_CONTENT),
+            TextSpan(text: "$data\n", style: TextStyleCustom.STYLE_LABEL),
           ],
         ),
       ),

@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:warranzy_demo/models/model_asset_data.dart';
 import 'package:warranzy_demo/tools/assets.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
+import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
+
+import 'scMy_trade.dart';
+import 'scSearch_trade.dart';
+import 'scTrade_detail.dart';
 
 class TradePage extends StatefulWidget {
   @override
@@ -10,7 +16,17 @@ class TradePage extends StatefulWidget {
 }
 
 class _TradePageState extends State<TradePage> {
+  final ecsLib = getIt.get<ECSLib>();
+  final allTranslations = getIt.get<GlobalTranslations>();
   int _currentPage = 0;
+  ModelAssetsData _assetsData = ModelAssetsData();
+  List<ModelAssetsData> listDataAsset = [];
+
+  @override
+  void initState() {
+    super.initState();
+    listDataAsset = _assetsData.pushData();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,11 +40,16 @@ class _TradePageState extends State<TradePage> {
             padding: const EdgeInsets.only(left: 20.0),
             child: IconButton(
               icon: Icon(
-                Icons.supervisor_account,
+                Icons.account_balance_wallet,
                 color: COLOR_THEME_APP,
                 size: 40,
               ),
-              onPressed: () {},
+              onPressed: () {
+                ecsLib.pushPage(
+                  context: context,
+                  pageWidget: MyTrade(),
+                );
+              },
             ),
           ),
           actions: <Widget>[
@@ -40,7 +61,12 @@ class _TradePageState extends State<TradePage> {
                   size: 40,
                   color: COLOR_THEME_APP,
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  ecsLib.pushPage(
+                    context: context,
+                    pageWidget: SearchTrade(),
+                  );
+                },
               ),
             )
           ],
@@ -83,24 +109,32 @@ class _TradePageState extends State<TradePage> {
                 body: Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: GridView.builder(
-                    itemCount: 10,
+                    itemCount: listDataAsset.length,
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
                         crossAxisSpacing: 10,
                         mainAxisSpacing: 10,
                         childAspectRatio: 6 / 9),
                     itemBuilder: (BuildContext context, int index) {
-                      return ModelTrade(
+                      var data = listDataAsset[index];
+                      return ModelTradeWidget(
                         id: index,
                         image: Image.asset(
                           Assets.BACK_GROUND_APP,
                           fit: BoxFit.cover,
                         ),
-                        price: "1,000 B",
-                        title: "Dyson V7 Trigger",
-                        subTitle:
-                            "Simply dummy text of the printing and df;isdfsdalf;sdfhasd",
-                        category: "Cleaning",
+                        price: data.productPrice,
+                        title: data.manuFacturerName,
+                        subTitle: data.productDetail,
+                        category: data.productCategory,
+                        onPressed: () {
+                          ecsLib.pushPage(
+                            context: context,
+                            pageWidget: TradeDetail(
+                              assetsData: data,
+                            ),
+                          );
+                        },
                       );
                     },
                   ),
@@ -126,22 +160,24 @@ class _TradePageState extends State<TradePage> {
   }
 }
 
-class ModelTrade extends StatelessWidget {
+class ModelTradeWidget extends StatelessWidget {
   final Widget image;
   final int id;
   final String price;
   final String title;
   final String subTitle;
   final String category;
+  final Function onPressed;
 
-  const ModelTrade(
+  const ModelTradeWidget(
       {Key key,
       this.image,
       this.price,
       this.title,
       this.subTitle,
       this.category,
-      this.id})
+      this.id,
+      this.onPressed})
       : super(key: key);
   @override
   Widget build(BuildContext context) {
@@ -151,9 +187,7 @@ class ModelTrade extends StatelessWidget {
         borderRadius: BorderRadius.circular(10.0),
       ),
       child: GestureDetector(
-        onTap: () {
-          print(id);
-        },
+        onTap: onPressed,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
