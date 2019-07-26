@@ -43,6 +43,8 @@ class _HistoryPageState extends State<HistoryPage> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.0)),
                 child: InkWell(
+                  borderRadius: BorderRadius.circular(10.0),
+                  splashColor: Colors.teal[200],
                   onTap: () {
                     ecsLib.pushPage(
                       context: context,

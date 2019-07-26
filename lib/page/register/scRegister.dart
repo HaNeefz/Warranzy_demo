@@ -63,10 +63,12 @@ class _RegisterState extends State<Register> {
                   colorsButton: agree == false ? Colors.grey.shade200 : null,
                   label: allTranslations.text("continue"),
                   onPressed: () {
+                    _fbKey.currentState.save();
                     if (_fbKey.currentState.validate()) {
-                      for (var value in _txtCtrl) {
-                        print(value.text);
-                      }
+                      print(_fbKey.currentState.value);
+                      // for (var value in _txtCtrl) {
+                      //   print(value.text);
+                      // }
                       ecsLib.pushPage(
                         context: context,
                         pageWidget: PinCodePageUpdate(

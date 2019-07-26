@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_credit_card/flutter_credit_card.dart';
+import 'package:warranzy_demo/services/method/mark_text_input_format.dart';
 import 'package:warranzy_demo/tools/assets.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
@@ -58,7 +59,16 @@ class _PayMentAboutClaimState extends State<PayMentAboutClaim> {
             //   showBackView:
             //       true, //true when you want to show cvv(back) view
             // ),
-            buildFormdata("Card Number", hint: "1111-2222-3333-4444"),
+            buildFormdata(
+              "Card Number",
+              hint: "1111-2222-3333-4444",
+              formatter: [
+                MaskedTextInputFormatter(
+                  mask: 'xxxx-xxxx-xxxx-xxxx',
+                  separator: '-',
+                ),
+              ],
+            ),
             buildFormdata("Name on Card", hint: "Sandy Kim"),
             Row(
               children: <Widget>[
@@ -148,7 +158,7 @@ class _PayMentAboutClaimState extends State<PayMentAboutClaim> {
         ),
       );
 
-  Container buildFormdata(title, {hint}) {
+  Container buildFormdata(title, {hint, formatter}) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 10),
       padding: EdgeInsets.all(10),
@@ -160,6 +170,7 @@ class _PayMentAboutClaimState extends State<PayMentAboutClaim> {
         children: <Widget>[
           TextBuilder.build(title: title, style: TextStyleCustom.STYLE_CONTENT),
           TextField(
+            inputFormatters: formatter,
             decoration: InputDecoration(
                 hintText: hint,
                 // hintStyle: TextStyleCustom.STYLE_CONTENT,

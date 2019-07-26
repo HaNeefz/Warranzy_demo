@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:warranzy_demo/models/model_asset_data.dart';
 import 'package:warranzy_demo/page/asset_page/detail_asset_page/scTrade_asset.dart';
 import 'package:warranzy_demo/tools/assets.dart';
@@ -7,6 +8,7 @@ import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 import 'package:http/http.dart' as http;
+import 'package:warranzy_demo/tools/widget_ui_custom/text_field_builder.dart';
 
 import 'scTrade_contact.dart';
 import 'scTrade_detail.dart';
@@ -45,7 +47,7 @@ class _MyTradeState extends State<MyTrade> {
             Divider(),
             buildTitleMyTradeAndButtonAddTrade(),
             buildMyTradeDataAll(),
-            testButtonAPI()
+            testButtonAPI(),
           ],
         ),
       ),
@@ -96,7 +98,8 @@ class _MyTradeState extends State<MyTrade> {
       children: listData.map((data) {
         return Container(
           child: Card(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             elevation: 5,
             child: ListTile(
               title: Row(
