@@ -10,6 +10,7 @@ import 'package:flutter_picker/flutter_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:warranzy_demo/models/model_country_birth_year.dart';
 import 'package:warranzy_demo/page/pin_code/scPinCode.dart';
+import 'package:warranzy_demo/services/providers/notification_state.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/const.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
@@ -36,10 +37,11 @@ class _RegisterState extends State<Register> {
   final ModelDataBirthYear modelBirthYear = ModelDataBirthYear();
   SharedPreferences _pref;
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-
+  NotificationState noti = NotificationState();
   @override
   void initState() {
     super.initState();
+    noti.getNotificationID();
     getDeviceInfo();
   }
 
@@ -52,7 +54,6 @@ class _RegisterState extends State<Register> {
       _pref.setString("DeviceID", androidInfo.androidId);
     } else if (Platform.isIOS) {
       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      print(iosInfo.identifierForVendor);
       _pref.setString("DeviceID", iosInfo.identifierForVendor);
       print('DeviceID : ${_pref.getString("DeviceID")}');
     } else {
@@ -95,38 +96,38 @@ class _RegisterState extends State<Register> {
                   context: context,
                   colorsButton: agree == false ? Colors.grey.shade200 : null,
                   label: allTranslations.text("continue"),
-                  onPressed: agree == true
-                      ? () {
-                          _fbKey.currentState.save();
-                          if (_fbKey.currentState.validate()) {
-                            if (checkSelectCountryAndBirthYear(context)) {
-                              var deviceID = {
-                                "deviceID": _pref.getString("DeviceID")
-                              };
-                              _fbKey.currentState.value["mobileNumber"] =
-                                  chenkNumberStartWith(_fbKey
-                                      .currentState.value["mobileNumber"]);
-                              var data = _fbKey.currentState.value
-                                ..addAll(modelCountry.toMap())
-                                ..addAll(modelBirthYear.toMap())
-                                ..addAll(deviceID);
-                              print(data);
-                              // ecsLib.pushPage(
-                              //   context: context,
-                              //   pageWidget: PinCodePageUpdate(
-                              //     type: PageType.setPin,
-                              //   ),
-                              // );
-                            }
-                          }
-                        }
-                      : null),
+                  onPressed: agree == true ? registerContinue() : null),
               space(50),
             ],
           ),
         ),
       ),
     );
+  }
+
+  registerContinue() {
+    _fbKey.currentState.save();
+    if (_fbKey.currentState.validate()) {
+      if (checkSelectCountryAndBirthYear(context)) {
+        var deviceIDAndPlayerID = {
+          "deviceID": _pref.getString("DeviceID"),
+          "notificationID": noti.playerID
+        };
+        _fbKey.currentState.value["mobileNumber"] =
+            chenkNumberStartWith(_fbKey.currentState.value["mobileNumber"]);
+        var data = _fbKey.currentState.value
+          ..addAll(modelCountry.toMap())
+          ..addAll(modelBirthYear.toMap())
+          ..addAll(deviceIDAndPlayerID);
+        print(data);
+        // ecsLib.pushPage(
+        //   context: context,
+        //   pageWidget: PinCodePageUpdate(
+        //     type: PageType.setPin,
+        //   ),
+        // );
+      }
+    }
   }
 
   String chenkNumberStartWith(String numb) {
@@ -168,8 +169,7 @@ class _RegisterState extends State<Register> {
                     cancelText: allTranslations.text("cancel"),
                     title: new Text("Please Select"),
                     onConfirm: (Picker picker, List value) {
-                      print(value.toString());
-                      print(picker.getSelectedValues());
+                      print("Picker value : ${picker.getSelectedValues()}");
                       setState(() {
                         modelBirthYear.birthYear =
                             "${picker.getSelectedValues().first.toString()}";
@@ -192,15 +192,13 @@ class _RegisterState extends State<Register> {
         content: "Please select country.",
         textOnButton: allTranslations.text("close"),
       );
-    else if (modelBirthYear.selectedBirthYear == false)
+    else //(modelBirthYear.selectedBirthYear == false)
       ecsLib.showDialogLib(
         context: context,
         title: "SELECT BIRTH YEAR",
         content: "Please select birth year.",
         textOnButton: allTranslations.text("close"),
       );
-    else
-      print("unknow error");
     return dataCorrect;
   }
 

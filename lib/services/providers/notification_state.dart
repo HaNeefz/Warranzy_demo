@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:onesignal/onesignal.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:warranzy_demo/models/receive_message_model.dart';
+
+Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
 class NotificationState extends ChangeNotifier {
   List<MessageModel> _messageList = [];
   List<MessageModel> get messageList => _messageList;
   int _counterMessage = 0;
+  String _playerID = "Unknow";
+
+  String get playerID => _playerID;
 
   int get counterMessage => _counterMessage;
   resetCounterMessage() {
@@ -52,7 +58,6 @@ class NotificationState extends ChangeNotifier {
   initNotification() async {
     // OneSignal.shared.setLogLevel(OSLogLevel.verbose, OSLogLevel.none);
 
-    await OneSignal.shared.getPermissionSubscriptionState();
     await OneSignal.shared.init("138414dc-cb53-43e0-bc67-49fc9b7a99f4");
     await OneSignal.shared
         .init("138414dc-cb53-43e0-bc67-49fc9b7a99f4", iOSSettings: _settings);
@@ -74,6 +79,17 @@ class NotificationState extends ChangeNotifier {
         .setNotificationOpenedHandler((OSNotificationOpenedResult result) {
       // will be called whenever a notification is opened/button pressed.
       print("OpenedHandler $result");
+    });
+  }
+
+  getNotificationID() async {
+    OneSignal.shared.getPermissionSubscriptionState().then((status) async {
+      _playerID = status.subscriptionStatus.userId;
+      print("PlayerID : " + _playerID);
+      SharedPreferences.getInstance().then((prefs) async {
+        // print(notificationID);
+        await prefs.setString("notificationID", _playerID);
+      });
     });
   }
 }
