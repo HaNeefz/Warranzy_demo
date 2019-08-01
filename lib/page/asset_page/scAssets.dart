@@ -70,7 +70,7 @@ class _AssetPageState extends State<AssetPage> {
         )),
         Expanded(
             child: Padding(
-          padding: const EdgeInsets.only(right: 10.0),
+          padding: const EdgeInsets.only(right: 5.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
@@ -89,15 +89,12 @@ class _AssetPageState extends State<AssetPage> {
                 ),
                 onPressed: () => buildShowModalBottomSheet(context),
               ),
-              // IconButton(
-              //   icon: Icon(Icons.add_circle),
-              //   tooltip: "Add Asset",
-              //   onPressed: () => buildShowModalBottomSheet(context),
-              // ),
-              IconButton(
-                icon: Icon(Icons.sort),
-                tooltip: "Sort Asset",
-                onPressed: () {},
+              Expanded(
+                child: IconButton(
+                  icon: Icon(Icons.sort),
+                  tooltip: "Sort Asset",
+                  onPressed: () {},
+                ),
               ),
             ],
           ),
