@@ -63,7 +63,10 @@ class _LoginPageState extends State<LoginPage> {
                       context: context,
                       pageWidget: Register(),
                     );
-                  }),                
+                  }),
+              SizedBox(
+                height: 20.0,
+              ),
             ],
           ),
         ),
