@@ -9,7 +9,6 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_picker/flutter_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:warranzy_demo/models/model_country_birth_year.dart';
-import 'package:warranzy_demo/page/pin_code/scPinCode.dart';
 import 'package:warranzy_demo/services/providers/notification_state.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/const.dart';
@@ -20,6 +19,8 @@ import 'package:warranzy_demo/tools/widget_ui_custom/button_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_field_builder.dart';
 import 'package:device_info/device_info.dart';
+
+import 'scReceive_otp.dart';
 
 class Register extends StatefulWidget {
   @override
@@ -96,7 +97,7 @@ class _RegisterState extends State<Register> {
                   context: context,
                   colorsButton: agree == false ? Colors.grey.shade200 : null,
                   label: allTranslations.text("continue"),
-                  onPressed: agree == true ? registerContinue() : null),
+                  onPressed: agree == true ? registerContinue : null),
               space(50),
             ],
           ),
@@ -120,12 +121,11 @@ class _RegisterState extends State<Register> {
           ..addAll(modelBirthYear.toMap())
           ..addAll(deviceIDAndPlayerID);
         print(data);
-        // ecsLib.pushPage(
-        //   context: context,
-        //   pageWidget: PinCodePageUpdate(
-        //     type: PageType.setPin,
-        //   ),
-        // );
+        ecsLib.pushPage(
+            context: context,
+            pageWidget: ReceiveOTP(
+              custDataRegister: data,
+            ));
       }
     }
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:warranzy_demo/page/login_first/scLogin.dart';
 import 'package:warranzy_demo/page/main_page/scMain_page.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/const.dart';
@@ -48,6 +49,9 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
   @override
   void initState() {
     super.initState();
+    if (usedPin == false && type == PageType.login) {
+      _localAuth();
+    }
   }
 
   bool get pinCorrect => listEquals(listPinTemp, listPinCorrect);
@@ -59,18 +63,16 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
         // actions: [switchUsedPin()],
       ),
       body: SingleChildScrollView(
-        child: Center(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              buildLogo(),
-              buildTitle(),
-              buildSubTitle(),
-              showDot(),
-              buildButtonNumberOrScan(),
-              buildButtonConfirmPinForSetPin() // Show When Type = PageType.setPin
-            ],
-          ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            buildLogo(),
+            buildTitle(),
+            buildSubTitle(),
+            showDot(),
+            buildButtonNumberOrScan(),
+            buildButtonConfirmPinForSetPin() // Show When Type = PageType.setPin
+          ],
         ),
       ),
     );
@@ -110,51 +112,56 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
     switch (type) {
       case PageType.setPin:
         if (listPinTemp.length == 6)
-          widgetConfirmSetPin = ButtonBuilder.buttonCustom(
-              context: context,
-              label: allTranslations.text("continue"),
-              onPressed: () async {
-                await ecsLib.showDialogLib(
+          widgetConfirmSetPin = Padding(
+            padding: const EdgeInsets.only(bottom: 15.0),
+            child: ButtonBuilder.buttonCustom(
+                context: context,
+                label: allTranslations.text("continue"),
+                onPressed: () async {
+                  await ecsLib.showDialogLib(
+                      context: context,
+                      title: "SUCCESS!",
+                      content: "Create your account successfully.",
+                      textOnButton: allTranslations.text("ok"));
+                  await ecsLib
+                      .showDialogAction(
                     context: context,
-                    title: "SUCCESS!",
-                    content: "Create your account successfully.",
-                    textOnButton: allTranslations.text("ok"));
-                await ecsLib
-                    .showDialogAction(
-                  context: context,
-                  title: "Use Fingerprint",
-                  content: "Do you need to use fingerprint for sign in.",
-                  textOk: "Yes, I do",
-                  textCancel: "Later",
-                )
-                    .then((response) {
-                  if (response == true) {
-                    setState(() {
-                      listPinTemp.clear();
-                      ecsLib.pushPage(
-                        context: context,
-                        pageWidget: PinCodePageUpdate(
-                          type: PageType.login,
-                        ),
-                      );
-                    });
-                  } else {
-                    setState(() {
-                      listPinTemp.clear();
-                      ecsLib.pushPage(
-                        context: context,
-                        pageWidget: PinCodePageUpdate(
-                          type: PageType.login,
-                          usedPin: true,
-                        ),
-                      );
-                    });
-                  }
-                });
-                // await _onAlert2ButtonsPressed(context).then((_) async {
-                //   await _onAlertButtonPressed(context);
-                // });
-              });
+                    title: "Use Fingerprint",
+                    content: "Do you need to use fingerprint for sign in.",
+                    textOk: "Yes, I do",
+                    textCancel: "Later",
+                  )
+                      .then((response) {
+                    if (response == true) {
+                      setState(() {
+                        listPinTemp.clear();
+                        ecsLib.pushPageAndClearAllScene(
+                            context: context, pageWidget: LoginPage());
+                        ecsLib.pushPage(
+                          context: context,
+                          pageWidget: PinCodePageUpdate(
+                            type: PageType.login,
+                          ),
+                        );
+                      });
+                    } else {
+                      setState(() {
+                        listPinTemp.clear();
+                        ecsLib.pushPage(
+                          context: context,
+                          pageWidget: PinCodePageUpdate(
+                            type: PageType.login,
+                            usedPin: true,
+                          ),
+                        );
+                      });
+                    }
+                  });
+                  // await _onAlert2ButtonsPressed(context).then((_) async {
+                  //   await _onAlertButtonPressed(context);
+                  // });
+                }),
+          );
         else
           widgetConfirmSetPin = Container();
 
@@ -258,13 +265,14 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
 
   Widget buttonGrideNumber() {
     return Container(
+      margin: EdgeInsets.only(bottom: 20),
       padding: EdgeInsets.symmetric(
         vertical: 20.0,
         horizontal: 70.0,
       ),
       width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height / 2,
       child: GridView.builder(
+        shrinkWrap: true,
         itemCount: 12,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 3, mainAxisSpacing: 20, crossAxisSpacing: 20),
@@ -317,18 +325,50 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
           child: Column(children: <Widget>[
             ButtonBuilder.buttonCustom(
                 context: context,
-                label: "Scan fingerprint",
+                label: "Scan to Authentication",
                 onPressed: () => _localAuth()),
             Padding(
-              padding: const EdgeInsets.only(top: 20.0),
-              child: GestureDetector(
-                child: TextBuilder.build(
-                    title: allTranslations.text("forgot_pin"),
-                    style: TextStyleCustom.STYLE_LABEL
-                        .copyWith(color: COLOR_THEME_APP)),
-                onTap: () => setState(() {
-                  widget.usedPin = !widget.usedPin;
-                }),
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
+              child: Row(
+                // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  Expanded(
+                    child: ButtonBuilder.buttonCustom(
+                        context: context,
+                        paddingValue: 0,
+                        colorsButton: COLOR_TRANSPARENT,
+                        label: "Use PIN",
+                        onPressed: () {
+                          setState(() {
+                            widget.usedPin = !widget.usedPin;
+                          });
+                        }),
+                  ),
+                  SizedBox(width: 5),
+                  Expanded(
+                    child: ButtonBuilder.buttonCustom(
+                        context: context,
+                        colorsButton: COLOR_MAJOR.withAlpha(200),
+                        labelStyle: TextStyleCustom.STYLE_LABEL_BOLD
+                            .copyWith(color: COLOR_WHITE),
+                        paddingValue: 0,
+                        label: allTranslations.text("forgot_pin"),
+                        onPressed: () {
+                          setState(() {
+                            widget.usedPin = !widget.usedPin;
+                          });
+                        }),
+                  ),
+                  // Padding(
+                  //   padding: const EdgeInsets.only(top: 20.0),
+                  //   child: GestureDetector(
+                  //       child: TextBuilder.build(
+                  //           title: allTranslations.text("forgot_pin"),
+                  //           style: TextStyleCustom.STYLE_LABEL
+                  //               .copyWith(color: COLOR_THEME_APP)),
+                  //       onTap: () {}),
+                  // ),
+                ],
               ),
             ),
             SizedBox(
@@ -350,11 +390,13 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
             shape: BoxShape.circle,
             border: Border.all(width: 2, color: Colors.teal)),
         child: Center(
-          child: number == 9
-              ? Icon(
-                  Icons.fingerprint,
-                  size: 40,
-                )
+          child: number == 9 && type == PageType.login
+              ? GestureDetector(
+                  onTap: () => _localAuth(),
+                  child: Icon(
+                    Icons.fingerprint,
+                    size: 40,
+                  ))
               : number == 10
                   ? TextBuilder.build(title: "0")
                   : number == 11
@@ -362,9 +404,12 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
                           Icons.backspace,
                           size: 30,
                         )
-                      : TextBuilder.build(
-                          title: "${number + 1}",
-                          style: TextStyleCustom.STYLE_LABEL),
+                      : number == 9 && type == PageType.setPin
+                          ? TextBuilder.build(
+                              title: "", style: TextStyleCustom.STYLE_LABEL)
+                          : TextBuilder.build(
+                              title: "${number + 1}",
+                              style: TextStyleCustom.STYLE_LABEL),
         ),
       ),
     );
