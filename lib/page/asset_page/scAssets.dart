@@ -43,7 +43,7 @@ class _AssetPageState extends State<AssetPage> {
               items: ["1", "2", "3", "5"],
             ),
             buildLabelAndSeeAll(),
-            buildYourAssets()
+            buildYourAssets(),
           ],
         ),
       ),

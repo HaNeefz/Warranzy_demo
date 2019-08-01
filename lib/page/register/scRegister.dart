@@ -1,5 +1,14 @@
+import 'dart:io';
+
+import 'package:country_pickers/country.dart';
+import 'package:country_pickers/country_picker_cupertino.dart';
+import 'package:country_pickers/country_picker_dialog.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:flutter_picker/flutter_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:warranzy_demo/models/model_country_birth_year.dart';
 import 'package:warranzy_demo/page/pin_code/scPinCode.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/const.dart';
@@ -9,6 +18,7 @@ import 'package:warranzy_demo/tools/widget_ui_custom/app_bar_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/button_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_field_builder.dart';
+import 'package:device_info/device_info.dart';
 
 class Register extends StatefulWidget {
   @override
@@ -19,20 +29,42 @@ class _RegisterState extends State<Register> {
   final ecsLib = getIt.get<ECSLib>();
   final allTranslations = getIt.get<GlobalTranslations>();
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
-  List<TextEditingController> _txtCtrl;
+  final FixedExtentScrollController fixController =
+      FixedExtentScrollController();
+
+  final ModelDataCountry modelCountry = ModelDataCountry();
+  final ModelDataBirthYear modelBirthYear = ModelDataBirthYear();
+  SharedPreferences _pref;
+  DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
 
   @override
   void initState() {
     super.initState();
-    _txtCtrl = List<TextEditingController>();
-    for (int i = 0; i < 6; i++) {
-      _txtCtrl.add(TextEditingController());
+    getDeviceInfo();
+  }
+
+  getDeviceInfo() async {
+    _pref = await SharedPreferences.getInstance();
+
+    if (Platform.isAndroid) {
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      print('Running on ${androidInfo.androidId}');
+      _pref.setString("DeviceID", androidInfo.androidId);
+    } else if (Platform.isIOS) {
+      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+      print(iosInfo.identifierForVendor);
+      _pref.setString("DeviceID", iosInfo.identifierForVendor);
+      print('DeviceID : ${_pref.getString("DeviceID")}');
+    } else {
+      print("Another");
     }
   }
 
   bool agree = false;
   @override
   Widget build(BuildContext context) {
+    // Locale myLocale = Localizations.localeOf(context);
+    // print(myLocale);
     return Scaffold(
       appBar: AppBarThemes.appBarStyle(context: context),
       body: SingleChildScrollView(
@@ -49,10 +81,11 @@ class _RegisterState extends State<Register> {
                   title: "Create your account to member",
                   style: TextStyleCustom.STYLE_CONTENT),
               space(10),
-              buildFormUserID(),
+              buildCountryCode(),
               buildFormFullName(),
+              buildFormGender(),
+              buildBirthYear(context),
               buildFormAddress(),
-              buildFormCountryCode(),
               buildFormEmail(),
               buildFormMobileNumber(),
               buildChackAgree(),
@@ -62,27 +95,134 @@ class _RegisterState extends State<Register> {
                   context: context,
                   colorsButton: agree == false ? Colors.grey.shade200 : null,
                   label: allTranslations.text("continue"),
-                  onPressed: () {
-                    _fbKey.currentState.save();
-                    if (_fbKey.currentState.validate()) {
-                      print(_fbKey.currentState.value);
-                      // for (var value in _txtCtrl) {
-                      //   print(value.text);
-                      // }
-                      ecsLib.pushPage(
-                        context: context,
-                        pageWidget: PinCodePageUpdate(
-                          type: PageType.setPin,
-                        ),
-                      );
-                    }
-                  }),
+                  onPressed: agree == true
+                      ? () {
+                          _fbKey.currentState.save();
+                          if (_fbKey.currentState.validate()) {
+                            if (checkSelectCountryAndBirthYear(context)) {
+                              var deviceID = {
+                                "deviceID": _pref.getString("DeviceID")
+                              };
+                              _fbKey.currentState.value["mobileNumber"] =
+                                  chenkNumberStartWith(_fbKey
+                                      .currentState.value["mobileNumber"]);
+                              var data = _fbKey.currentState.value
+                                ..addAll(modelCountry.toMap())
+                                ..addAll(modelBirthYear.toMap())
+                                ..addAll(deviceID);
+                              print(data);
+                              // ecsLib.pushPage(
+                              //   context: context,
+                              //   pageWidget: PinCodePageUpdate(
+                              //     type: PageType.setPin,
+                              //   ),
+                              // );
+                            }
+                          }
+                        }
+                      : null),
               space(50),
             ],
           ),
         ),
       ),
     );
+  }
+
+  String chenkNumberStartWith(String numb) {
+    String numbNew = numb;
+    if (numbNew.startsWith("0")) {
+      print("numberStartWith Zero is true");
+      numbNew = numbNew.replaceFirst(RegExp(r'0'), '');
+    }
+    return numbNew;
+  }
+
+  Container buildBirthYear(BuildContext context) {
+    return Container(
+      child: paddingWidget(
+          child: ButtonBuilder.buttonCustom(
+              colorsButton: COLOR_TRANSPARENT,
+              labelStyle:
+                  TextStyleCustom.STYLE_LABEL_BOLD.copyWith(color: COLOR_GREY),
+              paddingValue: 0,
+              context: context,
+              label: modelBirthYear.selectedBirthYears
+                  ? "Birth year is " + modelBirthYear.birthYear
+                  : modelBirthYear.birthYear,
+              onPressed: () {
+                Picker(
+                    itemExtent: 40,
+                    adapter: NumberPickerAdapter(data: [
+                      NumberPickerColumn(
+                        begin: 1900,
+                        end: 2010,
+                        initValue: 1950,
+                      )
+                    ]),
+                    /*PickerDataAdapter<String>(
+                                pickerdata: ["English", "Thai"]) */
+                    delimiter: [PickerDelimiter(child: Container())],
+                    hideHeader: true,
+                    confirmText: allTranslations.text("confirm"),
+                    cancelText: allTranslations.text("cancel"),
+                    title: new Text("Please Select"),
+                    onConfirm: (Picker picker, List value) {
+                      print(value.toString());
+                      print(picker.getSelectedValues());
+                      setState(() {
+                        modelBirthYear.birthYear =
+                            "${picker.getSelectedValues().first.toString()}";
+                        modelBirthYear.setSelectedBirthYear = true;
+                      });
+                    }).showDialog(context);
+              })),
+    );
+  }
+
+  bool checkSelectCountryAndBirthYear(BuildContext context) {
+    bool dataCorrect = false;
+    if (modelCountry.selectedCountry == true &&
+        modelBirthYear.selectedBirthYear == true) {
+      dataCorrect = true;
+    } else if (modelCountry.selectedCountry == false)
+      ecsLib.showDialogLib(
+        context: context,
+        title: "SELECT COUNTRY",
+        content: "Please select country.",
+        textOnButton: allTranslations.text("close"),
+      );
+    else if (modelBirthYear.selectedBirthYear == false)
+      ecsLib.showDialogLib(
+        context: context,
+        title: "SELECT BIRTH YEAR",
+        content: "Please select birth year.",
+        textOnButton: allTranslations.text("close"),
+      );
+    else
+      print("unknow error");
+    return dataCorrect;
+  }
+
+  Widget buildFormGender() {
+    return paddingWidget(
+        child: Container(
+      padding: EdgeInsets.all(10),
+      decoration: BoxDecoration(
+          border: Border.all(width: 0.7, color: COLOR_GREY),
+          borderRadius: BorderRadius.circular(25)),
+      child: FormBuilderRadio(
+        attribute: "Gender",
+        leadingInput: true,
+        validators: [FormBuilderValidators.required()],
+        decoration: InputDecoration(
+            labelText: "Gender",
+            labelStyle: TextStyleCustom.STYLE_CONTENT.copyWith(fontSize: 20)),
+        options: ["Male", "Female"]
+            .map((gender) => FormBuilderFieldOption(value: gender))
+            .toList(growable: false),
+      ),
+    ));
   }
 
   Widget space(double spaceValue) {
@@ -125,23 +265,49 @@ class _RegisterState extends State<Register> {
     );
   }
 
-  Widget buildFormUserID() {
+  Widget countryCodeWidget() {
+    return CountryPickerCupertino();
+  }
+
+  Widget buildCountryCode() {
     return paddingWidget(
-      child: TextFieldBuilder.enterInformation(
-          key: "userID",
-          textContrl: _txtCtrl[0],
-          hintText: "User ID",
-          validators: [
-            FormBuilderValidators.required(errorText: "Invalide User ID")
-          ]),
-    );
+        child: Container(
+      height: 50,
+      child: ButtonBuilder.buttonCustom(
+          context: context,
+          paddingValue: 0,
+          label: modelCountry.countryName,
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) => Theme(
+                  data: Theme.of(context).copyWith(primaryColor: Colors.pink),
+                  child: CountryPickerDialog(
+                      titlePadding: EdgeInsets.all(8.0),
+                      searchCursorColor: Colors.pinkAccent,
+                      searchInputDecoration:
+                          InputDecoration(hintText: 'Search...'),
+                      isSearchable: true,
+                      title: Text('Select your phone code'),
+                      onValuePicked: (Country country) {
+                        // print(country.isoCode);
+                        setState(() {
+                          modelCountry.countryName = country.name;
+                          modelCountry.countryCode = country.isoCode;
+                          modelCountry.countryNumberPhoneCode =
+                              country.phoneCode;
+                          modelCountry.setSelectedCountry = true;
+                        });
+                      })),
+            );
+          }),
+    ));
   }
 
   Widget buildFormFullName() {
     return paddingWidget(
       child: TextFieldBuilder.enterInformation(
           key: "fullName",
-          textContrl: _txtCtrl[1],
           hintText: "Full Name",
           validators: [
             FormBuilderValidators.required(errorText: "Invalide Full name")
@@ -153,23 +319,9 @@ class _RegisterState extends State<Register> {
     return paddingWidget(
       child: TextFieldBuilder.enterInformation(
           key: "address",
-          textContrl: _txtCtrl[2],
           hintText: "Address",
           validators: [
             FormBuilderValidators.required(errorText: "Invalide Address")
-          ]),
-    );
-  }
-
-  Widget buildFormCountryCode() {
-    return paddingWidget(
-      child: TextFieldBuilder.enterInformation(
-          key: "countryCode",
-          textContrl: _txtCtrl[3],
-          keyboardType: TextInputType.number,
-          hintText: "Country Code",
-          validators: [
-            FormBuilderValidators.required(errorText: "Invalide Country Code")
           ]),
     );
   }
@@ -178,7 +330,6 @@ class _RegisterState extends State<Register> {
     return paddingWidget(
       child: TextFieldBuilder.enterInformation(
           key: "email",
-          textContrl: _txtCtrl[4],
           hintText: "${allTranslations.text("email")}",
           keyboardType: TextInputType.emailAddress,
           validators: [
@@ -191,15 +342,37 @@ class _RegisterState extends State<Register> {
 
   Widget buildFormMobileNumber() {
     return paddingWidget(
-      child: TextFieldBuilder.enterInformation(
-          key: "mobileNumber",
-          textContrl: _txtCtrl[5],
-          hintText: "Mobile Number",
-          keyboardType: TextInputType.number,
-          textInputAction: TextInputAction.next,
-          validators: [
-            FormBuilderValidators.required(errorText: "Invalide Mobile Number")
-          ]),
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              decoration: BoxDecoration(
+                  border: Border.all(width: 0.7, color: COLOR_THEME_APP),
+                  borderRadius: BorderRadius.circular(25)),
+              height: 50,
+              child: Center(
+                  child: TextBuilder.build(
+                      title: "+ ${modelCountry.countryNumberPhoneCode}")),
+            ),
+          ),
+          SizedBox(
+            width: 5,
+          ),
+          Expanded(
+            flex: 4,
+            child: TextFieldBuilder.enterInformation(
+                key: "mobileNumber",
+                hintText: "Mobile Number",
+                keyboardType: TextInputType.number,
+                textInputAction: TextInputAction.next,
+                validators: [
+                  FormBuilderValidators.required(
+                      errorText: "Invalide Mobile Number")
+                ]),
+          ),
+        ],
+      ),
     );
   }
 }

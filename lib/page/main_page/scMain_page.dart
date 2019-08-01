@@ -1,7 +1,6 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fancy_bottom_navigation/fancy_bottom_navigation.dart';
 import 'package:provider/provider.dart';
 import 'package:warranzy_demo/page/asset_page/scAssets.dart';
 import 'package:warranzy_demo/page/notification_page/scNotification.dart';
@@ -77,7 +76,7 @@ class _MainPageState extends State<MainPage>
           type: BottomNavigationBarType.fixed,
           selectedItemColor: COLOR_THEME_APP,
           unselectedItemColor: COLOR_BLACK,
-          selectedFontSize: 15,          
+          selectedFontSize: 15,
           onTap: (position) {
             setState(() {
               setPage = position;

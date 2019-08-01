@@ -105,6 +105,7 @@
     "finish" :"Finish",
     "success": "Success",
     "delete":"Delete",
+    "confirm": "Confirm",
 
     "------_comment Aert" : "Alert------------",
     "title_award" : "AWARD LOTTO.",
