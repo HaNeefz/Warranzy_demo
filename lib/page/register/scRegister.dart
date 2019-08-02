@@ -7,9 +7,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_picker/flutter_picker.dart';
+import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:warranzy_demo/models/model_country_birth_year.dart';
 import 'package:warranzy_demo/models/model_mas_customers.dart';
+import 'package:warranzy_demo/models/model_verify_phone.dart';
+import 'package:warranzy_demo/services/api/api_services.dart';
 import 'package:warranzy_demo/services/providers/notification_state.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/const.dart';
@@ -34,7 +37,6 @@ class _RegisterState extends State<Register> {
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
   final FixedExtentScrollController fixController =
       FixedExtentScrollController();
-  final ModelMasCustomer modelMasCustomer = ModelMasCustomer();
   final ModelDataCountry modelCountry = ModelDataCountry();
   final ModelDataBirthYear modelBirthYear = ModelDataBirthYear();
   SharedPreferences _pref;
@@ -66,8 +68,6 @@ class _RegisterState extends State<Register> {
   bool agree = false;
   @override
   Widget build(BuildContext context) {
-    // Locale myLocale = Localizations.localeOf(context);
-    // print(myLocale);
     return Scaffold(
       appBar: AppBarThemes.appBarStyle(context: context),
       body: SingleChildScrollView(
@@ -107,28 +107,53 @@ class _RegisterState extends State<Register> {
     );
   }
 
-  registerContinue() {
+  registerContinue() async {
     _fbKey.currentState.save();
     if (_fbKey.currentState.validate()) {
       if (checkSelectCountryAndBirthYear(context)) {
-        var deviceIDAndPlayerID = {
+        String currentTimeZone = await FlutterNativeTimezone.getLocalTimezone();
+        var deviceIDAndPlayerIDAndTimeZone = {
           "DeviceID": _pref.getString("DeviceID"),
-          "NotificationID": noti.playerID
+          "NotificationID": noti.playerID,
+          "TimeZone": currentTimeZone
         };
-        _fbKey.currentState.value["mobileNumber"] =
+        _fbKey.currentState.value["MobilePhone"] =
             chenkNumberStartWith(_fbKey.currentState.value["MobilePhone"]);
         var masCustomersData = _fbKey.currentState.value
           ..addAll(modelCountry.toMap())
           ..addAll(modelBirthYear.toMap())
-          ..addAll(deviceIDAndPlayerID);
+          ..addAll(deviceIDAndPlayerIDAndTimeZone);
         print(masCustomersData);
-        var temp = ModelMasCustomer.fromJson(masCustomersData);
-        print(temp.mobileNumber);
-        // ecsLib.pushPage(
-        //     context: context,
-        //     pageWidget: ReceiveOTP(
-        //       custDataRegister: data,
-        //     ));
+
+        var dataCustomers = ModelMasCustomer.fromJson(masCustomersData);
+        ecsLib.showDialogLoadingLib(context: context, content: "Verifying");
+        var data = {
+          "Email": dataCustomers.email,
+          "MobilePhone":
+              "${dataCustomers.countryNumberPhoneCode}${dataCustomers.mobilePhone}",
+          "Country": dataCustomers.countryCode,
+          "TimeZone": dataCustomers.timeZone,
+        };
+        apiVerifyNumber(postData: data).then((response) async {
+          print(response);
+          if (response?.status == true) {
+            Navigator.pop(context); //clear alert
+            ecsLib.pushPage(
+                context: context,
+                pageWidget: ReceiveOTP(
+                  modelMasCustomer: dataCustomers,
+                  modelVerifyNumber: response,
+                ));
+          } else {
+            Navigator.pop(context); //clear alert
+            ecsLib.showDialogLib(
+                content:
+                    "This Phone number is duplicate! Or This Phone number incorrect.Please change your phone number.",
+                context: context,
+                textOnButton: allTranslations.text("close"),
+                title: "DUPLICATE PHONE NUMBER");
+          }
+        });
       }
     }
   }
@@ -220,7 +245,8 @@ class _RegisterState extends State<Register> {
             labelText: "Gender",
             labelStyle: TextStyleCustom.STYLE_CONTENT.copyWith(fontSize: 20)),
         options: ["Male", "Female"]
-            .map((gender) => FormBuilderFieldOption(value: gender))
+            .map((gender) => FormBuilderFieldOption(
+                label: gender, value: gender.substring(0, 1)))
             .toList(growable: false),
       ),
     ));

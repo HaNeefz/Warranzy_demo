@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:warranzy_demo/models/model_mas_customers.dart';
 import 'package:warranzy_demo/page/login_first/scLogin.dart';
 import 'package:warranzy_demo/page/main_page/scMain_page.dart';
+import 'package:warranzy_demo/services/api/api_services.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/const.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
@@ -13,8 +15,13 @@ import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 
 class PinCodePageUpdate extends StatefulWidget {
   final PageType type;
+  final ModelMasCustomer modelMasCustomer;
   bool usedPin;
-  PinCodePageUpdate({Key key, @required this.type, this.usedPin = false})
+  PinCodePageUpdate(
+      {Key key,
+      @required this.type,
+      this.usedPin = false,
+      this.modelMasCustomer})
       : super(key: key);
   @override
   _PinCodePageUpdateState createState() => _PinCodePageUpdateState();
@@ -30,6 +37,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
   // bool usedFingerprintOrFaceID = false;
   PageType get type => widget.type;
   bool get usedPin => widget.usedPin;
+  ModelMasCustomer get modelMasCustomer => widget.modelMasCustomer;
 
   Future _localAuth() async {
     await Future.delayed(
@@ -52,6 +60,17 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
     if (usedPin == false && type == PageType.login) {
       _localAuth();
     }
+    print(modelMasCustomer?.fullName);
+    print(modelMasCustomer?.address);
+    print(modelMasCustomer?.countryCode);
+    print(modelMasCustomer?.email);
+    print(modelMasCustomer?.mobilePhone);
+    print(modelMasCustomer?.notificationID);
+    print(modelMasCustomer?.pinCode);
+    print(modelMasCustomer?.deviceID);
+    print(modelMasCustomer?.gender);
+    print(modelMasCustomer?.birthYear);
+    print(modelMasCustomer?.config?.spacialPass);
   }
 
   bool get pinCorrect => listEquals(listPinTemp, listPinCorrect);
@@ -126,34 +145,67 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
                   await ecsLib
                       .showDialogAction(
                     context: context,
-                    title: "Use Fingerprint",
-                    content: "Do you need to use fingerprint for sign in.",
+                    title: "Use Scan to Authen",
+                    content: "Do you need to Scan for sign in.",
                     textOk: "Yes, I do",
                     textCancel: "Later",
                   )
                       .then((response) {
+                    String pinCode =
+                        "${listPinTemp[0]}${listPinTemp[1]}${listPinTemp[2]}${listPinTemp[3]}${listPinTemp[4]}${listPinTemp[5]}";
+
                     if (response == true) {
-                      setState(() {
-                        listPinTemp.clear();
-                        ecsLib.pushPageAndClearAllScene(
-                            context: context, pageWidget: LoginPage());
-                        ecsLib.pushPage(
-                          context: context,
-                          pageWidget: PinCodePageUpdate(
-                            type: PageType.login,
-                          ),
-                        );
+                      Navigator.pop(context);
+                      ecsLib.showDialogLoadingLib(
+                        context: context,
+                        content: "Please wait.",
+                      );
+                      var data =
+                          postDataCutomers(pinCode: pinCode, spacialPass: "Y");
+                      apiRegister(postData: data).then((reponse) {
+                        print(reponse);
+                        if (reponse["Status"] == true) {
+                          Navigator.pop(context);
+                          setState(() {
+                            listPinTemp.clear();
+                            ecsLib.pushPageAndClearAllScene(
+                                context: context, pageWidget: LoginPage());
+                            ecsLib.pushPage(
+                              context: context,
+                              pageWidget: PinCodePageUpdate(
+                                type: PageType.login,
+                              ),
+                            );
+                          });
+                        } else {
+                          showErrorRegister();
+                        }
                       });
                     } else {
-                      setState(() {
-                        listPinTemp.clear();
-                        ecsLib.pushPage(
-                          context: context,
-                          pageWidget: PinCodePageUpdate(
-                            type: PageType.login,
-                            usedPin: true,
-                          ),
-                        );
+                      Navigator.pop(context);
+                      ecsLib.showDialogLoadingLib(
+                        context: context,
+                        content: "Please wait.",
+                      );
+                      var data =
+                          postDataCutomers(pinCode: pinCode, spacialPass: "N");
+                      apiRegister(postData: data).then((response) {
+                        print(response);
+                        if (response["Status"] == true) {
+                          Navigator.pop(context);
+                          setState(() {
+                            listPinTemp.clear();
+                            ecsLib.pushPage(
+                              context: context,
+                              pageWidget: PinCodePageUpdate(
+                                type: PageType.login,
+                                usedPin: true,
+                              ),
+                            );
+                          });
+                        } else {
+                          showErrorRegister();
+                        }
                       });
                     }
                   });
@@ -170,6 +222,38 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
         Container();
     }
     return widgetConfirmSetPin;
+  }
+
+  void showErrorRegister() {
+    ecsLib.showDialogLib(
+      context: context,
+      title: "ERROR REGISTER",
+      content: "Can't register!",
+      textOnButton: allTranslations.text("close"),
+    );
+  }
+
+  Map postDataCutomers(
+      {@required String pinCode, @required String spacialPass}) {
+    modelMasCustomer?.pinCode = pinCode;
+    modelMasCustomer?.config?.spacialPass = spacialPass;
+
+    var data = {
+      "CustName": modelMasCustomer.fullName,
+      "HomeAddress": modelMasCustomer.address,
+      "ContryCode": modelMasCustomer.countryCode,
+      "CustEmail": modelMasCustomer.email,
+      "MobilePhone":
+          "${modelMasCustomer.countryNumberPhoneCode}${modelMasCustomer.mobilePhone}",
+      "NotificationID": modelMasCustomer.notificationID,
+      "PINcode": modelMasCustomer.pinCode,
+      "DeviceID": modelMasCustomer.deviceID,
+      "Gender": modelMasCustomer.gender,
+      "BirdYear": modelMasCustomer.birthYear,
+      "SpacialPass": spacialPass,
+    };
+    // print(data);
+    return data;
   }
 
 //------------------dot------------------------

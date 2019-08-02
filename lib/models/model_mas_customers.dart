@@ -3,11 +3,12 @@ class ModelMasCustomer {
   String gender;
   String address;
   String email;
-  String mobileNumber;
+  String mobilePhone;
   String countryCode;
   String countryNumberPhoneCode;
   String birthYear;
   String pinCode;
+  String timeZone;
   String deviceID;
   String notificationID;
   Config config;
@@ -17,10 +18,11 @@ class ModelMasCustomer {
       this.gender,
       this.address,
       this.email,
-      this.mobileNumber,
+      this.mobilePhone,
       this.countryCode,
       this.countryNumberPhoneCode,
       this.birthYear,
+      this.timeZone,
       this.pinCode,
       this.deviceID,
       this.notificationID,
@@ -31,12 +33,13 @@ class ModelMasCustomer {
     gender = json['CustGender'];
     address = json['CustAddress'];
     email = json['CustEmail'];
-    mobileNumber = json['MobilePhone'];
-    countryCode = json['CustCountryCode'];
-    countryNumberPhoneCode = json['CustcountryNumberPhoneCode'];
+    mobilePhone = json['MobilePhone'];
+    countryCode = json['CountryCode'];
+    countryNumberPhoneCode = json['CountryNumberPhoneCode'];
     birthYear = json['CustBirthYear'];
     deviceID = json['DeviceID'];
     pinCode = json['PINCode'];
+    timeZone = json['TimeZone'];
     notificationID = json['NotificationID'];
     config =
         json['config'] != null ? new Config.fromJson(json['config']) : null;
@@ -48,12 +51,13 @@ class ModelMasCustomer {
     data['CustGender'] = this.gender;
     data['CustAddress'] = this.address;
     data['CustEmail'] = this.email;
-    data['CustMobileNumber'] = this.mobileNumber;
-    data['CustCountryCode'] = this.countryCode;
-    data['CustcountryNumberPhoneCode'] = this.countryNumberPhoneCode;
+    data['CustMobileNumber'] = this.mobilePhone;
+    data['CountryCode'] = this.countryCode;
+    data['CountryNumberPhoneCode'] = this.countryNumberPhoneCode;
     data['CustBirthYear'] = this.birthYear;
     data['CustDeviceID'] = this.deviceID;
     data['PINCode'] = this.pinCode;
+    data['TimeZone'] = this.timeZone;
     data['notificationID'] = this.notificationID;
     if (this.config != null) {
       data['config'] = this.config.toJson();
@@ -64,19 +68,19 @@ class ModelMasCustomer {
 
 class Config {
   String language;
-  bool scanToAuthen;
+  String spacialPass = "F";
 
-  Config({this.language, this.scanToAuthen});
+  Config({this.language, this.spacialPass});
 
   Config.fromJson(Map<String, dynamic> json) {
     language = json['language'];
-    scanToAuthen = json['scanToAuthen'];
+    spacialPass = json['spacialPass'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['language'] = this.language;
-    data['scanToAuthen'] = this.scanToAuthen;
+    data['scanToAuthen'] = this.spacialPass;
     return data;
   }
 }

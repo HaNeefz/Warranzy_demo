@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:pin_code_text_field/pin_code_text_field.dart';
+import 'package:warranzy_demo/models/model_mas_customers.dart';
+import 'package:warranzy_demo/models/model_verify_phone.dart';
 import 'package:warranzy_demo/page/pin_code/scPinCode.dart';
+import 'package:warranzy_demo/services/api/api_services.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/const.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
@@ -9,9 +12,11 @@ import 'package:warranzy_demo/tools/widget_ui_custom/button_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 
 class ReceiveOTP extends StatefulWidget {
-  final Map<String, dynamic> custDataRegister;
+  final ModelMasCustomer modelMasCustomer;
+  final ModelVerifyNumber modelVerifyNumber;
 
-  const ReceiveOTP({Key key, this.custDataRegister}) : super(key: key);
+  const ReceiveOTP({Key key, this.modelMasCustomer, this.modelVerifyNumber})
+      : super(key: key);
   @override
   _ReceiveOTPState createState() => _ReceiveOTPState();
 }
@@ -20,15 +25,15 @@ class _ReceiveOTPState extends State<ReceiveOTP> {
   final ecsLib = getIt.get<ECSLib>();
   final allTranslations = getIt.get<GlobalTranslations>();
   TextEditingController controller = TextEditingController();
+  final int otpTimeOut = 120;
   String thisText = "";
   int pinLength = 4;
 
   bool hasError = false;
   String errorMessage;
 
-  String get numberPhone => widget.custDataRegister["mobileNumber"];
-  String get countryNumberPhoneCode =>
-      widget.custDataRegister["countryNumberPhoneCode"];
+  ModelMasCustomer get modelMasCustomer => widget.modelMasCustomer;
+  ModelVerifyNumber get modelVerifyData => widget.modelVerifyNumber;
 
   void initState() {
     super.initState();
@@ -62,7 +67,7 @@ class _ReceiveOTPState extends State<ReceiveOTP> {
                     ),
                     TextSpan(
                         text:
-                            "A OTP has been sent to +$countryNumberPhoneCode $numberPhone",
+                            "A OTP has been sent to +${modelMasCustomer.countryNumberPhoneCode} ${modelMasCustomer.mobilePhone}",
                         style: TextStyleCustom.STYLE_LABEL
                             .copyWith(fontSize: 15, color: COLOR_GREY)),
                   ]),
@@ -111,12 +116,7 @@ class _ReceiveOTPState extends State<ReceiveOTP> {
                     paddingValue: 20,
                     label: allTranslations.text("confirm"),
                     onPressed: () {
-                      ecsLib.pushPage(
-                        context: context,
-                        pageWidget: PinCodePageUpdate(
-                          type: PageType.setPin,
-                        ),
-                      );
+                      sendOTP(context);
                     }),
               ),
               Padding(
@@ -128,7 +128,34 @@ class _ReceiveOTPState extends State<ReceiveOTP> {
                         title: "Resend OTP",
                         style: TextStyleCustom.STYLE_TEXT_UNDERLINE
                             .copyWith(fontSize: 15)),
-                    onTap: () {},
+                    onTap: () async {
+                      var data = {
+                        "MobilePhone":
+                            "${modelMasCustomer.countryNumberPhoneCode}${modelMasCustomer.mobilePhone}",
+                        "Country": modelMasCustomer.countryCode,
+                        "TimeZone": modelMasCustomer.timeZone,
+                      };
+                      print("data befor send => $data");
+                      ecsLib.showDialogLoadingLib(
+                        context: context,
+                        content: "Resend OTP, Wait a minutes.",
+                      );
+                      await apiVerifyNumberTryRequest(postData: data)
+                          .then((response) {
+                        Navigator.pop(context);
+                        print(
+                            "createDate Old => ${modelVerifyData.createDate}");
+                        print(
+                            "verifyCode Old => ${modelVerifyData.codeVerify}");
+                        modelVerifyData.createDate = response.createDate;
+                        modelVerifyData.codeVerify = response.codeVerify;
+                        print(
+                            "createDate Change => ${modelVerifyData.createDate}");
+                        print(
+                            "verifyCode Change => ${modelVerifyData.codeVerify}");
+                        sendOTP(context);
+                      });
+                    },
                   ),
                 ),
               )
@@ -137,5 +164,40 @@ class _ReceiveOTPState extends State<ReceiveOTP> {
         ),
       ),
     );
+  }
+
+  void sendOTP(BuildContext context) {
+    if (checkOTPTimeOut() == false) {
+      // false ยังไม่หมดเวลา
+      if (controller.text == modelVerifyData?.codeVerify.toString()) {
+        print("Verify Done.");
+        ecsLib.pushPage(
+          context: context,
+          pageWidget: PinCodePageUpdate(
+            type: PageType.setPin,
+            modelMasCustomer: modelMasCustomer,
+          ),
+        );
+      } else
+        setState(() {
+          hasError = true;
+        });
+    } else {
+      ecsLib.showDialogLib(
+        context: context,
+        title: "OTP TIME OUT",
+        content: "OTP time out!. Please resend OTP.",
+        textOnButton: allTranslations.text("close"),
+      );
+    }
+  }
+
+  bool checkOTPTimeOut() {
+    var createOTPTime = DateTime.parse(modelVerifyData.createDate);
+    var dateTimeNow = DateTime.now();
+    if (dateTimeNow.compareTo(createOTPTime) > otpTimeOut)
+      return true;
+    else
+      return false;
   }
 }
