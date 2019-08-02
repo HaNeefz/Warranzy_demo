@@ -40,6 +40,7 @@ class _AssetPageState extends State<AssetPage> {
           children: <Widget>[
             buildHeaderAndProfile(),
             CarouselWithIndicator(
+              height: 250,
               items: ["1", "2", "3", "5"],
             ),
             buildLabelAndSeeAll(),

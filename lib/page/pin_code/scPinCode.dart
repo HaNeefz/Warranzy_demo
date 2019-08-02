@@ -353,11 +353,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
                             .copyWith(color: COLOR_WHITE),
                         paddingValue: 0,
                         label: allTranslations.text("forgot_pin"),
-                        onPressed: () {
-                          setState(() {
-                            widget.usedPin = !widget.usedPin;
-                          });
-                        }),
+                        onPressed: () {}),
                   ),
                   // Padding(
                   //   padding: const EdgeInsets.only(top: 20.0),

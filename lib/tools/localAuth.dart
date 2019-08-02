@@ -21,6 +21,7 @@ class LocalAuth {
     List<BiometricType> availableBiometrics;
     try {
       availableBiometrics = await auth.getAvailableBiometrics();
+      print(availableBiometrics);
     } on PlatformException catch (e) {
       print(e);
     }
