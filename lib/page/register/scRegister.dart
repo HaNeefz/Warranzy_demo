@@ -9,6 +9,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_picker/flutter_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:warranzy_demo/models/model_country_birth_year.dart';
+import 'package:warranzy_demo/models/model_mas_customers.dart';
 import 'package:warranzy_demo/services/providers/notification_state.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/const.dart';
@@ -33,7 +34,7 @@ class _RegisterState extends State<Register> {
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
   final FixedExtentScrollController fixController =
       FixedExtentScrollController();
-
+  final ModelMasCustomer modelMasCustomer = ModelMasCustomer();
   final ModelDataCountry modelCountry = ModelDataCountry();
   final ModelDataBirthYear modelBirthYear = ModelDataBirthYear();
   SharedPreferences _pref;
@@ -111,28 +112,30 @@ class _RegisterState extends State<Register> {
     if (_fbKey.currentState.validate()) {
       if (checkSelectCountryAndBirthYear(context)) {
         var deviceIDAndPlayerID = {
-          "deviceID": _pref.getString("DeviceID"),
-          "notificationID": noti.playerID
+          "DeviceID": _pref.getString("DeviceID"),
+          "NotificationID": noti.playerID
         };
         _fbKey.currentState.value["mobileNumber"] =
-            chenkNumberStartWith(_fbKey.currentState.value["mobileNumber"]);
-        var data = _fbKey.currentState.value
+            chenkNumberStartWith(_fbKey.currentState.value["MobilePhone"]);
+        var masCustomersData = _fbKey.currentState.value
           ..addAll(modelCountry.toMap())
           ..addAll(modelBirthYear.toMap())
           ..addAll(deviceIDAndPlayerID);
-        print(data);
-        ecsLib.pushPage(
-            context: context,
-            pageWidget: ReceiveOTP(
-              custDataRegister: data,
-            ));
+        print(masCustomersData);
+        var temp = ModelMasCustomer.fromJson(masCustomersData);
+        print(temp.mobileNumber);
+        // ecsLib.pushPage(
+        //     context: context,
+        //     pageWidget: ReceiveOTP(
+        //       custDataRegister: data,
+        //     ));
       }
     }
   }
 
   String chenkNumberStartWith(String numb) {
     String numbNew = numb;
-    if (numbNew.startsWith("0")) {
+    if (numbNew.startsWith(RegExp(r'0')) == true) {
       print("numberStartWith Zero is true");
       numbNew = numbNew.replaceFirst(RegExp(r'0'), '');
     }
@@ -210,7 +213,7 @@ class _RegisterState extends State<Register> {
           border: Border.all(width: 0.7, color: COLOR_GREY),
           borderRadius: BorderRadius.circular(25)),
       child: FormBuilderRadio(
-        attribute: "Gender",
+        attribute: "CustGender",
         leadingInput: true,
         validators: [FormBuilderValidators.required()],
         decoration: InputDecoration(
@@ -305,7 +308,7 @@ class _RegisterState extends State<Register> {
   Widget buildFormFullName() {
     return paddingWidget(
       child: TextFieldBuilder.enterInformation(
-          key: "fullName",
+          key: "CustName",
           hintText: "Full Name",
           validators: [
             FormBuilderValidators.required(errorText: "Invalide Full name")
@@ -316,7 +319,7 @@ class _RegisterState extends State<Register> {
   Widget buildFormAddress() {
     return paddingWidget(
       child: TextFieldBuilder.enterInformation(
-          key: "address",
+          key: "CustAddress",
           hintText: "Address",
           validators: [
             FormBuilderValidators.required(errorText: "Invalide Address")
@@ -327,7 +330,7 @@ class _RegisterState extends State<Register> {
   Widget buildFormEmail() {
     return paddingWidget(
       child: TextFieldBuilder.enterInformation(
-          key: "email",
+          key: "CustEmail",
           hintText: "${allTranslations.text("email")}",
           keyboardType: TextInputType.emailAddress,
           validators: [
@@ -360,7 +363,7 @@ class _RegisterState extends State<Register> {
           Expanded(
             flex: 4,
             child: TextFieldBuilder.enterInformation(
-                key: "mobileNumber",
+                key: "MobilePhone",
                 hintText: "Mobile Number",
                 keyboardType: TextInputType.number,
                 textInputAction: TextInputAction.next,

@@ -14,8 +14,8 @@ class ModelDataCountry {
   Map<String, String> toMap() {
     Map<String, String> map = {
       // "countryName": this.countryName,
-      "countryCode": this.countryCode,
-      "countryNumberPhoneCode": this.countryNumberPhoneCode,
+      "CountryCode": this.countryCode,
+      "CountryNumberPhoneCode": this.countryNumberPhoneCode,
     };
     return map;
   }
@@ -33,7 +33,7 @@ class ModelDataBirthYear {
   });
 
   Map<String, String> toMap() {
-    Map<String, String> map = {"birthYear": this.birthYear};
+    Map<String, String> map = {"CustBirthYear": this.birthYear};
     return map;
   }
 
