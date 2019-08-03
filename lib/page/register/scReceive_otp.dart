@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pin_code_text_field/pin_code_text_field.dart';
-import 'package:warranzy_demo/models/model_mas_customers.dart';
+import 'package:warranzy_demo/models/model_cust_temp_data.dart';
 import 'package:warranzy_demo/models/model_verify_phone.dart';
 import 'package:warranzy_demo/page/pin_code/scPinCode.dart';
 import 'package:warranzy_demo/services/api/api_services.dart';

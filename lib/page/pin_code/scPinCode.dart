@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:warranzy_demo/models/model_mas_customers.dart';
+import 'package:warranzy_demo/models/model_cust_temp_data.dart';
 import 'package:warranzy_demo/page/login_first/scLogin.dart';
 import 'package:warranzy_demo/page/main_page/scMain_page.dart';
 import 'package:warranzy_demo/services/api/api_services.dart';
@@ -59,18 +59,19 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
     super.initState();
     if (usedPin == false && type == PageType.login) {
       _localAuth();
+    } else {
+      print(modelMasCustomer?.fullName);
+      print(modelMasCustomer?.address);
+      print(modelMasCustomer?.countryCode);
+      print(modelMasCustomer?.email);
+      print(modelMasCustomer?.mobilePhone);
+      print(modelMasCustomer?.notificationID);
+      print(modelMasCustomer?.pinCode);
+      print(modelMasCustomer?.deviceID);
+      print(modelMasCustomer?.gender);
+      print(modelMasCustomer?.birthYear);
+      print(modelMasCustomer?.config?.spacialPass);
     }
-    print(modelMasCustomer?.fullName);
-    print(modelMasCustomer?.address);
-    print(modelMasCustomer?.countryCode);
-    print(modelMasCustomer?.email);
-    print(modelMasCustomer?.mobilePhone);
-    print(modelMasCustomer?.notificationID);
-    print(modelMasCustomer?.pinCode);
-    print(modelMasCustomer?.deviceID);
-    print(modelMasCustomer?.gender);
-    print(modelMasCustomer?.birthYear);
-    print(modelMasCustomer?.config?.spacialPass);
   }
 
   bool get pinCorrect => listEquals(listPinTemp, listPinCorrect);

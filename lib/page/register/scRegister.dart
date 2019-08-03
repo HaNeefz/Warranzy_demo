@@ -10,7 +10,7 @@ import 'package:flutter_picker/flutter_picker.dart';
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:warranzy_demo/models/model_country_birth_year.dart';
-import 'package:warranzy_demo/models/model_mas_customers.dart';
+import 'package:warranzy_demo/models/model_cust_temp_data.dart';
 import 'package:warranzy_demo/models/model_verify_phone.dart';
 import 'package:warranzy_demo/services/api/api_services.dart';
 import 'package:warranzy_demo/services/providers/notification_state.dart';
