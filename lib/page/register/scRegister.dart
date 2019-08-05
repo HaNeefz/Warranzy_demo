@@ -126,7 +126,8 @@ class _RegisterState extends State<Register> {
         print(masCustomersData);
 
         var dataCustomers = ModelMasCustomer.fromJson(masCustomersData);
-        ecsLib.showDialogLoadingLib(context: context, content: "Verifying");
+        ecsLib.showDialogLoadingLib(
+            context: context, content: "Verifying", barrierDismissible: false);
         var data = {
           "Email": dataCustomers.email,
           "MobilePhone":
@@ -144,14 +145,21 @@ class _RegisterState extends State<Register> {
                   modelMasCustomer: dataCustomers,
                   modelVerifyNumber: response,
                 ));
-          } else {
+          } else if (response?.status == false) {
             Navigator.pop(context); //clear alert
             ecsLib.showDialogLib(
                 content:
-                    "This Phone number is duplicate! Or This Phone number incorrect.Please change your phone number.",
+                    "This Phone number is duplicate! or incorrect. Please change your phone number.",
                 context: context,
                 textOnButton: allTranslations.text("close"),
                 title: "DUPLICATE PHONE NUMBER");
+          } else {
+            Navigator.pop(context); //clear alert
+            ecsLib.showDialogLib(
+                content: "Server error. Please try again",
+                context: context,
+                textOnButton: allTranslations.text("close"),
+                title: "SERVER ERROR");
           }
         });
       }

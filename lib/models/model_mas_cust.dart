@@ -32,9 +32,8 @@ class ModelCustomers {
   String deviceID;
   String gender;
   String birthYear;
-  String spacialPass;
+  String specialPass;
   String packageType;
-  String createDate;
 
   ModelCustomers(
       {this.custUserID,
@@ -48,9 +47,8 @@ class ModelCustomers {
       this.deviceID,
       this.gender,
       this.birthYear,
-      this.spacialPass,
-      this.packageType,
-      this.createDate});
+      this.specialPass,
+      this.packageType});
 
   ModelCustomers.fromJson(Map<String, dynamic> json) {
     custUserID = json['CustUserID'];
@@ -64,9 +62,8 @@ class ModelCustomers {
     deviceID = json['DeviceID'];
     gender = json['Gender'];
     birthYear = json['BirthYear'];
-    spacialPass = json['SpacialPass'];
+    specialPass = json['SpecialPass'];
     packageType = json['PackageType'];
-    createDate = json['CreateDate'];
   }
 
   Map<String, dynamic> toJson() {
@@ -82,9 +79,8 @@ class ModelCustomers {
     data['DeviceID'] = this.deviceID;
     data['Gender'] = this.gender;
     data['BirthYear'] = this.birthYear;
-    data['SpacialPass'] = this.spacialPass;
+    data['SpecialPass'] = this.specialPass;
     data['PackageType'] = this.packageType;
-    data['CreateDate'] = this.createDate;
     return data;
   }
 }

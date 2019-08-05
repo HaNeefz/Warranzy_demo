@@ -4,6 +4,7 @@ import 'package:warranzy_demo/models/model_cust_temp_data.dart';
 import 'package:warranzy_demo/page/login_first/scLogin.dart';
 import 'package:warranzy_demo/page/main_page/scMain_page.dart';
 import 'package:warranzy_demo/services/api/api_services.dart';
+import 'package:warranzy_demo/services/sqflit/db_customers.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/const.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
@@ -156,58 +157,23 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
                         "${listPinTemp[0]}${listPinTemp[1]}${listPinTemp[2]}${listPinTemp[3]}${listPinTemp[4]}${listPinTemp[5]}";
 
                     if (response == true) {
-                      Navigator.pop(context);
                       ecsLib.showDialogLoadingLib(
                         context: context,
                         content: "Please wait.",
                       );
                       var data =
-                          postDataCutomers(pinCode: pinCode, spacialPass: "Y");
-                      apiRegister(postData: data).then((reponse) {
-                        print(reponse);
-                        if (reponse["Status"] == true) {
-                          Navigator.pop(context);
-                          setState(() {
-                            listPinTemp.clear();
-                            ecsLib.pushPageAndClearAllScene(
-                                context: context, pageWidget: LoginPage());
-                            ecsLib.pushPage(
-                              context: context,
-                              pageWidget: PinCodePageUpdate(
-                                type: PageType.login,
-                              ),
-                            );
-                          });
-                        } else {
-                          showErrorRegister();
-                        }
-                      });
+                          postDataCutomers(pinCode: pinCode, specialPass: "Y");
+                      print("Data before send : $data");
+                      sendApiRegister(data);
                     } else {
-                      Navigator.pop(context);
                       ecsLib.showDialogLoadingLib(
                         context: context,
                         content: "Please wait.",
                       );
                       var data =
-                          postDataCutomers(pinCode: pinCode, spacialPass: "N");
-                      apiRegister(postData: data).then((response) {
-                        print(response);
-                        if (response["Status"] == true) {
-                          Navigator.pop(context);
-                          setState(() {
-                            listPinTemp.clear();
-                            ecsLib.pushPage(
-                              context: context,
-                              pageWidget: PinCodePageUpdate(
-                                type: PageType.login,
-                                usedPin: true,
-                              ),
-                            );
-                          });
-                        } else {
-                          showErrorRegister();
-                        }
-                      });
+                          postDataCutomers(pinCode: pinCode, specialPass: "N");
+                      print("Data before send : $data");
+                      sendApiRegister(data);
                     }
                   });
                   // await _onAlert2ButtonsPressed(context).then((_) async {
@@ -225,6 +191,42 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
     return widgetConfirmSetPin;
   }
 
+  Future sendApiRegister(Map data) async {
+    apiRegister(postData: data).then((response) async {
+      if (response?.status == true) {
+        if (await DBProviderCustomer.db.addDataCustomer(response.data) ==
+            true) {
+          Navigator.pop(context);
+          setState(() {
+            listPinTemp.clear();
+            ecsLib.pushPageAndClearAllScene(
+                context: context, pageWidget: LoginPage());
+            ecsLib.pushPage(
+              context: context,
+              pageWidget: PinCodePageUpdate(
+                type: PageType.login,
+              ),
+            );
+          });
+        } else {
+          ecsLib.showDialogLib(
+              context: context,
+              title: "SQFLITE FAILD!",
+              content: "Can't insert data into sqflite.",
+              textOnButton: allTranslations.text("close"));
+        }
+      } else if (response.status == false) {
+        showErrorRegister();
+      } else {
+        ecsLib.showDialogLib(
+            context: context,
+            title: "ERROR SERVER!",
+            content: "Server is Poblem. Try Again",
+            textOnButton: allTranslations.text("close"));
+      }
+    });
+  }
+
   void showErrorRegister() {
     ecsLib.showDialogLib(
       context: context,
@@ -235,14 +237,14 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
   }
 
   Map postDataCutomers(
-      {@required String pinCode, @required String spacialPass}) {
+      {@required String pinCode, @required String specialPass}) {
     modelMasCustomer?.pinCode = pinCode;
-    modelMasCustomer?.config?.spacialPass = spacialPass;
+    modelMasCustomer?.config?.spacialPass = specialPass;
 
     var data = {
       "CustName": modelMasCustomer.fullName,
       "HomeAddress": modelMasCustomer.address,
-      "ContryCode": modelMasCustomer.countryCode,
+      "CountryCode": modelMasCustomer.countryCode,
       "CustEmail": modelMasCustomer.email,
       "MobilePhone":
           "${modelMasCustomer.countryNumberPhoneCode}${modelMasCustomer.mobilePhone}",
@@ -250,8 +252,8 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
       "PINcode": modelMasCustomer.pinCode,
       "DeviceID": modelMasCustomer.deviceID,
       "Gender": modelMasCustomer.gender,
-      "BirdYear": modelMasCustomer.birthYear,
-      "SpacialPass": spacialPass,
+      "BirthYear": modelMasCustomer.birthYear,
+      "SpecialPass": specialPass,
     };
     // print(data);
     return data;

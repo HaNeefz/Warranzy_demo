@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
+import 'package:warranzy_demo/models/model_mas_cust.dart';
 import 'package:warranzy_demo/models/model_verify_phone.dart';
 
 final String baseUrl = "http://192.168.0.36:9999/API/v1";
@@ -64,22 +65,26 @@ Future<ModelVerifyNumber> apiVerifyNumberTryRequest({dynamic postData}) async {
   return data;
 }
 
-Future apiRegister({dynamic postData}) async {
+Future<InformationMasCustomners> apiRegister({dynamic postData}) async {
   print("apiRegister");
+  InformationMasCustomners dataCustomers;
   String urlPost = "$baseUrl/User/UserRegister"; //User/CheckVerifyPhone;
   try {
-    final response = await http.post(urlPost, body: postData)
-        // .timeout(Duration(seconds: 30))
-        ; //dio.post(urlPost, data: postData);
+    final response =
+        await http.post(urlPost, body: postData).timeout(Duration(seconds: 30));
     if (response.statusCode == 200) {
-      return json.decode(response.body);
+      print(
+          "Response:============\n ${json.decode(response.body)}\n ===============");
+      return dataCustomers =
+          InformationMasCustomners.fromJson(json.decode(response.body));
     } else
       Exception("Failed to load post");
   } on TimeoutException catch (_) {
     print("TimeOut");
   } catch (e) {
-    print("Error => $e");
+    print("Catch Error => $e");
   }
+  return dataCustomers;
 }
 
 /*

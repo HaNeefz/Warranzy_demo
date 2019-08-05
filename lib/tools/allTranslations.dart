@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:warranzy_demo/services/sqflit/db_language.dart';
 
 ///
 /// Preferences related
@@ -76,6 +77,15 @@ class GlobalTranslations {
     // Set the locale
 
     if (language == "") {
+      DBProviderLanguage.db.checkHasLanguage().then((haveLanguage) {
+        if (haveLanguage == true) {
+          language = DBProviderLanguage.db.getDataLanguage();
+          print("Have language, $language");
+        } else {
+          language = "th";
+          print("No language, SetDefault 'th' ");
+        }
+      });
       // dbLang.getCount().then((counter){
       //   if(counter == 0){
       //     language = "th";
@@ -86,7 +96,7 @@ class GlobalTranslations {
       //     });
       //   }
       // });
-      language = "th";
+
     }
     _locale = Locale(language, "");
 
