@@ -3,9 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-
 import 'package:page_transition/page_transition.dart';
-
 import 'assets.dart';
 
 class ECSLib {
@@ -67,14 +65,14 @@ class ECSLib {
     return response;
   }
 
-  Future showDialogLib({
+  Future<bool> showDialogLib({
     @required BuildContext context,
     @required String title,
     @required String content,
     @required String textOnButton,
     bool barrierDismissible = false,
-  }) {
-    final response = showDialog(
+  }) async {
+    final bool response = await showDialog(
         barrierDismissible: barrierDismissible,
         context: context,
         builder: (BuildContext context) {
@@ -90,7 +88,7 @@ class ECSLib {
             actions: <Widget>[
               FlatButton(
                 child: Text(
-                  textOnButton,
+                  textOnButton ?? "",
                 ),
                 onPressed: () {
                   Navigator.pop(context, true);

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "162099434762",
+    "firebase_url": "https://testwarranty-239103.firebaseio.com",
+    "project_id": "testwarranty-239103",
+    "storage_bucket": "testwarranty-239103.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:162099434762:android:b95ea1eda30696fa",
+        "android_client_info": {
+          "package_name": "com.example.warranzy_demo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "162099434762-0hreqg8mv1br0l2tl4jlhu2sa9vmuv96.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBv0ihI6u02glXiyaYq3UAj9l9oJB64sHE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "162099434762-0hreqg8mv1br0l2tl4jlhu2sa9vmuv96.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "162099434762-en642ocp1nvrt7jbeq68k5bluictlr76.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "th.co.e-customs.ecs-warranzy"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -40,7 +40,7 @@ class TextFieldBuilder {
         readonly: readOnly,
         textInputAction: textInputAction ??= TextInputAction.done,
         style: TextStyleCustom.STYLE_LABEL.copyWith(fontSize: 15),
-        decoration: InputDecoration(
+        decoration: InputDecoration(          
             contentPadding: EdgeInsets.all(size),
             border: borderOutLine
                 ? OutlineInputBorder(
@@ -61,7 +61,7 @@ class TextFieldBuilder {
             labelStyle: TextStyleCustom.STYLE_LABEL,
             hintText: "\t\t\t ${hintText ?? ""}",
             hintStyle: TextStyleCustom.STYLE_CONTENT,
-            counterStyle: TextStyleCustom.STYLE_LABEL,
+            counterStyle: TextStyleCustom.STYLE_LABEL.copyWith(fontSize: 14),
             errorStyle: TextStyleCustom.STYLE_ERROR,
             prefixIcon: prefix,
             suffixIcon: suffix),

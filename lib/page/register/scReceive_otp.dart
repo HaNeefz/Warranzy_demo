@@ -3,7 +3,7 @@ import 'package:pin_code_text_field/pin_code_text_field.dart';
 import 'package:warranzy_demo/models/model_cust_temp_data.dart';
 import 'package:warranzy_demo/models/model_verify_phone.dart';
 import 'package:warranzy_demo/page/pin_code/scPinCode.dart';
-import 'package:warranzy_demo/services/api/api_services.dart';
+import 'package:warranzy_demo/services/api/api_services_user.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/const.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';

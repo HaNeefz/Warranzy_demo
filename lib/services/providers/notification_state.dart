@@ -83,13 +83,16 @@ class NotificationState extends ChangeNotifier {
   }
 
   getNotificationID() async {
-    OneSignal.shared.getPermissionSubscriptionState().then((status) async {
-      _playerID = status.subscriptionStatus.userId;
-      print("PlayerID : " + _playerID);
-      SharedPreferences.getInstance().then((prefs) async {
-        // print(notificationID);
-        await prefs.setString("notificationID", _playerID);
+    try {
+      OneSignal.shared.getPermissionSubscriptionState().then((status) async {
+        _playerID = status.subscriptionStatus.userId;
+        print("PlayerID : " + _playerID);
+        SharedPreferences.getInstance().then((prefs) async {
+          await prefs.setString("NotificationID", _playerID);
+        });
       });
-    });
+    } catch (e) {
+      print("ERROR get NotificationID => $e");
+    }
   }
 }

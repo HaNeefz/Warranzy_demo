@@ -38,7 +38,7 @@ class ModelMasCustomer {
     countryNumberPhoneCode = json['CountryNumberPhoneCode'];
     birthYear = json['CustBirthYear'];
     deviceID = json['DeviceID'];
-    pinCode = json['PINCode'];
+    pinCode = json['PINcode'];
     timeZone = json['TimeZone'];
     notificationID = json['NotificationID'];
     config =
@@ -56,7 +56,7 @@ class ModelMasCustomer {
     data['CountryNumberPhoneCode'] = this.countryNumberPhoneCode;
     data['CustBirthYear'] = this.birthYear;
     data['CustDeviceID'] = this.deviceID;
-    data['PINCode'] = this.pinCode;
+    data['PINcode'] = this.pinCode;
     data['TimeZone'] = this.timeZone;
     data['notificationID'] = this.notificationID;
     if (this.config != null) {

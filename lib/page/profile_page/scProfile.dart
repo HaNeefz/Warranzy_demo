@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:warranzy_demo/models/model_mas_cust.dart';
 import 'package:warranzy_demo/page/login_first/scLogin.dart';
 import 'package:warranzy_demo/services/calls_and_message/calls_and_message.dart';
+import 'package:warranzy_demo/services/sqflit/db_customers.dart';
 import 'package:warranzy_demo/tools/assets.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
@@ -29,6 +31,20 @@ class _ProfilePageState extends State<ProfilePage> {
     "address": true,
     "pin": true
   };
+
+  @override
+  void initState() {
+    super.initState();
+    getDataCustomers();
+  }
+
+  void getDataCustomers() async {
+    var dataCust = await DBProviderCustomer.db.getDataCustomer();
+    print("ID Customer => ${await DBProviderCustomer.db.getIDCustomer()}");
+    print(
+        "<=========================MAS_CUSTOMER=========================>\n${dataCust.toJson()}\n<================================================================>");
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -197,7 +213,27 @@ class _ProfilePageState extends State<ProfilePage> {
                       print(_fbKey.currentState.value);
                     }
                   },
-                )
+                ),
+                RaisedButton(
+                  child: Text("Clear data Customer"),
+                  onPressed: () async {
+                    var res =
+                        await DBProviderCustomer.db.deleteAllDataOfCustomer();
+                    if (res == true) {
+                      ecsLib.pushPageAndClearAllScene(
+                        context: context,
+                        pageWidget: LoginPage(),
+                      );
+                    } else {
+                      ecsLib.showDialogLib(
+                        context: context,
+                        title: "DELETE CUSTOMER.",
+                        content: "Can't delete customer, Try again.",
+                        textOnButton: allTranslations.text("close"),
+                      );
+                    }
+                  },
+                ),
               ],
             )),
             SliverFixedExtentList(

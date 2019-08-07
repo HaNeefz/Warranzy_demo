@@ -1,9 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:warranzy_demo/models/model_cust_temp_data.dart';
+import 'package:warranzy_demo/models/model_mas_cust.dart';
 import 'package:warranzy_demo/page/login_first/scLogin.dart';
 import 'package:warranzy_demo/page/main_page/scMain_page.dart';
-import 'package:warranzy_demo/services/api/api_services.dart';
+import 'package:warranzy_demo/services/api/api_services_user.dart';
 import 'package:warranzy_demo/services/sqflit/db_customers.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/const.dart';
@@ -21,7 +23,7 @@ class PinCodePageUpdate extends StatefulWidget {
   PinCodePageUpdate(
       {Key key,
       @required this.type,
-      this.usedPin = false,
+      this.usedPin = true,
       this.modelMasCustomer})
       : super(key: key);
   @override
@@ -34,18 +36,62 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
   List<Widget> listDot = List<Widget>(6);
   List<int> listPinTemp = List<int>();
   List<int> listPinCorrect = [0, 0, 0, 0, 0, 0];
+  Future<SharedPreferences> _pref = SharedPreferences.getInstance();
   // bool get setPinCodePage => widget.setPin;
   // bool usedFingerprintOrFaceID = false;
   PageType get type => widget.type;
   bool get usedPin => widget.usedPin;
   ModelMasCustomer get modelMasCustomer => widget.modelMasCustomer;
 
+  void sendApiLogin() async {
+    SharedPreferences pref = await _pref;
+    ModelCustomers dataCust = await DBProviderCustomer.db.getDataCustomer();
+    var dvID = pref?.getString("DeviceID");
+    var pinCIde = dataCust?.pINcode;
+    var custID = dataCust?.custUserID;
+    var postData = {
+      "DeviceID": dvID,
+      "PINcode": pinCIde,
+      "CustUserID": custID,
+    };
+    print("Data before send Api => $postData");
+    await apiVerifyLogin(postData: postData).then((response) {
+      if (response?.status == true) {
+        gotoMainPage();
+      } else if (response?.status == false) {
+        ecsLib
+            .showDialogLib(
+                context: context,
+                content: response.mssage ?? "PIN Incorrct, Try again.",
+                textOnButton: allTranslations.text("close"),
+                title: "SERVER ERROR")
+            .then((res) {
+          if (res) Navigator.pop(context);
+        });
+      } else {
+        ecsLib
+            .showDialogLib(
+                context: context,
+                content: "Can't connect server. Try again.",
+                textOnButton: allTranslations.text("close"),
+                title: "SERVER ERROR")
+            .then((res) {
+          if (res) Navigator.pop(context);
+        });
+      }
+    });
+  }
+
   Future _localAuth() async {
     await Future.delayed(
-        Duration(milliseconds: 300),
-        () => localAuth.authenticate().then((_authorized) {
+        Duration(milliseconds: 200),
+        () => localAuth.authenticate().then((_authorized) async {
               if (_authorized) {
-                gotoMainPage();
+                ecsLib.showDialogLoadingLib(
+                  context: context,
+                  content: "Verifying",
+                );
+                sendApiLogin();
               }
             }));
   }
@@ -55,11 +101,17 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
         pageWidget: MainPage(),
       );
 
-  @override
-  void initState() {
-    super.initState();
-    if (usedPin == false && type == PageType.login) {
-      _localAuth();
+  Future<bool> loginBySettingOfCustomer() async {
+    var dataCust = await DBProviderCustomer.db.getDataCustomer();
+    if (dataCust.specialPass == "Y")
+      return true;
+    else
+      return false;
+  }
+
+  initMethodLogin() async {
+    if (usedPin == true && type == PageType.login) {
+      if (await loginBySettingOfCustomer() == true) _localAuth();
     } else {
       print(modelMasCustomer?.fullName);
       print(modelMasCustomer?.address);
@@ -73,6 +125,11 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
       print(modelMasCustomer?.birthYear);
       print(modelMasCustomer?.config?.spacialPass);
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   bool get pinCorrect => listEquals(listPinTemp, listPinCorrect);
@@ -152,7 +209,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
                     textOk: "Yes, I do",
                     textCancel: "Later",
                   )
-                      .then((response) {
+                      .then((response) async {
                     String pinCode =
                         "${listPinTemp[0]}${listPinTemp[1]}${listPinTemp[2]}${listPinTemp[3]}${listPinTemp[4]}${listPinTemp[5]}";
 
@@ -164,7 +221,10 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
                       var data =
                           postDataCutomers(pinCode: pinCode, specialPass: "Y");
                       print("Data before send : $data");
-                      sendApiRegister(data);
+                      // ModelCustomers temp =
+                      //     await DBProviderCustomer.db.getDataCustomer();
+                      // print(temp?.toJson());
+                      sendApiRegister(data, pinCode);
                     } else {
                       ecsLib.showDialogLoadingLib(
                         context: context,
@@ -173,7 +233,10 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
                       var data =
                           postDataCutomers(pinCode: pinCode, specialPass: "N");
                       print("Data before send : $data");
-                      sendApiRegister(data);
+                      // ModelCustomers temp =
+                      //     await DBProviderCustomer.db.getDataCustomer();
+                      // print(temp.toJson());
+                      sendApiRegister(data, pinCode);
                     }
                   });
                   // await _onAlert2ButtonsPressed(context).then((_) async {
@@ -191,23 +254,28 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
     return widgetConfirmSetPin;
   }
 
-  Future sendApiRegister(Map data) async {
+  Future sendApiRegister(Map data, String pinCode) async {
     apiRegister(postData: data).then((response) async {
       if (response?.status == true) {
         if (await DBProviderCustomer.db.addDataCustomer(response.data) ==
             true) {
+          var dataCust = await DBProviderCustomer.db.getDataCustomer();
+          await DBProviderCustomer.db.updateCustomerFieldPinCode(ModelCustomers(
+              pINcode: pinCode, custUserID: dataCust.custUserID));
+          dataCust = await DBProviderCustomer.db.getDataCustomer();
+          print(
+              "===========Information Customer============\n${dataCust.toJson()}\n============");
           Navigator.pop(context);
-          setState(() {
-            listPinTemp.clear();
-            ecsLib.pushPageAndClearAllScene(
-                context: context, pageWidget: LoginPage());
-            ecsLib.pushPage(
-              context: context,
-              pageWidget: PinCodePageUpdate(
-                type: PageType.login,
-              ),
-            );
-          });
+          ecsLib.pushPageAndClearAllScene(
+              context: context, pageWidget: LoginPage());
+          ecsLib.pushPage(
+            context: context,
+            pageWidget: PinCodePageUpdate(
+              type: PageType.login,
+              usedPin: data['SpecialPass'] == "Y" ? true : false,
+            ),
+          );
+          // });
         } else {
           ecsLib.showDialogLib(
               context: context,
@@ -215,7 +283,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
               content: "Can't insert data into sqflite.",
               textOnButton: allTranslations.text("close"));
         }
-      } else if (response.status == false) {
+      } else if (response?.status == false) {
         showErrorRegister();
       } else {
         ecsLib.showDialogLib(
@@ -358,19 +426,41 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
         horizontal: 70.0,
       ),
       width: MediaQuery.of(context).size.width,
-      child: GridView.builder(
-        shrinkWrap: true,
-        itemCount: 12,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3, mainAxisSpacing: 20, crossAxisSpacing: 20),
-        itemBuilder: (BuildContext context, int index) {
-          return buttonNumbers(
-            number: index,
-            onpressed: () {
-              checkedButton(index: index + 1);
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          GridView.builder(
+            shrinkWrap: true,
+            itemCount: 12,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3, mainAxisSpacing: 20, crossAxisSpacing: 20),
+            itemBuilder: (BuildContext context, int index) {
+              return buttonNumbers(
+                number: index,
+                onpressed: () {
+                  checkedButton(index: index + 1);
+                },
+              );
             },
-          );
-        },
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: ButtonBuilder.buttonCustom(
+                      context: context,
+                      colorsButton: COLOR_MAJOR.withAlpha(200),
+                      labelStyle: TextStyleCustom.STYLE_LABEL_BOLD
+                          .copyWith(color: COLOR_WHITE),
+                      paddingValue: 0,
+                      label: allTranslations.text("forgot_pin"),
+                      onPressed: () {}),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -442,15 +532,6 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
                         label: allTranslations.text("forgot_pin"),
                         onPressed: () {}),
                   ),
-                  // Padding(
-                  //   padding: const EdgeInsets.only(top: 20.0),
-                  //   child: GestureDetector(
-                  //       child: TextBuilder.build(
-                  //           title: allTranslations.text("forgot_pin"),
-                  //           style: TextStyleCustom.STYLE_LABEL
-                  //               .copyWith(color: COLOR_THEME_APP)),
-                  //       onTap: () {}),
-                  // ),
                 ],
               ),
             ),
@@ -509,11 +590,20 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
     }
   }
 
-  checkPINCorrect() {
+  checkPINCorrect() async {
     if (usedPin == true && listPinTemp.length == 6) {
-      if (pinCorrect == true) {
+      var dataCust = await DBProviderCustomer.db.getDataCustomer();
+      var pinCode =
+          "${listPinTemp[0]}${listPinTemp[1]}${listPinTemp[2]}${listPinTemp[3]}${listPinTemp[4]}${listPinTemp[5]}";
+      if (dataCust?.pINcode == pinCode) {
+        //pinCorrect == true
         print("Correct");
-        gotoMainPage();
+        // gotoMainPage();
+        ecsLib.showDialogLoadingLib(
+          context: context,
+          content: "Verifying",
+        );
+        sendApiLogin();
       } else {
         print("In Correct");
         ecsLib

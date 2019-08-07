@@ -12,7 +12,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:warranzy_demo/models/model_country_birth_year.dart';
 import 'package:warranzy_demo/models/model_cust_temp_data.dart';
 import 'package:warranzy_demo/models/model_verify_phone.dart';
-import 'package:warranzy_demo/services/api/api_services.dart';
+import 'package:warranzy_demo/page/pin_code/scPinCode.dart';
+import 'package:warranzy_demo/services/api/api_services_user.dart';
 import 'package:warranzy_demo/services/providers/notification_state.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/const.dart';
@@ -39,30 +40,23 @@ class _RegisterState extends State<Register> {
       FixedExtentScrollController();
   final ModelDataCountry modelCountry = ModelDataCountry();
   final ModelDataBirthYear modelBirthYear = ModelDataBirthYear();
-  SharedPreferences _pref;
+  Future<SharedPreferences> _pref = SharedPreferences.getInstance();
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
   NotificationState noti = NotificationState();
+  String _dvID = '';
+  String _notiID = '';
+
+  getDvIDwithNotiID() async {
+    var pref = await _pref;
+    _dvID = pref?.getString("DeviceID");
+    _notiID = pref?.getString("NotificationID");
+    print("get pref complete");
+  }
+
   @override
   void initState() {
     super.initState();
-    noti.getNotificationID();
-    getDeviceInfo();
-  }
-
-  getDeviceInfo() async {
-    _pref = await SharedPreferences.getInstance();
-
-    if (Platform.isAndroid) {
-      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      print('Running on ${androidInfo.androidId}');
-      _pref.setString("DeviceID", androidInfo.androidId);
-    } else if (Platform.isIOS) {
-      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      _pref.setString("DeviceID", iosInfo.identifierForVendor);
-      print('DeviceID : ${_pref.getString("DeviceID")}');
-    } else {
-      print("Another");
-    }
+    getDvIDwithNotiID();
   }
 
   bool agree = false;
@@ -113,8 +107,8 @@ class _RegisterState extends State<Register> {
       if (checkSelectCountryAndBirthYear(context)) {
         String currentTimeZone = await FlutterNativeTimezone.getLocalTimezone();
         var deviceIDAndPlayerIDAndTimeZone = {
-          "DeviceID": _pref.getString("DeviceID"),
-          "NotificationID": noti.playerID,
+          "DeviceID": _dvID,
+          "NotificationID": _notiID,
           "TimeZone": currentTimeZone
         };
         _fbKey.currentState.value["MobilePhone"] =
@@ -135,6 +129,14 @@ class _RegisterState extends State<Register> {
           "Country": dataCustomers.countryCode,
           "TimeZone": dataCustomers.timeZone,
         };
+        // ecsLib.pushPage(
+        //   context: context,
+        //   pageWidget: PinCodePageUpdate(
+        //     type: PageType.setPin,
+        //     modelMasCustomer: dataCustomers,
+        //   ),
+        // ); // Skip verify phone number
+
         apiVerifyNumber(postData: data).then((response) async {
           print(response);
           if (response?.status == true) {
@@ -148,8 +150,7 @@ class _RegisterState extends State<Register> {
           } else if (response?.status == false) {
             Navigator.pop(context); //clear alert
             ecsLib.showDialogLib(
-                content:
-                    "This Phone number is duplicate! or incorrect. Please change your phone number.",
+                content: response?.message ?? "Duplicate number",
                 context: context,
                 textOnButton: allTranslations.text("close"),
                 title: "DUPLICATE PHONE NUMBER");
@@ -323,7 +324,7 @@ class _RegisterState extends State<Register> {
                       searchInputDecoration:
                           InputDecoration(hintText: 'Search...'),
                       isSearchable: true,
-                      title: Text('Select your phone code'),
+                      title: Text('Select your country code'),
                       onValuePicked: (Country country) {
                         // print(country.isoCode);
                         setState(() {

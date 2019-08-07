@@ -68,7 +68,9 @@ class ModelCustomers {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['CustUserID'] = this.custUserID;
+    if (this.custUserID != null) {
+      data['CustUserID'] = this.custUserID;
+    }
     data['CustName'] = this.custName;
     data['HomeAddress'] = this.homeAddress;
     data['CountryCode'] = this.countryCode;

@@ -41,7 +41,7 @@ class DBProviderCustomer {
 
   void customerDb(Database database, int version) async {
     await database.execute("CREATE TABLE $tableName ("
-        "$columnCustUserID INTEGER PRIMARY KEY AUTOINCREMENT,"
+        "$columnCustUserID TEXT PRIMARY KEY,"
         "$columnCustName TEXT,"
         "$columnHomeAddress TEXT,"
         "$columnCountryCode TEXT,"
@@ -71,19 +71,43 @@ class DBProviderCustomer {
     return res > 0 ? true : false;
   }
 
-  getDataCustomer() async {
+  Future<ModelCustomers> getDataCustomer() async {
+    final db = await database;
+    try {
+      var res = await db.query(tableName);
+      return res.map((data) => ModelCustomers.fromJson(data)).toList().first;
+    } catch (e) {
+      print("error gerData $e");
+      return null;
+    }
+  }
+
+  Future<String> getIDCustomer() async {
+    final db = await database;
+    try {
+      var res = await db.query(tableName, columns: [columnCustUserID]);
+      ModelCustomers data =
+          res.map((data) => ModelCustomers.fromJson(data)).toList().first;
+      return data.custUserID;
+    } catch (e) {
+      print("error gerData $e");
+      return null;
+    }
+  }
+
+  Future<bool> checkHasCustomer() async {
     final db = await database;
     var res = await db.query(tableName);
-    List<ModelCustomers> data = res.isNotEmpty
-        ? res.map((data) => ModelCustomers.fromJson(data)).toList()
-        : [];
-
-    return data;
+    if (res.isNotEmpty)
+      return true;
+    else
+      return false;
   }
 
   getDataCustomerByID(int id) async {
     final db = await database;
-    var res = await db.query(tableName, where: 'id = ?', whereArgs: [id]);
+    var res = await db
+        .query(tableName, where: '$columnCustUserID = ?', whereArgs: [id]);
 
     return res.isNotEmpty ? ModelCustomers.fromJson(res.first) : null;
   }
@@ -91,14 +115,47 @@ class DBProviderCustomer {
   updateCustomer(ModelCustomers data) async {
     final db = await database;
     var res = await db.update(tableName, data.toJson(),
-        where: 'id = ?', whereArgs: [data.custUserID]);
+        where: '$columnCustUserID = ?', whereArgs: [data.custUserID]);
 
     return res;
   }
 
+  Future<bool> updateCustomerFieldPinCode(ModelCustomers data) async {
+    final db = await database;
+    var row = {columnPINcode: data.pINcode};
+    try {
+      var res = await db.update(tableName, row,
+          where: '$columnCustUserID = ?', whereArgs: [data.custUserID]);
+      if (res != null) {
+        print("Updated");
+        return true;
+      } else
+        return false;
+    } catch (e) {
+      print("Catch update => $e");
+      return false;
+    }
+  }
+
   deleteCustomer(int id) async {
     final db = await database;
+    try {
+      db.delete(tableName, where: '$columnCustUserID = ?', whereArgs: [id]);
+      print(id);
+    } catch (e) {
+      print("ERROR DELECT CUST $e");
+    }
+  }
 
-    db.delete(tableName, where: 'id = ?', whereArgs: [id]);
+  Future<bool> deleteAllDataOfCustomer() async {
+    final db = await database;
+    try {
+      await db.delete(tableName);
+      print("deleted");
+      return true;
+    } catch (e) {
+      print("ERROR DELECT CUST $e");
+      return false;
+    }
   }
 }

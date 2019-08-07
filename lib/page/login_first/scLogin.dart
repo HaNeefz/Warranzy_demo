@@ -1,6 +1,13 @@
+import 'dart:io';
+
+import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:warranzy_demo/page/change_device_page/scChange_device.dart';
 import 'package:warranzy_demo/page/pin_code/scPinCode.dart';
 import 'package:warranzy_demo/page/pin_code/scPin_code.dart';
+import 'package:warranzy_demo/services/providers/notification_state.dart';
+import 'package:warranzy_demo/services/sqflit/db_customers.dart';
 import 'package:warranzy_demo/tools/const.dart';
 import '../../page/register/scRegister.dart';
 import '../../tools/config/text_style.dart';
@@ -17,6 +24,57 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final ecsLib = getIt.get<ECSLib>();
   final allTranslations = getIt.get<GlobalTranslations>();
+  SharedPreferences _pref;
+  DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+  NotificationState noti = NotificationState();
+  bool hasAccount = false;
+  @override
+  void initState() {
+    super.initState();
+    noti.getNotificationID();
+    getDeviceInfo();
+    checkHasCustomer();
+  }
+
+  getDeviceInfo() async {
+    _pref = await SharedPreferences.getInstance();
+
+    if (Platform.isAndroid) {
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      print('Running on ${androidInfo.androidId}');
+      _pref.setString("DeviceID", androidInfo.androidId);
+    } else if (Platform.isIOS) {
+      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+      _pref.setString("DeviceID", iosInfo.identifierForVendor);
+    } else {
+      print("Another");
+    }
+    print('DeviceID : ${_pref.getString("DeviceID")}');
+  }
+
+  void checkHasCustomer() async {
+    hasAccount = await DBProviderCustomer.db.checkHasCustomer();
+    print("hasAccount => $hasAccount");
+    setState(() {});
+  }
+
+  gotoRegisterPage() => ecsLib.pushPage(
+        context: context,
+        pageWidget: Register(),
+      );
+
+  gotoPinCodePage() => ecsLib.pushPage(
+        context: context,
+        pageWidget: PinCodePageUpdate(
+          type: PageType.login,
+          usedPin: true,
+        ),
+      );
+  gotoChangeDevicePage() => ecsLib.pushPage(
+        context: context,
+        pageWidget: ChangeDevice(),
+      );
+  //ChangeDevice
 
   @override
   Widget build(BuildContext context) {
@@ -41,28 +99,25 @@ class _LoginPageState extends State<LoginPage> {
               ),
               ButtonBuilder.buttonCustom(
                   context: context,
-                  label: allTranslations.text("login"),
+                  label: hasAccount == true
+                      ? allTranslations.text("login")
+                      : allTranslations.text("register"),
                   onPressed: () {
-                    ecsLib.pushPage(
-                      context: context,
-                      pageWidget: PinCodePageUpdate(
-                        type: PageType.login,
-                        usedPin: false,
-                      ),
-                    );
+                    if (hasAccount == true) {
+                      gotoPinCodePage();
+                    } else {
+                      gotoRegisterPage();
+                    }
                   }),
               SizedBox(
                 height: 20.0,
               ),
               ButtonBuilder.buttonCustom(
                   context: context,
-                  label: allTranslations.text("register"),
+                  label: allTranslations.text("change_device"),
                   colorsButton: COLOR_WHITE,
                   onPressed: () {
-                    ecsLib.pushPage(
-                      context: context,
-                      pageWidget: Register(),
-                    );
+                    gotoChangeDevicePage();
                   }),
               SizedBox(
                 height: 20.0,
