@@ -35,6 +35,7 @@ class _TradePageState extends State<TradePage> {
       initialIndex: _currentPage,
       child: Scaffold(
         appBar: AppBar(
+          centerTitle: true,
           backgroundColor: COLOR_WHITE,
           leading: Padding(
             padding: const EdgeInsets.only(left: 20.0),
@@ -205,41 +206,39 @@ class ModelTradeWidget extends StatelessWidget {
                     )),
               ),
             ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    TextBuilder.build(
-                        title: price, style: TextStyleCustom.STYLE_CONTENT),
-                    TextBuilder.build(
-                        title: title, style: TextStyleCustom.STYLE_LABEL_BOLD),
-                    TextBuilder.build(
-                        title: subTitle,
-                        style: TextStyleCustom.STYLE_CONTENT
-                            .copyWith(fontSize: 14),
-                        textOverflow: TextOverflow.ellipsis,
-                        maxLine: 2),
-                    SizedBox(
-                      height: 10.0,
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  TextBuilder.build(
+                      title: price, style: TextStyleCustom.STYLE_CONTENT),
+                  TextBuilder.build(
+                      title: title, style: TextStyleCustom.STYLE_LABEL_BOLD),
+                  TextBuilder.build(
+                      title: subTitle,
+                      style: TextStyleCustom.STYLE_CONTENT
+                          .copyWith(fontSize: 14),
+                      textOverflow: TextOverflow.ellipsis,
+                      maxLine: 2),
+                  SizedBox(
+                    height: 10.0,
+                  ),
+                  Container(
+                    // padding: EdgeInsets.only(top: 10.0),
+                    width: 100,
+                    height: 25,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: COLOR_GREY.withOpacity(0.3)),
+                    child: Center(
+                      child: TextBuilder.build(
+                          title: category,
+                          style: TextStyleCustom.STYLE_LABEL
+                              .copyWith(fontSize: 14)),
                     ),
-                    Container(
-                      // padding: EdgeInsets.only(top: 10.0),
-                      width: 100,
-                      height: 25,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          color: COLOR_GREY.withOpacity(0.3)),
-                      child: Center(
-                        child: TextBuilder.build(
-                            title: category,
-                            style: TextStyleCustom.STYLE_LABEL
-                                .copyWith(fontSize: 14)),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ],

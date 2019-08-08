@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:warranzy_demo/models/model_mas_cust.dart';
 import 'package:warranzy_demo/page/login_first/scLogin.dart';
 import 'package:warranzy_demo/services/calls_and_message/calls_and_message.dart';
 import 'package:warranzy_demo/services/sqflit/db_customers.dart';
@@ -45,6 +46,19 @@ class _ProfilePageState extends State<ProfilePage> {
         "<=========================MAS_CUSTOMER=========================>\n${dataCust.toJson()}\n<================================================================>");
   }
 
+  sendTocloudFireStore() async {
+    // try {
+    //   Firestore.instance.collection("Customer").snapshots().listen((onData) {
+    //     onData.documents.forEach((doc) {
+    //       print("${doc["CustName"]} | ${doc["Phone"]}");
+    //     });
+    //     // print("${onData["CustName"]}");
+    //   });
+    // } catch (e) {
+    //   print(e);
+    // }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,6 +73,7 @@ class _ProfilePageState extends State<ProfilePage> {
           child: CustomScrollView(slivers: <Widget>[
             SliverAppBar(
               automaticallyImplyLeading: false,
+              centerTitle: true,
               leading: IconButton(
                 icon: Icon(
                   Icons.arrow_back_ios,
@@ -215,24 +230,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   },
                 ),
                 RaisedButton(
-                  child: Text("Clear data Customer"),
-                  onPressed: () async {
-                    var res =
-                        await DBProviderCustomer.db.deleteAllDataOfCustomer();
-                    if (res == true) {
-                      ecsLib.pushPageAndClearAllScene(
-                        context: context,
-                        pageWidget: LoginPage(),
-                      );
-                    } else {
-                      ecsLib.showDialogLib(
-                        context: context,
-                        title: "DELETE CUSTOMER.",
-                        content: "Can't delete customer, Try again.",
-                        textOnButton: allTranslations.text("close"),
-                      );
-                    }
-                  },
+                  child: Text("Send to cloud_firestore"),
+                  onPressed: sendTocloudFireStore,
                 ),
               ],
             )),

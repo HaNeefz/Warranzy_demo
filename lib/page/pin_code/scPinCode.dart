@@ -292,6 +292,8 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
             content: "Server is Poblem. Try Again",
             textOnButton: allTranslations.text("close"));
       }
+    }).catchError((onError) {
+      print("Error => $onError");
     });
   }
 
@@ -443,23 +445,26 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
               );
             },
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  child: ButtonBuilder.buttonCustom(
-                      context: context,
-                      colorsButton: COLOR_MAJOR.withAlpha(200),
-                      labelStyle: TextStyleCustom.STYLE_LABEL_BOLD
-                          .copyWith(color: COLOR_WHITE),
-                      paddingValue: 0,
-                      label: allTranslations.text("forgot_pin"),
-                      onPressed: () {}),
-                ),
-              ],
-            ),
-          ),
+          type == PageType.login
+              ? Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
+                  child: Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: ButtonBuilder.buttonCustom(
+                            context: context,
+                            colorsButton: COLOR_MAJOR.withAlpha(200),
+                            labelStyle: TextStyleCustom.STYLE_LABEL_BOLD
+                                .copyWith(color: COLOR_WHITE),
+                            paddingValue: 0,
+                            label: allTranslations.text("forgot_pin"),
+                            onPressed: () {}),
+                      ),
+                    ],
+                  ),
+                )
+              : Container(),
         ],
       ),
     );
@@ -591,7 +596,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
   }
 
   checkPINCorrect() async {
-    if (usedPin == true && listPinTemp.length == 6) {
+    if (usedPin == true && listPinTemp.length == 6 && type == PageType.login) {
       var dataCust = await DBProviderCustomer.db.getDataCustomer();
       var pinCode =
           "${listPinTemp[0]}${listPinTemp[1]}${listPinTemp[2]}${listPinTemp[3]}${listPinTemp[4]}${listPinTemp[5]}";

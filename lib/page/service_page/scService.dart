@@ -18,6 +18,7 @@ class _ClaimAndServicePageState extends State<ClaimAndServicePage> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
+          centerTitle: true,
           backgroundColor: COLOR_WHITE,
           title: TextBuilder.build(
               title: "Claim & Service",

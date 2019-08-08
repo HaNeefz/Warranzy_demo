@@ -297,6 +297,7 @@ class _DetailProductClaimState extends State<DetailProductClaim> {
     return SliverAppBar(
       // pinned: true,
       expandedHeight: 300,
+      centerTitle: true,
       // backgroundColor: COLOR_WHITE,
       automaticallyImplyLeading: false,
       leading: IconButton(

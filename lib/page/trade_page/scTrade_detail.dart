@@ -181,6 +181,7 @@ class _TradeDetailState extends State<TradeDetail> {
     return SliverAppBar(
       pinned: true,
       expandedHeight: 300,
+      centerTitle: true,
       // backgroundColor: COLOR_WHITE,
       automaticallyImplyLeading: false,
       leading: IconButton(

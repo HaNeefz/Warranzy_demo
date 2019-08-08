@@ -31,8 +31,12 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-    noti.getNotificationID();
-    getDeviceInfo();
+    iniFunction();
+  }
+
+  iniFunction() async {
+    await noti.getNotificationID();
+    await getDeviceInfo();
     checkHasCustomer();
   }
 
@@ -41,7 +45,7 @@ class _LoginPageState extends State<LoginPage> {
 
     if (Platform.isAndroid) {
       AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      print('Running on ${androidInfo.androidId}');
+      // print('Running on ${androidInfo.androidId}');
       _pref.setString("DeviceID", androidInfo.androidId);
     } else if (Platform.isIOS) {
       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;

@@ -21,6 +21,7 @@ class _TranfersInformationState extends State<TranfersInformation> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: TextBuilder.build(
             title: "Transfer asset", style: TextStyleCustom.STYLE_APPBAR),
       ),

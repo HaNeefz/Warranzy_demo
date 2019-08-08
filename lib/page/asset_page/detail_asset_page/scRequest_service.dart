@@ -23,6 +23,7 @@ class _RequestServiceState extends State<RequestService> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: TextBuilder.build(
             title: "Request service", style: TextStyleCustom.STYLE_APPBAR),
       ),

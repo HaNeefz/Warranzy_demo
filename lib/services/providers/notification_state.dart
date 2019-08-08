@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:onesignal/onesignal.dart';
+import 'package:onesignal/onesignal.dart' as prefix0;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:warranzy_demo/models/receive_message_model.dart';
 
@@ -61,6 +62,7 @@ class NotificationState extends ChangeNotifier {
     await OneSignal.shared.init("138414dc-cb53-43e0-bc67-49fc9b7a99f4");
     await OneSignal.shared
         .init("138414dc-cb53-43e0-bc67-49fc9b7a99f4", iOSSettings: _settings);
+    OneSignal.shared.getPermissionSubscriptionState();
     OneSignal.shared
         .setInFocusDisplayType(OSNotificationDisplayType.notification);
     OneSignal.shared
@@ -84,7 +86,9 @@ class NotificationState extends ChangeNotifier {
 
   getNotificationID() async {
     try {
-      OneSignal.shared.getPermissionSubscriptionState().then((status) async {
+      await OneSignal.shared
+          .getPermissionSubscriptionState()
+          .then((status) async {
         _playerID = status.subscriptionStatus.userId;
         print("PlayerID : " + _playerID);
         SharedPreferences.getInstance().then((prefs) async {

@@ -60,6 +60,7 @@ class _InputInformationState extends State<InputInformation> {
 
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: TextBuilder.build(
             title: widget.hasDataAssetAlready == true
                 ? "Edit Asset"

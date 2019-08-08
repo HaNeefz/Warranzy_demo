@@ -143,7 +143,7 @@ Future<ModelVerifyLogin> apiVerifyLogin({dynamic postData}) async {
     print("TimeOut");
     return null;
   } catch (e) {
-    print("$baseUrl/User/ChangeDevice => Catch Error : $e");
+    print("$baseUrl/User/Login => Catch Error : $e");
     return null;
   }
 }

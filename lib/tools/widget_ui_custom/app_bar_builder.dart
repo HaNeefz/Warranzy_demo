@@ -16,6 +16,7 @@ class AppBarThemes {
       title: TextBuilder.build(
           title: title, style: TextStyleCustom.STYLE_LABEL_BOLD),
       backgroundColor: Colors.white,
+      centerTitle: true,
       elevation: 0.0,
       actions: actions,
       flexibleSpace: Container(

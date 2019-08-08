@@ -50,6 +50,8 @@ class _RegisterState extends State<Register> {
     var pref = await _pref;
     _dvID = pref?.getString("DeviceID");
     _notiID = pref?.getString("NotificationID");
+    print("DeviceID => $_dvID");
+    print("NotificationID => $_notiID");
     print("get pref complete");
   }
 

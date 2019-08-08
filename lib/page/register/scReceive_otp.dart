@@ -45,6 +45,7 @@ class _ReceiveOTPState extends State<ReceiveOTP> {
         TextStyleCustom.STYLE_LABEL_BOLD.copyWith(color: COLOR_BLACK);
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: TextBuilder.build(
             title: "Confirm OTP", style: TextStyleCustom.STYLE_APPBAR),
       ),

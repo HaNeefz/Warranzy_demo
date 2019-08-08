@@ -37,6 +37,7 @@ class _DetailAssetState extends State<DetailAsset> {
         child: CustomScrollView(
           slivers: <Widget>[
             SliverAppBar(
+              centerTitle: true,
               expandedHeight: 300,
               backgroundColor: COLOR_WHITE,
               automaticallyImplyLeading: false,

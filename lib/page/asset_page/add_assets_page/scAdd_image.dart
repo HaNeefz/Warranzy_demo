@@ -25,6 +25,7 @@ class _AddImageState extends State<AddImage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: TextBuilder.build(
             title: hasDataAssetAlready ? "Edit Asset" : "New Asset",
             style: TextStyleCustom.STYLE_APPBAR),

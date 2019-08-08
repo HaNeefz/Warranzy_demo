@@ -26,6 +26,7 @@ class _TradeInformationState extends State<TradeInformation> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: TextBuilder.build(
             title: widget.editAble ? "Edit trade asset" : "Add trade asset",
             style: TextStyleCustom.STYLE_APPBAR),

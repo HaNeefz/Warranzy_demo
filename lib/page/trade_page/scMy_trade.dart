@@ -34,6 +34,7 @@ class _MyTradeState extends State<MyTrade> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: TextBuilder.build(
             title: "My Trade", style: TextStyleCustom.STYLE_APPBAR),
       ),

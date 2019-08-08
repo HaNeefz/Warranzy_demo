@@ -64,6 +64,7 @@ class _AddMoreInformationAssetState extends State<AddMoreInformationAsset> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: TextBuilder.build(
             title:
                 widget.hasDataAssetAlready == true ? "Edit Asset" : "New Asset",

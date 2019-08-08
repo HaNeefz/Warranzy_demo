@@ -13,6 +13,7 @@ class _TradeContactState extends State<TradeContact> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: TextBuilder.build(
             title: "Trade Contact", style: TextStyleCustom.STYLE_APPBAR),
         actions: <Widget>[

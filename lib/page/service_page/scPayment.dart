@@ -18,6 +18,7 @@ class _PayMentAboutClaimState extends State<PayMentAboutClaim> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: TextBuilder.build(
             title: "Payment", style: TextStyleCustom.STYLE_APPBAR),
       ),
