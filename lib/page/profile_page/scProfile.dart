@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-// import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:warranzy_demo/page/login_first/scLogin.dart';
@@ -47,16 +47,16 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   sendTocloudFireStore() async {
-    // try {
-    //   Firestore.instance.collection("Customer").snapshots().listen((onData) {
-    //     onData.documents.forEach((doc) {
-    //       print("${doc["CustName"]} | ${doc["Phone"]}");
-    //     });
-    //     // print("${onData["CustName"]}");
-    //   });
-    // } catch (e) {
-    //   print(e);
-    // }
+    try {
+      Firestore.instance.collection("BrandName").snapshots().listen((onData) {
+        onData.documents.forEach((doc) {
+          print("${doc.data}");
+        });
+        // print("${onData["CustName"]}");
+      });
+    } catch (e) {
+      print(e);
+    }
   }
 
   @override
