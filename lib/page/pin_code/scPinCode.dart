@@ -68,6 +68,9 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
             .then((res) {
           if (res) Navigator.pop(context);
         });
+        setState(() {
+          listPinTemp.clear();
+        });
       } else {
         ecsLib
             .showDialogLib(
@@ -609,6 +612,9 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
           content: "Verifying",
         );
         sendApiLogin();
+        setState(() {
+          listPinTemp.clear();
+        });
       } else {
         print("In Correct");
         ecsLib

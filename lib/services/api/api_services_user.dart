@@ -6,25 +6,25 @@ import 'package:warranzy_demo/models/model_mas_cust.dart';
 import 'package:warranzy_demo/models/model_verify_login.dart';
 import 'package:warranzy_demo/models/model_verify_phone.dart';
 
+// final String baseUrl = "https://testwarranty-239103.appspot.com/API/v1";
 final String baseUrl = "http://192.168.0.36:9999/API/v1";
-//https://testwarranty-239103.appspot.com
-final Dio dio = Dio();
-Future apiVerifyNumberTest({String url, dynamic postData}) async {
-  print("apiVerfyNumber");
-  String urlPost = "http://192.168.0.36:9999/API/v1/User/CheckVerifyPhone";
-  print(postData);
-  try {
-    final response = await dio.post(urlPost, data: postData);
-    if (response.statusCode == 200) {
-      return response.data;
-    } else
-      Exception("Failed to load post");
-  } on TimeoutException catch (_) {
-    print("TimeOut");
-  } catch (e) {
-    print("Catch => " + "$e");
-  }
-}
+// final Dio dio = Dio();
+// Future apiVerifyNumberTest({String url, dynamic postData}) async {
+//   print("apiVerfyNumber");
+//   String urlPost = "http://192.168.0.36:9999/API/v1/User/CheckVerifyPhone";
+//   print(postData);
+//   try {
+//     final response = await dio.post(urlPost, data: postData);
+//     if (response.statusCode == 200) {
+//       return response.data;
+//     } else
+//       Exception("Failed to load post");
+//   } on TimeoutException catch (_) {
+//     print("TimeOut");
+//   } catch (e) {
+//     print("Catch => " + "$e");
+//   }
+// }
 
 Future<ModelVerifyNumber> apiVerifyNumber({dynamic postData}) async {
   print("apiVerfyNumber");
@@ -137,7 +137,7 @@ Future<ModelVerifyLogin> apiVerifyLogin({dynamic postData}) async {
   try {
     final response = await http.post(urlPost, body: postData);
     print(
-        "$baseUrl/User/ChangeDevice => Response:============\n ${json.decode(response.body)}\n ===============");
+        "$baseUrl/User/Login => Response:============\n ${json.decode(response.body)}\n ===============");
     return ModelVerifyLogin.fromJson(json.decode(response.body));
   } on TimeoutException catch (_) {
     print("TimeOut");

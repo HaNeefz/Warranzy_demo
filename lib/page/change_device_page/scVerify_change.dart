@@ -48,6 +48,7 @@ class _VerifyChangeDeviceState extends State<VerifyChangeDevice> {
       "DeviceID": deviceID,
       "NotificationID": notificationID
     };
+    print("DeviceInfo => $dataDeviceInfo");
     return dataDeviceInfo;
   }
 

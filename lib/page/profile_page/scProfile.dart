@@ -48,11 +48,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
   sendTocloudFireStore() async {
     try {
-      Firestore.instance.collection("BrandName").snapshots().listen((onData) {
-        onData.documents.forEach((doc) {
-          print("${doc.data}");
-        });
-        // print("${onData["CustName"]}");
+      print("Click");
+      Firestore.instance.collection('BrandName').snapshots().listen((data) {
+        for (var list in data.documents) print(list.data);
       });
     } catch (e) {
       print(e);

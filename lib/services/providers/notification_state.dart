@@ -90,10 +90,11 @@ class NotificationState extends ChangeNotifier {
           .getPermissionSubscriptionState()
           .then((status) async {
         _playerID = status.subscriptionStatus.userId;
-        print("PlayerID : " + _playerID);
-        SharedPreferences.getInstance().then((prefs) async {
+        await SharedPreferences.getInstance().then((prefs) async {
           await prefs.setString("NotificationID", _playerID);
         });
+        var pID = await SharedPreferences.getInstance();
+        print("PlayerID : " + "${pID.getString("NotificationID")}");
       });
     } catch (e) {
       print("ERROR get NotificationID => $e");
