@@ -36,13 +36,13 @@ class _TradePageState extends State<TradePage> {
       child: Scaffold(
         appBar: AppBar(
           centerTitle: true,
-          backgroundColor: COLOR_WHITE,
+          backgroundColor: ThemeColors.COLOR_WHITE,
           leading: Padding(
             padding: const EdgeInsets.only(left: 20.0),
             child: IconButton(
               icon: Icon(
                 Icons.account_balance_wallet,
-                color: COLOR_THEME_APP,
+                color: ThemeColors.COLOR_THEME_APP,
                 size: 40,
               ),
               onPressed: () {
@@ -60,7 +60,7 @@ class _TradePageState extends State<TradePage> {
                 icon: Icon(
                   Icons.search,
                   size: 40,
-                  color: COLOR_THEME_APP,
+                  color: ThemeColors.COLOR_THEME_APP,
                 ),
                 onPressed: () {
                   ecsLib.pushPage(
@@ -73,9 +73,9 @@ class _TradePageState extends State<TradePage> {
           ],
           title: TextBuilder.build(
               title: "Trade Market",
-              style: TextStyleCustom.STYLE_APPBAR.copyWith(color: COLOR_BLACK)),
+              style: TextStyleCustom.STYLE_APPBAR.copyWith(color: ThemeColors.COLOR_BLACK)),
           bottom: TabBar(
-            indicatorColor: COLOR_THEME_APP,
+            indicatorColor: ThemeColors.COLOR_THEME_APP,
             onTap: (i) {
               setState(() {
                 _currentPage = i;
@@ -106,7 +106,7 @@ class _TradePageState extends State<TradePage> {
           child: TabBarView(
             children: <Widget>[
               Scaffold(
-                backgroundColor: COLOR_GREY.withOpacity(0.3),
+                backgroundColor: ThemeColors.COLOR_GREY.withOpacity(0.3),
                 body: Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: GridView.builder(
@@ -184,7 +184,7 @@ class ModelTradeWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: COLOR_WHITE,
+        color: ThemeColors.COLOR_WHITE,
         borderRadius: BorderRadius.circular(10.0),
       ),
       child: GestureDetector(
@@ -230,7 +230,7 @@ class ModelTradeWidget extends StatelessWidget {
                     height: 25,
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
-                        color: COLOR_GREY.withOpacity(0.3)),
+                        color: ThemeColors.COLOR_GREY.withOpacity(0.3)),
                     child: Center(
                       child: TextBuilder.build(
                           title: category,

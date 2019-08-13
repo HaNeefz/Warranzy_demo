@@ -79,7 +79,7 @@ class _MyTradeState extends State<MyTrade> {
   ListTile buildProfile(BuildContext context) {
     return ListTile(
       leading: CircleAvatar(
-        backgroundColor: COLOR_BLACK,
+        backgroundColor: ThemeColors.COLOR_BLACK,
         radius: 30,
         child: FlutterLogo(),
       ),
@@ -142,7 +142,7 @@ class _MyTradeState extends State<MyTrade> {
                                 TextSpan(
                                     text: "Active",
                                     style: TextStyleCustom.STYLE_LABEL_BOLD
-                                        .copyWith(color: COLOR_THEME_APP)),
+                                        .copyWith(color: ThemeColors.COLOR_THEME_APP)),
                               ],
                             ),
                           )
@@ -231,7 +231,7 @@ class _MyTradeState extends State<MyTrade> {
       child: ListTile(
         leading: Icon(
           icons,
-          color: COLOR_BLACK,
+          color: ThemeColors.COLOR_BLACK,
         ),
         title: TextBuilder.build(title: title),
         onTap: onTap,
@@ -246,17 +246,17 @@ class _MyTradeState extends State<MyTrade> {
         TextBuilder.build(
             title: "My Trade Asset", style: TextStyleCustom.STYLE_LABEL_BOLD),
         RaisedButton.icon(
-          color: COLOR_THEME_APP,
+          color: ThemeColors.COLOR_THEME_APP,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           icon: Icon(
             Icons.add,
-            color: COLOR_WHITE,
+            color: ThemeColors.COLOR_WHITE,
           ),
           label: TextBuilder.build(
               title: "Add Trade",
               style: TextStyleCustom.STYLE_LABEL
-                  .copyWith(color: COLOR_WHITE, fontSize: 14)),
+                  .copyWith(color: ThemeColors.COLOR_WHITE, fontSize: 14)),
           onPressed: () => ecsLib.pushPage(
               context: context,
               pageWidget: TradeInformation(

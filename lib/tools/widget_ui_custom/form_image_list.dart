@@ -19,7 +19,7 @@ class FormImageList {
         margin: EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
             border: path.length == 0
-                ? Border.all(width: 0.5, color: COLOR_THEME_APP)
+                ? Border.all(width: 0.5, color: ThemeColors.COLOR_THEME_APP)
                 : null,
             borderRadius: BorderRadius.circular(20.0)),
         child: ClipRRect(
@@ -92,7 +92,7 @@ Column imageEmpty() {
 //         margin: EdgeInsets.symmetric(vertical: 8),
 //         decoration: BoxDecoration(
 //             border: imageList.length == 0
-//                 ? Border.all(width: 0.5, color: COLOR_THEME_APP)
+//                 ? Border.all(width: 0.5, color: ThemeColors.COLOR_THEME_APP)
 //                 : null,
 //             borderRadius: BorderRadius.circular(20.0)),
 //         child: ClipRRect(

@@ -76,17 +76,17 @@ class _AssetPageState extends State<AssetPage> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
               RaisedButton.icon(
-                color: COLOR_THEME_APP,
+                color: ThemeColors.COLOR_THEME_APP,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20)),
                 icon: Icon(
                   Icons.add_circle,
-                  color: COLOR_WHITE,
+                  color: ThemeColors.COLOR_WHITE,
                 ),
                 label: Text(
                   "Add asset",
                   style:
-                      TextStyleCustom.STYLE_LABEL.copyWith(color: COLOR_WHITE),
+                      TextStyleCustom.STYLE_LABEL.copyWith(color: ThemeColors.COLOR_WHITE),
                 ),
                 onPressed: () => buildShowModalBottomSheet(context),
               ),
@@ -121,7 +121,7 @@ class _AssetPageState extends State<AssetPage> {
                 TextBuilder.build(
                     title: "Hello, Username",
                     style:
-                        TextStyleCustom.STYLE_TITLE.copyWith(color: COLOR_GREY))
+                        TextStyleCustom.STYLE_TITLE.copyWith(color: ThemeColors.COLOR_GREY))
               ],
             ),
           ),
@@ -140,11 +140,11 @@ class _AssetPageState extends State<AssetPage> {
                 height: 50.0,
                 decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(width: 3, color: COLOR_THEME_APP)),
+                    border: Border.all(width: 3, color: ThemeColors.COLOR_THEME_APP)),
                 child: Center(
                   child: Hero(
                     child: FlutterLogo(
-                      colors: COLOR_THEME_APP,
+                      colors: ThemeColors.COLOR_THEME_APP,
                     ),
                     tag: "PhotoProfile",
                   ),
@@ -189,7 +189,7 @@ class _AssetPageState extends State<AssetPage> {
             ListTile(
               leading: Icon(
                 Icons.playlist_add,
-                color: COLOR_BLACK,
+                color: ThemeColors.COLOR_BLACK,
                 size: 35,
               ),
               title: TextBuilder.build(title: "Manaul Add Asset"),

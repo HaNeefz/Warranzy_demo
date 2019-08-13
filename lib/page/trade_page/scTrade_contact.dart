@@ -21,7 +21,7 @@ class _TradeContactState extends State<TradeContact> {
             child: TextBuilder.build(
                 title: "Save",
                 style:
-                    TextStyleCustom.STYLE_LABEL.copyWith(color: COLOR_WHITE)),
+                    TextStyleCustom.STYLE_LABEL.copyWith(color: ThemeColors.COLOR_WHITE)),
             onPressed: () {},
           )
         ],
@@ -33,7 +33,7 @@ class _TradeContactState extends State<TradeContact> {
             TextBuilder.build(
                 title: "Contact information",
                 style: TextStyleCustom.STYLE_TITLE
-                    .copyWith(color: COLOR_THEME_APP)),
+                    .copyWith(color: ThemeColors.COLOR_THEME_APP)),
             SizedBox(
               height: 20,
             ),
@@ -53,7 +53,7 @@ class _TradeContactState extends State<TradeContact> {
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5),
-          border: Border.all(width: 0.3, color: COLOR_GREY)),
+          border: Border.all(width: 0.3, color: ThemeColors.COLOR_GREY)),
       child: RichText(
         text: TextSpan(
           children: [

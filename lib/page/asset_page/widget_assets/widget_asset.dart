@@ -50,7 +50,7 @@ class ModelAssetWidget extends StatelessWidget {
                             tag: "thumbnail_${assetData.id}",
                             child: assetData.image ??
                                 FlutterLogo(
-                                  colors: COLOR_THEME_APP,
+                                  colors: ThemeColors.COLOR_THEME_APP,
                                 ),
                           ),
                         ),
@@ -98,7 +98,7 @@ class ModelAssetWidget extends StatelessWidget {
                           height: 30,
                           padding: EdgeInsets.all(2),
                           decoration: BoxDecoration(
-                              color: COLOR_GREY.withOpacity(0.5),
+                              color: ThemeColors.COLOR_GREY.withOpacity(0.5),
                               borderRadius: BorderRadius.circular(15.0)),
                           key: Key("Category"),
                           child: Center(

@@ -119,7 +119,7 @@ class _LoginPageState extends State<LoginPage> {
               ButtonBuilder.buttonCustom(
                   context: context,
                   label: allTranslations.text("change_device"),
-                  colorsButton: COLOR_WHITE,
+                  colorsButton: ThemeColors.COLOR_WHITE,
                   onPressed: () {
                     gotoChangeDevicePage();
                   }),

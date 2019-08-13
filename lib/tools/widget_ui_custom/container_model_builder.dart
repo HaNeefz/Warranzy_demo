@@ -9,8 +9,8 @@ class ModelContainerBuilder {
     EdgeInsetsGeometry magin,
     EdgeInsetsGeometry padding,
     double borderWidth = 0.5,
-    Color colorsBorder = COLOR_THEME_APP,
-    Color color = COLOR_TRANSPARENT,
+    Color colorsBorder = ThemeColors.COLOR_THEME_APP,
+    Color color = ThemeColors.COLOR_TRANSPARENT,
     double borderRadius = 20,
   }) {
     return Container(

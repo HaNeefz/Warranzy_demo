@@ -33,7 +33,7 @@ class IconButtonThemeBuilder {
                     ? Icon(
                         icons,
                         size: 50.0,
-                        color: COLOR_ICONS_THEME,
+                        color: ThemeColors.COLOR_ICONS_THEME,
                       )
                     : Padding(
                         child: replaceIconsToNameImageAsset.isNotEmpty

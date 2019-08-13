@@ -32,7 +32,7 @@ class _TranfersInformationState extends State<TranfersInformation> {
             TextBuilder.build(
                 title: "Transfer information",
                 style: TextStyleCustom.STYLE_TITLE
-                    .copyWith(color: COLOR_THEME_APP)),
+                    .copyWith(color: ThemeColors.COLOR_THEME_APP)),
             Padding(
               padding: EdgeInsets.symmetric(vertical: 20),
               child: RichText(
@@ -53,7 +53,7 @@ class _TranfersInformationState extends State<TranfersInformation> {
               width: MediaQuery.of(context).size.width,
               padding: EdgeInsets.all(10),
               decoration: BoxDecoration(
-                  border: Border.all(width: 0.3, color: COLOR_GREY),
+                  border: Border.all(width: 0.3, color: ThemeColors.COLOR_GREY),
                   borderRadius: BorderRadius.circular(5)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

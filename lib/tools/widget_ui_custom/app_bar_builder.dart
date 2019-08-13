@@ -62,7 +62,7 @@ class AppBarThemes {
       leading: IconButton(
           icon: Icon(
             Icons.arrow_back_ios,
-            color: COLOR_BLACK,
+            color: ThemeColors.COLOR_BLACK,
           ),
           onPressed: () => Navigator.pop(context)),
     );

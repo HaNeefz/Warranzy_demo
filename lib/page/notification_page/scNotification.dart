@@ -17,11 +17,11 @@ class _NotificationPageState extends State<NotificationPage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        backgroundColor: COLOR_WHITE,
+        backgroundColor: ThemeColors.COLOR_WHITE,
         elevation: 0.0,
         title: TextBuilder.build(
             title: "Notification",
-            style: TextStyleCustom.STYLE_APPBAR.copyWith(color: COLOR_BLACK)),
+            style: TextStyleCustom.STYLE_APPBAR.copyWith(color: ThemeColors.COLOR_BLACK)),
       ),
       body: Container(child: ShowMessage()),
     );
@@ -69,7 +69,7 @@ class ShowMessage extends StatelessWidget {
                   TextBuilder.build(
                       title: "${message.messageList[index].body}",
                       style: TextStyleCustom.STYLE_CONTENT
-                          .copyWith(color: COLOR_BLACK)),
+                          .copyWith(color: ThemeColors.COLOR_BLACK)),
                   TextBuilder.build(
                       title: "${message.messageList[index].dateTime}",
                       style:
@@ -84,7 +84,7 @@ class ShowMessage extends StatelessWidget {
           },
           separatorBuilder: (BuildContext context, int index) {
             return Divider(
-              color: COLOR_GREY,
+              color: ThemeColors.COLOR_GREY,
             );
           },
         );
@@ -129,7 +129,7 @@ class _NotificationWidgetState extends State<NotificationWidget> {
         activeRead: false,
         image: FlutterLogo(
           size: 50.0,
-          colors: COLOR_THEME_APP,
+          colors: ThemeColors.COLOR_THEME_APP,
         ),
         title: "Cliam - Dyson V7 Trigger",
         subTitle: "Simply dummy text of the printing and typesetting industry",

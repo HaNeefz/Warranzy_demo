@@ -457,9 +457,9 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
                       Expanded(
                         child: ButtonBuilder.buttonCustom(
                             context: context,
-                            colorsButton: COLOR_MAJOR.withAlpha(200),
+                            colorsButton: ThemeColors.COLOR_MAJOR.withAlpha(200),
                             labelStyle: TextStyleCustom.STYLE_LABEL_BOLD
-                                .copyWith(color: COLOR_WHITE),
+                                .copyWith(color: ThemeColors.COLOR_WHITE),
                             paddingValue: 0,
                             label: allTranslations.text("forgot_pin"),
                             onPressed: () {}),
@@ -490,7 +490,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
         decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(width: 2),
-            color: COLOR_WHITE),
+            color: ThemeColors.COLOR_WHITE),
         child: Center(
           child: Icon(
             Icons.account_circle,
@@ -521,7 +521,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
                     child: ButtonBuilder.buttonCustom(
                         context: context,
                         paddingValue: 0,
-                        colorsButton: COLOR_TRANSPARENT,
+                        colorsButton: ThemeColors.COLOR_TRANSPARENT,
                         label: "Use PIN",
                         onPressed: () {
                           setState(() {
@@ -533,9 +533,9 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
                   Expanded(
                     child: ButtonBuilder.buttonCustom(
                         context: context,
-                        colorsButton: COLOR_MAJOR.withAlpha(200),
+                        colorsButton: ThemeColors.COLOR_MAJOR.withAlpha(200),
                         labelStyle: TextStyleCustom.STYLE_LABEL_BOLD
-                            .copyWith(color: COLOR_WHITE),
+                            .copyWith(color: ThemeColors.COLOR_WHITE),
                         paddingValue: 0,
                         label: allTranslations.text("forgot_pin"),
                         onPressed: () {}),

@@ -64,7 +64,7 @@ Positioned removeImage(Function onPressed) {
           backgroundColor: Colors.black,
           child: Icon(
             Icons.close,
-            color: COLOR_TEXT_ICON_WHITE,
+            color: ThemeColors.COLOR_TEXT_ICON_WHITE,
           ),
         ),
         onPressed: onPressed),
@@ -79,7 +79,7 @@ Positioned numberImage(int index) {
       width: 35.0,
       height: 35.0,
       child: CircleAvatar(
-        backgroundColor: COLOR_BLACK,
+        backgroundColor: ThemeColors.COLOR_BLACK,
         child: Text(
           "$index",
           style: TextStyleCustom.STYLE_LABEL,
@@ -180,12 +180,12 @@ class _PhotoViewPageState extends State<PhotoViewPage> {
         child: Container(
           width: 40.0,
           height: 40.0,
-          decoration: BoxDecoration(shape: BoxShape.circle, color: COLOR_BLACK),
+          decoration: BoxDecoration(shape: BoxShape.circle, color: ThemeColors.COLOR_BLACK),
           child: Center(
             child: IconButton(
               icon: Icon(
                 Icons.close,
-                color: COLOR_THEME_APP,
+                color: ThemeColors.COLOR_THEME_APP,
               ),
               onPressed: () => Navigator.pop(context),
             ),

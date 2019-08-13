@@ -138,7 +138,7 @@ class _InputInformationState extends State<InputInformation> {
         Container(
           padding: EdgeInsets.all(10),
           decoration: BoxDecoration(
-              border: Border.all(width: 0.3, color: COLOR_GREY),
+              border: Border.all(width: 0.3, color: ThemeColors.COLOR_GREY),
               borderRadius: BorderRadius.circular(5)),
           child: DropdownButton<String>(
             isExpanded: true,
@@ -158,7 +158,7 @@ class _InputInformationState extends State<InputInformation> {
         Container(
           padding: EdgeInsets.all(10),
           decoration: BoxDecoration(
-              border: Border.all(width: 0.3, color: COLOR_GREY),
+              border: Border.all(width: 0.3, color: ThemeColors.COLOR_GREY),
               borderRadius: BorderRadius.circular(5)),
           child: DropdownButton<String>(
             isExpanded: true,
@@ -281,7 +281,7 @@ class _InputInformationState extends State<InputInformation> {
         children: [
           TextSpan(
             text: "Product Detail\n",
-            style: TextStyleCustom.STYLE_TITLE.copyWith(color: COLOR_THEME_APP),
+            style: TextStyleCustom.STYLE_TITLE.copyWith(color: ThemeColors.COLOR_THEME_APP),
           ),
           TextSpan(
               text:

@@ -75,7 +75,7 @@ class _ProfilePageState extends State<ProfilePage> {
               leading: IconButton(
                 icon: Icon(
                   Icons.arrow_back_ios,
-                  color: COLOR_WHITE,
+                  color: ThemeColors.COLOR_WHITE,
                 ),
                 onPressed: () {
                   Navigator.pop(context);
@@ -86,7 +86,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: Icon(
                     Icons.lock_open,
                     size: 30,
-                    color: COLOR_WHITE,
+                    color: ThemeColors.COLOR_WHITE,
                   ),
                   onPressed: () {
                     ecsLib.pushPageAndClearAllScene(
@@ -99,7 +99,7 @@ class _ProfilePageState extends State<ProfilePage> {
               elevation: 5,
               forceElevated: true,
               flexibleSpace: Container(
-                  color: COLOR_WHITE,
+                  color: ThemeColors.COLOR_WHITE,
                   child: Stack(children: <Widget>[
                     Container(
                       width: double.infinity,
@@ -121,7 +121,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           child: Center(
                             child: FlutterLogo(
                               size: 100,
-                              colors: COLOR_THEME_APP,
+                              colors: ThemeColors.COLOR_THEME_APP,
                             ),
                           ),
                         ),
@@ -135,7 +135,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         child: TextBuilder.build(
                             title: "Username",
                             style: TextStyleCustom.STYLE_APPBAR
-                                .copyWith(color: COLOR_WHITE)),
+                                .copyWith(color: ThemeColors.COLOR_WHITE)),
                       ),
                     )
                   ])

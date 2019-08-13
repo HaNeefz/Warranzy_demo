@@ -58,7 +58,7 @@ class _DetailProductClaimState extends State<DetailProductClaim> {
                     TextBuilder.build(
                         title: "Fix Service",
                         style: TextStyleCustom.STYLE_TITLE
-                            .copyWith(color: COLOR_THEME_APP)),
+                            .copyWith(color: ThemeColors.COLOR_THEME_APP)),
                   ],
                 ),
                 TextBuilder.build(
@@ -125,8 +125,8 @@ class _DetailProductClaimState extends State<DetailProductClaim> {
                         padding: const EdgeInsets.symmetric(vertical: 10.0),
                         child: ButtonBuilder.buttonCustom(
                           paddingValue: 0,
-                          colorsButton: COLOR_WHITE,
-                          labelStyle: styleContent.copyWith(color: COLOR_ERROR),
+                          colorsButton: ThemeColors.COLOR_WHITE,
+                          labelStyle: styleContent.copyWith(color: ThemeColors.COLOR_ERROR),
                           context: context,
                           label: "Cancel Service",
                         ),
@@ -174,7 +174,7 @@ class _DetailProductClaimState extends State<DetailProductClaim> {
                                     text: assetsData.productDetail
                                         .substring(0, 50),
                                     style: styleContent.copyWith(
-                                      color: COLOR_BLACK,
+                                      color: ThemeColors.COLOR_BLACK,
                                     ),
                                   )
                                 ],
@@ -189,7 +189,7 @@ class _DetailProductClaimState extends State<DetailProductClaim> {
                                   TextSpan(
                                       text: "Complete",
                                       style: TextStyleCustom.STYLE_LABEL_BOLD
-                                          .copyWith(color: COLOR_THEME_APP)),
+                                          .copyWith(color: ThemeColors.COLOR_THEME_APP)),
                                 ],
                               ),
                             )
@@ -211,7 +211,7 @@ class _DetailProductClaimState extends State<DetailProductClaim> {
                       Flexible(
                         child: ButtonBuilder.buttonCustom(
                           cornerRadius: 10,
-                          colorsButton: COLOR_WHITE,
+                          colorsButton: ThemeColors.COLOR_WHITE,
                           paddingValue: 0,
                           context: context,
                           label: "Call Service",
@@ -288,7 +288,7 @@ class _DetailProductClaimState extends State<DetailProductClaim> {
         TextSpan(
             text: data,
             style: TextStyleCustom.STYLE_LABEL_BOLD
-                .copyWith(color: COLOR_THEME_APP))
+                .copyWith(color: ThemeColors.COLOR_THEME_APP))
       ]),
     );
   }
@@ -298,12 +298,12 @@ class _DetailProductClaimState extends State<DetailProductClaim> {
       // pinned: true,
       expandedHeight: 300,
       centerTitle: true,
-      // backgroundColor: COLOR_WHITE,
+      // backgroundColor: ThemeColors.COLOR_WHITE,
       automaticallyImplyLeading: false,
       leading: IconButton(
         icon: Icon(
           Icons.arrow_back_ios,
-          color: COLOR_WHITE,
+          color: ThemeColors.COLOR_WHITE,
         ),
         onPressed: () => Navigator.pop(context),
       ),

@@ -114,12 +114,12 @@ class _HistoryPageState extends State<HistoryPage> {
                   children: <Widget>[
                     Icon(
                       Icons.directions_car,
-                      color: COLOR_WHITE,
+                      color: ThemeColors.COLOR_WHITE,
                     ),
                     TextBuilder.build(
                         title: "Delivery",
                         style: TextStyleCustom.STYLE_LABEL
-                            .copyWith(fontSize: 14, color: COLOR_WHITE))
+                            .copyWith(fontSize: 14, color: ThemeColors.COLOR_WHITE))
                   ],
                 ),
               ),
@@ -180,7 +180,7 @@ class TextDescriptions extends StatelessWidget {
             TextSpan(
                 text: "$description",
                 style: TextStyleCustom.STYLE_CONTENT
-                    .copyWith(fontSize: 14, color: COLOR_MAJOR))
+                    .copyWith(fontSize: 14, color: ThemeColors.COLOR_MAJOR))
           ]),
     );
   }

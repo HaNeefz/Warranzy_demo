@@ -105,7 +105,7 @@ class _MyHomePageState extends State<MyHomePage> {
           // primaryColor: Colors.white,
           scaffoldBackgroundColor: Colors.white,
           appBarTheme: AppBarTheme(),
-          iconTheme: IconThemeData(color: COLOR_THEME_APP)
+          iconTheme: IconThemeData(color: ThemeColors.COLOR_THEME_APP)
           // fontFamily: "Ekkamai"
           ), //Supermarket
       home: SplashScreenPage(),

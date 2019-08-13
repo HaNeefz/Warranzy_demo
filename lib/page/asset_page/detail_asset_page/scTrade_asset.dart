@@ -38,7 +38,7 @@ class _TradeInformationState extends State<TradeInformation> {
             TextBuilder.build(
                 title: "Trade Information",
                 style: TextStyleCustom.STYLE_TITLE
-                    .copyWith(color: COLOR_THEME_APP)),
+                    .copyWith(color: ThemeColors.COLOR_THEME_APP)),
             buildInformationAsset(),
             buildAddPhotos(context),
             buildDetailReadMore(),
@@ -110,7 +110,7 @@ class _TradeInformationState extends State<TradeInformation> {
                 return Container(
                   margin: EdgeInsets.only(right: 10, top: 10),
                   decoration: BoxDecoration(
-                      color: COLOR_THEME_APP,
+                      color: ThemeColors.COLOR_THEME_APP,
                       borderRadius: BorderRadius.circular(20)),
                 );
               },
@@ -180,7 +180,7 @@ class _TradeInformationState extends State<TradeInformation> {
       padding: EdgeInsets.all(10),
       margin: EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-          border: Border.all(width: 0.3, color: COLOR_GREY),
+          border: Border.all(width: 0.3, color: ThemeColors.COLOR_GREY),
           borderRadius: BorderRadius.circular(5)),
       child: RichText(
         text: TextSpan(
@@ -198,7 +198,7 @@ class _TradeInformationState extends State<TradeInformation> {
       margin: EdgeInsets.only(bottom: 10),
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
-          border: Border.all(width: 0.3, color: COLOR_GREY),
+          border: Border.all(width: 0.3, color: ThemeColors.COLOR_GREY),
           borderRadius: BorderRadius.circular(5)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

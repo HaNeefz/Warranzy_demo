@@ -19,12 +19,12 @@ class _ClaimAndServicePageState extends State<ClaimAndServicePage> {
       child: Scaffold(
         appBar: AppBar(
           centerTitle: true,
-          backgroundColor: COLOR_WHITE,
+          backgroundColor: ThemeColors.COLOR_WHITE,
           title: TextBuilder.build(
               title: "Claim & Service",
-              style: TextStyleCustom.STYLE_APPBAR.copyWith(color: COLOR_BLACK)),
+              style: TextStyleCustom.STYLE_APPBAR.copyWith(color: ThemeColors.COLOR_BLACK)),
           bottom: TabBar(
-            indicatorColor: COLOR_THEME_APP,
+            indicatorColor: ThemeColors.COLOR_THEME_APP,
             labelPadding: EdgeInsets.symmetric(vertical: 10),
             tabs: <Widget>[
               TextBuilder.build(

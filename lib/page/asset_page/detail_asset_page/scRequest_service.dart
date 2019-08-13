@@ -145,7 +145,7 @@ class _RequestServiceState extends State<RequestService> {
               return Container(
                 margin: EdgeInsets.only(right: 5),
                 decoration: BoxDecoration(
-                    color: COLOR_THEME_APP,
+                    color: ThemeColors.COLOR_THEME_APP,
                     borderRadius: BorderRadius.circular(20)),
               );
             },
@@ -172,7 +172,7 @@ class _RequestServiceState extends State<RequestService> {
       margin: EdgeInsets.only(bottom: 10),
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
-          border: Border.all(width: 0.3, color: COLOR_GREY),
+          border: Border.all(width: 0.3, color: ThemeColors.COLOR_GREY),
           borderRadius: BorderRadius.circular(5)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -191,7 +191,7 @@ class _RequestServiceState extends State<RequestService> {
         TextSpan(
             text: "Your Asset\n",
             style:
-                TextStyleCustom.STYLE_LABEL.copyWith(color: COLOR_THEME_APP)),
+                TextStyleCustom.STYLE_LABEL.copyWith(color: ThemeColors.COLOR_THEME_APP)),
         TextSpan(
             text: widget.assetName + "\n\n", style: TextStyleCustom.STYLE_LABEL)
       ]),
@@ -205,7 +205,7 @@ class _RequestServiceState extends State<RequestService> {
           TextSpan(
               text: "Enter asset information\n",
               style:
-                  TextStyleCustom.STYLE_TITLE.copyWith(color: COLOR_THEME_APP)),
+                  TextStyleCustom.STYLE_TITLE.copyWith(color: ThemeColors.COLOR_THEME_APP)),
           TextSpan(
               text:
                   "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae.\n\n",

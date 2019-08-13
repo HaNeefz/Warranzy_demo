@@ -51,7 +51,7 @@ class _ChangeDeviceState extends State<ChangeDevice> {
                 padding: const EdgeInsets.symmetric(vertical: 15.0),
                 child: ButtonBuilder.buttonCustom(
                     colorsButton: modelCountry.selectedCountry == false
-                        ? COLOR_WHITE
+                        ? ThemeColors.COLOR_WHITE
                         : null,
                     paddingValue: 30,
                     context: context,
@@ -163,7 +163,7 @@ class _ChangeDeviceState extends State<ChangeDevice> {
             child: Container(
               width: MediaQuery.of(context).size.width,
               decoration: BoxDecoration(
-                  border: Border.all(width: 0.7, color: COLOR_THEME_APP),
+                  border: Border.all(width: 0.7, color: ThemeColors.COLOR_THEME_APP),
                   borderRadius: BorderRadius.circular(25)),
               height: 50,
               child: Center(

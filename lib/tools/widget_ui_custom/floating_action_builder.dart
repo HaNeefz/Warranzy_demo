@@ -13,8 +13,8 @@ class FloatingActionBuilder {
     @required BuildContext context,
     @required List<SpeedDialChild> actionButton,
     String toolTip,
-    Color backgroundColor = COLOR_THEME_APP,
-    Color foregroundColor = COLOR_WHITE,
+    Color backgroundColor = ThemeColors.COLOR_THEME_APP,
+    Color foregroundColor = ThemeColors.COLOR_WHITE,
   }) {
     return SpeedDial(
       // both default to 16

@@ -78,13 +78,13 @@ class _VerifyChangeDeviceState extends State<VerifyChangeDevice> {
                   TextSpan(
                     text: "Please Enter the OTP to Verify your Account\n\n",
                     style: TextStyleCustom.STYLE_TITLE
-                        .copyWith(fontSize: 22, color: COLOR_THEME_APP),
+                        .copyWith(fontSize: 22, color: ThemeColors.COLOR_THEME_APP),
                   ),
                   TextSpan(
                       text:
                           "A OTP has been sent to +${modelMasCustomer.countryNumberPhoneCode} ${modelMasCustomer.mobilePhone}",
                       style: TextStyleCustom.STYLE_LABEL
-                          .copyWith(fontSize: 15, color: COLOR_GREY)),
+                          .copyWith(fontSize: 15, color: ThemeColors.COLOR_GREY)),
                 ]),
               ),
               PinCodeTextField(
@@ -92,9 +92,9 @@ class _VerifyChangeDeviceState extends State<VerifyChangeDevice> {
                 controller: controller,
                 hideCharacter: false,
                 highlight: true,
-                highlightColor: COLOR_GREY,
-                defaultBorderColor: COLOR_THEME_APP,
-                hasTextBorderColor: COLOR_THEME_APP,
+                highlightColor: ThemeColors.COLOR_GREY,
+                defaultBorderColor: ThemeColors.COLOR_THEME_APP,
+                hasTextBorderColor: ThemeColors.COLOR_THEME_APP,
                 maxLength: pinLength,
                 hasError: hasError,
                 // maskCharacter: "*", //😎

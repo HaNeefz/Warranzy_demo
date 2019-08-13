@@ -50,7 +50,7 @@ class _TradeDetailState extends State<TradeDetail> {
                     TextBuilder.build(
                         title: assetsData.productPrice,
                         style: TextStyleCustom.STYLE_TITLE
-                            .copyWith(color: COLOR_THEME_APP)),
+                            .copyWith(color: ThemeColors.COLOR_THEME_APP)),
                     IconButton(
                       icon: Icon(Icons.more_vert),
                       onPressed: () {},
@@ -82,7 +82,7 @@ class _TradeDetailState extends State<TradeDetail> {
                   padding: EdgeInsets.all(5),
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),
-                      color: COLOR_THEME_APP.withOpacity(0.5)),
+                      color: ThemeColors.COLOR_THEME_APP.withOpacity(0.5)),
                   child: TextBuilder.build(title: assetsData.productCategory),
                 ),
                 Padding(
@@ -172,7 +172,7 @@ class _TradeDetailState extends State<TradeDetail> {
         TextSpan(
             text: data,
             style: TextStyleCustom.STYLE_LABEL_BOLD
-                .copyWith(color: COLOR_THEME_APP))
+                .copyWith(color: ThemeColors.COLOR_THEME_APP))
       ]),
     );
   }
@@ -182,12 +182,12 @@ class _TradeDetailState extends State<TradeDetail> {
       pinned: true,
       expandedHeight: 300,
       centerTitle: true,
-      // backgroundColor: COLOR_WHITE,
+      // backgroundColor: ThemeColors.COLOR_WHITE,
       automaticallyImplyLeading: false,
       leading: IconButton(
         icon: Icon(
           Icons.arrow_back_ios,
-          color: COLOR_WHITE,
+          color: ThemeColors.COLOR_WHITE,
         ),
         onPressed: () => Navigator.pop(context),
       ),

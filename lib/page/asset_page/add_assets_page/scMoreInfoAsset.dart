@@ -91,7 +91,7 @@ class _AddMoreInformationAssetState extends State<AddMoreInformationAsset> {
                     child: TextBuilder.build(
                         title: "$data",
                         style: TextStyleCustom.STYLE_LABEL
-                            .copyWith(color: COLOR_BLACK)),
+                            .copyWith(color: ThemeColors.COLOR_BLACK)),
                   );
                 }).toList(),
                 onChanged: (newValue) {
@@ -115,7 +115,7 @@ class _AddMoreInformationAssetState extends State<AddMoreInformationAsset> {
                     child: TextBuilder.build(
                         title: "$data",
                         style: TextStyleCustom.STYLE_LABEL
-                            .copyWith(color: COLOR_BLACK)),
+                            .copyWith(color: ThemeColors.COLOR_BLACK)),
                   );
                 }).toList(),
                 onChanged: (newValue) {
@@ -139,7 +139,7 @@ class _AddMoreInformationAssetState extends State<AddMoreInformationAsset> {
                     child: TextBuilder.build(
                         title: "$data",
                         style: TextStyleCustom.STYLE_LABEL
-                            .copyWith(color: COLOR_BLACK)),
+                            .copyWith(color: ThemeColors.COLOR_BLACK)),
                   );
                 }).toList(),
                 onChanged: (newValue) {
@@ -166,7 +166,7 @@ class _AddMoreInformationAssetState extends State<AddMoreInformationAsset> {
                     child: TextBuilder.build(
                         title: "$data",
                         style: TextStyleCustom.STYLE_LABEL
-                            .copyWith(color: COLOR_BLACK)),
+                            .copyWith(color: ThemeColors.COLOR_BLACK)),
                   );
                 }).toList(),
                 onChanged: (newValue) {
@@ -190,7 +190,7 @@ class _AddMoreInformationAssetState extends State<AddMoreInformationAsset> {
                     child: TextBuilder.build(
                         title: "$data",
                         style: TextStyleCustom.STYLE_LABEL
-                            .copyWith(color: COLOR_BLACK)),
+                            .copyWith(color: ThemeColors.COLOR_BLACK)),
                   );
                 }).toList(),
                 onChanged: (newValue) {
@@ -214,7 +214,7 @@ class _AddMoreInformationAssetState extends State<AddMoreInformationAsset> {
                     child: TextBuilder.build(
                         title: "$data",
                         style: TextStyleCustom.STYLE_LABEL
-                            .copyWith(color: COLOR_BLACK)),
+                            .copyWith(color: ThemeColors.COLOR_BLACK)),
                   );
                 }).toList(),
                 onChanged: (newValue) {
@@ -239,7 +239,7 @@ class _AddMoreInformationAssetState extends State<AddMoreInformationAsset> {
                     child: TextBuilder.build(
                         title: "$data",
                         style: TextStyleCustom.STYLE_LABEL
-                            .copyWith(color: COLOR_BLACK)),
+                            .copyWith(color: ThemeColors.COLOR_BLACK)),
                   );
                 }).toList(),
                 onChanged: (newValue) {
@@ -303,7 +303,7 @@ class _AddMoreInformationAssetState extends State<AddMoreInformationAsset> {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
       decoration: BoxDecoration(
-          border: Border.all(width: 0.3, color: COLOR_GREY),
+          border: Border.all(width: 0.3, color: ThemeColors.COLOR_GREY),
           borderRadius: BorderRadius.circular(5)),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -325,7 +325,7 @@ class _AddMoreInformationAssetState extends State<AddMoreInformationAsset> {
           TextSpan(
               text: "Add more information\n",
               style:
-                  TextStyleCustom.STYLE_TITLE.copyWith(color: COLOR_THEME_APP)),
+                  TextStyleCustom.STYLE_TITLE.copyWith(color: ThemeColors.COLOR_THEME_APP)),
           TextSpan(
               text:
                   "Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.",

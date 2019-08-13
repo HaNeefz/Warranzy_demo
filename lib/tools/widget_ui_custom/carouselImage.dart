@@ -42,14 +42,14 @@ class _CarouselWithIndicatorState extends State<CarouselWithIndicator> {
             return Container(
               margin: EdgeInsets.symmetric(horizontal: 2, vertical: 2),
               decoration: BoxDecoration(
-                  color: COLOR_THEME_APP,
+                  color: ThemeColors.COLOR_THEME_APP,
                   borderRadius: BorderRadius.circular(10)),
               width: MediaQuery.of(context).size.width,
               child: Center(
                 child: TextBuilder.build(
                     title: "$i",
                     style: TextStyleCustom.STYLE_LABEL
-                        .copyWith(color: COLOR_WHITE)),
+                        .copyWith(color: ThemeColors.COLOR_WHITE)),
               ),
             );
         }).toList(),

@@ -67,15 +67,15 @@ class _MainPageState extends State<MainPage>
                   : Badge(
                       badgeContent: TextBuilder.build(
                           title: "${notiState.counterMessage}",
-                          style: textStyle.copyWith(color: COLOR_WHITE)),
+                          style: textStyle.copyWith(color: ThemeColors.COLOR_WHITE)),
                       child: Icon(Icons.notifications_active),
                     ),
             ),
           ],
           currentIndex: currentPage,
           type: BottomNavigationBarType.fixed,
-          selectedItemColor: COLOR_THEME_APP,
-          unselectedItemColor: COLOR_BLACK,
+          selectedItemColor: ThemeColors.COLOR_THEME_APP,
+          unselectedItemColor: ThemeColors.COLOR_BLACK,
           selectedFontSize: 15,
           onTap: (position) {
             setState(() {

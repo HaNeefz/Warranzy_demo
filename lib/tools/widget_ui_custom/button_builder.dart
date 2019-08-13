@@ -21,7 +21,7 @@ class ButtonBuilder {
         height: height,
         decoration: BoxDecoration(
             border: colorsButton == null
-                ? Border.all(width: 0.5, color: COLOR_THEME_APP)
+                ? Border.all(width: 0.5, color: ThemeColors.COLOR_THEME_APP)
                 : null,
             gradient: LinearGradient(colors: <Color>[
               Colors.teal[300],
@@ -31,7 +31,7 @@ class ButtonBuilder {
             borderRadius: BorderRadius.circular(cornerRadius)),
         child: RaisedButton(
           splashColor: Colors.teal[300],
-          // color: colorsButton ?? COLOR_TRANSPARENT,
+          // color: colorsButton ?? ThemeColors.COLOR_TRANSPARENT,
           elevation: elevation,
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(cornerRadius)),
@@ -79,7 +79,7 @@ class ButtonBuilder {
                   style: labelStyle ??
                       TextStyleCustom.STYLE_LABEL_BOLD.copyWith(
                           color: colorsButton == null
-                              ? COLOR_WHITE
+                              ? ThemeColors.COLOR_WHITE
                               : Colors.teal[300]))),
         ),
       ),

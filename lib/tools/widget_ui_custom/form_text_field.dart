@@ -10,7 +10,7 @@ class FormEnterInformationBuilder {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-          border: Border.all(width: 0.8, color: COLOR_THEME_APP),
+          border: Border.all(width: 0.8, color: ThemeColors.COLOR_THEME_APP),
           borderRadius: BorderRadius.circular(20.0)),
       child: Column(
         mainAxisSize: MainAxisSize.min,

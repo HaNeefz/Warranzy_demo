@@ -31,7 +31,7 @@ class _PayMentAboutClaimState extends State<PayMentAboutClaim> {
             TextBuilder.build(
                 title: "Payment methods",
                 style: TextStyleCustom.STYLE_LABEL_BOLD
-                    .copyWith(color: COLOR_THEME_APP, fontSize: 30)),
+                    .copyWith(color: ThemeColors.COLOR_THEME_APP, fontSize: 30)),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 15.0),
               child: Row(
@@ -51,7 +51,7 @@ class _PayMentAboutClaimState extends State<PayMentAboutClaim> {
             TextBuilder.build(
                 title: "Detail",
                 style: TextStyleCustom.STYLE_LABEL_BOLD
-                    .copyWith(color: COLOR_THEME_APP, fontSize: 20)),
+                    .copyWith(color: ThemeColors.COLOR_THEME_APP, fontSize: 20)),
             // CreditCardWidget(
             //   cardNumber: "1234123123",
             //   expiryDate: "12/20",
@@ -131,7 +131,7 @@ class _PayMentAboutClaimState extends State<PayMentAboutClaim> {
                               TextSpan(
                                 text: "500 THB\n",
                                 style: TextStyleCustom.STYLE_TITLE.copyWith(
-                                    fontSize: 25, color: COLOR_THEME_APP),
+                                    fontSize: 25, color: ThemeColors.COLOR_THEME_APP),
                               ),
                               TextSpan(
                                 text: "Dyson V7 Trigger\n\n",
@@ -164,7 +164,7 @@ class _PayMentAboutClaimState extends State<PayMentAboutClaim> {
       margin: EdgeInsets.symmetric(vertical: 10),
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
-          border: Border.all(width: 0.3, color: COLOR_GREY),
+          border: Border.all(width: 0.3, color: ThemeColors.COLOR_GREY),
           borderRadius: BorderRadius.circular(8)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -188,7 +188,7 @@ class _PayMentAboutClaimState extends State<PayMentAboutClaim> {
         height: 100,
         child: RaisedButton.icon(
           elevation: 5,
-          color: actived ? COLOR_THEME_APP : COLOR_WHITE,
+          color: actived ? ThemeColors.COLOR_THEME_APP : ThemeColors.COLOR_WHITE,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           icon: Icon(icons),

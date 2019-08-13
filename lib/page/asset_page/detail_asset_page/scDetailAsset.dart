@@ -39,12 +39,12 @@ class _DetailAssetState extends State<DetailAsset> {
             SliverAppBar(
               centerTitle: true,
               expandedHeight: 300,
-              backgroundColor: COLOR_WHITE,
+              backgroundColor: ThemeColors.COLOR_WHITE,
               automaticallyImplyLeading: false,
               leading: IconButton(
                 icon: Icon(
                   Icons.arrow_back_ios,
-                  color: COLOR_BLACK,
+                  color: ThemeColors.COLOR_BLACK,
                 ),
                 onPressed: () => Navigator.pop(context),
               ),
@@ -54,7 +54,7 @@ class _DetailAssetState extends State<DetailAsset> {
                         child: TextBuilder.build(
                             title: "Edit",
                             style: TextStyleCustom.STYLE_LABEL
-                                .copyWith(color: COLOR_WHITE)),
+                                .copyWith(color: ThemeColors.COLOR_WHITE)),
                         onPressed: () {
                           ecsLib.pushPage(
                               context: context,
@@ -260,7 +260,7 @@ class _DetailAssetState extends State<DetailAsset> {
                 return Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
-                    color: COLOR_THEME_APP,
+                    color: ThemeColors.COLOR_THEME_APP,
                   ),
                   margin: EdgeInsets.fromLTRB(0, 15, 10, 10),
                 );
@@ -319,7 +319,7 @@ class _DetailAssetState extends State<DetailAsset> {
         TextSpan(text: title + " : ", style: TextStyleCustom.STYLE_CONTENT),
         TextSpan(
             text: data + "\n",
-            style: TextStyleCustom.STYLE_CONTENT.copyWith(color: COLOR_BLACK)),
+            style: TextStyleCustom.STYLE_CONTENT.copyWith(color: ThemeColors.COLOR_BLACK)),
       ],
     );
   }
@@ -331,12 +331,12 @@ class _DetailAssetState extends State<DetailAsset> {
           gradient: LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
-        colors: <Color>[COLOR_BLACK.withOpacity(0.6), COLOR_TRANSPARENT],
+        colors: <Color>[ThemeColors.COLOR_BLACK.withOpacity(0.6), ThemeColors.COLOR_TRANSPARENT],
       )),
       child: Center(
         child: FlutterLogo(
           size: 200,
-          colors: COLOR_THEME_APP,
+          colors: ThemeColors.COLOR_THEME_APP,
         ),
       ),
     );
