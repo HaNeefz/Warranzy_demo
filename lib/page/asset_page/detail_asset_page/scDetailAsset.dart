@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:warranzy_demo/models/model_asset_data.dart';
-import 'package:warranzy_demo/page/asset_page/add_assets_page/scShow_detail_product.dart';
+import 'package:warranzy_demo/page/asset_page/add_assets_page/scFillInformation.dart';
 import 'package:warranzy_demo/page/asset_page/detail_asset_page/scTranfer_asset.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/const.dart';
@@ -58,7 +58,7 @@ class _DetailAssetState extends State<DetailAsset> {
                         onPressed: () {
                           ecsLib.pushPage(
                               context: context,
-                              pageWidget: InputInformation(
+                              pageWidget: FillInformation(
                                 onClickAddAssetPage: PageAction.SCAN_QR_CODE,
                                 hasDataAssetAlready: true,
                               ));
@@ -319,7 +319,8 @@ class _DetailAssetState extends State<DetailAsset> {
         TextSpan(text: title + " : ", style: TextStyleCustom.STYLE_CONTENT),
         TextSpan(
             text: data + "\n",
-            style: TextStyleCustom.STYLE_CONTENT.copyWith(color: ThemeColors.COLOR_BLACK)),
+            style: TextStyleCustom.STYLE_CONTENT
+                .copyWith(color: ThemeColors.COLOR_BLACK)),
       ],
     );
   }
@@ -331,7 +332,10 @@ class _DetailAssetState extends State<DetailAsset> {
           gradient: LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
-        colors: <Color>[ThemeColors.COLOR_BLACK.withOpacity(0.6), ThemeColors.COLOR_TRANSPARENT],
+        colors: <Color>[
+          ThemeColors.COLOR_BLACK.withOpacity(0.6),
+          ThemeColors.COLOR_TRANSPARENT
+        ],
       )),
       child: Center(
         child: FlutterLogo(

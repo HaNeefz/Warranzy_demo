@@ -9,18 +9,18 @@ import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 
 import 'scAdd_image.dart';
 
-class InputInformation extends StatefulWidget {
+class FillInformation extends StatefulWidget {
   final PageAction onClickAddAssetPage;
   final bool hasDataAssetAlready;
 
-  InputInformation(
+  FillInformation(
       {Key key, this.onClickAddAssetPage, this.hasDataAssetAlready = false})
       : super(key: key);
   @override
-  _InputInformationState createState() => _InputInformationState();
+  _FillInformationState createState() => _FillInformationState();
 }
 
-class _InputInformationState extends State<InputInformation> {
+class _FillInformationState extends State<FillInformation> {
   final ecsLib = getIt.get<ECSLib>();
   final allTranslations = getIt.get<GlobalTranslations>();
   var valueBrandName = "DysonElectric";
@@ -62,9 +62,8 @@ class _InputInformationState extends State<InputInformation> {
       appBar: AppBar(
         centerTitle: true,
         title: TextBuilder.build(
-            title: widget.hasDataAssetAlready == true
-                ? "Edit Asset"
-                : "New Asset",
+            title:
+                widget.hasDataAssetAlready == true ? "Edit Asset" : "New Asset",
             style: TextStyleCustom.STYLE_APPBAR),
       ),
       body: Padding(
@@ -94,20 +93,6 @@ class _InputInformationState extends State<InputInformation> {
                       title: "Manufacturer Name", data: "Dyson V7 Trigger"),
                 ],
               ),
-            // DropdownButton<String>(
-            //   value: valueBrandName,
-            //   items: <String>["1", "0", "2", "3"].map<DropdownMenuItem<String>>((data) {
-            //     return DropdownMenuItem<String>(
-            //       value: data,
-            //       child: TextBuilder.build(title: data),
-            //     );
-            //   }).toList(),
-            //   onChanged: (value) {
-            //     setState(() {
-            //       valueBrandName = value;
-            //     });
-            //   },
-            // ),
             buildInformation(
                 title: "Manufacturer Product ID", data: "Dyson123456"),
             buildInformation(title: "Serial No.", data: "DS12345678"),
@@ -281,7 +266,8 @@ class _InputInformationState extends State<InputInformation> {
         children: [
           TextSpan(
             text: "Product Detail\n",
-            style: TextStyleCustom.STYLE_TITLE.copyWith(color: ThemeColors.COLOR_THEME_APP),
+            style: TextStyleCustom.STYLE_TITLE
+                .copyWith(color: ThemeColors.COLOR_THEME_APP),
           ),
           TextSpan(
               text:

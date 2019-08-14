@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
-import 'package:warranzy_demo/tools/const.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/button_builder.dart';
@@ -324,8 +323,8 @@ class _AddMoreInformationAssetState extends State<AddMoreInformationAsset> {
         children: [
           TextSpan(
               text: "Add more information\n",
-              style:
-                  TextStyleCustom.STYLE_TITLE.copyWith(color: ThemeColors.COLOR_THEME_APP)),
+              style: TextStyleCustom.STYLE_TITLE
+                  .copyWith(color: ThemeColors.COLOR_THEME_APP)),
           TextSpan(
               text:
                   "Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.",

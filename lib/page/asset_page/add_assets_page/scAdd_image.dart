@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
-import 'package:warranzy_demo/tools/const.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/button_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 
-import 'scMoreInfoAsset.dart';
+import 'scAddMoreInfoAsset.dart';
 
 class AddImage extends StatefulWidget {
   final bool hasDataAssetAlready;

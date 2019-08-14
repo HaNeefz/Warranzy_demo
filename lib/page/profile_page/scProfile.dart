@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:warranzy_demo/models/model_mas_cust.dart';
 import 'package:warranzy_demo/page/login_first/scLogin.dart';
 import 'package:warranzy_demo/services/calls_and_message/calls_and_message.dart';
 import 'package:warranzy_demo/services/sqflit/db_customers.dart';
@@ -9,6 +10,7 @@ import 'package:warranzy_demo/tools/assets.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
+import 'package:warranzy_demo/tools/widget_ui_custom/form_input_data.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_field_builder.dart';
 
@@ -26,13 +28,7 @@ class _ProfilePageState extends State<ProfilePage> {
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
   final CallsAndMessageService _service = CallsAndMessageService();
   bool checkInformationChange = false;
-  Map<String, bool> enableRead = {
-    "id": true,
-    "name": true,
-    "address": true,
-    "pin": true
-  };
-
+  ModelCustomers dataCust;
   @override
   void initState() {
     super.initState();
@@ -40,7 +36,8 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void getDataCustomers() async {
-    var dataCust = await DBProviderCustomer.db.getDataCustomer();
+    var tempDataCust = await DBProviderCustomer.db.getDataCustomer();
+    dataCust = tempDataCust;
     print("ID Customer => ${await DBProviderCustomer.db.getIDCustomer()}");
     print(
         "<=========================MAS_CUSTOMER=========================>\n${dataCust.toJson()}\n<================================================================>");
@@ -150,89 +147,67 @@ class _ProfilePageState extends State<ProfilePage> {
               //     title: "Profile", style: TextStyleCustom.STYLE_APPBAR),
             ),
             SliverList(
-                delegate: SliverChildListDelegate(
-              [
-                formInformation(
-                    "ID",
-                    TextFieldBuilder.enterInformation(
-                        key: "ID",
-                        initialValue: "IdTesting",
-                        readOnly: true, //enableRead['id'],
-                        borderOutLine: false,
-                        size: 20,
-                        validators: [FormBuilderValidators.required()]),
-                    showTextReadOnly: true,
-                    editAble: false //enableRead['id'],
-                    ),
-                formInformation(
-                    "Name",
-                    TextFieldBuilder.enterInformation(
-                        key: "fullName",
-                        initialValue: "Name",
-                        borderOutLine: false,
-                        size: 20,
-                        readOnly: true, //enableRead['name'],
-                        validators: [FormBuilderValidators.required()]),
-                    showTextReadOnly: true,
-                    editAble: false //enableRead['name'],
-                    ),
-                formInformation(
-                    "Address",
-                    TextFieldBuilder.enterInformation(
-                        key: "address",
-                        initialValue: "Address",
-                        borderOutLine: false,
-                        readOnly: enableRead['address'],
-                        size: 20,
-                        validators: [FormBuilderValidators.required()]),
-                    showTextReadOnly: false,
-                    editAble: true, onTapEdit: () {
-                  setState(() {
-                    enableRead['address'] = !enableRead['address'];
-                  });
-                }),
-                formInformation(
-                    "PIN",
-                    TextFieldBuilder.enterInformation(
-                        key: "pin",
-                        initialValue: "******",
-                        borderOutLine: false,
-                        obsecure: true,
-                        size: 20,
-                        readOnly: enableRead['pin'],
-                        validators: [FormBuilderValidators.required()]),
-                    showTextReadOnly: false,
-                    editAble: true, onTapEdit: () {
-                  setState(() {
-                    enableRead['pin'] = !enableRead['pin'];
-                  });
-                }),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                delegate: SliverChildListDelegate([
+              // FormWidgetBuilder.formDropDown(
+              //     key: "test1",
+              //     title: "DropDowm",
+              //     validate: [
+              //       FormBuilderValidators.required(),
+              //     ],
+              //     items: [
+              //       1,
+              //       2,
+              //       3
+              //     ]),
+              Container(
+                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    buttonContact(Icons.call, "Call Center", Colors.green,
-                        () => _service.call("0123456789")),
-                    buttonContact(Icons.sms, "Send Sms", Colors.blue,
-                        () => _service.sendSms("0123456789")),
-                    buttonContact(Icons.email, "Email us", Colors.redAccent,
-                        () => _service.sendEmail("wpoungchoo@gmail.com")),
+                    TextBuilder.build(
+                        title: "Profile",
+                        style: TextStyleCustom.STYLE_LABEL.copyWith(
+                            fontSize: 25, color: ThemeColors.COLOR_THEME_APP)),
+                    ListTile(
+                      leading: Icon(
+                        Icons.account_circle,
+                        size: 40,
+                        color: ThemeColors.COLOR_BLACK,
+                      ),
+                      title: TextBuilder.build(title: "Account Details"),
+                      trailing: IconButton(
+                        icon: Icon(Icons.arrow_forward_ios),
+                        onPressed: () {},
+                      ),
+                    ),
                   ],
                 ),
-                RaisedButton(
-                  child: Icon(Icons.check),
-                  onPressed: () {
-                    _fbKey.currentState.save();
-                    if (_fbKey.currentState.validate()) {
-                      print(_fbKey.currentState.value);
-                    }
-                  },
-                ),
-                RaisedButton(
-                  child: Text("Send to cloud_firestore"),
-                  onPressed: sendTocloudFireStore,
-                ),
-              ],
-            )),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  buttonContact(Icons.call, "Call Center", Colors.green,
+                      () => _service.call("0123456789")),
+                  buttonContact(Icons.sms, "Send Sms", Colors.blue,
+                      () => _service.sendSms("0123456789")),
+                  buttonContact(Icons.email, "Email us", Colors.redAccent,
+                      () => _service.sendEmail("wpoungchoo@gmail.com")),
+                ],
+              ),
+              RaisedButton(
+                child: Icon(Icons.check),
+                onPressed: () {
+                  _fbKey.currentState.save();
+                  if (_fbKey.currentState.validate()) {
+                    print(_fbKey.currentState.value);
+                  }
+                },
+              ),
+              RaisedButton(
+                child: Text("Send to cloud_firestore"),
+                onPressed: sendTocloudFireStore,
+              ),
+            ])),
             SliverFixedExtentList(
               itemExtent: 150.0,
               delegate: SliverChildListDelegate([

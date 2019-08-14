@@ -2,6 +2,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:warranzy_demo/models/model_asset_data.dart';
+import 'package:warranzy_demo/page/asset_page/add_assets_page/scFillInformation.dart';
 import 'package:warranzy_demo/page/profile_page/scProfile.dart';
 import 'package:warranzy_demo/services/method/scan_qr.dart';
 import 'package:warranzy_demo/tools/assets.dart';
@@ -11,8 +12,6 @@ import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/carouselImage.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
-
-import 'add_assets_page/scShow_detail_product.dart';
 import 'widget_assets/widget_asset.dart';
 
 class AssetPage extends StatefulWidget {
@@ -85,8 +84,8 @@ class _AssetPageState extends State<AssetPage> {
                 ),
                 label: Text(
                   "Add asset",
-                  style:
-                      TextStyleCustom.STYLE_LABEL.copyWith(color: ThemeColors.COLOR_WHITE),
+                  style: TextStyleCustom.STYLE_LABEL
+                      .copyWith(color: ThemeColors.COLOR_WHITE),
                 ),
                 onPressed: () => buildShowModalBottomSheet(context),
               ),
@@ -120,8 +119,8 @@ class _AssetPageState extends State<AssetPage> {
                     title: date, style: TextStyleCustom.STYLE_LABEL_BOLD),
                 TextBuilder.build(
                     title: "Hello, Username",
-                    style:
-                        TextStyleCustom.STYLE_TITLE.copyWith(color: ThemeColors.COLOR_GREY))
+                    style: TextStyleCustom.STYLE_TITLE
+                        .copyWith(color: ThemeColors.COLOR_GREY))
               ],
             ),
           ),
@@ -140,7 +139,8 @@ class _AssetPageState extends State<AssetPage> {
                 height: 50.0,
                 decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(width: 3, color: ThemeColors.COLOR_THEME_APP)),
+                    border: Border.all(
+                        width: 3, color: ThemeColors.COLOR_THEME_APP)),
                 child: Center(
                   child: Hero(
                     child: FlutterLogo(
@@ -178,7 +178,7 @@ class _AssetPageState extends State<AssetPage> {
                 if (res.isNotEmpty) Navigator.pop(context);
                 ecsLib.pushPage(
                   context: context,
-                  pageWidget: InputInformation(
+                  pageWidget: FillInformation(
                     onClickAddAssetPage: PageAction.SCAN_QR_CODE,
                     hasDataAssetAlready: false,
                   ),
@@ -198,7 +198,7 @@ class _AssetPageState extends State<AssetPage> {
                 Navigator.pop(context);
                 ecsLib.pushPage(
                   context: context,
-                  pageWidget: InputInformation(
+                  pageWidget: FillInformation(
                     onClickAddAssetPage: PageAction.MANUAL_ADD,
                   ),
                 );
