@@ -139,7 +139,7 @@ class _RegisterState extends State<Register> {
         //   ),
         // ); // Skip verify phone number
 
-        apiVerifyNumber(postData: data).then((response) async {
+        APIService.apiVerifyNumber(postData: data).then((response) async {
           print(response);
           if (response?.status == true) {
             Navigator.pop(context); //clear alert
@@ -183,8 +183,8 @@ class _RegisterState extends State<Register> {
       child: paddingWidget(
           child: ButtonBuilder.buttonCustom(
               colorsButton: ThemeColors.COLOR_TRANSPARENT,
-              labelStyle:
-                  TextStyleCustom.STYLE_LABEL_BOLD.copyWith(color: ThemeColors.COLOR_GREY),
+              labelStyle: TextStyleCustom.STYLE_LABEL_BOLD
+                  .copyWith(color: ThemeColors.COLOR_GREY),
               paddingValue: 0,
               context: context,
               label: modelBirthYear.selectedBirthYears
@@ -289,8 +289,8 @@ class _RegisterState extends State<Register> {
           ),
           TextBuilder.build(
               title: "Terms and Conditions",
-              style:
-                  TextStyleCustom.STYLE_LABEL.copyWith(color: ThemeColors.COLOR_THEME_APP))
+              style: TextStyleCustom.STYLE_LABEL
+                  .copyWith(color: ThemeColors.COLOR_THEME_APP))
         ],
       ),
     );
@@ -386,7 +386,8 @@ class _RegisterState extends State<Register> {
             child: Container(
               width: MediaQuery.of(context).size.width,
               decoration: BoxDecoration(
-                  border: Border.all(width: 0.7, color: ThemeColors.COLOR_THEME_APP),
+                  border: Border.all(
+                      width: 0.7, color: ThemeColors.COLOR_THEME_APP),
                   borderRadius: BorderRadius.circular(25)),
               height: 50,
               child: Center(

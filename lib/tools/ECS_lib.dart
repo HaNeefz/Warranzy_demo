@@ -100,6 +100,10 @@ class ECSLib {
     return response;
   }
 
+  void cancelDialogLoadindLib(BuildContext context) {
+    Navigator.pop(context);
+  }
+
   void showDialogLoadingLib(
       {@required BuildContext context,
       String title,

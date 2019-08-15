@@ -141,7 +141,7 @@ class _ReceiveOTPState extends State<ReceiveOTP> {
                         context: context,
                         content: "Resend OTP, Wait a minutes.",
                       );
-                      await apiVerifyNumberTryRequest(postData: data)
+                      await APIService.apiVerifyNumberTryRequest(postData: data)
                           .then((response) {
                         Navigator.pop(context);
                         print(

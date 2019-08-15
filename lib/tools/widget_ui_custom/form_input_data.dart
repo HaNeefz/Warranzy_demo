@@ -6,12 +6,37 @@ import '../theme_color.dart';
 import 'text_builder.dart';
 
 class FormWidgetBuilder {
+  static Widget formWidget(
+      {@required String title, @required Widget child, bool showTitle = true}) {
+    return Container(
+        margin: EdgeInsets.symmetric(vertical: 5),
+        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+        decoration: BoxDecoration(
+            border: Border.all(width: 0.3, color: ThemeColors.COLOR_GREY),
+            borderRadius: BorderRadius.circular(10)),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            if (showTitle == true)
+              TextBuilder.build(
+                  title: title,
+                  style:
+                      TextStyleCustom.STYLE_LABEL_BOLD.copyWith(fontSize: 15)),
+            child,
+          ],
+        ));
+  }
+
   static Widget formDropDown(
       {@required key,
       @required String title,
       @required List items,
-      @required validate}) {
+      @required validate,
+      String hint,
+      Function onChange}) {
     return Container(
+      margin: EdgeInsets.symmetric(vertical: 5),
       padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
       decoration: BoxDecoration(
           border: Border.all(width: 0.3, color: ThemeColors.COLOR_GREY),
@@ -22,14 +47,17 @@ class FormWidgetBuilder {
         children: <Widget>[
           TextBuilder.build(
               title: title,
-              style: TextStyleCustom.STYLE_CONTENT.copyWith(fontSize: 15)),
+              style: TextStyleCustom.STYLE_LABEL_BOLD.copyWith(fontSize: 15)),
           FormBuilderDropdown(
             attribute: key,
             initialValue: items.first,
+            onChanged: onChange,
+            hint: TextBuilder.build(
+                title: "$hint", style: TextStyleCustom.STYLE_CONTENT),
             items: items
                 .map<DropdownMenuItem>((data) => DropdownMenuItem(
                       child: TextBuilder.build(
-                        title: "$data",
+                        title: "${items.indexOf(data) + 1}. \t\t$data",
                         style:
                             TextStyleCustom.STYLE_LABEL.copyWith(fontSize: 15),
                       ),
@@ -46,7 +74,7 @@ class FormWidgetBuilder {
   static Widget formInputData(
       {@required String key,
       @required validators,
-      String title,
+      @required String title,
       TextEditingController textContrl,
       String label,
       String hintText,
@@ -65,6 +93,7 @@ class FormWidgetBuilder {
       Widget suffix,
       bool readOnly = false}) {
     return Container(
+      margin: EdgeInsets.symmetric(vertical: 5),
       padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
       decoration: BoxDecoration(
           border: Border.all(width: 0.3, color: ThemeColors.COLOR_GREY),
@@ -75,10 +104,10 @@ class FormWidgetBuilder {
         children: <Widget>[
           TextBuilder.build(
               title: readOnly == true ? title + " (read only)" : title,
-              style: TextStyleCustom.STYLE_CONTENT.copyWith(fontSize: 15)),
+              style: TextStyleCustom.STYLE_LABEL_BOLD.copyWith(fontSize: 15)),
           FormBuilderTextField(
             attribute: key,
-            validators: validators,
+            validators: validators != null ? validators : null,
             controller: textContrl,
             autovalidate: autovalidate,
             maxLength: maxLength,

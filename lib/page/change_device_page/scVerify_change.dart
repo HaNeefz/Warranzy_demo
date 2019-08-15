@@ -77,14 +77,14 @@ class _VerifyChangeDeviceState extends State<VerifyChangeDevice> {
                 text: TextSpan(children: [
                   TextSpan(
                     text: "Please Enter the OTP to Verify your Account\n\n",
-                    style: TextStyleCustom.STYLE_TITLE
-                        .copyWith(fontSize: 22, color: ThemeColors.COLOR_THEME_APP),
+                    style: TextStyleCustom.STYLE_TITLE.copyWith(
+                        fontSize: 22, color: ThemeColors.COLOR_THEME_APP),
                   ),
                   TextSpan(
                       text:
                           "A OTP has been sent to +${modelMasCustomer.countryNumberPhoneCode} ${modelMasCustomer.mobilePhone}",
-                      style: TextStyleCustom.STYLE_LABEL
-                          .copyWith(fontSize: 15, color: ThemeColors.COLOR_GREY)),
+                      style: TextStyleCustom.STYLE_LABEL.copyWith(
+                          fontSize: 15, color: ThemeColors.COLOR_GREY)),
                 ]),
               ),
               PinCodeTextField(
@@ -166,7 +166,8 @@ class _VerifyChangeDeviceState extends State<VerifyChangeDevice> {
         print(postData);
         ecsLib.showDialogLoadingLib(context: context, content: "Verifying");
 
-        apiVerifyChangeDevice(postData: postData).then((response) async {
+        APIService.apiVerifyChangeDevice(postData: postData)
+            .then((response) async {
           if (response?.status == true) {
             if (await DBProviderCustomer.db.checkHasCustomer() == true) {
               print("Have information customer, deleting");

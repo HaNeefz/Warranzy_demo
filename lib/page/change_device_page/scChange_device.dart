@@ -95,7 +95,7 @@ class _ChangeDeviceState extends State<ChangeDevice> {
           context: context,
           content: "Verifying",
         );
-        apiChangeDevice(postData: dataSendToAPIChangeDevice)
+        APIService.apiChangeDevice(postData: dataSendToAPIChangeDevice)
             .then((response) async {
           if (response?.status == true) {
             Navigator.pop(context); //Cancel alert loading
