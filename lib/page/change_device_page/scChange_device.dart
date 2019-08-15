@@ -95,7 +95,7 @@ class _ChangeDeviceState extends State<ChangeDevice> {
           context: context,
           content: "Verifying",
         );
-        APIService.apiChangeDevice(postData: dataSendToAPIChangeDevice)
+        APIServiceUser.apiChangeDevice(postData: dataSendToAPIChangeDevice)
             .then((response) async {
           if (response?.status == true) {
             ecsLib.cancelDialogLoadindLib(context);

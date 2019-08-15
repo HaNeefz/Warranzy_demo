@@ -10,7 +10,8 @@ import 'package:warranzy_demo/models/model_verify_phone.dart';
 final String baseUrl = "http://192.168.0.36:9999/API/v1";
 final Dio dio = Dio();
 
-class APIService {
+class APIServiceUser {
+
   static Future apiVerifyNumberTest({String url, dynamic postData}) async {
     print("apiVerfyNumber");
     String urlPost = "http://192.168.0.36:9999/API/v1/User/CheckVerifyPhone";

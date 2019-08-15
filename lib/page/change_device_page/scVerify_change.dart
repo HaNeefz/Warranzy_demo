@@ -166,7 +166,7 @@ class _VerifyChangeDeviceState extends State<VerifyChangeDevice> {
         print(postData);
         ecsLib.showDialogLoadingLib(context: context, content: "Verifying");
 
-        APIService.apiVerifyChangeDevice(postData: postData)
+        APIServiceUser.apiVerifyChangeDevice(postData: postData)
             .then((response) async {
           if (response?.status == true) {
             if (await DBProviderCustomer.db.checkHasCustomer() == true) {

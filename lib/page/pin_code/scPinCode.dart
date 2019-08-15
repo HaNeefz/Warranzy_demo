@@ -55,7 +55,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
       "CustUserID": custID,
     };
     print("Data before send Api => $postData");
-    await APIService.apiVerifyLogin(postData: postData).then((response) {
+    await APIServiceUser.apiVerifyLogin(postData: postData).then((response) {
       if (response?.status == true) {
         gotoMainPage();
       } else if (response?.status == false) {
@@ -258,7 +258,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
   }
 
   Future sendApiRegister(Map data, String pinCode) async {
-    APIService.apiRegister(postData: data).then((response) async {
+    APIServiceUser.apiRegister(postData: data).then((response) async {
       if (response?.status == true) {
         if (await DBProviderCustomer.db.addDataCustomer(response.data) ==
             true) {

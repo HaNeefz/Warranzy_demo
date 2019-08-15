@@ -139,7 +139,7 @@ class _RegisterState extends State<Register> {
         //   ),
         // ); // Skip verify phone number
 
-        APIService.apiVerifyNumber(postData: data).then((response) async {
+        APIServiceUser.apiVerifyNumber(postData: data).then((response) async {
           print(response);
           if (response?.status == true) {
             ecsLib.cancelDialogLoadindLib(context);
