@@ -98,7 +98,7 @@ class _ChangeDeviceState extends State<ChangeDevice> {
         APIService.apiChangeDevice(postData: dataSendToAPIChangeDevice)
             .then((response) async {
           if (response?.status == true) {
-            Navigator.pop(context); //Cancel alert loading
+            ecsLib.cancelDialogLoadindLib(context);
             ecsLib.pushPage(
               context: context,
               pageWidget: VerifyChangeDevice(
@@ -115,7 +115,7 @@ class _ChangeDeviceState extends State<ChangeDevice> {
               textOnButton: allTranslations.text("close"),
             )
                 .then((res) {
-              Navigator.pop(context); //Cancel alert loading
+              ecsLib.cancelDialogLoadindLib(context);
             });
           } else {
             ecsLib
@@ -126,7 +126,7 @@ class _ChangeDeviceState extends State<ChangeDevice> {
               textOnButton: allTranslations.text("close"),
             )
                 .then((res) {
-              Navigator.pop(context); //Cancel alert loading
+              ecsLib.cancelDialogLoadindLib(context);
             });
           }
         });

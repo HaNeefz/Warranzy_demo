@@ -142,7 +142,7 @@ class _RegisterState extends State<Register> {
         APIService.apiVerifyNumber(postData: data).then((response) async {
           print(response);
           if (response?.status == true) {
-            Navigator.pop(context); //clear alert
+            ecsLib.cancelDialogLoadindLib(context);
             ecsLib.pushPage(
                 context: context,
                 pageWidget: ReceiveOTP(
@@ -150,14 +150,14 @@ class _RegisterState extends State<Register> {
                   modelVerifyNumber: response,
                 ));
           } else if (response?.status == false) {
-            Navigator.pop(context); //clear alert
+            ecsLib.cancelDialogLoadindLib(context);
             ecsLib.showDialogLib(
                 content: response?.message ?? "Duplicate number",
                 context: context,
                 textOnButton: allTranslations.text("close"),
                 title: "DUPLICATE PHONE NUMBER");
           } else {
-            Navigator.pop(context); //clear alert
+            ecsLib.cancelDialogLoadindLib(context);
             ecsLib.showDialogLib(
                 content: "Server error. Please try again",
                 context: context,

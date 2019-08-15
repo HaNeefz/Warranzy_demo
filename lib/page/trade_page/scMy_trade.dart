@@ -188,7 +188,7 @@ class _MyTradeState extends State<MyTrade> {
                                       icons: Icons.edit,
                                       title: "Edit Trade",
                                       onTap: () {
-                                        Navigator.pop(context);
+                                        ecsLib.cancelDialogLoadindLib(context);
                                         ecsLib.pushPage(
                                             context: context,
                                             pageWidget: TradeInformation(

@@ -143,7 +143,7 @@ class _ReceiveOTPState extends State<ReceiveOTP> {
                       );
                       await APIService.apiVerifyNumberTryRequest(postData: data)
                           .then((response) {
-                        Navigator.pop(context);
+                        ecsLib.cancelDialogLoadindLib(context);
                         print(
                             "createDate Old => ${modelVerifyData.createDate}");
                         print(

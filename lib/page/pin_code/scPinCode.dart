@@ -66,7 +66,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
                 textOnButton: allTranslations.text("close"),
                 title: "SERVER ERROR")
             .then((res) {
-          if (res) Navigator.pop(context);
+          if (res) ecsLib.cancelDialogLoadindLib(context);
         });
         setState(() {
           listPinTemp.clear();
@@ -79,7 +79,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
                 textOnButton: allTranslations.text("close"),
                 title: "SERVER ERROR")
             .then((res) {
-          if (res) Navigator.pop(context);
+          if (res) ecsLib.cancelDialogLoadindLib(context);
         });
       }
     });
@@ -268,7 +268,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
           dataCust = await DBProviderCustomer.db.getDataCustomer();
           print(
               "===========Information Customer============\n${dataCust.toJson()}\n============");
-          Navigator.pop(context);
+          ecsLib.cancelDialogLoadindLib(context);
           ecsLib.pushPageAndClearAllScene(
               context: context, pageWidget: LoginPage());
           ecsLib.pushPage(

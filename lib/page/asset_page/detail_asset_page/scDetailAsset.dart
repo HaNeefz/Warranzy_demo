@@ -127,7 +127,7 @@ class _DetailAssetState extends State<DetailAsset> {
                                 icons: Icons.timeline,
                                 title: "Request service",
                                 onTap: () {
-                                  Navigator.pop(context);
+                                  ecsLib.cancelDialogLoadindLib(context);
                                   ecsLib.pushPage(
                                     context: context,
                                     pageWidget: RequestService(
@@ -140,7 +140,7 @@ class _DetailAssetState extends State<DetailAsset> {
                                 icons: Icons.store,
                                 title: "Trade asset",
                                 onTap: () {
-                                  Navigator.pop(context);
+                                  ecsLib.cancelDialogLoadindLib(context);
                                   ecsLib.pushPage(
                                     context: context,
                                     pageWidget: TradeInformation(
@@ -153,7 +153,7 @@ class _DetailAssetState extends State<DetailAsset> {
                                 icons: Icons.repeat,
                                 title: "Tranfer asset",
                                 onTap: () {
-                                  Navigator.pop(context);
+                                  ecsLib.cancelDialogLoadindLib(context);
                                   ecsLib.pushPage(
                                     context: context,
                                     pageWidget: TranfersInformation(
