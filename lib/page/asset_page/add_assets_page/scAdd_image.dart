@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:warranzy_demo/models/model_repository_init_app.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/button_builder.dart';
@@ -74,7 +75,7 @@ class _AddImageState extends State<AddImage> {
                   try {
                     await dio
                         .post(
-                            "http://192.168.0.36:9999/API/v1/User/TestLoading",
+                            "https://testwarranty-239103.appspot.com/API/v1/User/TestLoading", //http://192.168.0.36:9999/API/v1
                             data: form,
                             onSendProgress: (int sent, int total) =>
                                 print("$sent | $total"))
@@ -96,8 +97,23 @@ class _AddImageState extends State<AddImage> {
               },
             ),
             RaisedButton(
-              onPressed: () {
-                ecsLib.showDialogLoadingLib(context: context,content: "");
+              onPressed: () async {
+                ecsLib.showDialogLoadingLib(context);
+                try {
+                  await dio
+                      .get("http://192.168.0.36:9999/API/v1/User/InitialApp")
+                      .then((res) {
+                    ecsLib.cancelDialogLoadindLib(context);
+                    var data =
+                        RepositoryInitalApp.fromJson(jsonDecode(res.data));
+                    print(data.productCatagory[0].repositoryCatName.catName.eN);
+                    print(data.productCatagory[0].repositoryCatName.catName.tH);
+                    var s = data.productCatagory[0].toJson();
+                    print(s);
+                  });
+                } catch (e) {
+                  print(e);
+                }
               },
             ),
           ],

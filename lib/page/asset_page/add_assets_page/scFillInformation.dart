@@ -39,7 +39,7 @@ class _FillInformationState extends State<FillInformation> {
   TextEditingController txtCtrlNote = TextEditingController(text: "");
   TextEditingController txtCtrlLotNo = TextEditingController(text: "");
   TextEditingController txtCtrlPrice = TextEditingController(text: "");
-  // StreamController<List<String>> streamController;
+  String hasBrandInSystem = "N";
   var valueBrandName = "DysonElectric";
   List<GetBrandName> listBrandName = [];
   List<GetBrandName> tempListBrandName = [];
@@ -111,110 +111,113 @@ class _FillInformationState extends State<FillInformation> {
                 widget.hasDataAssetAlready == true ? "Edit Asset" : "New Asset",
             style: TextStyleCustom.STYLE_APPBAR),
       ),
-      body: FormBuilder(
-        key: _fbk,
-        autovalidate: true,
-        child: Padding(
-          padding: const EdgeInsets.only(left: 15.0, right: 10, top: 20),
-          child: ListView(
-            children: <Widget>[
-              buildTitle(),
-              SizedBox(
-                height: 20,
-              ),
-              if (page == PageAction.SCAN_QR_CODE)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    buildInformation(
-                        title: "Brand Name", data: "Dyson Electric"),
-                    buildInformation(
-                        title: "Manufacturer Name", data: "Dyson V7 Trigger"),
-                  ],
-                )
-              else
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    FormWidgetBuilder.formDropDown(
-                      key: "PdtGroup",
-                      title: "Group*",
-                      hint: "Choose your group",
-                      validate: [
-                        FormBuilderValidators.required(),
-                      ],
-                      items: _group,
-                    ),
-                    FormWidgetBuilder.formWidget(
-                        title: "BrandName*", child: autoCompleteTextField()),
-                    FormWidgetBuilder.formDropDown(
-                      key: "PdtPlace",
-                      title: "Place*",
-                      hint: "Choose your place",
-                      validate: [
-                        FormBuilderValidators.required(),
-                      ],
-                      items: _place,
-                    ),
-                  ],
+      body: ecsLib.dismissedKeyboard(
+        context,
+        child: FormBuilder(
+          key: _fbk,
+          autovalidate: true,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 15.0, right: 10, top: 20),
+            child: ListView(
+              children: <Widget>[
+                buildTitle(),
+                SizedBox(
+                  height: 20,
                 ),
-              FormWidgetBuilder.formInputData(
-                  key: "Title",
-                  title: "Title*",
-                  validators: [FormBuilderValidators.required()]),
-              FormWidgetBuilder.formInputData(
-                  key: "WarrantyNo",
-                  title: "Warranty No.*",
-                  validators: [FormBuilderValidators.required()]),
-              FormWidgetBuilder.formInputData(
-                  key: "WarrantyExpire",
-                  title: "Warranty Expire*",
-                  validators: [FormBuilderValidators.required()]),
-              FormWidgetBuilder.formDropDown(
-                key: "ChooseExpireDate",
-                title: "Choose notification before expire* (Day)",
-                hint: "Ex. 30 days",
-                validate: [
-                  FormBuilderValidators.required(),
-                ],
-                items: [60, 30, 7, 0],
-              ),
-              FormWidgetBuilder.formWidget(
-                  title: "Optional",
-                  showTitle: false,
-                  child: ExpansionTile(
-                    title: TextBuilder.build(
-                        title: "Optional",
-                        style: TextStyleCustom.STYLE_LABEL_BOLD),
+                if (page == PageAction.SCAN_QR_CODE)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      FormWidgetBuilder.formInputDataNotValidate(
-                        controller: txtCtrlSerialNo,
-                        title: "Serial No.",
+                      buildInformation(
+                          title: "Brand Name", data: "Dyson Electric"),
+                      buildInformation(
+                          title: "Manufacturer Name", data: "Dyson V7 Trigger"),
+                    ],
+                  )
+                else
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      FormWidgetBuilder.formDropDown(
+                        key: "PdtGroup",
+                        title: "Group*",
+                        hint: "Choose your group",
+                        validate: [
+                          FormBuilderValidators.required(),
+                        ],
+                        items: _group,
                       ),
-                      FormWidgetBuilder.formInputDataNotValidate(
-                        controller: txtCtrlLotNo,
-                        title: "Lot No.",
-                      ),
-                      FormWidgetBuilder.formInputDataNotValidate(
-                        title: "Price",
-                        controller: txtCtrlPrice,
+                      FormWidgetBuilder.formWidget(
+                          title: "BrandName*", child: autoCompleteTextField()),
+                      FormWidgetBuilder.formDropDown(
+                        key: "PdtPlace",
+                        title: "Place*",
+                        hint: "Choose your place",
+                        validate: [
+                          FormBuilderValidators.required(),
+                        ],
+                        items: _place,
                       ),
                     ],
-                  )),
-              FormWidgetBuilder.formInputDataNotValidate(
-                controller: txtCtrlNote,
-                title: "Note",
-                maxLine: 5,
-              ),
-              if (page == PageAction.SCAN_QR_CODE)
-                Column(
-                  children: <Widget>[
-                    buildProductImage(),
-                    buildDetailProduct(),
+                  ),
+                FormWidgetBuilder.formInputData(
+                    key: "Title",
+                    title: "Title*",
+                    validators: [FormBuilderValidators.required()]),
+                FormWidgetBuilder.formInputData(
+                    key: "WarrantyNo",
+                    title: "Warranty No.*",
+                    validators: [FormBuilderValidators.required()]),
+                FormWidgetBuilder.formInputData(
+                    key: "WarrantyExpire",
+                    title: "Warranty Expire*",
+                    validators: [FormBuilderValidators.required()]),
+                FormWidgetBuilder.formDropDown(
+                  key: "ChooseExpireDate",
+                  title: "Choose notification before expire* (Day)",
+                  hint: "Ex. 30 days",
+                  validate: [
+                    FormBuilderValidators.required(),
                   ],
+                  items: [60, 30, 7, 0],
                 ),
-              buildContinue(context)
-            ],
+                FormWidgetBuilder.formWidget(
+                    title: "Optional",
+                    showTitle: false,
+                    child: ExpansionTile(
+                      title: TextBuilder.build(
+                          title: "Optional",
+                          style: TextStyleCustom.STYLE_LABEL_BOLD),
+                      children: <Widget>[
+                        FormWidgetBuilder.formInputDataNotValidate(
+                          controller: txtCtrlSerialNo,
+                          title: "Serial No.",
+                        ),
+                        FormWidgetBuilder.formInputDataNotValidate(
+                          controller: txtCtrlLotNo,
+                          title: "Lot No.",
+                        ),
+                        FormWidgetBuilder.formInputDataNotValidate(
+                          title: "Price",
+                          controller: txtCtrlPrice,
+                        ),
+                      ],
+                    )),
+                FormWidgetBuilder.formInputDataNotValidate(
+                  controller: txtCtrlNote,
+                  title: "Note",
+                  maxLine: 5,
+                ),
+                if (page == PageAction.SCAN_QR_CODE)
+                  Column(
+                    children: <Widget>[
+                      buildProductImage(),
+                      buildDetailProduct(),
+                    ],
+                  ),
+                buildContinue(context)
+              ],
+            ),
           ),
         ),
       ),
@@ -245,6 +248,7 @@ class _FillInformationState extends State<FillInformation> {
           txtCtrlBrandName.text = item.modelBrandName.modelEN.en;
           searchTextField.textField.controller.text =
               item.modelBrandName.modelEN.en;
+          hasBrandInSystem = "Y";
         });
       },
     );
@@ -340,6 +344,7 @@ class _FillInformationState extends State<FillInformation> {
   Map<String, String> addTextController() {
     Map<String, String> mapData = {
       "BrandName": txtCtrlBrandName.text,
+      "hasBrandInSystem": hasBrandInSystem,
       "SerialNo": txtCtrlSerialNo.text,
       "LotNo": txtCtrlLotNo.text,
       "Price": txtCtrlPrice.text,

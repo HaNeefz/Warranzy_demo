@@ -107,11 +107,8 @@ class ECSLib {
     Navigator.pop(context);
   }
 
-  void showDialogLoadingLib(
-      {@required BuildContext context,
-      String title,
-      @required String content,
-      bool barrierDismissible = true}) {
+  void showDialogLoadingLib(BuildContext context,
+      {String title, String content, bool barrierDismissible = true}) {
     showDialog(
         context: context,
         barrierDismissible: barrierDismissible,
@@ -281,6 +278,14 @@ class ECSLib {
     } else {
       return true;
     }
+  }
+
+  Widget dismissedKeyboard(BuildContext context, {Widget child}) {
+    return GestureDetector(
+      onTap: () => // FocusScope.of(context).unfocus();
+          FocusScope.of(context).requestFocus(new FocusNode()),
+      child: child,
+    );
   }
 
   Widget modelImageFile({@required File file, BoxFit fit = BoxFit.cover}) {

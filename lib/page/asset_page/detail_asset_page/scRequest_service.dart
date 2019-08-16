@@ -27,68 +27,71 @@ class _RequestServiceState extends State<RequestService> {
         title: TextBuilder.build(
             title: "Request service", style: TextStyleCustom.STYLE_APPBAR),
       ),
-      body: Padding(
-        padding: const EdgeInsets.fromLTRB(15, 0, 15, 15),
-        child: ListView(
-          children: <Widget>[
-            buildHeader(),
-            buildAssetName(),
-            formWidget(
-              title: "Serive Type",
-              child: DropdownButton(
-                value: serviceTypeValue,
-                isExpanded: true,
-                items: ["Fix Service", "Other"]
-                    .map<DropdownMenuItem<String>>((data) {
-                  return DropdownMenuItem(
-                    value: data,
-                    child: TextBuilder.build(title: data),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    serviceTypeValue = value;
-                  });
-                },
+      body: ecsLib.dismissedKeyboard(
+        context,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(15, 0, 15, 15),
+          child: ListView(
+            children: <Widget>[
+              buildHeader(),
+              buildAssetName(),
+              formWidget(
+                title: "Serive Type",
+                child: DropdownButton(
+                  value: serviceTypeValue,
+                  isExpanded: true,
+                  items: ["Fix Service", "Other"]
+                      .map<DropdownMenuItem<String>>((data) {
+                    return DropdownMenuItem(
+                      value: data,
+                      child: TextBuilder.build(title: data),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      serviceTypeValue = value;
+                    });
+                  },
+                ),
               ),
-            ),
-            formWidget(
-              title: "Delivey",
-              child: DropdownButton(
-                value: deliveryTypeValue,
-                isExpanded: true,
-                items: ["Delivery by service", "Other"]
-                    .map<DropdownMenuItem<String>>((data) {
-                  return DropdownMenuItem(
-                    value: data,
-                    child: TextBuilder.build(title: data),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    deliveryTypeValue = value;
-                  });
-                },
+              formWidget(
+                title: "Delivey",
+                child: DropdownButton(
+                  value: deliveryTypeValue,
+                  isExpanded: true,
+                  items: ["Delivery by service", "Other"]
+                      .map<DropdownMenuItem<String>>((data) {
+                    return DropdownMenuItem(
+                      value: data,
+                      child: TextBuilder.build(title: data),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      deliveryTypeValue = value;
+                    });
+                  },
+                ),
               ),
-            ),
-            formWidget(
-                title: "Your Address",
-                child: TextField(
-                  decoration: InputDecoration(
-                      hintText: allTranslations.text("address")),
-                )),
-            buildAddPhotos(context),
-            formWidget(
-                title: "Note (Optional)",
-                child: TextField(
-                  maxLines: 5,
-                  textInputAction: TextInputAction.done,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                  ),
-                )),
-            buildButtonSend(context),
-          ],
+              formWidget(
+                  title: "Your Address",
+                  child: TextField(
+                    decoration: InputDecoration(
+                        hintText: allTranslations.text("address")),
+                  )),
+              buildAddPhotos(context),
+              formWidget(
+                  title: "Note (Optional)",
+                  child: TextField(
+                    maxLines: 5,
+                    textInputAction: TextInputAction.done,
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                    ),
+                  )),
+              buildButtonSend(context),
+            ],
+          ),
         ),
       ),
     );
@@ -190,8 +193,8 @@ class _RequestServiceState extends State<RequestService> {
       text: TextSpan(children: [
         TextSpan(
             text: "Your Asset\n",
-            style:
-                TextStyleCustom.STYLE_LABEL.copyWith(color: ThemeColors.COLOR_THEME_APP)),
+            style: TextStyleCustom.STYLE_LABEL
+                .copyWith(color: ThemeColors.COLOR_THEME_APP)),
         TextSpan(
             text: widget.assetName + "\n\n", style: TextStyleCustom.STYLE_LABEL)
       ]),
@@ -204,8 +207,8 @@ class _RequestServiceState extends State<RequestService> {
         children: [
           TextSpan(
               text: "Enter asset information\n",
-              style:
-                  TextStyleCustom.STYLE_TITLE.copyWith(color: ThemeColors.COLOR_THEME_APP)),
+              style: TextStyleCustom.STYLE_TITLE
+                  .copyWith(color: ThemeColors.COLOR_THEME_APP)),
           TextSpan(
               text:
                   "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae.\n\n",

@@ -91,7 +91,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
         () => localAuth.authenticate().then((_authorized) async {
               if (_authorized) {
                 ecsLib.showDialogLoadingLib(
-                  context: context,
+                  context,
                   content: "Verifying",
                 );
                 sendApiLogin();
@@ -218,7 +218,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
 
                     if (response == true) {
                       ecsLib.showDialogLoadingLib(
-                        context: context,
+                        context,
                         content: "Please wait.",
                       );
                       var data =
@@ -230,7 +230,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
                       sendApiRegister(data, pinCode);
                     } else {
                       ecsLib.showDialogLoadingLib(
-                        context: context,
+                        context,
                         content: "Please wait.",
                       );
                       var data =
@@ -605,7 +605,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
         print("Correct");
         // gotoMainPage();
         ecsLib.showDialogLoadingLib(
-          context: context,
+          context,
           content: "Verifying",
         );
         sendApiLogin();

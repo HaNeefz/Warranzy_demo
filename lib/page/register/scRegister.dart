@@ -66,37 +66,40 @@ class _RegisterState extends State<Register> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBarThemes.appBarStyle(context: context),
-      body: SingleChildScrollView(
-        child: FormBuilder(
-          key: _fbKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              ecsLib.logoApp(width: 200, height: 200),
-              TextBuilder.build(
-                  title: "Registeration", style: TextStyleCustom.STYLE_TITLE),
-              space(10),
-              TextBuilder.build(
-                  title: "Create your account to member",
-                  style: TextStyleCustom.STYLE_CONTENT),
-              space(10),
-              buildCountryCode(),
-              buildFormFullName(),
-              buildFormGender(),
-              buildBirthYear(context),
-              buildFormAddress(),
-              buildFormEmail(),
-              buildFormMobileNumber(),
-              buildChackAgree(),
-              space(20),
-              ButtonBuilder.buttonCustom(
-                  paddingValue: 20.0,
-                  context: context,
-                  colorsButton: agree == false ? Colors.grey.shade200 : null,
-                  label: allTranslations.text("continue"),
-                  onPressed: agree == true ? registerContinue : null),
-              space(50),
-            ],
+      body: ecsLib.dismissedKeyboard(
+        context,
+        child: SingleChildScrollView(
+          child: FormBuilder(
+            key: _fbKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                ecsLib.logoApp(width: 200, height: 200),
+                TextBuilder.build(
+                    title: "Registeration", style: TextStyleCustom.STYLE_TITLE),
+                space(10),
+                TextBuilder.build(
+                    title: "Create your account to member",
+                    style: TextStyleCustom.STYLE_CONTENT),
+                space(10),
+                buildCountryCode(),
+                buildFormFullName(),
+                buildFormGender(),
+                buildBirthYear(context),
+                buildFormAddress(),
+                buildFormEmail(),
+                buildFormMobileNumber(),
+                buildChackAgree(),
+                space(20),
+                ButtonBuilder.buttonCustom(
+                    paddingValue: 20.0,
+                    context: context,
+                    colorsButton: agree == false ? Colors.grey.shade200 : null,
+                    label: allTranslations.text("continue"),
+                    onPressed: agree == true ? registerContinue : null),
+                space(50),
+              ],
+            ),
           ),
         ),
       ),
@@ -122,8 +125,8 @@ class _RegisterState extends State<Register> {
         print(masCustomersData);
 
         var dataCustomers = ModelMasCustomer.fromJson(masCustomersData);
-        ecsLib.showDialogLoadingLib(
-            context: context, content: "Verifying", barrierDismissible: false);
+        ecsLib.showDialogLoadingLib(context,
+            content: "Verifying", barrierDismissible: false);
         var data = {
           "Email": dataCustomers.email,
           "MobilePhone":

@@ -31,46 +31,49 @@ class _TradeInformationState extends State<TradeInformation> {
             title: widget.editAble ? "Edit trade asset" : "Add trade asset",
             style: TextStyleCustom.STYLE_APPBAR),
       ),
-      body: Padding(
-        padding: const EdgeInsets.fromLTRB(15, 0, 15, 15),
-        child: ListView(
-          children: <Widget>[
-            TextBuilder.build(
-                title: "Trade Information",
-                style: TextStyleCustom.STYLE_TITLE
-                    .copyWith(color: ThemeColors.COLOR_THEME_APP)),
-            buildInformationAsset(),
-            buildAddPhotos(context),
-            buildDetailReadMore(),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10.0),
-              child: ButtonBuilder.buttonCustom(
-                  context: context,
-                  label: "Publish",
-                  paddingValue: 0,
-                  onPressed: () {
-                    widget.editAble
-                        ? ecsLib
-                            .showDialogLib(
-                                context: context,
-                                title: "EDIT TRADE",
-                                content: "Edit Trade Success!",
-                                textOnButton: allTranslations.text("success"))
-                            .then((response) {
-                            if (response) Navigator.pop(context);
-                          })
-                        : ecsLib
-                            .showDialogLib(
-                                context: context,
-                                title: "ADD TRADE",
-                                content: "Add Trade Success!",
-                                textOnButton: allTranslations.text("success"))
-                            .then((response) {
-                            if (response) Navigator.pop(context);
-                          });
-                  }),
-            )
-          ],
+      body: ecsLib.dismissedKeyboard(
+        context,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(15, 0, 15, 15),
+          child: ListView(
+            children: <Widget>[
+              TextBuilder.build(
+                  title: "Trade Information",
+                  style: TextStyleCustom.STYLE_TITLE
+                      .copyWith(color: ThemeColors.COLOR_THEME_APP)),
+              buildInformationAsset(),
+              buildAddPhotos(context),
+              buildDetailReadMore(),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10.0),
+                child: ButtonBuilder.buttonCustom(
+                    context: context,
+                    label: "Publish",
+                    paddingValue: 0,
+                    onPressed: () {
+                      widget.editAble
+                          ? ecsLib
+                              .showDialogLib(
+                                  context: context,
+                                  title: "EDIT TRADE",
+                                  content: "Edit Trade Success!",
+                                  textOnButton: allTranslations.text("success"))
+                              .then((response) {
+                              if (response) Navigator.pop(context);
+                            })
+                          : ecsLib
+                              .showDialogLib(
+                                  context: context,
+                                  title: "ADD TRADE",
+                                  content: "Add Trade Success!",
+                                  textOnButton: allTranslations.text("success"))
+                              .then((response) {
+                              if (response) Navigator.pop(context);
+                            });
+                    }),
+              )
+            ],
+          ),
         ),
       ),
     );

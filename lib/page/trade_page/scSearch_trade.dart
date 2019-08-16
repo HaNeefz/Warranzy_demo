@@ -22,45 +22,48 @@ class _SearchTradeState extends State<SearchTrade> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: Column(
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  children: <Widget>[
-                    Flexible(
-                        child: TextField(
-                      controller: _textEditingController,
-                      decoration: InputDecoration(
-                          prefixIcon: Icon(Icons.search),
-                          suffixIcon: IconButton(
-                            icon: Icon(Icons.close),
-                            onPressed: () {
-                              setState(() {
-                                _textEditingController.clear();
-                              });
-                            },
-                          ),
-                          contentPadding:
-                              EdgeInsets.symmetric(vertical: 0, horizontal: 0),
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(40))),
-                    )),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    GestureDetector(
-                        onTap: () => Navigator.pop(context),
-                        child: TextBuilder.build(
-                            title: allTranslations.text("cancel"))),
-                  ],
+      body: ecsLib.dismissedKeyboard(
+        context,
+        child: SafeArea(
+          child: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: Column(
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                    children: <Widget>[
+                      Flexible(
+                          child: TextField(
+                        controller: _textEditingController,
+                        decoration: InputDecoration(
+                            prefixIcon: Icon(Icons.search),
+                            suffixIcon: IconButton(
+                              icon: Icon(Icons.close),
+                              onPressed: () {
+                                setState(() {
+                                  _textEditingController.clear();
+                                });
+                              },
+                            ),
+                            contentPadding: EdgeInsets.symmetric(
+                                vertical: 0, horizontal: 0),
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(40))),
+                      )),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      GestureDetector(
+                          onTap: () => Navigator.pop(context),
+                          child: TextBuilder.build(
+                              title: allTranslations.text("cancel"))),
+                    ],
+                  ),
                 ),
-              ),
-              Divider()
-            ],
+                Divider()
+              ],
+            ),
           ),
         ),
       ),

@@ -91,8 +91,7 @@ class _ChangeDeviceState extends State<ChangeDevice> {
           "TimeZone": dataCustomers.timeZone
         };
         print("Data before send => $dataSendToAPIChangeDevice");
-        ecsLib.showDialogLoadingLib(
-          context: context,
+        ecsLib.showDialogLoadingLib(context,
           content: "Verifying",
         );
         APIServiceUser.apiChangeDevice(postData: dataSendToAPIChangeDevice)

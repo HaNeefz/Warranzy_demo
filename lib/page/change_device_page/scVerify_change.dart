@@ -164,7 +164,7 @@ class _VerifyChangeDeviceState extends State<VerifyChangeDevice> {
               "${modelMasCustomer.countryNumberPhoneCode}${modelMasCustomer.mobilePhone}"
         });
         print(postData);
-        ecsLib.showDialogLoadingLib(context: context, content: "Verifying");
+        ecsLib.showDialogLoadingLib(context, content: "Verifying");
 
         APIServiceUser.apiVerifyChangeDevice(postData: postData)
             .then((response) async {
