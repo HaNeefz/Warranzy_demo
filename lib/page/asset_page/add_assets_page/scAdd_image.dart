@@ -1,4 +1,8 @@
+import 'dart:async';
+import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/button_builder.dart';
@@ -8,8 +12,10 @@ import 'scAddMoreInfoAsset.dart';
 
 class AddImage extends StatefulWidget {
   final bool hasDataAssetAlready;
+  final Map<String, dynamic> dataAsset;
 
-  AddImage({Key key, this.hasDataAssetAlready = false}) : super(key: key);
+  AddImage({Key key, this.hasDataAssetAlready = false, this.dataAsset})
+      : super(key: key);
   @override
   _AddImageState createState() => _AddImageState();
 }
@@ -18,8 +24,16 @@ class _AddImageState extends State<AddImage> {
   int counterImage = 0;
   final ecsLib = getIt.get<ECSLib>();
   final allTranslations = getIt.get<GlobalTranslations>();
+  final Dio dio = Dio();
 
   bool get hasDataAssetAlready => widget.hasDataAssetAlready == true;
+  Map<String, dynamic> get dataAsset => widget.dataAsset;
+
+  void initState() {
+    super.initState();
+    print(dataAsset);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,7 +53,53 @@ class _AddImageState extends State<AddImage> {
             ),
             buildImage(context),
             buildButtonAddImage(context),
-            buildDetailImage()
+            buildDetailImage(),
+            RaisedButton(
+              child: Text("Take a Photo"),
+              onPressed: () async {
+                await ecsLib.getImage().then((v) async {
+                  var imageConpressed = await ecsLib.compressFile(
+                      file: v,
+                      targetPath: v.absolute.path,
+                      minHeight: 800,
+                      minWidth: 600,
+                      quality: 90);
+                  String imageBase64 =
+                      base64Encode(imageConpressed.readAsBytesSync());
+                  print("sending..");
+                  FormData form = FormData.from({
+                    "base64": [imageBase64, imageBase64]
+                  });
+
+                  try {
+                    await dio
+                        .post(
+                            "http://192.168.0.36:9999/API/v1/User/TestLoading",
+                            data: form,
+                            onSendProgress: (int sent, int total) =>
+                                print("$sent | $total"))
+                        // await http
+                        //     .post(
+                        //         "http://192.168.0.36:9999/API/v1/User/TestLoading",
+                        //         body: body)
+                        .then((res) {
+                      print(res.data);
+                    }).catchError((onError) {
+                      print("catchError $onError");
+                    });
+                  } on TimeoutException catch (_) {
+                    print("TimeOut");
+                  } catch (e) {
+                    print("$e");
+                  }
+                });
+              },
+            ),
+            RaisedButton(
+              onPressed: () {
+                ecsLib.showDialogLoadingLib(context: context,content: "");
+              },
+            ),
           ],
         ),
       ),

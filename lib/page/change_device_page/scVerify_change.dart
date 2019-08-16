@@ -205,14 +205,14 @@ class _VerifyChangeDeviceState extends State<VerifyChangeDevice> {
             ecsLib.showDialogLib(
                 context: context,
                 title: "STATUS FAILD",
-                content: "Please try again.",
+                content: response?.message,
                 textOnButton: allTranslations.text("close"));
           } else {
             ecsLib.cancelDialogLoadindLib(context);
             ecsLib.showDialogLib(
                 context: context,
                 title: "SERVER ERROR",
-                content: "Disconnect server. Try again",
+                content: response?.message,
                 textOnButton: allTranslations.text("close"));
           }
         });

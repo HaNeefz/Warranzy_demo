@@ -122,7 +122,7 @@ class _ChangeDeviceState extends State<ChangeDevice> {
                 .showDialogLib(
               context: context,
               title: "SERVER ERROR",
-              content: "Server disconnect. Try again",
+              content: response?.message,
               textOnButton: allTranslations.text("close"),
             )
                 .then((res) {
@@ -163,7 +163,8 @@ class _ChangeDeviceState extends State<ChangeDevice> {
             child: Container(
               width: MediaQuery.of(context).size.width,
               decoration: BoxDecoration(
-                  border: Border.all(width: 0.7, color: ThemeColors.COLOR_THEME_APP),
+                  border: Border.all(
+                      width: 0.7, color: ThemeColors.COLOR_THEME_APP),
                   borderRadius: BorderRadius.circular(25)),
               height: 50,
               child: Center(

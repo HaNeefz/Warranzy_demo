@@ -62,7 +62,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
         ecsLib
             .showDialogLib(
                 context: context,
-                content: response.mssage ?? "PIN Incorrct, Try again.",
+                content: response.message ?? "PIN Incorrct, Try again.",
                 textOnButton: allTranslations.text("close"),
                 title: "SERVER ERROR")
             .then((res) {
@@ -75,7 +75,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
         ecsLib
             .showDialogLib(
                 context: context,
-                content: "Can't connect server. Try again.",
+                content: response?.message,
                 textOnButton: allTranslations.text("close"),
                 title: "SERVER ERROR")
             .then((res) {
@@ -287,26 +287,22 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
               textOnButton: allTranslations.text("close"));
         }
       } else if (response?.status == false) {
-        showErrorRegister();
+        ecsLib.showDialogLib(
+          context: context,
+          title: "ERROR REGISTER",
+          content: response?.message,
+          textOnButton: allTranslations.text("close"),
+        );
       } else {
         ecsLib.showDialogLib(
             context: context,
             title: "ERROR SERVER!",
-            content: "Server is Poblem. Try Again",
+            content: response?.message,
             textOnButton: allTranslations.text("close"));
       }
     }).catchError((onError) {
       print("Error => $onError");
     });
-  }
-
-  void showErrorRegister() {
-    ecsLib.showDialogLib(
-      context: context,
-      title: "ERROR REGISTER",
-      content: "Can't register!",
-      textOnButton: allTranslations.text("close"),
-    );
   }
 
   Map postDataCutomers(

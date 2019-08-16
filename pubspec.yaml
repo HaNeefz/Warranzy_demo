@@ -50,6 +50,7 @@ dependencies:
   flutter_native_timezone: ^1.0.4
   cloud_firestore: ^0.12.9
   autocomplete_textfield: ^1.7.3
+  flutter_spinkit: ^3.1.0
 
 
 dev_dependencies:

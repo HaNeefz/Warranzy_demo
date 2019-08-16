@@ -50,10 +50,11 @@ class FormWidgetBuilder {
               style: TextStyleCustom.STYLE_LABEL_BOLD.copyWith(fontSize: 15)),
           FormBuilderDropdown(
             attribute: key,
-            initialValue: items.first,
+            // initialValue: items.first,
             onChanged: onChange,
             hint: TextBuilder.build(
-                title: "$hint", style: TextStyleCustom.STYLE_CONTENT),
+                title: "$hint",
+                style: TextStyleCustom.STYLE_CONTENT.copyWith(fontSize: 15)),
             items: items
                 .map<DropdownMenuItem>((data) => DropdownMenuItem(
                       child: TextBuilder.build(
@@ -117,6 +118,70 @@ class FormWidgetBuilder {
             initialValue: initialValue,
             keyboardType: keyboardType ??= TextInputType.text,
             readonly: readOnly,
+            textInputAction: textInputAction ??= TextInputAction.done,
+            style: TextStyleCustom.STYLE_LABEL.copyWith(fontSize: 15),
+            decoration: InputDecoration(
+                contentPadding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                border: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.teal[300])),
+                // InputBorder.none,
+                errorBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.teal[300])),
+                labelText: label != null ? label : null,
+                labelStyle: TextStyleCustom.STYLE_LABEL,
+                hintText: "\t\t\t ${hintText ?? ""}",
+                hintStyle: TextStyleCustom.STYLE_CONTENT,
+                counterStyle:
+                    TextStyleCustom.STYLE_LABEL.copyWith(fontSize: 14),
+                errorStyle: TextStyleCustom.STYLE_ERROR,
+                prefixIcon: prefix,
+                suffixIcon: suffix),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static Widget formInputDataNotValidate(
+      {@required String title,
+      TextEditingController controller,
+      String label,
+      String hintText,
+      FocusNode focusNode,
+      int maxLength,
+      int maxLine,
+      TextAlign textAlign = TextAlign.start,
+      bool obsecure = false,
+      TextInputType keyboardType,
+      TextInputAction textInputAction,
+      double size = 5,
+      bool borderOutLine = false,
+      String initialValue,
+      bool autovalidate = false,
+      Widget prefix,
+      Widget suffix,
+      bool readOnly = false}) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 5),
+      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+      decoration: BoxDecoration(
+          border: Border.all(width: 0.3, color: ThemeColors.COLOR_GREY),
+          borderRadius: BorderRadius.circular(10)),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          TextBuilder.build(
+              title: readOnly == true ? title + " (read only)" : title,
+              style: TextStyleCustom.STYLE_LABEL_BOLD.copyWith(fontSize: 15)),
+          TextField(
+            controller: controller,
+            maxLength: maxLength,
+            textAlign: textAlign,
+            maxLines: maxLine,
+            obscureText: obsecure,
+            keyboardType: keyboardType ??= TextInputType.text,
+            readOnly: readOnly,
             textInputAction: textInputAction ??= TextInputAction.done,
             style: TextStyleCustom.STYLE_LABEL.copyWith(fontSize: 15),
             decoration: InputDecoration(

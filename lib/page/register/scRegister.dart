@@ -159,7 +159,7 @@ class _RegisterState extends State<Register> {
           } else {
             ecsLib.cancelDialogLoadindLib(context);
             ecsLib.showDialogLib(
-                content: "Server error. Please try again",
+                content: response?.message,
                 context: context,
                 textOnButton: allTranslations.text("close"),
                 title: "SERVER ERROR");

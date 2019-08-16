@@ -1,11 +1,9 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:warranzy_demo/models/model_get_brand_name.dart';
-import 'package:warranzy_demo/services/api/api_services_user.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/const.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
@@ -14,6 +12,8 @@ import 'package:warranzy_demo/tools/widget_ui_custom/button_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/form_input_data.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 import 'package:dio/dio.dart';
+
+import 'scAdd_image.dart';
 
 class FillInformation extends StatefulWidget {
   final PageAction onClickAddAssetPage;
@@ -32,9 +32,11 @@ class _FillInformationState extends State<FillInformation> {
   final GlobalKey<FormBuilderState> _fbk = GlobalKey<FormBuilderState>();
   final GlobalKey<AutoCompleteTextFieldState<GetBrandName>> keyAutoComplete =
       GlobalKey();
+  final Dio dio = Dio();
   AutoCompleteTextField searchTextField;
-  TextEditingController txtCtrl = TextEditingController(text: "");
+  TextEditingController txtCtrlBrandName = TextEditingController(text: "");
   TextEditingController txtCtrlSerialNo = TextEditingController(text: "");
+  TextEditingController txtCtrlNote = TextEditingController(text: "");
   TextEditingController txtCtrlLotNo = TextEditingController(text: "");
   TextEditingController txtCtrlPrice = TextEditingController(text: "");
   // StreamController<List<String>> streamController;
@@ -111,6 +113,7 @@ class _FillInformationState extends State<FillInformation> {
       ),
       body: FormBuilder(
         key: _fbk,
+        autovalidate: true,
         child: Padding(
           padding: const EdgeInsets.only(left: 15.0, right: 10, top: 20),
           child: ListView(
@@ -136,7 +139,7 @@ class _FillInformationState extends State<FillInformation> {
                     FormWidgetBuilder.formDropDown(
                       key: "PdtGroup",
                       title: "Group*",
-                      hint: "qwertteqwe",
+                      hint: "Choose your group",
                       validate: [
                         FormBuilderValidators.required(),
                       ],
@@ -147,7 +150,7 @@ class _FillInformationState extends State<FillInformation> {
                     FormWidgetBuilder.formDropDown(
                       key: "PdtPlace",
                       title: "Place*",
-                      hint: "qwertteqwe",
+                      hint: "Choose your place",
                       validate: [
                         FormBuilderValidators.required(),
                       ],
@@ -167,6 +170,15 @@ class _FillInformationState extends State<FillInformation> {
                   key: "WarrantyExpire",
                   title: "Warranty Expire*",
                   validators: [FormBuilderValidators.required()]),
+              FormWidgetBuilder.formDropDown(
+                key: "ChooseExpireDate",
+                title: "Choose notification before expire* (Day)",
+                hint: "Ex. 30 days",
+                validate: [
+                  FormBuilderValidators.required(),
+                ],
+                items: [60, 30, 7, 0],
+              ),
               FormWidgetBuilder.formWidget(
                   title: "Optional",
                   showTitle: false,
@@ -175,69 +187,24 @@ class _FillInformationState extends State<FillInformation> {
                         title: "Optional",
                         style: TextStyleCustom.STYLE_LABEL_BOLD),
                     children: <Widget>[
-                      FormWidgetBuilder.formInputData(
-                        key: "SerialNo",
-                        textContrl: txtCtrlSerialNo,
+                      FormWidgetBuilder.formInputDataNotValidate(
+                        controller: txtCtrlSerialNo,
                         title: "Serial No.",
-                        validators: null,
                       ),
-                      FormWidgetBuilder.formInputData(
-                        key: "LotNo",
-                        textContrl: txtCtrlLotNo,
+                      FormWidgetBuilder.formInputDataNotValidate(
+                        controller: txtCtrlLotNo,
                         title: "Lot No.",
-                        validators: null,
                       ),
-                      FormWidgetBuilder.formInputData(
-                        key: "Price",
+                      FormWidgetBuilder.formInputDataNotValidate(
                         title: "Price",
-                        textContrl: txtCtrlPrice,
-                        validators: null,
+                        controller: txtCtrlPrice,
                       ),
                     ],
                   )),
-              FormWidgetBuilder.formInputData(
-                  key: "Remark", title: "Note", validators: null, maxLine: 5),
-              RaisedButton(
-                child: Text("Take a Photo"),
-                onPressed: () async {
-                  await ecsLib.getImage().then((v) async {
-                    var imageConpressed = await ecsLib.compressFile(
-                        file: v,
-                        targetPath: v.absolute.path,
-                        minHeight: 640,
-                        minWidth: 480,
-                        quality: 50);
-                    String imageBase64 =
-                        base64Encode(imageConpressed.readAsBytesSync());
-                    // print("$imageBase64");
-                    print("sending..");
-                    FormData form = FormData.from({
-                      "base64": ["imageBase64[0]", "imageBase64[1]"]
-                    });
-
-                    try {
-                      await dio
-                          .post(
-                              "http://192.168.0.36:9999/API/v1/User/TestLoading",
-                              data: form,
-                              onSendProgress: (int sent, int total) =>
-                                  print("$sent | $total"))
-                          // await http
-                          //     .post(
-                          //         "http://192.168.0.36:9999/API/v1/User/TestLoading",
-                          //         body: body)
-                          .then((res) {
-                        print(res.data);
-                      }).catchError((onError) {
-                        print("catchError $onError");
-                      });
-                    } on TimeoutException catch (_) {
-                      print("TimeOut");
-                    } catch (e) {
-                      print("$e");
-                    }
-                  });
-                },
+              FormWidgetBuilder.formInputDataNotValidate(
+                controller: txtCtrlNote,
+                title: "Note",
+                maxLine: 5,
               ),
               if (page == PageAction.SCAN_QR_CODE)
                 Column(
@@ -259,7 +226,7 @@ class _FillInformationState extends State<FillInformation> {
       key: keyAutoComplete,
       suggestions: listBrandName,
       clearOnSubmit: false,
-      controller: txtCtrl,
+      controller: txtCtrlBrandName,
       decoration: InputDecoration(
           contentPadding: EdgeInsets.fromLTRB(10, 30, 10, 20),
           hintText: "Search"),
@@ -275,7 +242,7 @@ class _FillInformationState extends State<FillInformation> {
       },
       itemSubmitted: (item) {
         setState(() {
-          txtCtrl.text = item.modelBrandName.modelEN.en;
+          txtCtrlBrandName.text = item.modelBrandName.modelEN.en;
           searchTextField.textField.controller.text =
               item.modelBrandName.modelEN.en;
         });
@@ -288,7 +255,12 @@ class _FillInformationState extends State<FillInformation> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            Text("${item.modelBrandName.modelEN.en}"),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: TextBuilder.build(
+                  title: "${item.modelBrandName.modelEN.en}",
+                  style: TextStyleCustom.STYLE_LABEL_BOLD),
+            )
           ],
         ),
       );
@@ -350,18 +322,30 @@ class _FillInformationState extends State<FillInformation> {
           onPressed: () {
             print("tap");
             _fbk.currentState.save();
-            // print(_fbk.currentState.value);
             if (_fbk.currentState.validate()) {
-              print(_fbk.currentState.value);
+              var dataAsset = _fbk.currentState.value;
+              dataAsset.addAll(addTextController());
+              ecsLib.pushPage(
+                context: context,
+                pageWidget: AddImage(
+                  hasDataAssetAlready: widget.hasDataAssetAlready,
+                  dataAsset: dataAsset,
+                ),
+              );
             }
-            // ecsLib.pushPage(
-            //   context: context,
-            //   pageWidget: AddImage(
-            //     hasDataAssetAlready: widget.hasDataAssetAlready,
-            //   ),
-            // );
           }),
     );
+  }
+
+  Map<String, String> addTextController() {
+    Map<String, String> mapData = {
+      "BrandName": txtCtrlBrandName.text,
+      "SerialNo": txtCtrlSerialNo.text,
+      "LotNo": txtCtrlLotNo.text,
+      "Price": txtCtrlPrice.text,
+      "Remark": txtCtrlNote.text
+    };
+    return mapData;
   }
 
   Padding buildDetailProduct() {

@@ -1,9 +1,12 @@
 import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:warranzy_demo/tools/config/text_style.dart';
+import 'package:warranzy_demo/tools/theme_color.dart';
 import 'assets.dart';
 
 class ECSLib {
@@ -116,7 +119,8 @@ class ECSLib {
           return Container(
             margin: EdgeInsets.all(50.0),
             child: AlertDialog(
-              elevation: 20,
+              // elevation: 20,
+              backgroundColor: Colors.black.withOpacity(0.3),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20.0)),
               // backgroundColor: Theme.of(context).backgroundColor,
@@ -125,22 +129,22 @@ class ECSLib {
                 // style: normalText.copyWith(fontWeight: FontWeight.bold),
               ),
               content: Container(
-                margin: EdgeInsets.all(5.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
+                    SpinKitCircle(
+                      color: Colors.teal[300],
+                      size: 80,
+                    ),
                     SizedBox(
-                        width: 100.0,
-                        height: 100.0,
-                        child: CircularProgressIndicator()),
-                    SizedBox(
-                      height: 50.0,
+                      height: 40.0,
                     ),
                     Text(
                       content ?? "",
-                      // style: normalText.copyWith(color: Colors.white),
+                      style: TextStyleCustom.STYLE_LABEL_BOLD
+                          .copyWith(color: ThemeColors.COLOR_WHITE),
                       textAlign: TextAlign.center,
                     )
                   ],

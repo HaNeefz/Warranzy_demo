@@ -1,8 +1,9 @@
 class InformationMasCustomners {
   bool status;
   ModelCustomers data;
+  String message;
 
-  InformationMasCustomners({this.status, this.data});
+  InformationMasCustomners({this.status, this.data, this.message});
 
   InformationMasCustomners.fromJson(Map<String, dynamic> json) {
     status = json['Status'];
