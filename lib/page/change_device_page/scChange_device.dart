@@ -31,34 +31,38 @@ class _ChangeDeviceState extends State<ChangeDevice> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBarThemes.appBarStyle(context: context),
-      body: SingleChildScrollView(
-        child: FormBuilder(
-          key: _fbKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              ecsLib.logoApp(width: 200, height: 200),
-              Padding(
-                padding: EdgeInsets.only(bottom: 70),
-                child: TextBuilder.build(
-                    title: "Change Device", style: TextStyleCustom.STYLE_TITLE),
-              ),
-              buildCountryCode(),
-              buildFormMobileNumber(),
-              buildFormPINcode(),
-              Divider(),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 15.0),
-                child: ButtonBuilder.buttonCustom(
-                    colorsButton: modelCountry.selectedCountry == false
-                        ? ThemeColors.COLOR_WHITE
-                        : null,
-                    paddingValue: 30,
-                    context: context,
-                    label: "Send",
-                    onPressed: onClickSend),
-              )
-            ],
+      body: ecsLib.dismissedKeyboard(
+        context,
+        child: SingleChildScrollView(
+          child: FormBuilder(
+            key: _fbKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                ecsLib.logoApp(width: 200, height: 200),
+                Padding(
+                  padding: EdgeInsets.only(bottom: 70),
+                  child: TextBuilder.build(
+                      title: "Change Device",
+                      style: TextStyleCustom.STYLE_TITLE),
+                ),
+                buildCountryCode(),
+                buildFormMobileNumber(),
+                buildFormPINcode(),
+                Divider(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 15.0),
+                  child: ButtonBuilder.buttonCustom(
+                      colorsButton: modelCountry.selectedCountry == false
+                          ? ThemeColors.COLOR_WHITE
+                          : null,
+                      paddingValue: 30,
+                      context: context,
+                      label: "Send",
+                      onPressed: onClickSend),
+                )
+              ],
+            ),
           ),
         ),
       ),
@@ -91,7 +95,8 @@ class _ChangeDeviceState extends State<ChangeDevice> {
           "TimeZone": dataCustomers.timeZone
         };
         print("Data before send => $dataSendToAPIChangeDevice");
-        ecsLib.showDialogLoadingLib(context,
+        ecsLib.showDialogLoadingLib(
+          context,
           content: "Verifying",
         );
         APIServiceUser.apiChangeDevice(postData: dataSendToAPIChangeDevice)

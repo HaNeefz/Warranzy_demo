@@ -62,78 +62,81 @@ class _VerifyChangeDeviceState extends State<VerifyChangeDevice> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBarThemes.appBarStyle(context: context),
-      body: SingleChildScrollView(
-        child: FormBuilder(
-          key: _fbKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              ecsLib.logoApp(width: 200, height: 200),
-              SizedBox(
-                height: 50,
-              ),
-              RichText(
-                textAlign: TextAlign.center,
-                text: TextSpan(children: [
-                  TextSpan(
-                    text: "Please Enter the OTP to Verify your Account\n\n",
-                    style: TextStyleCustom.STYLE_TITLE.copyWith(
-                        fontSize: 22, color: ThemeColors.COLOR_THEME_APP),
-                  ),
-                  TextSpan(
-                      text:
-                          "A OTP has been sent to +${modelMasCustomer.countryNumberPhoneCode} ${modelMasCustomer.mobilePhone}",
-                      style: TextStyleCustom.STYLE_LABEL.copyWith(
-                          fontSize: 15, color: ThemeColors.COLOR_GREY)),
-                ]),
-              ),
-              PinCodeTextField(
-                autofocus: true,
-                controller: controller,
-                hideCharacter: false,
-                highlight: true,
-                highlightColor: ThemeColors.COLOR_GREY,
-                defaultBorderColor: ThemeColors.COLOR_THEME_APP,
-                hasTextBorderColor: ThemeColors.COLOR_THEME_APP,
-                maxLength: pinLength,
-                hasError: hasError,
-                // maskCharacter: "*", //😎
-                onTextChanged: (text) {
-                  setState(() {
-                    hasError = false;
-                  });
-                },
-                onDone: (text) {
-                  // print("DONE $text");
-                },
-                pinCodeTextFieldLayoutType:
-                    PinCodeTextFieldLayoutType.AUTO_ADJUST_WIDTH,
-                wrapAlignment: WrapAlignment.start,
-                pinBoxDecoration:
-                    ProvidedPinBoxDecoration.underlinedPinBoxDecoration,
-                pinTextStyle: TextStyle(fontSize: 30.0),
-                pinTextAnimatedSwitcherTransition:
-                    ProvidedPinBoxTextAnimation.scalingTransition,
-                pinTextAnimatedSwitcherDuration: Duration(milliseconds: 100),
-              ),
-              Visibility(
-                child: Text(
-                  "Wrong PIN!",
-                  style: TextStyle(color: Colors.red),
+      body: ecsLib.dismissedKeyboard(
+        context,
+        child: SingleChildScrollView(
+          child: FormBuilder(
+            key: _fbKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                ecsLib.logoApp(width: 200, height: 200),
+                SizedBox(
+                  height: 50,
                 ),
-                visible: hasError,
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 32),
-                child: ButtonBuilder.buttonCustom(
-                    context: context,
-                    paddingValue: 20,
-                    label: allTranslations.text("confirm"),
-                    onPressed: () {
-                      checkOTPCorrect(context);
-                    }),
-              ),
-            ],
+                RichText(
+                  textAlign: TextAlign.center,
+                  text: TextSpan(children: [
+                    TextSpan(
+                      text: "Please Enter the OTP to Verify your Account\n\n",
+                      style: TextStyleCustom.STYLE_TITLE.copyWith(
+                          fontSize: 22, color: ThemeColors.COLOR_THEME_APP),
+                    ),
+                    TextSpan(
+                        text:
+                            "A OTP has been sent to +${modelMasCustomer.countryNumberPhoneCode} ${modelMasCustomer.mobilePhone}",
+                        style: TextStyleCustom.STYLE_LABEL.copyWith(
+                            fontSize: 15, color: ThemeColors.COLOR_GREY)),
+                  ]),
+                ),
+                PinCodeTextField(
+                  autofocus: true,
+                  controller: controller,
+                  hideCharacter: false,
+                  highlight: true,
+                  highlightColor: ThemeColors.COLOR_GREY,
+                  defaultBorderColor: ThemeColors.COLOR_THEME_APP,
+                  hasTextBorderColor: ThemeColors.COLOR_THEME_APP,
+                  maxLength: pinLength,
+                  hasError: hasError,
+                  // maskCharacter: "*", //😎
+                  onTextChanged: (text) {
+                    setState(() {
+                      hasError = false;
+                    });
+                  },
+                  onDone: (text) {
+                    // print("DONE $text");
+                  },
+                  pinCodeTextFieldLayoutType:
+                      PinCodeTextFieldLayoutType.AUTO_ADJUST_WIDTH,
+                  wrapAlignment: WrapAlignment.start,
+                  pinBoxDecoration:
+                      ProvidedPinBoxDecoration.underlinedPinBoxDecoration,
+                  pinTextStyle: TextStyle(fontSize: 30.0),
+                  pinTextAnimatedSwitcherTransition:
+                      ProvidedPinBoxTextAnimation.scalingTransition,
+                  pinTextAnimatedSwitcherDuration: Duration(milliseconds: 100),
+                ),
+                Visibility(
+                  child: Text(
+                    "Wrong PIN!",
+                    style: TextStyle(color: Colors.red),
+                  ),
+                  visible: hasError,
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 32),
+                  child: ButtonBuilder.buttonCustom(
+                      context: context,
+                      paddingValue: 20,
+                      label: allTranslations.text("confirm"),
+                      onPressed: () {
+                        checkOTPCorrect(context);
+                      }),
+                ),
+              ],
+            ),
           ),
         ),
       ),
