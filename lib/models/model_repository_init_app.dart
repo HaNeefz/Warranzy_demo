@@ -132,7 +132,7 @@ class TimeZone {
 
 class ProductCatagory {
   String catCode;
-  RepositoryCatName repositoryCatName;
+  String catName;
   String imageBox;
   String imageProduct;
   String imageDocument;
@@ -146,7 +146,7 @@ class ProductCatagory {
 
   ProductCatagory(
       {this.catCode,
-      this.repositoryCatName,
+      this.catName,
       this.imageBox,
       this.imageProduct,
       this.imageDocument,
@@ -160,11 +160,7 @@ class ProductCatagory {
 
   ProductCatagory.fromJson(Map<String, dynamic> json) {
     catCode = json['CatCode'];
-    // catName = json['CatName'];
-    var jsonDecode = jsonProvider.jsonDecode(json['CatName']);
-    repositoryCatName = jsonDecode['CatName'] != null
-        ? new RepositoryCatName.fromJson(jsonDecode['CatName'])
-        : null;
+    catName = json['CatName'];
     imageBox = json['Image_Box'];
     imageProduct = json['Image_Product'];
     imageDocument = json['Image_Document'];
@@ -180,8 +176,7 @@ class ProductCatagory {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['CatCode'] = this.catCode;
-    // data['CatName'] = this.catName;
-    if (data['CatName'] != null) data['CatName'] = repositoryCatName.toJson();
+    data['CatName'] = this.catName;
     data['Image_Box'] = this.imageBox;
     data['Image_Product'] = this.imageProduct;
     data['Image_Document'] = this.imageDocument;
@@ -196,25 +191,6 @@ class ProductCatagory {
   }
 }
 
-class RepositoryCatName {
-  CatName catName;
-
-  RepositoryCatName({this.catName});
-
-  RepositoryCatName.fromJson(Map<String, dynamic> json) {
-    catName =
-        json['CatName'] != null ? new CatName.fromJson(json['CatName']) : null;
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.catName != null) {
-      data['CatName'] = this.catName.toJson();
-    }
-    return data;
-  }
-}
-
 class CatName {
   String eN;
   String tH;
@@ -222,6 +198,9 @@ class CatName {
   CatName({this.eN, this.tH});
 
   CatName.fromJson(Map<String, dynamic> json) {
+    // print("Before jsonDeocde => ${json['CatName']}");
+    // var jsonDecode = jsonProvider.jsonDecode(json['CatName']);
+    // print("After jsonDeocde => ${jsonDecode['CatName']}");
     eN = json['EN'];
     tH = json['TH'];
   }

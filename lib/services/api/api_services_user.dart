@@ -6,8 +6,8 @@ import 'package:warranzy_demo/models/model_mas_cust.dart';
 import 'package:warranzy_demo/models/model_verify_login.dart';
 import 'package:warranzy_demo/models/model_verify_phone.dart';
 
-final String baseUrl = "https://testwarranty-239103.appspot.com/API/v1";
-// final String baseUrl = "http://192.168.0.36:9999/API/v1";
+// final String baseUrl = "https://testwarranty-239103.appspot.com/API/v1";
+final String baseUrl = "http://192.168.0.36:9999/API/v1";
 
 class ShowDataAPI {
   static void printAPIName(String apiName) {

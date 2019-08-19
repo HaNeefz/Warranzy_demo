@@ -6,6 +6,7 @@ import 'package:warranzy_demo/models/model_mas_cust.dart';
 import 'package:warranzy_demo/page/login_first/scLogin.dart';
 import 'package:warranzy_demo/page/main_page/scMain_page.dart';
 import 'package:warranzy_demo/services/api/api_services_user.dart';
+import 'package:warranzy_demo/services/api/jwt.dart';
 import 'package:warranzy_demo/services/sqflit/db_customers.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/const.dart';
@@ -33,6 +34,7 @@ class PinCodePageUpdate extends StatefulWidget {
 class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
   final ecsLib = getIt.get<ECSLib>();
   final allTranslations = getIt.get<GlobalTranslations>();
+  JWTService jwtService;
   List<Widget> listDot = List<Widget>(6);
   List<int> listPinTemp = List<int>();
   List<int> listPinCorrect = [0, 0, 0, 0, 0, 0];
@@ -459,7 +461,17 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
                                 .copyWith(color: ThemeColors.COLOR_WHITE),
                             paddingValue: 0,
                             label: allTranslations.text("forgot_pin"),
-                            onPressed: () {}),
+                            onPressed: () async {
+                              print("tap");
+                              var dataCust =
+                                  await DBProviderCustomer.db.getDataCustomer();
+                              jwtService = JWTService(
+                                custID: dataCust.custUserID,
+                                countryCode: dataCust.countryCode,
+                                phoneNumber: dataCust.mobilePhone,
+                              );
+                              print(jwtService.sendApiTokenJWT());
+                            }),
                       ),
                     ],
                   ),
@@ -535,7 +547,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
                             .copyWith(color: ThemeColors.COLOR_WHITE),
                         paddingValue: 0,
                         label: allTranslations.text("forgot_pin"),
-                        onPressed: () {}),
+                        onPressed: () async {}),
                   ),
                 ],
               ),

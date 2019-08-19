@@ -74,8 +74,7 @@ class _AddImageState extends State<AddImage> {
 
                   try {
                     await dio
-                        .post(
-                            "https://testwarranty-239103.appspot.com/API/v1/User/TestLoading", //http://192.168.0.36:9999/API/v1
+                        .post("192.168.0.36:9999/API/v1/User/TestLoading",
                             data: form,
                             onSendProgress: (int sent, int total) =>
                                 print("$sent | $total"))
@@ -106,10 +105,13 @@ class _AddImageState extends State<AddImage> {
                     ecsLib.cancelDialogLoadindLib(context);
                     var data =
                         RepositoryInitalApp.fromJson(jsonDecode(res.data));
-                    print(data.productCatagory[0].repositoryCatName.catName.eN);
-                    print(data.productCatagory[0].repositoryCatName.catName.tH);
-                    var s = data.productCatagory[0].toJson();
-                    print(s);
+                    // print(data.productCatagory[0].repositoryCatName.catName.eN);
+                    // print(data.productCatagory[0].repositoryCatName.catName.tH);
+                    var s = data.productCatagory[0].catName;
+                    var temp = jsonDecode(s);
+                    var catName = CatName.fromJson(temp);
+                    print(catName.eN);
+                    print(catName.tH);
                   });
                 } catch (e) {
                   print(e);

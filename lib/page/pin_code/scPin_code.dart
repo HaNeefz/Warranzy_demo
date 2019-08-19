@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:warranzy_demo/page/main_page/scMain_page.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
@@ -102,9 +101,8 @@ class _PinCodePageState extends State<PinCodePage> {
         children: <Widget>[
           ecsLib.logoApp(width: 150, height: 150),
           TextBuilder.build(
-              title: listPinTemp.length == 6
-                  ? "Confirm Pin Code"
-                  : "Set Pin Code",
+              title:
+                  listPinTemp.length == 6 ? "Confirm Pin Code" : "Set Pin Code",
               style: TextStyleCustom.STYLE_TITLE),
           showDot(),
           buttonGrideNumber(),
@@ -152,26 +150,26 @@ class _PinCodePageState extends State<PinCodePage> {
       return Container();
   }
 
-  Future _onAlertButtonPressed(context) async {
-    Alert(
-      context: context,
-      type: AlertType.success,
-      title: "SUCCESS",
-      desc: "Create your account successfully.",
-      buttons: [
-        DialogButton(
-          gradient:
-              LinearGradient(colors: [Colors.teal[400], Colors.teal[100]]),
-          child: Text(
-            "OK",
-            style: TextStyle(color: Colors.white, fontSize: 20),
-          ),
-          onPressed: () => Navigator.pop(context),
-          width: 120,
-        )
-      ],
-    ).show();
-  }
+  // Future _onAlertButtonPressed(context) async {
+  //   Alert(
+  //     context: context,
+  //     type: AlertType.success,
+  //     title: "SUCCESS",
+  //     desc: "Create your account successfully.",
+  //     buttons: [
+  //       DialogButton(
+  //         gradient:
+  //             LinearGradient(colors: [Colors.teal[400], Colors.teal[100]]),
+  //         child: Text(
+  //           "OK",
+  //           style: TextStyle(color: Colors.white, fontSize: 20),
+  //         ),
+  //         onPressed: () => Navigator.pop(context),
+  //         width: 120,
+  //       )
+  //     ],
+  //   ).show();
+  // }
 
   Widget dot({bool active = false}) {
     return Padding(
@@ -234,7 +232,7 @@ class _PinCodePageState extends State<PinCodePage> {
     );
   }
 
-  Widget buttonGrideNumber() {    
+  Widget buttonGrideNumber() {
     return Container(
         padding: EdgeInsets.symmetric(
           vertical: 20.0,
