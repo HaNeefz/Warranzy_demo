@@ -1,13 +1,14 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:device_info/device_info.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_picker/Picker.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:warranzy_demo/models/model_language.dart';
+import 'package:warranzy_demo/models/model_repository_init_app.dart';
 import 'package:warranzy_demo/page/login_first/scLogin.dart';
 import 'package:simple_animations/simple_animations.dart';
-import 'package:warranzy_demo/services/providers/notification_state.dart';
 import 'package:warranzy_demo/services/sqflit/db_language.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
@@ -20,6 +21,7 @@ class SplashScreenPage extends StatefulWidget {
 class _SplashScreenPageState extends State<SplashScreenPage> {
   final ecsLib = getIt.get<ECSLib>();
   final allTranslations = getIt.get<GlobalTranslations>();
+  final Dio dio = Dio();
 
   DBProviderLanguage get sqfliteDB => DBProviderLanguage.db;
 
@@ -38,20 +40,65 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
             sqfliteDB
                 .addDataLanguage(
                     ModelLanguage(name: picker.getSelectedValues().first))
-                .then((res) {
+                .then((res) async {
               if (res == true) {
                 print("ADDED ${picker.getSelectedValues()}");
-                ecsLib.pushPageReplacement(
-                    context: context, pageWidget: LoginPage());
+                // ecsLib.pushPageReplacement(
+                //     context: context, pageWidget: LoginPage());
+                await initialApp();
               } else
                 print("ADD LANGUAGE FAIL"); //ต้องเเก้ปัญหานี้ด้วย
             });
           }).showDialog(context);
     } else
-      Future.delayed(
-          Duration(milliseconds: 3000),
-          () => ecsLib.pushPageReplacement(
-              context: context, pageWidget: LoginPage()));
+      await checkUpdateApp();
+  }
+
+  checkUpdateApp() async {
+    await Future.delayed(Duration(milliseconds: 2000), () async {
+      ecsLib.showDialogLoadingLib(context, content: "Checking Update");
+      await Future.delayed(Duration(seconds: 2), () {
+        ecsLib.cancelDialogLoadindLib(context);
+        print("Checked Update");
+        ecsLib.pushPageReplacement(context: context, pageWidget: LoginPage());
+      });
+    });
+  }
+
+  initialApp() async {
+    await Future.delayed(Duration(milliseconds: 2000), () async {
+      ecsLib.showDialogLoadingLib(context, content: "Initial Application");
+      try {
+        await dio
+            .get("http://192.168.0.36:9999/API/v1/User/InitialApp")
+            .then((res) {
+          var data = RepositoryInitalApp.fromJson(jsonDecode(res.data));
+          if (data.status == true) {
+            print("<---------Completed InitialApplication");
+            ecsLib.cancelDialogLoadindLib(context);
+            ecsLib.pushPageReplacement(
+                context: context, pageWidget: LoginPage());
+          } else if (data.status == false) {
+            ecsLib.showDialogLib(
+                context: context,
+                title: "ERROR LOADING",
+                content: "null",
+                textOnButton: allTranslations.text("close"));
+          } else {
+            ecsLib.showDialogLib(
+                context: context,
+                title: "ERROR SERVER",
+                content: "null",
+                textOnButton: allTranslations.text("close"));
+          }
+          // var s = data.productCatagory[0].catName;
+          // var temp = jsonDecode(s);
+          // var catName = CatName.fromJson(temp);
+        });
+      } catch (e) {
+        print(e);
+      }
+    });
   }
 
   // TODO: ทำ Log ของ Sqflite

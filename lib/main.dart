@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get_it/get_it.dart';
+import 'package:global_configuration/global_configuration.dart';
 import 'package:provider/provider.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
@@ -51,8 +52,13 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     _initLangeuage("en");
+    initialConfig();
     notiState.initNotification();
     allTranslations.onLocaleChangedCallback = _onLocaleChanged;
+  }
+
+  initialConfig() async {
+    await GlobalConfiguration().loadFromAsset("app_settings");
   }
 
   // initnoti() async {

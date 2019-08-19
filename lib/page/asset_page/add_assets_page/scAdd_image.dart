@@ -95,29 +95,6 @@ class _AddImageState extends State<AddImage> {
                 });
               },
             ),
-            RaisedButton(
-              onPressed: () async {
-                ecsLib.showDialogLoadingLib(context);
-                try {
-                  await dio
-                      .get("http://192.168.0.36:9999/API/v1/User/InitialApp")
-                      .then((res) {
-                    ecsLib.cancelDialogLoadindLib(context);
-                    var data =
-                        RepositoryInitalApp.fromJson(jsonDecode(res.data));
-                    // print(data.productCatagory[0].repositoryCatName.catName.eN);
-                    // print(data.productCatagory[0].repositoryCatName.catName.tH);
-                    var s = data.productCatagory[0].catName;
-                    var temp = jsonDecode(s);
-                    var catName = CatName.fromJson(temp);
-                    print(catName.eN);
-                    print(catName.tH);
-                  });
-                } catch (e) {
-                  print(e);
-                }
-              },
-            ),
           ],
         ),
       ),

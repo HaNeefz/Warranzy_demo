@@ -449,7 +449,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
           type == PageType.login
               ? Padding(
                   padding:
-                      const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
+                      const EdgeInsets.symmetric(vertical: 20, horizontal: 0),
                   child: Row(
                     children: <Widget>[
                       Expanded(

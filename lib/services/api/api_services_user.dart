@@ -6,8 +6,10 @@ import 'package:warranzy_demo/models/model_mas_cust.dart';
 import 'package:warranzy_demo/models/model_verify_login.dart';
 import 'package:warranzy_demo/models/model_verify_phone.dart';
 
+import 'base_url.dart';
+
 // final String baseUrl = "https://testwarranty-239103.appspot.com/API/v1";
-final String baseUrl = "http://192.168.0.36:9999/API/v1";
+// final String baseUrl = "http://192.168.0.36:9999/API/v1";
 
 class ShowDataAPI {
   static void printAPIName(String apiName) {
@@ -20,13 +22,14 @@ class ShowDataAPI {
 
   static void printResponse(String response) {
     print(
-        "<=====================Response=============\n$response\n<======================================");
+        "<===================== Response\n$response\n<======================================");
   }
 }
 
 class APIServiceUser {
   final Dio dio = Dio();
   static const int TIMEOUT = 60;
+  static final String baseUrl = BaseUrl.baseUrlLocal;
   // static Future apiVerifyNumberTest({String url, dynamic postData}) async {
   //   printAPIName("apiVerfyNumber");
   //   String urlPost = "http://192.168.0.36:9999/API/v1/User/CheckVerifyPhone";

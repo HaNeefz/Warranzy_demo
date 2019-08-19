@@ -113,42 +113,47 @@ class ECSLib {
         context: context,
         barrierDismissible: barrierDismissible,
         builder: (BuildContext context) {
-          return Container(
-            margin: EdgeInsets.all(50.0),
-            child: AlertDialog(
-              // elevation: 20,
-              backgroundColor: Colors.black.withOpacity(0.3),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20.0)),
-              // backgroundColor: Theme.of(context).backgroundColor,
-              title: Text(
-                title ?? "",
-                // style: normalText.copyWith(fontWeight: FontWeight.bold),
-              ),
-              content: Container(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    SpinKitCircle(
-                      color: Colors.teal[300],
-                      size: 80,
-                    ),
-                    SizedBox(
-                      height: 40.0,
-                    ),
-                    Text(
-                      content ?? "",
-                      style: TextStyleCustom.STYLE_LABEL_BOLD
-                          .copyWith(color: ThemeColors.COLOR_WHITE),
-                      textAlign: TextAlign.center,
-                    )
-                  ],
-                ),
-              ),
-            ),
+          return DialogCustom(
+            title: title??"",
+            description: content??"",
+            buttonText: "",
           );
+          // Container(
+          //   margin: EdgeInsets.all(50.0),
+          //   child: AlertDialog(
+          //     // elevation: 20,
+          //     backgroundColor: Colors.black.withOpacity(0.3),
+          //     shape: RoundedRectangleBorder(
+          //         borderRadius: BorderRadius.circular(20.0)),
+          //     // backgroundColor: Theme.of(context).backgroundColor,
+          //     title: Text(
+          //       title ?? "",
+          //       // style: normalText.copyWith(fontWeight: FontWeight.bold),
+          //     ),
+          //     content: Container(
+          //       child: Column(
+          //         crossAxisAlignment: CrossAxisAlignment.center,
+          //         mainAxisAlignment: MainAxisAlignment.center,
+          //         mainAxisSize: MainAxisSize.min,
+          //         children: <Widget>[
+          //           SpinKitCircle(
+          //             color: Colors.teal[300],
+          //             size: 80,
+          //           ),
+          //           SizedBox(
+          //             height: 40.0,
+          //           ),
+          //           Text(
+          //             content ?? "",
+          //             style: TextStyleCustom.STYLE_LABEL_BOLD
+          //                 .copyWith(color: ThemeColors.COLOR_WHITE),
+          //             textAlign: TextAlign.center,
+          //           )
+          //         ],
+          //       ),
+          //     ),
+          //   ),
+          // );
         });
   }
 
@@ -324,3 +329,44 @@ class ECSLib {
   }
 }
 
+class DialogCustom extends StatelessWidget {
+  final String title;
+  final String description;
+  final String buttonText;
+
+  DialogCustom({Key key, this.title, this.description, this.buttonText})
+      : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      elevation: 0.0,
+      backgroundColor: Colors.transparent,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Text(
+            title ?? "",
+            style: TextStyleCustom.STYLE_LABEL_BOLD
+                .copyWith(color: ThemeColors.COLOR_WHITE),
+            textAlign: TextAlign.center,
+          ),
+          SpinKitCircle(
+            color: Colors.teal[300],
+            size: 80,
+          ),
+          SizedBox(
+            height: 40.0,
+          ),
+          Text(
+            description ?? "",
+            style: TextStyleCustom.STYLE_LABEL_BOLD
+                .copyWith(color: ThemeColors.COLOR_WHITE),
+            textAlign: TextAlign.center,
+          )
+        ],
+      ),
+    );
+  }
+}

@@ -1,0 +1,5 @@
+{
+    "BaseUrl": "https://testwarranty-239103.appspot.com/API/v1",
+    "BaseUrlTest": "http://192.168.0.36:9999/API/v1",
+    "appVersion": "1.0"
+}

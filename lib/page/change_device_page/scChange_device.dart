@@ -6,8 +6,8 @@ import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:warranzy_demo/models/model_country_birth_year.dart';
 import 'package:warranzy_demo/models/model_cust_temp_data.dart';
-import 'package:warranzy_demo/page/change_device_page/scVerify_change.dart';
 import 'package:warranzy_demo/services/api/api_services_user.dart';
+import 'package:warranzy_demo/services/api/base_url.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
@@ -15,6 +15,8 @@ import 'package:warranzy_demo/tools/widget_ui_custom/app_bar_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/button_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_field_builder.dart';
+
+import 'scVerify_change.dart';
 
 class ChangeDevice extends StatefulWidget {
   @override
@@ -27,6 +29,7 @@ class _ChangeDeviceState extends State<ChangeDevice> {
   final ModelDataCountry modelCountry = ModelDataCountry();
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
   final Future<SharedPreferences> _pref = SharedPreferences.getInstance();
+  final APIServiceUser apiService = APIServiceUser();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
