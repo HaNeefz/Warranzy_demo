@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:warranzy_demo/services/method/mark_text_input_format.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 
 import '../theme_color.dart';
@@ -90,6 +92,7 @@ class FormWidgetBuilder {
       bool borderOutLine = false,
       String initialValue,
       bool autovalidate = false,
+      List<TextInputFormatter> inputFormatters = const [],
       Widget prefix,
       Widget suffix,
       bool readOnly = false}) {
@@ -111,6 +114,7 @@ class FormWidgetBuilder {
             validators: validators != null ? validators : null,
             controller: textContrl,
             autovalidate: autovalidate,
+            inputFormatters: inputFormatters,
             maxLength: maxLength,
             textAlign: textAlign,
             maxLines: maxLine,

@@ -6,7 +6,7 @@ import 'package:warranzy_demo/models/model_mas_cust.dart';
 import 'package:warranzy_demo/page/login_first/scLogin.dart';
 import 'package:warranzy_demo/page/main_page/scMain_page.dart';
 import 'package:warranzy_demo/services/api/api_services_user.dart';
-import 'package:warranzy_demo/services/api/jwt.dart';
+import 'package:warranzy_demo/services/api/jwt_service.dart';
 import 'package:warranzy_demo/services/sqflit/db_customers.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/const.dart';
@@ -460,14 +460,8 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
                             label: allTranslations.text("forgot_pin"),
                             onPressed: () async {
                               print("tap");
-                              var dataCust =
-                                  await DBProviderCustomer.db.getDataCustomer();
-                              jwtService = JWTService(
-                                custID: dataCust.custUserID,
-                                countryCode: dataCust.countryCode,
-                                phoneNumber: dataCust.mobilePhone,
-                              );
-                              print(jwtService.getTokenJWT());
+
+                              print(await JWTService.getTokenJWT());
                             }),
                       ),
                     ],

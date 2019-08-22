@@ -5,9 +5,9 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:warranzy_demo/models/model_repository_init_app.dart';
+import 'package:warranzy_demo/services/api/jwt_service.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
-import 'package:warranzy_demo/tools/widget_ui_custom/button_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 
 class AddImageDemo extends StatefulWidget {
@@ -41,7 +41,7 @@ class _AddImageDemoState extends State<AddImageDemo> {
       listKeepImageData[i] =
           ImageKeepData(title: listRelated[i], imagesList: [], imageBase64: []);
     }
-    print(widget.dataAsset);
+    ecsLib.printJson(widget.dataAsset);
   }
 
   @override
@@ -85,11 +85,46 @@ class _AddImageDemoState extends State<AddImageDemo> {
               ecsLib.cancelDialogLoadindLib(context);
               var dataPost = {"Data": widget.dataAsset, "Images": {}};
 
-              listKeepImageData.forEach((v) {
-                dataPost['Images'].addAll({"${v.title}": v.imageBase64});
+              listKeepImageData.forEach((modelImage) {
+                modelImage.imageBase64.forEach((imageBase64) {
+                  dataPost['Images'].addAll({
+                    "${modelImage.title}": {
+                      "${modelImage.imageBase64.indexOf(imageBase64)}":
+                          imageBase64
+                    }
+                  });
+                });
               });
+              ecsLib.printJson(dataPost);
 
-              print(dataPost);
+              FormData formData = FormData.from(dataPost);
+              ecsLib.showDialogLoadingLib(context, content: "Adding assets");
+              try {
+                print(
+                    "sending Api URL => http://192.168.0.36:9999/API/v1/Asset/AddAsset");
+                await dio
+                    .post(
+                  "http://192.168.0.36:9999/API/v1/Asset/AddAsset",
+                  data: formData,
+                  options: Options(
+                    headers: {"Authorization": await JWTService.getTokenJWT()},
+                  ),
+                )
+                    .then((res) {
+                  print("<--- Response");
+                  print(res.data);
+                  ecsLib.cancelDialogLoadindLib(context);
+                }).catchError((e) {
+                  print(e);
+                  ecsLib.cancelDialogLoadindLib(context);
+                });
+              } on DioError catch (error) {
+                print("DIO ERROR => ${error.error}\nMsg => ${error.message}");
+                ecsLib.cancelDialogLoadindLib(context);
+              } catch (e) {
+                print("Catch $e");
+                ecsLib.cancelDialogLoadindLib(context);
+              }
             },
           )
         ],
@@ -191,69 +226,65 @@ class _TakePhotosState extends State<TakePhotos> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Take a Photos',
-          style: TextStyleCustom.STYLE_APPBAR,
+        appBar: AppBar(
+          title: Text(
+            'Take a Photos',
+            style: TextStyleCustom.STYLE_APPBAR,
+          ),
         ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            images.length > 0
-                ? GridView.builder(
-                    shrinkWrap: true,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        crossAxisSpacing: 5,
-                        mainAxisSpacing: 5),
-                    itemCount: images.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return Container(
-                        width: 100.0,
-                        height: 100.0,
-                        child: Image.file(
-                          images[index],
-                          fit: BoxFit.cover,
-                        ),
-                      );
-                    },
-                  )
-                : Center(
-                    child: TextBuilder.build(
-                        title: "Empty photos, Please take a photos."),
+        body: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              images.length > 0
+                  ? GridView.builder(
+                      shrinkWrap: true,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 5,
+                          mainAxisSpacing: 5),
+                      itemCount: images.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return Container(
+                          width: 100.0,
+                          height: 100.0,
+                          child: Image.file(
+                            images[index],
+                            fit: BoxFit.cover,
+                          ),
+                        );
+                      },
+                    )
+                  : Center(
+                      child: TextBuilder.build(
+                          title: "Empty photos, Please take a photos."),
+                    ),
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: RaisedButton(
+                      child: TextBuilder.build(title: "Save"),
+                      onPressed: () {
+                        Navigator.pop(context, images);
+                      },
+                    ),
                   ),
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: RaisedButton(
-                    child: TextBuilder.build(title: "Take a photo"),
-                    onPressed: () async {
-                      var image = await ecsLib.getImage();
-                      print(image);
-                      setState(() {
-                        images.add(image);
-                      });
-                    },
-                  ),
-                ),
-                SizedBox(
-                  width: 5.0,
-                ),
-                Expanded(
-                  child: RaisedButton(
-                    child: TextBuilder.build(title: "Save"),
-                    onPressed: () {
-                      Navigator.pop(context, images);
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
-      ),
-    );
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.add_a_photo),
+          onPressed: () async {
+            var image = await ecsLib.getImage();
+            print(image);
+            if (image != null) {
+              setState(() {
+                images.add(image);
+              });
+            }
+          },
+        ));
   }
 }
 

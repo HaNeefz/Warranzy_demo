@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
@@ -66,6 +67,16 @@ class ECSLib {
         PageTransition(type: animationType, child: pageWidget),
         ModalRoute.withName('/'));
     return response;
+  }
+
+  void printJson(Map json) {
+    if (json is Map && json != null) {
+      JsonEncoder encoder = JsonEncoder.withIndent(" ");
+      String prettyprint = encoder.convert(json);
+      print(prettyprint);
+    } else {
+      print("Empty data or Data not match format.");
+    }
   }
 
   Future<bool> showDialogLib({

@@ -3,7 +3,9 @@ import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:intl/intl.dart';
 import 'package:warranzy_demo/models/model_get_brand_name.dart';
+import 'package:warranzy_demo/services/method/mark_text_input_format.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/const.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
@@ -176,6 +178,13 @@ class _FillInformationState extends State<FillInformation> {
                 FormWidgetBuilder.formInputData(
                     key: "WarrantyExpire",
                     title: "Warranty Expire*",
+                    inputFormatters: [
+                      MaskedTextInputFormatter(
+                        mask: 'xxxx-xx-xx',
+                        separator: '-',
+                      ),
+                    ],
+                    hintText: "yyyy/mm/dd",
                     validators: [FormBuilderValidators.required()]),
                 FormWidgetBuilder.formDropDown(
                   key: "AlertDate",
@@ -251,6 +260,7 @@ class _FillInformationState extends State<FillInformation> {
       itemSubmitted: (item) {
         setState(() {
           txtCtrlBrandCode.text = item.brandCode;
+          print("BrandCode => ${txtCtrlBrandCode.text}");
           searchTextField.textField.controller.text =
               item.modelBrandName.modelEN.en;
           txtCtrlBrandName.text = item.modelBrandName.modelEN.en;
@@ -334,30 +344,40 @@ class _FillInformationState extends State<FillInformation> {
             _fbk.currentState.save();
             if (_fbk.currentState.validate()) {
               var dataAsset = _fbk.currentState.value;
+              var formatDateExpire = dataAsset['WarrantyExpire'];
+              DateFormat format = DateFormat("yyyy-MM-dd");
+              dataAsset['WarrantyExpire'] =
+                  "${format.parseUTC(formatDateExpire)}";
               dataAsset.addAll(addTextController());
-              // print(dataAsset);
               ecsLib.pushPage(
                 context: context,
                 pageWidget: AddImageDemo(
                   dataAsset: dataAsset,
                 ),
-                // AddImage(
-                //   hasDataAssetAlready: widget.hasDataAssetAlready,
-                //   dataAsset: dataAsset,
-                // ),
+                //   // AddImage(
+                //   //   hasDataAssetAlready: widget.hasDataAssetAlready,
+                //   //   dataAsset: dataAsset,
+                //   // ),
               );
             }
           }),
     );
   }
 
-  Map<String, String> addTextController() {
-    Map<String, String> mapData = {
+  Map<String, dynamic> addTextController() {
+    // int salsePrice = 0;
+    // if (txtCtrlPrice.text != null ||
+    //     txtCtrlPrice.text != "" ||
+    //     txtCtrlPrice.text.isEmpty) {
+    //   salsePrice = int.parse(txtCtrlPrice.text);
+    // }
+    Map<String, dynamic> mapData = {
       "BrandCode": txtCtrlBrandCode.text,
+      "BrandName": txtCtrlBrandName.text,
       "BrandActive": brandActive,
       "SerialNo": txtCtrlSerialNo.text,
       "LotNo": txtCtrlLotNo.text,
-      "SalesPrice": txtCtrlPrice.text,
+      "SalesPrice": txtCtrlPrice.text == "" ? 0 : int.parse(txtCtrlPrice.text),
       "CustRemark": txtCtrlNote.text,
       "CreateType":
           widget.onClickAddAssetPage == PageAction.MANUAL_ADD ? "C" : "T",

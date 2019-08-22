@@ -8,7 +8,7 @@ import 'package:warranzy_demo/models/model_asset_data.dart';
 import 'package:warranzy_demo/page/asset_page/add_assets_page/scFillInformation.dart';
 import 'package:warranzy_demo/page/profile_page/scProfile.dart';
 import 'package:warranzy_demo/page/splash_screen/scSplash_screen.dart';
-import 'package:warranzy_demo/services/api/jwt.dart';
+import 'package:warranzy_demo/services/api/jwt_service.dart';
 import 'package:warranzy_demo/services/method/scan_qr.dart';
 import 'package:warranzy_demo/services/sqflit/db_customers.dart';
 import 'package:warranzy_demo/tools/assets.dart';
@@ -107,7 +107,7 @@ class _AssetPageState extends State<AssetPage> {
                   icon: Icon(Icons.sort),
                   tooltip: "Sort Asset",
                   onPressed: () async {
-                    await buildShowModalBottomSheet(context);
+                    // await buildShowModalBottomSheet(context);
                     // await checkSessionExpired();
                   },
                 ),
@@ -120,22 +120,13 @@ class _AssetPageState extends State<AssetPage> {
   }
 
   checkSessionExpired() async {
-    var dataCust = await DBProviderCustomer.db.getDataCustomer();
-    jwtService = JWTService(
-      custID: dataCust.custUserID,
-      countryCode: dataCust.countryCode,
-      phoneNumber: dataCust.mobilePhone,
-    );
-    // print(jwtService.sendApiTokenJWT());
-    // FormData formData = FormData.from({"data": "eieie"});
     try {
       print("Check Session Expire");
       ecsLib.showDialogLoadingLib(context);
       await dio
           .post("http://192.168.0.36:9999/API/v1/Asset/AddAsset",
-              // data: formData,
               options:
-                  Options(headers: {"Authorization": jwtService.getTokenJWT()}))
+                  Options(headers: {"Authorization": JWTService.getTokenJWT()}))
           .then((res) async {
         var response = jsonDecode(res.data);
         if (response['Status'] == true) {
