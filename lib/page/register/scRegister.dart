@@ -125,8 +125,7 @@ class _RegisterState extends State<Register> {
         print(masCustomersData);
 
         var dataCustomers = ModelMasCustomer.fromJson(masCustomersData);
-        ecsLib.showDialogLoadingLib(context,
-            content: "Verifying", barrierDismissible: false);
+        ecsLib.showDialogLoadingLib(context, barrierDismissible: false);
         var data = {
           "Email": dataCustomers.email,
           "MobilePhone":

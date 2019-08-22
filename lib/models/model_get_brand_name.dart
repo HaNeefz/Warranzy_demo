@@ -2,6 +2,7 @@ import 'dart:convert' as jsonProvider;
 
 class GetBrandName {
   ModelBrandName modelBrandName;
+  String brandCode;
   String description;
   String manCode;
   String lastUpdate;
@@ -11,6 +12,7 @@ class GetBrandName {
   GetBrandName(
       {this.modelBrandName,
       this.description,
+      this.brandCode,
       this.manCode,
       this.lastUpdate,
       this.fileIDLogo,

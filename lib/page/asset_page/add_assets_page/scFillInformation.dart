@@ -14,6 +14,7 @@ import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 import 'package:dio/dio.dart';
 
 import 'scAdd_image.dart';
+import 'scAdd_image_demo.dart';
 
 class FillInformation extends StatefulWidget {
   final PageAction onClickAddAssetPage;
@@ -34,15 +35,16 @@ class _FillInformationState extends State<FillInformation> {
       GlobalKey();
   final Dio dio = Dio();
   AutoCompleteTextField searchTextField;
+  TextEditingController txtCtrlBrandCode = TextEditingController(text: "");
   TextEditingController txtCtrlBrandName = TextEditingController(text: "");
   TextEditingController txtCtrlSerialNo = TextEditingController(text: "");
   TextEditingController txtCtrlNote = TextEditingController(text: "");
   TextEditingController txtCtrlLotNo = TextEditingController(text: "");
   TextEditingController txtCtrlPrice = TextEditingController(text: "");
-  String hasBrandInSystem = "N";
+  String brandActive = "N";
   var valueBrandName = "DysonElectric";
   List<GetBrandName> listBrandName = [];
-  List<GetBrandName> tempListBrandName = [];
+  List<String> listBrandID = [];
 
   List<String> _dataBrandNameDD = [
     "Dyson Electric",
@@ -74,8 +76,11 @@ class _FillInformationState extends State<FillInformation> {
     Firestore.instance.collection('BrandName').snapshots().listen((onData) {
       for (var temp in onData.documents) {
         listBrandName.add(GetBrandName.fromJson(temp.data));
+        listBrandName[onData.documents.indexOf(temp)].brandCode =
+            temp.documentID;
+        // print(
+        //     "${listBrandName[onData.documents.indexOf(temp)].brandID} | ${listBrandName[onData.documents.indexOf(temp)].modelBrandName.modelEN.en}");
       }
-      print(listBrandName.length);
     });
   }
 
@@ -173,7 +178,7 @@ class _FillInformationState extends State<FillInformation> {
                     title: "Warranty Expire*",
                     validators: [FormBuilderValidators.required()]),
                 FormWidgetBuilder.formDropDown(
-                  key: "ChooseExpireDate",
+                  key: "AlertDate",
                   title: "Choose notification before expire* (Day)",
                   hint: "Ex. 30 days",
                   validate: [
@@ -245,10 +250,11 @@ class _FillInformationState extends State<FillInformation> {
       },
       itemSubmitted: (item) {
         setState(() {
-          txtCtrlBrandName.text = item.modelBrandName.modelEN.en;
+          txtCtrlBrandCode.text = item.brandCode;
           searchTextField.textField.controller.text =
               item.modelBrandName.modelEN.en;
-          hasBrandInSystem = "Y";
+          txtCtrlBrandName.text = item.modelBrandName.modelEN.en;
+          brandActive = item.brandActive;
         });
       },
     );
@@ -329,12 +335,16 @@ class _FillInformationState extends State<FillInformation> {
             if (_fbk.currentState.validate()) {
               var dataAsset = _fbk.currentState.value;
               dataAsset.addAll(addTextController());
+              // print(dataAsset);
               ecsLib.pushPage(
                 context: context,
-                pageWidget: AddImage(
-                  hasDataAssetAlready: widget.hasDataAssetAlready,
+                pageWidget: AddImageDemo(
                   dataAsset: dataAsset,
                 ),
+                // AddImage(
+                //   hasDataAssetAlready: widget.hasDataAssetAlready,
+                //   dataAsset: dataAsset,
+                // ),
               );
             }
           }),
@@ -343,12 +353,15 @@ class _FillInformationState extends State<FillInformation> {
 
   Map<String, String> addTextController() {
     Map<String, String> mapData = {
-      "BrandName": txtCtrlBrandName.text,
-      "hasBrandInSystem": hasBrandInSystem,
+      "BrandCode": txtCtrlBrandCode.text,
+      "BrandActive": brandActive,
       "SerialNo": txtCtrlSerialNo.text,
       "LotNo": txtCtrlLotNo.text,
-      "Price": txtCtrlPrice.text,
-      "Remark": txtCtrlNote.text
+      "SalesPrice": txtCtrlPrice.text,
+      "CustRemark": txtCtrlNote.text,
+      "CreateType":
+          widget.onClickAddAssetPage == PageAction.MANUAL_ADD ? "C" : "T",
+      "PdtCatCode": "A001"
     };
     return mapData;
   }

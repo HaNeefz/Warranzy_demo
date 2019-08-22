@@ -100,7 +100,6 @@ class _ChangeDeviceState extends State<ChangeDevice> {
         print("Data before send => $dataSendToAPIChangeDevice");
         ecsLib.showDialogLoadingLib(
           context,
-          content: "Verifying",
         );
         APIServiceUser.apiChangeDevice(postData: dataSendToAPIChangeDevice)
             .then((response) async {

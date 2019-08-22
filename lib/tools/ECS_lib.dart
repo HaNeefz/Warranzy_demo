@@ -114,8 +114,8 @@ class ECSLib {
         barrierDismissible: barrierDismissible,
         builder: (BuildContext context) {
           return DialogCustom(
-            title: title??"",
-            description: content??"",
+            title: title ?? "",
+            description: content ?? "",
             buttonText: "",
           );
           // Container(

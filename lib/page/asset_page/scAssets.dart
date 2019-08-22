@@ -1,10 +1,16 @@
+import 'dart:convert';
+
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:warranzy_demo/models/model_asset_data.dart';
 import 'package:warranzy_demo/page/asset_page/add_assets_page/scFillInformation.dart';
 import 'package:warranzy_demo/page/profile_page/scProfile.dart';
+import 'package:warranzy_demo/page/splash_screen/scSplash_screen.dart';
+import 'package:warranzy_demo/services/api/jwt.dart';
 import 'package:warranzy_demo/services/method/scan_qr.dart';
+import 'package:warranzy_demo/services/sqflit/db_customers.dart';
 import 'package:warranzy_demo/tools/assets.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/const.dart';
@@ -13,6 +19,7 @@ import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/carouselImage.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 import 'widget_assets/widget_asset.dart';
+import 'package:http/http.dart' as http;
 
 class AssetPage extends StatefulWidget {
   @override
@@ -23,7 +30,10 @@ class _AssetPageState extends State<AssetPage> {
   final ecsLib = getIt.get<ECSLib>();
   final allTranslations = getIt.get<GlobalTranslations>();
   ModelAssetsData assetData = ModelAssetsData();
+  final Dio dio = Dio();
+
   List<ModelAssetsData> listAssetData;
+  JWTService jwtService;
 
   @override
   void initState() {
@@ -87,13 +97,19 @@ class _AssetPageState extends State<AssetPage> {
                   style: TextStyleCustom.STYLE_LABEL
                       .copyWith(color: ThemeColors.COLOR_WHITE),
                 ),
-                onPressed: () => buildShowModalBottomSheet(context),
+                onPressed: () async {
+                  await buildShowModalBottomSheet(context);
+                  // await checkSessionExpired();
+                },
               ),
               Expanded(
                 child: IconButton(
                   icon: Icon(Icons.sort),
                   tooltip: "Sort Asset",
-                  onPressed: () {},
+                  onPressed: () async {
+                    await buildShowModalBottomSheet(context);
+                    // await checkSessionExpired();
+                  },
                 ),
               ),
             ],
@@ -101,6 +117,47 @@ class _AssetPageState extends State<AssetPage> {
         )),
       ],
     );
+  }
+
+  checkSessionExpired() async {
+    var dataCust = await DBProviderCustomer.db.getDataCustomer();
+    jwtService = JWTService(
+      custID: dataCust.custUserID,
+      countryCode: dataCust.countryCode,
+      phoneNumber: dataCust.mobilePhone,
+    );
+    // print(jwtService.sendApiTokenJWT());
+    // FormData formData = FormData.from({"data": "eieie"});
+    try {
+      print("Check Session Expire");
+      ecsLib.showDialogLoadingLib(context);
+      await dio
+          .post("http://192.168.0.36:9999/API/v1/Asset/AddAsset",
+              // data: formData,
+              options:
+                  Options(headers: {"Authorization": jwtService.getTokenJWT()}))
+          .then((res) async {
+        var response = jsonDecode(res.data);
+        if (response['Status'] == true) {
+          await buildShowModalBottomSheet(context);
+          ecsLib.cancelDialogLoadindLib(context);
+        } else {
+          print(response);
+          await ecsLib.showDialogLib(
+            context: context,
+            title: "",
+            content: response['Message'],
+            textOnButton: allTranslations.text("close"),
+          );
+          ecsLib.pushPageReplacement(
+            context: context,
+            pageWidget: SplashScreenPage(),
+          );
+        }
+      });
+    } catch (e) {
+      print("$e");
+    }
   }
 
   Widget buildHeaderAndProfile() {

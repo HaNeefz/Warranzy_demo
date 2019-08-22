@@ -8,9 +8,6 @@ import 'package:warranzy_demo/models/model_verify_phone.dart';
 
 import 'base_url.dart';
 
-// final String baseUrl = "https://testwarranty-239103.appspot.com/API/v1";
-// final String baseUrl = "http://192.168.0.36:9999/API/v1";
-
 class ShowDataAPI {
   static void printAPIName(String apiName) {
     print("<------------------------------ $apiName");
@@ -78,7 +75,7 @@ class APIServiceUser {
     try {
       final response = await http
           .post(urlPost, body: postData)
-          // .timeout(Duration(seconds: TIMEOUT))
+          .timeout(Duration(seconds: TIMEOUT))
           .catchError((e) => ModelVerifyNumber(message: "CatchError => $e"));
       if (response.statusCode == 200) {
         ShowDataAPI.printResponse("${json.decode(response.body)}");
@@ -102,7 +99,7 @@ class APIServiceUser {
     try {
       final response = await http
           .post(urlPost, body: postData)
-          // .timeout(Duration(seconds: TIMEOUT))
+          .timeout(Duration(seconds: TIMEOUT))
           .catchError(
               (e) => InformationMasCustomners(message: "CatchError => $e"));
       if (response.statusCode == 200) {
@@ -128,7 +125,7 @@ class APIServiceUser {
     try {
       final response = await http
           .post(urlPost, body: postData)
-          // .timeout(Duration(seconds: TIMEOUT))
+          .timeout(Duration(seconds: TIMEOUT))
           .catchError(
               (e) => InformationMasCustomners(message: "CatchError => $e"));
       if (response.statusCode == 200) {
@@ -152,7 +149,7 @@ class APIServiceUser {
     try {
       final response = await http
           .post(urlPost, body: postData)
-          // .timeout(Duration(seconds: TIMEOUT))
+          .timeout(Duration(seconds: TIMEOUT))
           .catchError((e) => ModelVerifyNumber(message: "CatchError => $e"));
       if (response.statusCode == 200) {
         ShowDataAPI.printResponse("${json.decode(response.body)}");
@@ -175,7 +172,7 @@ class APIServiceUser {
     try {
       final response = await http
           .post(urlPost, body: postData)
-          // .timeout(Duration(seconds: TIMEOUT))
+          .timeout(Duration(seconds: TIMEOUT))
           .catchError((e) => ModelVerifyLogin(message: "CatchError $e"));
       if (response.statusCode == 200) {
         ShowDataAPI.printResponse("${json.decode(response.body)}");
@@ -191,4 +188,13 @@ class APIServiceUser {
       return ModelVerifyLogin(message: "Error => $e");
     }
   }
+}
+
+class SendAPI<T> {
+  Map<String, dynamic> body;
+  String url;
+
+  SendAPI({this.url, this.body});
+
+  sendingAPI() {}
 }

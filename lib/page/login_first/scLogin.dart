@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:warranzy_demo/page/asset_page/add_assets_page/scAdd_image_demo.dart';
 import 'package:warranzy_demo/page/change_device_page/scChange_device.dart';
 import 'package:warranzy_demo/page/pin_code/scPinCode.dart';
-import 'package:warranzy_demo/page/pin_code/scPin_code.dart';
 import 'package:warranzy_demo/services/providers/notification_state.dart';
 import 'package:warranzy_demo/services/sqflit/db_customers.dart';
 import 'package:warranzy_demo/tools/const.dart';
@@ -126,6 +126,15 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(
                 height: 20.0,
               ),
+              RaisedButton(
+                child: Text("AddImageDemoPage Test"),
+                onPressed: () {
+                  ecsLib.pushPage(
+                    context: context,
+                    pageWidget: AddImageDemo(),
+                  );
+                },
+              )
             ],
           ),
         ),

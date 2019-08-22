@@ -189,6 +189,69 @@ class ProductCatagory {
     data['LastUpdate'] = this.lastUpdate;
     return data;
   }
+
+  List<ProductCatagory> getListCat() {
+    List<ProductCatagory> listProductCat = [
+      ProductCatagory(
+          catCode: "01",
+          catName: "Elec",
+          imageBox: "Y",
+          imageChassisNo: "Y",
+          imageDocument: "N",
+          imageOther: "Y",
+          imageProduct: "N",
+          imageReceipt: "N",
+          imageSellerCard: "Y",
+          imageSerial: "Y",
+          imageWarranty: "Y"),
+      ProductCatagory(
+          catCode: "02",
+          catName: "TV",
+          imageBox: "Y",
+          imageChassisNo: "Y",
+          imageDocument: "N",
+          imageOther: "N",
+          imageProduct: "Y",
+          imageReceipt: "Y",
+          imageSellerCard: "N",
+          imageSerial: "Y",
+          imageWarranty: "N"),
+      ProductCatagory(
+          catCode: "03",
+          catName: "Car",
+          imageBox: "Y",
+          imageChassisNo: "Y",
+          imageDocument: "Y",
+          imageOther: "N",
+          imageProduct: "Y",
+          imageReceipt: "N",
+          imageSellerCard: "Y",
+          imageSerial: "N",
+          imageWarranty: "Y"),
+    ];
+    return listProductCat;
+  }
+}
+
+class RelatedImage {
+  final ProductCatagory category;
+  List<String> _reletedImage = [];
+  RelatedImage({this.category});
+
+  List<String> listRelatedImage() {
+    String wanted = "Y";
+    if (category.imageBox == wanted) _reletedImage.add("Image_Box");
+    if (category.imageProduct == wanted) _reletedImage.add("Image_Product");
+    if (category.imageDocument == wanted) _reletedImage.add("Image_Document");
+    if (category.imageSerial == wanted) _reletedImage.add("Image_Serial");
+    if (category.imageChassisNo == wanted) _reletedImage.add("Image_ChassisNo");
+    if (category.imageWarranty == wanted) _reletedImage.add("Image_Warranty");
+    if (category.imageReceipt == wanted) _reletedImage.add("Image_Receipt");
+    if (category.imageSellerCard == wanted)
+      _reletedImage.add("Image_SellerCard");
+    if (category.imageOther == wanted) _reletedImage.add("Image_Other");
+    return _reletedImage;
+  }
 }
 
 class CatName {

@@ -13,7 +13,7 @@ class JWTService {
       @required this.phoneNumber,
       @required this.countryCode});
 
-  sendApiTokenJWT() async {
+  String getTokenJWT() {
     var claimSet = JwtClaim(
         defaultIatExp: true,
         otherClaims: <String, dynamic>{
@@ -24,7 +24,7 @@ class JWTService {
         maxAge: Duration(minutes: 1));
 
     String token = issueJwtHS256(claimSet, key);
-    print(token);
+    return token;
     // final JwtClaim decClaimSet = verifyJwtHS256Signature(token, "ECS");
     // try {
     //   await dio.post("http://192.168.0.36:9999/API/v1",

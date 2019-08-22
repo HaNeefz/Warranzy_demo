@@ -94,7 +94,6 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
               if (_authorized) {
                 ecsLib.showDialogLoadingLib(
                   context,
-                  content: "Verifying",
                 );
                 sendApiLogin();
               }
@@ -221,7 +220,6 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
                     if (response == true) {
                       ecsLib.showDialogLoadingLib(
                         context,
-                        content: "Please wait.",
                       );
                       var data =
                           postDataCutomers(pinCode: pinCode, specialPass: "Y");
@@ -233,7 +231,6 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
                     } else {
                       ecsLib.showDialogLoadingLib(
                         context,
-                        content: "Please wait.",
                       );
                       var data =
                           postDataCutomers(pinCode: pinCode, specialPass: "N");
@@ -470,7 +467,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
                                 countryCode: dataCust.countryCode,
                                 phoneNumber: dataCust.mobilePhone,
                               );
-                              print(jwtService.sendApiTokenJWT());
+                              print(jwtService.getTokenJWT());
                             }),
                       ),
                     ],
@@ -616,10 +613,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
         //pinCorrect == true
         print("Correct");
         // gotoMainPage();
-        ecsLib.showDialogLoadingLib(
-          context,
-          content: "Verifying",
-        );
+        ecsLib.showDialogLoadingLib(context);
         sendApiLogin();
         setState(() {
           listPinTemp.clear();
