@@ -98,7 +98,7 @@ class ECSLib {
             title: Text(
               title,
             ),
-            content: Text(content),
+            content: Text(content ?? ""),
             actions: <Widget>[
               FlatButton(
                 child: Text(

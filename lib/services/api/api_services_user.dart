@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 import 'package:warranzy_demo/models/model_mas_cust.dart';
 import 'package:warranzy_demo/models/model_verify_login.dart';
@@ -24,7 +23,6 @@ class ShowDataAPI {
 }
 
 class APIServiceUser {
-  final Dio dio = Dio();
   static const int TIMEOUT = 60;
   static final String baseUrl = BaseUrl.baseUrlLocal;
   // static Future apiVerifyNumberTest({String url, dynamic postData}) async {
@@ -61,6 +59,9 @@ class APIServiceUser {
     } on TimeoutException catch (_) {
       print("TimeOut");
       return ModelVerifyNumber(message: "Time Out. Try again.");
+    } on Exception catch (e) {
+      print("Catch on Exception => $e");
+      return ModelVerifyNumber(message: "$e");
     } catch (e) {
       print("Error => $e");
       return ModelVerifyNumber(message: "Error => $e");
@@ -85,6 +86,9 @@ class APIServiceUser {
     } on TimeoutException catch (_) {
       print("TimeOut");
       return ModelVerifyNumber(message: "Time Out. Try again.");
+    } on Exception catch (e) {
+      print("Catch on Exception => $e");
+      return ModelVerifyNumber(message: "$e");
     } catch (e) {
       print("Error => $e");
       return ModelVerifyNumber(message: "Error => $e");
@@ -110,6 +114,9 @@ class APIServiceUser {
     } on TimeoutException catch (_) {
       print("TimeOut");
       return InformationMasCustomners(message: "Time Out. Try again.");
+    } on Exception catch (e) {
+      print("Catch on Exception => $e");
+      return InformationMasCustomners(message: "$e");
     } catch (e) {
       print("$baseUrl/User/UserRegister => Catch Error $e");
       return InformationMasCustomners(message: "Error => $e");
@@ -136,6 +143,9 @@ class APIServiceUser {
     } on TimeoutException catch (_) {
       print("TimeOut");
       return InformationMasCustomners(message: "Time Out. Try again.");
+    } on Exception catch (e) {
+      print("Catch on Exception => $e");
+      return InformationMasCustomners(message: "$e");
     } catch (e) {
       print("Catch Error => $e");
       return InformationMasCustomners(message: "Error => $e");
@@ -159,6 +169,9 @@ class APIServiceUser {
     } on TimeoutException catch (_) {
       print("TimeOut");
       return ModelVerifyNumber(message: "Time out. Try again");
+    } on Exception catch (e) {
+      print("Catch on Exception => $e");
+      return ModelVerifyNumber(message: "$e");
     } catch (e) {
       print("Catch Error => $e");
       return ModelVerifyNumber(message: "Error => $e");
@@ -183,6 +196,9 @@ class APIServiceUser {
     } on TimeoutException catch (_) {
       print("TimeOut");
       return ModelVerifyLogin(message: "Request time out. Try again.");
+    } on Exception catch (e) {
+      print("Catch on Exception => $e");
+      return ModelVerifyLogin(message: "$e");
     } catch (e) {
       print("$baseUrl/User/Login => Catch Error : $e");
       return ModelVerifyLogin(message: "Error => $e");

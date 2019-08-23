@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -11,6 +12,19 @@ import 'page/splash_screen/scSplash_screen.dart';
 import 'services/providers/notification_state.dart';
 
 var getIt = GetIt();
+
+class HttpService {
+  static Dio _dio = Dio();
+  static Dio get dio => _dio;
+}
+
+setupApp() {
+  getIt.registerSingleton<ECSLib>(ECSLib());
+  getIt.registerSingleton<GlobalTranslations>(GlobalTranslations());
+  getIt.registerSingleton<HttpService>(HttpService());
+  getIt.registerSingleton<NotificationState>(NotificationState());
+}
+
 void main() {
   Provider.debugCheckInvalidValueType = null;
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
@@ -20,9 +34,7 @@ void main() {
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]).then((_) async {
-    getIt.registerSingleton<ECSLib>(ECSLib());
-    getIt.registerSingleton<GlobalTranslations>(GlobalTranslations());
-    getIt.registerSingleton<NotificationState>(NotificationState());
+    setupApp();
     runApp(MultiProvider(
         providers: [
           ChangeNotifierProvider<NotificationState>(
