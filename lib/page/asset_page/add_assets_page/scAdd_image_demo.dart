@@ -120,7 +120,7 @@ class _AddImageDemoState extends State<AddImageDemo> {
                     "sending Api URL => https://testwarranty-239103.appspot.com/API/v1/Asset/AddAsset");
                 await dio
                     .post(
-                  "https://testwarranty-239103.appspot.com/API/v1/Asset/AddAsset",
+                  "http://192.168.0.36:9999/API/v1/Asset/AddAsset",
                   //http://192.168.0.36:9999/API/v1/Asset/AddAsset
                   data: formData,
                   options: Options(
@@ -131,34 +131,34 @@ class _AddImageDemoState extends State<AddImageDemo> {
                   print("<--- Response");
                   ecsLib.printJson(jsonDecode(res.data));
                   ecsLib.cancelDialogLoadindLib(context);
-                  var temp = RepositoryOfAsset.fromJson(jsonDecode(res.data));
-                  try {
-                    await DBProviderAsset.db
-                        .insertDataWarranzyUesd(temp.warranzyUsed)
-                        .catchError(
-                            (onError) => print("warranzyUsed : $onError"));
-                  } catch (e) {
-                    print("insertDataWarranzyUesd => $e");
-                  }
-                  try {
-                    await DBProviderAsset.db
-                        .insertDataWarranzyLog(temp.warranzyLog)
-                        .catchError((onError) => print("warranzyLog $onError"));
-                  } catch (e) {
-                    print("insertDataWarranzyLog => $e");
-                  }
-                  temp.filePool.forEach((data) async {
-                    try {
-                      await DBProviderAsset.db
-                          .insertDataFilePool(data)
-                          .catchError((onError) => print("filePool $onError"))
-                          .whenComplete(() {
-                        ecsLib.stepBackScene(context, 2);
-                      });
-                    } catch (e) {
-                      print("insertDataFilePool => $e");
-                    }
-                  });
+                  // var temp = RepositoryOfAsset.fromJson(jsonDecode(res.data));
+                  // try {
+                  //   await DBProviderAsset.db
+                  //       .insertDataWarranzyUesd(temp.warranzyUsed)
+                  //       .catchError(
+                  //           (onError) => print("warranzyUsed : $onError"));
+                  // } catch (e) {
+                  //   print("insertDataWarranzyUesd => $e");
+                  // }
+                  // try {
+                  //   await DBProviderAsset.db
+                  //       .insertDataWarranzyLog(temp.warranzyLog)
+                  //       .catchError((onError) => print("warranzyLog $onError"));
+                  // } catch (e) {
+                  //   print("insertDataWarranzyLog => $e");
+                  // }
+                  // temp.filePool.forEach((data) async {
+                  //   try {
+                  //     await DBProviderAsset.db
+                  //         .insertDataFilePool(data)
+                  //         .catchError((onError) => print("filePool $onError"))
+                  //         .whenComplete(() {
+                  //       ecsLib.stepBackScene(context, 2);
+                  //     });
+                  //   } catch (e) {
+                  //     print("insertDataFilePool => $e");
+                  //   }
+                  // });
                 }).catchError((e) {
                   print(e);
                   ecsLib.cancelDialogLoadindLib(context);
@@ -205,29 +205,11 @@ class _AddImageDemoState extends State<AddImageDemo> {
                               Expanded(
                                 flex: 4,
                                 child: Container(
-                                  width: 100,
-                                  height: 100,
-                                  child: data.imagesList.length > 0
-                                      ? ListView.builder(
-                                          scrollDirection: Axis.horizontal,
-                                          itemCount: data.imagesList.length,
-                                          shrinkWrap: true,
-                                          itemBuilder: (BuildContext context,
-                                              int index) {
-                                            return Container(
-                                              margin: EdgeInsets.fromLTRB(
-                                                  10, 5, 0, 10),
-                                              // width: 50.0,
-                                              // height: 50.0,
-                                              child: Image.file(
-                                                data.imagesList[index],
-                                                fit: BoxFit.cover,
-                                              ),
-                                            );
-                                          },
-                                        )
-                                      : Container(),
-                                ),
+                                    width: 100,
+                                    height: 100,
+                                    child: TextBuilder.build(
+                                        title:
+                                            "Images have ${data.imagesList.length} items.")),
                               ),
                               Expanded(
                                 child: Container(
@@ -360,3 +342,27 @@ class Name<T> {
     print(value);
   }
 }
+
+// data.imagesList.length > 0
+//     ? ListView.builder(
+//         scrollDirection: Axis.horizontal,
+//         itemCount: data.imagesList.length,
+//         shrinkWrap: true,
+//         itemBuilder: (BuildContext context,
+//             int index) {
+//           return Container(
+//               margin: EdgeInsets.fromLTRB(
+//                   10, 5, 0, 10),
+//               // width: 50.0,
+//               // height: 50.0,
+//               child: TextBuilder.build(
+//                   title:
+//                       "Images have ${data.imagesList.length}")
+//               // Image.file(
+//               //   data.imagesList[index],
+//               //   fit: BoxFit.cover,
+//               // ),
+//               );
+//         },
+//       )
+//     : Container(),

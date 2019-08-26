@@ -126,55 +126,35 @@ class ECSLib {
         context: context,
         barrierDismissible: barrierDismissible,
         builder: (BuildContext context) {
-          return Center(
-            child: HeartbeatProgressIndicator(
-              child: Image.asset(
-                Assets.LOGO_APP_LOADING,
-                scale: 0.2,
-                width: 80,
-                height: 80,
-              ),
-            ),
+          return DialogCustom(
+            title: title,
+            description: content,
           );
-          // DialogCustom(
-          //   title: title ?? "",
-          //   description: content ?? "",
-          //   buttonText: "",
-          // );
-          // Container(
-          //   margin: EdgeInsets.all(50.0),
-          //   child: AlertDialog(
-          //     // elevation: 20,
-          //     backgroundColor: Colors.black.withOpacity(0.3),
-          //     shape: RoundedRectangleBorder(
-          //         borderRadius: BorderRadius.circular(20.0)),
-          //     // backgroundColor: Theme.of(context).backgroundColor,
-          //     title: Text(
-          //       title ?? "",
-          //       // style: normalText.copyWith(fontWeight: FontWeight.bold),
-          //     ),
-          //     content: Container(
-          //       child: Column(
-          //         crossAxisAlignment: CrossAxisAlignment.center,
-          //         mainAxisAlignment: MainAxisAlignment.center,
-          //         mainAxisSize: MainAxisSize.min,
-          //         children: <Widget>[
-          //           SpinKitCircle(
-          //             color: Colors.teal[300],
-          //             size: 80,
-          //           ),
-          //           SizedBox(
-          //             height: 40.0,
-          //           ),
-          //           Text(
-          //             content ?? "",
-          //             style: TextStyleCustom.STYLE_LABEL_BOLD
-          //                 .copyWith(color: ThemeColors.COLOR_WHITE),
-          //             textAlign: TextAlign.center,
-          //           )
-          //         ],
+          // Center(
+          //   child: Column(
+          //     mainAxisSize: MainAxisSize.min,
+          //     children: <Widget>[
+          //       Text(
+          //         title ?? "",
+          //         style: TextStyleCustom.STYLE_LABEL_BOLD
+          //             .copyWith(color: ThemeColors.COLOR_WHITE),
+          //         textAlign: TextAlign.center,
           //       ),
-          //     ),
+          //       HeartbeatProgressIndicator(
+          //         child: Image.asset(
+          //           Assets.LOGO_APP_LOADING,
+          //           scale: 0.2,
+          //           width: 80,
+          //           height: 80,
+          //         ),
+          //       ),
+          //       Text(
+          //         content ?? "",
+          //         style: TextStyleCustom.STYLE_LABEL_BOLD
+          //             .copyWith(color: ThemeColors.COLOR_WHITE),
+          //         textAlign: TextAlign.center,
+          //       ),
+          //     ],
           //   ),
           // );
         });
@@ -386,10 +366,18 @@ class DialogCustom extends StatelessWidget {
                 .copyWith(color: ThemeColors.COLOR_WHITE),
             textAlign: TextAlign.center,
           ),
-          SpinKitCircle(
-            color: Colors.teal[300],
-            size: 80,
+          HeartbeatProgressIndicator(
+            child: Image.asset(
+              Assets.LOGO_APP_LOADING,
+              scale: 0.2,
+              width: 80,
+              height: 80,
+            ),
           ),
+          // SpinKitCircle(
+          //   color: Colors.teal[300],
+          //   size: 80,
+          // ),
           SizedBox(
             height: 40.0,
           ),
