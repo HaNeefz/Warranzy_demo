@@ -8,6 +8,7 @@ import 'package:warranzy_demo/page/change_device_page/scChange_device.dart';
 import 'package:warranzy_demo/page/pin_code/scPinCode.dart';
 import 'package:warranzy_demo/services/providers/notification_state.dart';
 import 'package:warranzy_demo/services/sqflit/db_customers.dart';
+import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
 import 'package:warranzy_demo/tools/const.dart';
 import '../../page/register/scRegister.dart';
 import '../../tools/config/text_style.dart';
@@ -134,7 +135,25 @@ class _LoginPageState extends State<LoginPage> {
                     pageWidget: AddImageDemo(),
                   );
                 },
-              )
+              ),
+              RaisedButton(
+                child: Text("getDataCountry"),
+                onPressed: () async {
+                  await DBProviderInitialApp.db.getAllDataCountry();
+                },
+              ),
+              RaisedButton(
+                child: Text("getDataTimeZone"),
+                onPressed: () async {
+                  await DBProviderInitialApp.db.getAllDataTimeZone();
+                },
+              ),
+              RaisedButton(
+                child: Text("getDataProducCategory"),
+                onPressed: () async {
+                  await DBProviderInitialApp.db.getAllDataProductCategory();
+                },
+              ),
             ],
           ),
         ),

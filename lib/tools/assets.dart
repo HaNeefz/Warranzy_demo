@@ -10,5 +10,7 @@ class Assets {
 
   static const String ICON_APP_TRANSPARENT =
       "assets/logo/warranzy_logo_transparent.png";
+  static const String LOGO_APP_LOADING =
+      "assets/logo/warranzy_logo_transparent512.png";
   static const String ICON_APP = "assets/logo/warranzy_logo_new.jpg";
 }

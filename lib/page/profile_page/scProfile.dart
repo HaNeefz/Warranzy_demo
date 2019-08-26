@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:warranzy_demo/models/model_mas_cust.dart';
 import 'package:warranzy_demo/page/login_first/scLogin.dart';
+import 'package:warranzy_demo/page/splash_screen/scSplash_screen.dart';
 import 'package:warranzy_demo/services/calls_and_message/calls_and_message.dart';
 import 'package:warranzy_demo/services/sqflit/db_customers.dart';
 import 'package:warranzy_demo/tools/assets.dart';
@@ -88,7 +89,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   onPressed: () {
                     ecsLib.pushPageAndClearAllScene(
                       context: context,
-                      pageWidget: LoginPage(),
+                      pageWidget: SplashScreenPage(),
                     );
                   },
                 )
@@ -206,6 +207,10 @@ class _ProfilePageState extends State<ProfilePage> {
               RaisedButton(
                 child: Text("Send to cloud_firestore"),
                 onPressed: sendTocloudFireStore,
+              ),
+              RaisedButton(
+                child: Text("Test Loading"),
+                onPressed: () => ecsLib.showDialogLoadingLib(context),
               ),
             ])),
             SliverFixedExtentList(

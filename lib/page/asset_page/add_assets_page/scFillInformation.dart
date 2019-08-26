@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:intl/intl.dart';
 import 'package:warranzy_demo/models/model_get_brand_name.dart';
+import 'package:warranzy_demo/models/model_repository_init_app.dart';
 import 'package:warranzy_demo/services/method/mark_text_input_format.dart';
+import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/const.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
@@ -61,7 +63,7 @@ class _FillInformationState extends State<FillInformation> {
   ];
 
   PageAction get page => widget.onClickAddAssetPage;
-
+  Future<List<ProductCatagory>> getProductCategory;
   @override
   void initState() {
     super.initState();
@@ -69,6 +71,7 @@ class _FillInformationState extends State<FillInformation> {
     // streamController.sink.add(["test1", "test2", "test3", "test4"]);
 
     // getBrandName();
+    getProductCategory = DBProviderInitialApp.db.getAllDataProductCategory();
     Future.delayed(Duration(milliseconds: 1500), () {
       getBrandName();
     });
@@ -122,7 +125,6 @@ class _FillInformationState extends State<FillInformation> {
         context,
         child: FormBuilder(
           key: _fbk,
-          autovalidate: true,
           child: Padding(
             padding: const EdgeInsets.only(left: 15.0, right: 10, top: 20),
             child: ListView(
@@ -145,6 +147,39 @@ class _FillInformationState extends State<FillInformation> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
+                      FormWidgetBuilder.formInputData(
+                          key: "Title",
+                          title: "Asset Name*",
+                          validators: [FormBuilderValidators.required()]),
+                      FutureBuilder<List<ProductCatagory>>(
+                        future: getProductCategory,
+                        builder: (BuildContext context,
+                            AsyncSnapshot<List<ProductCatagory>> snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.done) {
+                            if (!(snapshot.hasError)) {
+                              return FormWidgetBuilder.formDropDownCategory(
+                                  key: "PdtCatCode",
+                                  title: "Category*",
+                                  hint: "Choose your category",
+                                  validate: [
+                                    FormBuilderValidators.required(),
+                                  ],
+                                  items: snapshot.data,
+                                  onChange: (value) {
+                                    print(value);
+                                  });
+                            } else {
+                              return TextBuilder.build(title: "Error data");
+                            }
+                          } else if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return CircularProgressIndicator();
+                          } else {
+                            return TextBuilder.build(title: "Something Wrong.");
+                          }
+                        },
+                      ),
                       FormWidgetBuilder.formDropDown(
                         key: "PdtGroup",
                         title: "Group*",
@@ -154,8 +189,6 @@ class _FillInformationState extends State<FillInformation> {
                         ],
                         items: _group,
                       ),
-                      FormWidgetBuilder.formWidget(
-                          title: "BrandName*", child: autoCompleteTextField()),
                       FormWidgetBuilder.formDropDown(
                         key: "PdtPlace",
                         title: "Place*",
@@ -167,10 +200,8 @@ class _FillInformationState extends State<FillInformation> {
                       ),
                     ],
                   ),
-                FormWidgetBuilder.formInputData(
-                    key: "Title",
-                    title: "Title*",
-                    validators: [FormBuilderValidators.required()]),
+                FormWidgetBuilder.formWidget(
+                    title: "BrandName*", child: autoCompleteTextField()),
                 FormWidgetBuilder.formInputData(
                     key: "WarrantyNo",
                     title: "Warranty No.*",
@@ -272,15 +303,17 @@ class _FillInformationState extends State<FillInformation> {
 
   Widget buildTextAutoComplete(GetBrandName item) => Container(
         height: 50,
-        child: Row(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: TextBuilder.build(
                   title: "${item.modelBrandName.modelEN.en}",
                   style: TextStyleCustom.STYLE_LABEL_BOLD),
-            )
+            ),
+            Divider()
           ],
         ),
       );
@@ -345,9 +378,8 @@ class _FillInformationState extends State<FillInformation> {
             if (_fbk.currentState.validate()) {
               var dataAsset = _fbk.currentState.value;
               var formatDateExpire = dataAsset['WarrantyExpire'];
-              DateFormat format = DateFormat("yyyy-MM-dd");
               dataAsset['WarrantyExpire'] =
-                  "${format.parseUTC(formatDateExpire)}";
+                  ecsLib.setDateFormat(formatDateExpire);
               dataAsset.addAll(addTextController());
               ecsLib.pushPage(
                 context: context,
@@ -365,12 +397,6 @@ class _FillInformationState extends State<FillInformation> {
   }
 
   Map<String, dynamic> addTextController() {
-    // int salsePrice = 0;
-    // if (txtCtrlPrice.text != null ||
-    //     txtCtrlPrice.text != "" ||
-    //     txtCtrlPrice.text.isEmpty) {
-    //   salsePrice = int.parse(txtCtrlPrice.text);
-    // }
     Map<String, dynamic> mapData = {
       "BrandCode": txtCtrlBrandCode.text,
       "BrandName": txtCtrlBrandName.text,
@@ -380,8 +406,7 @@ class _FillInformationState extends State<FillInformation> {
       "SalesPrice": txtCtrlPrice.text == "" ? 0 : int.parse(txtCtrlPrice.text),
       "CustRemark": txtCtrlNote.text,
       "CreateType":
-          widget.onClickAddAssetPage == PageAction.MANUAL_ADD ? "C" : "T",
-      "PdtCatCode": "A001"
+          widget.onClickAddAssetPage == PageAction.MANUAL_ADD ? "C" : "T"
     };
     return mapData;
   }

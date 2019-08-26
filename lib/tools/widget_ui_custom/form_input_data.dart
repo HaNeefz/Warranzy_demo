@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:warranzy_demo/models/model_repository_init_app.dart';
 import 'package:warranzy_demo/services/method/mark_text_input_format.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 
@@ -65,6 +66,50 @@ class FormWidgetBuilder {
                             TextStyleCustom.STYLE_LABEL.copyWith(fontSize: 15),
                       ),
                       value: data,
+                    ))
+                .toList(),
+            validators: validate, //<DropdownMenuItem>[],
+          )
+        ],
+      ),
+    );
+  }
+
+  static Widget formDropDownCategory(
+      {@required key,
+      @required String title,
+      @required List<ProductCatagory> items,
+      @required validate,
+      String hint,
+      Function onChange}) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 5),
+      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+      decoration: BoxDecoration(
+          border: Border.all(width: 0.3, color: ThemeColors.COLOR_GREY),
+          borderRadius: BorderRadius.circular(10)),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          TextBuilder.build(
+              title: title,
+              style: TextStyleCustom.STYLE_LABEL_BOLD.copyWith(fontSize: 15)),
+          FormBuilderDropdown(
+            attribute: key,
+            // initialValue: items.first,
+            onChanged: onChange,
+            hint: TextBuilder.build(
+                title: "$hint",
+                style: TextStyleCustom.STYLE_CONTENT.copyWith(fontSize: 15)),
+            items: items
+                .map<DropdownMenuItem>((data) => DropdownMenuItem(
+                      child: TextBuilder.build(
+                        title: "${data.catCode}. \t\t${data.catName}",
+                        style:
+                            TextStyleCustom.STYLE_LABEL.copyWith(fontSize: 15),
+                      ),
+                      value: data.catCode,
                     ))
                 .toList(),
             validators: validate, //<DropdownMenuItem>[],

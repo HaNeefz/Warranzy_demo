@@ -6,6 +6,8 @@ import 'package:warranzy_demo/models/model_language.dart';
 import 'package:warranzy_demo/models/model_repository_init_app.dart';
 import 'package:warranzy_demo/page/login_first/scLogin.dart';
 import 'package:simple_animations/simple_animations.dart';
+import 'package:warranzy_demo/services/api/base_url.dart';
+import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
 import 'package:warranzy_demo/services/sqflit/db_language.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
@@ -43,6 +45,7 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
                 // ecsLib.pushPageReplacement(
                 //     context: context, pageWidget: LoginPage());
                 await initialApp();
+                // await checkUpdateApp();
               } else
                 print("ADD LANGUAGE FAIL"); //ต้องเเก้ปัญหานี้ด้วย
             });
@@ -64,34 +67,33 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
 
   initialApp() async {
     await Future.delayed(Duration(milliseconds: 2000), () async {
-      ecsLib.showDialogLoadingLib(context, content: "Initial Application");
       try {
-        await dio
-            .get("http://192.168.0.36:9999/API/v1/User/InitialApp")
-            .then((res) {
-          var data = RepositoryInitalApp.fromJson(jsonDecode(res.data));
-          if (data.status == true) {
-            print("<---------Completed InitialApplication");
+        ecsLib.showDialogLoadingLib(context, content: "Initial App");
+        await dio.get("${BaseUrl.baseUrl}/User/InitialApp").then((res) async {
+          var response = jsonDecode(res.data);
+          var temp = RepositoryInitalApp.fromJson(response);
+          if (temp.status == true) {
             ecsLib.cancelDialogLoadindLib(context);
+            ecsLib.showDialogLoadingLib(context, content: "Setting App");
+            await DBProviderInitialApp.db.deleteAllDataIn3Table();
+            temp.country.forEach((v) async => await DBProviderInitialApp.db
+                .insertDataInToTableCountry(v)
+                .catchError((onError) => print("Country $onError")));
+            temp.timeZone.forEach((v) async => await DBProviderInitialApp.db
+                .insertDataInToTableTimeZone(v)
+                .catchError((onError) => print("TimeZone $onError")));
+            temp.productCatagory.forEach((v) async => await DBProviderInitialApp
+                .db
+                .insertDataInToTableProductCategory(v)
+                .catchError((onError) => print("ProductCategory $onError")));
+            // ecsLib.cancelDialogLoadindLib(context);
             ecsLib.pushPageReplacement(
                 context: context, pageWidget: LoginPage());
-          } else if (data.status == false) {
-            ecsLib.showDialogLib(
-                context: context,
-                title: "ERROR LOADING",
-                content: "null",
-                textOnButton: allTranslations.text("close"));
-          } else {
-            ecsLib.showDialogLib(
-                context: context,
-                title: "ERROR SERVER",
-                content: "null",
-                textOnButton: allTranslations.text("close"));
-          }
-          // var s = data.productCatagory[0].catName;
-          // var temp = jsonDecode(s);
-          // var catName = CatName.fromJson(temp);
+          } else
+            print("Status ${temp.status}");
         });
+      } on DioError catch (e) {
+        print("$e");
       } catch (e) {
         print(e);
       }

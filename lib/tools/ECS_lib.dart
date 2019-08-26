@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:progress_indicators/progress_indicators.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
 import 'assets.dart';
@@ -124,11 +126,21 @@ class ECSLib {
         context: context,
         barrierDismissible: barrierDismissible,
         builder: (BuildContext context) {
-          return DialogCustom(
-            title: title ?? "",
-            description: content ?? "",
-            buttonText: "",
+          return Center(
+            child: HeartbeatProgressIndicator(
+              child: Image.asset(
+                Assets.LOGO_APP_LOADING,
+                scale: 0.2,
+                width: 80,
+                height: 80,
+              ),
+            ),
           );
+          // DialogCustom(
+          //   title: title ?? "",
+          //   description: content ?? "",
+          //   buttonText: "",
+          // );
           // Container(
           //   margin: EdgeInsets.all(50.0),
           //   child: AlertDialog(
@@ -337,6 +349,17 @@ class ECSLib {
     print("Image file Original : " + "${file.lengthSync()}");
     print("Image file Compress : " + "${result.lengthSync()}");
     return result;
+  }
+
+  String setDateFormat(String dateTime, [formate = "yyyy-MM-dd"]) {
+    DateFormat _format = DateFormat(formate);
+    return _format.parseUTC(dateTime).toString();
+  }
+
+  stepBackScene(BuildContext context, int step) {
+    for (var i = 0; i < step; i++) {
+      Navigator.of(context).pop();
+    }
   }
 }
 

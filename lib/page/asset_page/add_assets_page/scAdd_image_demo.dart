@@ -5,7 +5,11 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:warranzy_demo/models/model_repository_init_app.dart';
+import 'package:warranzy_demo/models/model_respository_asset.dart';
+import 'package:warranzy_demo/services/api/base_url.dart';
 import 'package:warranzy_demo/services/api/jwt_service.dart';
+import 'package:warranzy_demo/services/sqflit/db_asset.dart';
+import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
@@ -29,18 +33,30 @@ class _AddImageDemoState extends State<AddImageDemo> {
   List<String> listRelated = [];
   List<ImageKeepData> listKeepImageData;
 
-  @override
-  void initState() {
-    super.initState();
-
-    listCat = productCatagory?.getListCat();
-    relatedImage = RelatedImage(category: listCat[0]);
+  getPrudcutCategory() async {
+    var catTemp = await DBProviderInitialApp.db.getAllDataProductCategory();
+    ProductCatagory category;
+    catTemp.forEach((v) {
+      if (v.catCode == widget.dataAsset['PdtCatCode']) {
+        setState(() {
+          category = v;
+        });
+        return;
+      }
+    });
+    relatedImage = RelatedImage(category: category);
     listRelated = relatedImage.listRelatedImage();
     listKeepImageData = List<ImageKeepData>(listRelated.length);
     for (int i = 0; i < listRelated.length; i++) {
       listKeepImageData[i] =
           ImageKeepData(title: listRelated[i], imagesList: [], imageBase64: []);
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getPrudcutCategory();
     ecsLib.printJson(widget.dataAsset);
   }
 
@@ -101,25 +117,66 @@ class _AddImageDemoState extends State<AddImageDemo> {
               ecsLib.showDialogLoadingLib(context, content: "Adding assets");
               try {
                 print(
-                    "sending Api URL => http://192.168.0.36:9999/API/v1/Asset/AddAsset");
+                    "sending Api URL => https://testwarranty-239103.appspot.com/API/v1/Asset/AddAsset");
                 await dio
                     .post(
-                  "http://192.168.0.36:9999/API/v1/Asset/AddAsset",
+                  "https://testwarranty-239103.appspot.com/API/v1/Asset/AddAsset",
+                  //http://192.168.0.36:9999/API/v1/Asset/AddAsset
                   data: formData,
                   options: Options(
                     headers: {"Authorization": await JWTService.getTokenJWT()},
                   ),
                 )
-                    .then((res) {
+                    .then((res) async {
                   print("<--- Response");
-                  print(res.data);
+                  ecsLib.printJson(jsonDecode(res.data));
                   ecsLib.cancelDialogLoadindLib(context);
+                  var temp = RepositoryOfAsset.fromJson(jsonDecode(res.data));
+                  try {
+                    await DBProviderAsset.db
+                        .insertDataWarranzyUesd(temp.warranzyUsed)
+                        .catchError(
+                            (onError) => print("warranzyUsed : $onError"));
+                  } catch (e) {
+                    print("insertDataWarranzyUesd => $e");
+                  }
+                  try {
+                    await DBProviderAsset.db
+                        .insertDataWarranzyLog(temp.warranzyLog)
+                        .catchError((onError) => print("warranzyLog $onError"));
+                  } catch (e) {
+                    print("insertDataWarranzyLog => $e");
+                  }
+                  temp.filePool.forEach((data) async {
+                    try {
+                      await DBProviderAsset.db
+                          .insertDataFilePool(data)
+                          .catchError((onError) => print("filePool $onError"))
+                          .whenComplete(() {
+                        ecsLib.stepBackScene(context, 2);
+                      });
+                    } catch (e) {
+                      print("insertDataFilePool => $e");
+                    }
+                  });
                 }).catchError((e) {
                   print(e);
                   ecsLib.cancelDialogLoadindLib(context);
                 });
               } on DioError catch (error) {
                 print("DIO ERROR => ${error.error}\nMsg => ${error.message}");
+                ecsLib.cancelDialogLoadindLib(context);
+              } on SocketException catch (e) {
+                print(e);
+                ecsLib.cancelDialogLoadindLib(context);
+              } on HttpException catch (e) {
+                print(e);
+                ecsLib.cancelDialogLoadindLib(context);
+              } on FormatException catch (e) {
+                print(e);
+                ecsLib.cancelDialogLoadindLib(context);
+              } on Exception catch (e) {
+                print(e);
                 ecsLib.cancelDialogLoadindLib(context);
               } catch (e) {
                 print("Catch $e");
@@ -182,9 +239,10 @@ class _AddImageDemoState extends State<AddImageDemo> {
                                       List<File> images = await ecsLib.pushPage(
                                           context: context,
                                           pageWidget: TakePhotos());
-                                      print("return Images = ${images.length}");
                                       setState(() {
                                         if (images != null) {
+                                          print(
+                                              "return Images = ${images.length}");
                                           for (var fileImage in images) {
                                             data.imagesList.add(fileImage);
                                             data.imageBase64.add("temp");

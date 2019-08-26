@@ -5,11 +5,13 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:warranzy_demo/models/model_asset_data.dart';
+import 'package:warranzy_demo/models/model_respository_asset.dart';
 import 'package:warranzy_demo/page/asset_page/add_assets_page/scFillInformation.dart';
 import 'package:warranzy_demo/page/profile_page/scProfile.dart';
 import 'package:warranzy_demo/page/splash_screen/scSplash_screen.dart';
 import 'package:warranzy_demo/services/api/jwt_service.dart';
 import 'package:warranzy_demo/services/method/scan_qr.dart';
+import 'package:warranzy_demo/services/sqflit/db_asset.dart';
 import 'package:warranzy_demo/services/sqflit/db_customers.dart';
 import 'package:warranzy_demo/tools/assets.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
@@ -62,9 +64,165 @@ class _AssetPageState extends State<AssetPage> {
 
   Column buildYourAssets() {
     return Column(
-      children: listAssetData.map((i) {
-        return ModelAssetWidget(i);
-      }).toList(),
+      children: <Widget>[
+        // FutureBuilder<Iterable<RepositoryOfAssetFromSqflite>>(
+        //   future: DBProviderAsset.db.getAllDataAsset(),
+        //   builder: (BuildContext context,
+        //       AsyncSnapshot<Iterable<RepositoryOfAssetFromSqflite>> snapshot) {
+        //     if (snapshot.connectionState == ConnectionState.done) {
+        //       if (!(snapshot.hasError)) {
+        //         return Padding(
+        //           padding: const EdgeInsets.fromLTRB(10, 15, 10, 10),
+        //           child: Column(
+        //             crossAxisAlignment: CrossAxisAlignment.start,
+        //             mainAxisSize: MainAxisSize.min,
+        //             children: <Widget>[
+        //               Column(
+        //                   children: snapshot.data
+        //                       .map((data) => Card(
+        //                             elevation: 5.0,
+        //                             child: Padding(
+        //                               padding: const EdgeInsets.all(8.0),
+        //                               child: Container(
+        //                                 child: Row(
+        //                                   children: <Widget>[
+        //                                     Expanded(
+        //                                       flex: 1,
+        //                                       child: Container(
+        //                                         width: 150,
+        //                                         height: 150,
+        //                                         decoration: BoxDecoration(
+        //                                             border: Border.all(
+        //                                                 width: 0.3,
+        //                                                 color: ThemeColors
+        //                                                     .COLOR_THEME_APP),
+        //                                             borderRadius:
+        //                                                 BorderRadius.circular(
+        //                                                     10)),
+        //                                         child: Center(
+        //                                           child: FlutterLogo(),
+        //                                         ),
+        //                                       ),
+        //                                     ),
+        //                                     Expanded(
+        //                                       flex: 2,
+        //                                       child: Container(
+        //                                         padding: EdgeInsets.symmetric(
+        //                                             vertical: 10,
+        //                                             horizontal: 10),
+        //                                         child: Column(
+        //                                           crossAxisAlignment:
+        //                                               CrossAxisAlignment.start,
+        //                                           children: <Widget>[
+        //                                             TextBuilder.build(
+        //                                                 title: data.title ??
+        //                                                     "Empty title",
+        //                                                 style: TextStyleCustom
+        //                                                     .STYLE_LABEL_BOLD),
+        //                                             TextBuilder.build(
+        //                                                 title:
+        //                                                     data.custRemark ??
+        //                                                         "Empty Remark",
+        //                                                 style: TextStyleCustom
+        //                                                     .STYLE_CONTENT,
+        //                                                 textOverflow:
+        //                                                     TextOverflow
+        //                                                         .ellipsis,
+        //                                                 maxLine: 2),
+        //                                             TextBuilder.build(
+        //                                                 title: data.fileID ??
+        //                                                     "Empty Remark | ${data.fileName}",
+        //                                                 style: TextStyleCustom
+        //                                                     .STYLE_CONTENT,
+        //                                                 textOverflow:
+        //                                                     TextOverflow
+        //                                                         .ellipsis,
+        //                                                 maxLine: 2),
+        //                                             TextBuilder.build(
+        //                                                 title: "\nExpire Date : ${data.warrantyExpire}" ??
+        //                                                     "Empty warrantyExpire",
+        //                                                 style: TextStyleCustom
+        //                                                     .STYLE_CONTENT
+        //                                                     .copyWith(
+        //                                                         fontSize: 12),
+        //                                                 textOverflow:
+        //                                                     TextOverflow
+        //                                                         .ellipsis,
+        //                                                 maxLine: 2),
+        //                                             Container(
+        //                                               margin:
+        //                                                   EdgeInsets.symmetric(
+        //                                                       vertical: 10),
+        //                                               width: 80,
+        //                                               height: 30,
+        //                                               decoration: BoxDecoration(
+        //                                                   borderRadius:
+        //                                                       BorderRadius
+        //                                                           .circular(20),
+        //                                                   color: ThemeColors
+        //                                                       .COLOR_GREY
+        //                                                       .withOpacity(
+        //                                                           0.3)),
+        //                                               child: Center(
+        //                                                 child: TextBuilder.build(
+        //                                                     title:
+        //                                                         data.pdtCatCode,
+        //                                                     style:
+        //                                                         TextStyleCustom
+        //                                                             .STYLE_LABEL
+        //                                                             .copyWith(
+        //                                                                 fontSize:
+        //                                                                     12),
+        //                                                     textOverflow:
+        //                                                         TextOverflow
+        //                                                             .ellipsis,
+        //                                                     maxLine: 2),
+        //                                               ),
+        //                                             ),
+        //                                           ],
+        //                                         ),
+        //                                       ),
+        //                                     ),
+        //                                   ],
+        //                                 ),
+        //                               ),
+        //                             ),
+        //                           ))
+        //                       .toList()),
+        //
+        //             ],
+        //           ),
+        //         );
+        //       } else {
+        //         return Text("Error");
+        //       }
+        //     } else if (snapshot.connectionState == ConnectionState.waiting) {
+        //       return CircularProgressIndicator();
+        //     } else {
+        //       return Text("Something wrong.!!");
+        //     }
+        //   },
+        // ),
+        FutureBuilder(
+          future: DBProviderAsset.db.getAllDataAssetTest(),
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              if (!(snapshot.hasError)) {
+                return Text("${snapshot.data}");
+              } else
+                return Text("Error");
+            } else if (snapshot.connectionState == ConnectionState.waiting)
+              return CircularProgressIndicator();
+            else
+              return Text("Somthing wrong.");
+          },
+        ),
+        Column(
+          children: listAssetData.map((i) {
+            return ModelAssetWidget(i);
+          }).toList(),
+        )
+      ],
     );
   }
 
@@ -107,11 +265,43 @@ class _AssetPageState extends State<AssetPage> {
                   icon: Icon(Icons.sort),
                   tooltip: "Sort Asset",
                   onPressed: () async {
-                    // await buildShowModalBottomSheet(context);
-                    // await checkSessionExpired();
+                    try {
+                      var filePool = await DBProviderAsset.db
+                          .getAllDataFilePool()
+                          .catchError((onError) =>
+                              print("getAllDataFilePool => $onError"));
+                      var waranzyUsed = await DBProviderAsset.db
+                          .getAllDataWarranzyUsed()
+                          .catchError((onError) =>
+                              print("getAllDataWarranzyUsed => $onError"));
+                      var warranzyLog = await DBProviderAsset.db
+                          .getAllDataWarranzyLog()
+                          .catchError((onError) =>
+                              print("getAllDataWarranzyLog => $onError"));
+
+                      filePool.forEach(
+                          (v) => print("filePool => ${v.fileDescription}"));
+                      waranzyUsed.forEach(
+                          (v) => print("waranzyUsed => ${v.custUserID}"));
+                      warranzyLog.forEach(
+                          (v) => print("warranzyLog => ${v.fileAttachID}"));
+                    } catch (e) {
+                      print(e);
+                    }
                   },
                 ),
               ),
+              Expanded(
+                child: IconButton(
+                  icon: Icon(Icons.clear_all),
+                  onPressed: () async {
+                    // try {
+                    //   await DBProviderAsset.db.deleteAllAsset();
+                    // } catch (e) {}
+                    
+                  },
+                ),
+              )
             ],
           ),
         )),

@@ -23,7 +23,7 @@ class ShowDataAPI {
 }
 
 class APIServiceUser {
-  static const int TIMEOUT = 60;
+  static const int TIMEOUT = 300;
   static final String baseUrl = BaseUrl.baseUrlLocal;
   // static Future apiVerifyNumberTest({String url, dynamic postData}) async {
   //   printAPIName("apiVerfyNumber");
@@ -186,13 +186,13 @@ class APIServiceUser {
       final response = await http
           .post(urlPost, body: postData)
           .timeout(Duration(seconds: TIMEOUT))
-          .catchError((e) => ModelVerifyLogin(message: "CatchError $e"));
+          .catchError((e) => print("message: CatchError ${e.toString()}")); //
       if (response.statusCode == 200) {
         ShowDataAPI.printResponse("${json.decode(response.body)}");
         return ModelVerifyLogin.fromJson(json.decode(response.body));
-      } else
-        throw Exception(
-            "Error"); //ModelVerifyLogin(message: "Error ${response.statusCode}")
+      } else {
+        throw Exception("Error ${response.request}");
+      } //ModelVerifyLogin(message: "Error ${response.statusCode}")
     } on TimeoutException catch (_) {
       print("TimeOut");
       return ModelVerifyLogin(message: "Request time out. Try again.");
@@ -200,8 +200,8 @@ class APIServiceUser {
       print("Catch on Exception => $e");
       return ModelVerifyLogin(message: "$e");
     } catch (e) {
-      print("$baseUrl/User/Login => Catch Error : $e");
-      return ModelVerifyLogin(message: "Error => $e");
+      print("Catch Error $baseUrl/User/Login => : $e");
+      return ModelVerifyLogin(message: "Error");
     }
   }
 }

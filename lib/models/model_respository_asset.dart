@@ -2,8 +2,10 @@ class RepositoryOfAsset {
   bool status;
   WarranzyUsed warranzyUsed;
   WarranzyLog warranzyLog;
+  List<FilePool> filePool;
 
-  RepositoryOfAsset({this.status, this.warranzyUsed, this.warranzyLog});
+  RepositoryOfAsset(
+      {this.status, this.warranzyUsed, this.warranzyLog, this.filePool});
 
   RepositoryOfAsset.fromJson(Map<String, dynamic> json) {
     status = json['Status'];
@@ -13,6 +15,12 @@ class RepositoryOfAsset {
     warranzyLog = json['WarranzyLog'] != null
         ? new WarranzyLog.fromJson(json['WarranzyLog'])
         : null;
+    if (json['FilePool'] != null) {
+      filePool = new List<FilePool>();
+      json['FilePool'].forEach((v) {
+        filePool.add(new FilePool.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -23,6 +31,9 @@ class RepositoryOfAsset {
     }
     if (this.warranzyLog != null) {
       data['WarranzyLog'] = this.warranzyLog.toJson();
+    }
+    if (this.filePool != null) {
+      data['FilePool'] = this.filePool.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -158,6 +169,156 @@ class WarranzyLog {
     data['WarrantyNo'] = this.warrantyNo;
     data['WarranzyEndDate'] = this.warranzyEndDate;
     data['FileAttach_ID'] = this.fileAttachID;
+    return data;
+  }
+}
+
+class FilePool {
+  String fileID;
+  String fileName;
+  String fileType;
+  String fileDescription;
+  String fileData;
+  String lastUpdate;
+
+  FilePool(
+      {this.fileID,
+      this.fileName,
+      this.fileType,
+      this.fileDescription,
+      this.fileData,
+      this.lastUpdate});
+
+  FilePool.fromJson(Map<String, dynamic> json) {
+    fileID = json['FileID'];
+    fileName = json['FileName'];
+    fileType = json['FileType'];
+    fileDescription = json['FileDescription'];
+    fileData = json['FileData'];
+    lastUpdate = json['LastUpdate'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['FileID'] = this.fileID;
+    data['FileName'] = this.fileName;
+    data['FileType'] = this.fileType;
+    data['FileDescription'] = this.fileDescription;
+    data['FileData'] = this.fileData;
+    data['LastUpdate'] = this.lastUpdate;
+    return data;
+  }
+}
+
+class RepositoryOfAssetFromSqflite {
+  String wTokenID;
+  String custUserID;
+  String custCountryCode;
+  String pdtCatCode;
+  String pdtGroup;
+  String pdtPlace;
+  String brandCode;
+  String title;
+  String serialNo;
+  String lotNo;
+  String salesPrice;
+  String warrantyNo;
+  String warrantyExpire;
+  String custRemark;
+  String createType;
+  String createDate;
+  String lastModiflyDate;
+  String exWarrantyStatus;
+  String tradeStatus;
+  String fileID;
+  String fileName;
+  String fileType;
+  String fileDescription;
+  String fileData;
+  String lastUpdate;
+
+  RepositoryOfAssetFromSqflite(
+      {this.wTokenID,
+      this.custUserID,
+      this.custCountryCode,
+      this.pdtCatCode,
+      this.pdtGroup,
+      this.pdtPlace,
+      this.brandCode,
+      this.title,
+      this.serialNo,
+      this.lotNo,
+      this.salesPrice,
+      this.warrantyNo,
+      this.warrantyExpire,
+      this.custRemark,
+      this.createType,
+      this.createDate,
+      this.lastModiflyDate,
+      this.exWarrantyStatus,
+      this.tradeStatus,
+      this.fileID,
+      this.fileName,
+      this.fileType,
+      this.fileDescription,
+      this.fileData,
+      this.lastUpdate});
+
+  RepositoryOfAssetFromSqflite.fromJson(Map<String, dynamic> json) {
+    wTokenID = json['WTokenID'];
+    custUserID = json['CustUserID'];
+    custCountryCode = json['CustCountryCode'];
+    pdtCatCode = json['PdtCatCode'];
+    pdtGroup = json['PdtGroup'];
+    pdtPlace = json['PdtPlace'];
+    brandCode = json['BrandCode'];
+    title = json['Title'];
+    serialNo = json['SerialNo'];
+    lotNo = json['LotNo'];
+    salesPrice = json['SalesPrice'];
+    warrantyNo = json['WarrantyNo'];
+    warrantyExpire = json['WarrantyExpire'];
+    custRemark = json['CustRemark'];
+    createType = json['CreateType'];
+    createDate = json['CreateDate'];
+    lastModiflyDate = json['LastModiflyDate'];
+    exWarrantyStatus = json['ExWarrantyStatus'];
+    tradeStatus = json['TradeStatus'];
+    fileID = json['FileID'];
+    fileName = json['FileName'];
+    fileType = json['FileType'];
+    fileDescription = json['FileDescription'];
+    fileData = json['FileData'];
+    lastUpdate = json['LastUpdate'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['WTokenID'] = this.wTokenID;
+    data['CustUserID'] = this.custUserID;
+    data['CustCountryCode'] = this.custCountryCode;
+    data['PdtCatCode'] = this.pdtCatCode;
+    data['PdtGroup'] = this.pdtGroup;
+    data['PdtPlace'] = this.pdtPlace;
+    data['BrandCode'] = this.brandCode;
+    data['Title'] = this.title;
+    data['SerialNo'] = this.serialNo;
+    data['LotNo'] = this.lotNo;
+    data['SalesPrice'] = this.salesPrice;
+    data['WarrantyNo'] = this.warrantyNo;
+    data['WarrantyExpire'] = this.warrantyExpire;
+    data['CustRemark'] = this.custRemark;
+    data['CreateType'] = this.createType;
+    data['CreateDate'] = this.createDate;
+    data['LastModiflyDate'] = this.lastModiflyDate;
+    data['ExWarrantyStatus'] = this.exWarrantyStatus;
+    data['TradeStatus'] = this.tradeStatus;
+    data['FileID'] = this.fileID;
+    data['FileName'] = this.fileName;
+    data['FileType'] = this.fileType;
+    data['FileDescription'] = this.fileDescription;
+    data['FileData'] = this.fileData;
+    data['LastUpdate'] = this.lastUpdate;
     return data;
   }
 }

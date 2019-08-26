@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -57,6 +58,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
       "CustUserID": custID,
     };
     print("Data before send Api => $postData");
+
     await APIServiceUser.apiVerifyLogin(postData: postData).then((response) {
       if (response?.status == true) {
         gotoMainPage();
@@ -77,7 +79,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
         ecsLib
             .showDialogLib(
                 context: context,
-                content: response?.message,
+                content: response?.message ?? "Catch Error",
                 textOnButton: allTranslations.text("close"),
                 title: "SERVER ERROR")
             .then((res) {
