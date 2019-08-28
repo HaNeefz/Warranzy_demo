@@ -1,9 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 import 'package:warranzy_demo/models/model_mas_cust.dart';
 import 'package:warranzy_demo/models/model_verify_login.dart';
 import 'package:warranzy_demo/models/model_verify_phone.dart';
+import 'package:warranzy_demo/tools/export_lib.dart';
 
 import 'base_url.dart';
 
@@ -193,6 +196,9 @@ class APIServiceUser {
       } else {
         throw Exception("Error ${response.request}");
       } //ModelVerifyLogin(message: "Error ${response.statusCode}")
+    } on SocketException catch (e) {
+      print(e);
+      return ModelVerifyLogin(message: "Error ${e.message}");
     } on TimeoutException catch (_) {
       print("TimeOut");
       return ModelVerifyLogin(message: "Request time out. Try again.");
@@ -201,6 +207,41 @@ class APIServiceUser {
       return ModelVerifyLogin(message: "$e");
     } catch (e) {
       print("Catch Error $baseUrl/User/Login => : $e");
+      return ModelVerifyLogin(message: "Error");
+    }
+  }
+
+  static Future<ModelVerifyLogin> apiVerifyLoginTest({dynamic postData}) async {
+    ShowDataAPI.printAPIName("apiLogin");
+    String urlPost = "$baseUrl/User/Login"; //User/CheckVerifyPhone;
+    ShowDataAPI.printAPIRequestUrl("$baseUrl/User/Login");
+    FormData formData = FormData.from(postData);
+    try {
+      final response = await HttpService.dio
+          .post("$urlPost", data: formData)
+          // await http
+          // .post(urlPost, body: postData)
+          .timeout(Duration(seconds: TIMEOUT));
+      if (response.statusCode == 200) {
+        ShowDataAPI.printResponse("${json.decode(response.data)}");
+        return ModelVerifyLogin.fromJson(json.decode(response.data));
+      } else {
+        throw Exception(ModelVerifyLogin(message: "Throw Error"));
+      }
+    } on DioError catch (e) {
+      print("DioError ${e.request}");
+      return ModelVerifyLogin(message: "Error ${e.message}");
+    } on SocketException catch (e) {
+      print(e);
+      return ModelVerifyLogin(message: "Error ${e.message}");
+    } on TimeoutException catch (_) {
+      print("TimeOut");
+      return ModelVerifyLogin(message: "Request time out. Try again.");
+    } on Exception catch (e) {
+      print("Catch on Exception => $e");
+      return ModelVerifyLogin(message: "$e");
+    } catch (e, s) {
+      print("Catch Error $baseUrl/User/Login => : $e | $s");
       return ModelVerifyLogin(message: "Error");
     }
   }

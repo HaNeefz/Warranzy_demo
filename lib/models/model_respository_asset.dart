@@ -3,12 +3,18 @@ class RepositoryOfAsset {
   WarranzyUsed warranzyUsed;
   WarranzyLog warranzyLog;
   List<FilePool> filePool;
+  String message;
 
   RepositoryOfAsset(
-      {this.status, this.warranzyUsed, this.warranzyLog, this.filePool});
+      {this.status,
+      this.warranzyUsed,
+      this.warranzyLog,
+      this.filePool,
+      this.message});
 
   RepositoryOfAsset.fromJson(Map<String, dynamic> json) {
     status = json['Status'];
+    message = json['Message'];
     warranzyUsed = json['WarranzyUsed'] != null
         ? new WarranzyUsed.fromJson(json['WarranzyUsed'])
         : null;
@@ -26,6 +32,7 @@ class RepositoryOfAsset {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['Status'] = this.status;
+    data['Message'] = this.message;
     if (this.warranzyUsed != null) {
       data['WarranzyUsed'] = this.warranzyUsed.toJson();
     }
@@ -210,7 +217,32 @@ class FilePool {
   }
 }
 
-class RepositoryOfAssetFromSqflite {
+class ResponseDetailOfAsset {
+  bool status;
+  ModelDataAsset data;
+  String message;
+
+  ResponseDetailOfAsset({this.status, this.data, this.message});
+
+  ResponseDetailOfAsset.fromJson(Map<String, dynamic> json) {
+    status = json['Status'];
+    message = json['Message'];
+    data =
+        json['Data'] != null ? new ModelDataAsset.fromJson(json['Data']) : null;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['Status'] = this.status;
+    data['Message'] = this.message;
+    if (this.data != null) {
+      data['Data'] = this.data.toJson();
+    }
+    return data;
+  }
+}
+
+class ModelDataAsset {
   String wTokenID;
   String custUserID;
   String custCountryCode;
@@ -230,14 +262,16 @@ class RepositoryOfAssetFromSqflite {
   String lastModiflyDate;
   String exWarrantyStatus;
   String tradeStatus;
-  String fileID;
-  String fileName;
-  String fileType;
-  String fileDescription;
-  String fileData;
-  String lastUpdate;
+  String logDate;
+  String logType;
+  String partyCode;
+  String partyCountryCode;
+  String warranzyEndDate;
+  String fileAttachID;
+  String imageMain;
+  String images;
 
-  RepositoryOfAssetFromSqflite(
+  ModelDataAsset(
       {this.wTokenID,
       this.custUserID,
       this.custCountryCode,
@@ -257,14 +291,15 @@ class RepositoryOfAssetFromSqflite {
       this.lastModiflyDate,
       this.exWarrantyStatus,
       this.tradeStatus,
-      this.fileID,
-      this.fileName,
-      this.fileType,
-      this.fileDescription,
-      this.fileData,
-      this.lastUpdate});
+      this.logDate,
+      this.logType,
+      this.partyCode,
+      this.partyCountryCode,
+      this.warranzyEndDate,
+      this.fileAttachID,
+      this.images});
 
-  RepositoryOfAssetFromSqflite.fromJson(Map<String, dynamic> json) {
+  ModelDataAsset.fromJson(Map<String, dynamic> json) {
     wTokenID = json['WTokenID'];
     custUserID = json['CustUserID'];
     custCountryCode = json['CustCountryCode'];
@@ -284,12 +319,14 @@ class RepositoryOfAssetFromSqflite {
     lastModiflyDate = json['LastModiflyDate'];
     exWarrantyStatus = json['ExWarrantyStatus'];
     tradeStatus = json['TradeStatus'];
-    fileID = json['FileID'];
-    fileName = json['FileName'];
-    fileType = json['FileType'];
-    fileDescription = json['FileDescription'];
-    fileData = json['FileData'];
-    lastUpdate = json['LastUpdate'];
+    logDate = json['LogDate'];
+    logType = json['LogType'];
+    partyCode = json['PartyCode'];
+    partyCountryCode = json['PartyCountryCode'];
+    warranzyEndDate = json['WarranzyEndDate'];
+    fileAttachID = json['FileAttach_ID'];
+    imageMain = json['ImageMain'];
+    images = json['Images'];
   }
 
   Map<String, dynamic> toJson() {
@@ -313,12 +350,42 @@ class RepositoryOfAssetFromSqflite {
     data['LastModiflyDate'] = this.lastModiflyDate;
     data['ExWarrantyStatus'] = this.exWarrantyStatus;
     data['TradeStatus'] = this.tradeStatus;
-    data['FileID'] = this.fileID;
-    data['FileName'] = this.fileName;
-    data['FileType'] = this.fileType;
-    data['FileDescription'] = this.fileDescription;
-    data['FileData'] = this.fileData;
-    data['LastUpdate'] = this.lastUpdate;
+    data['LogDate'] = this.logDate;
+    data['LogType'] = this.logType;
+    data['PartyCode'] = this.partyCode;
+    data['PartyCountryCode'] = this.partyCountryCode;
+    data['WarranzyEndDate'] = this.warranzyEndDate;
+    data['FileAttach_ID'] = this.fileAttachID;
+    data['Images'] = this.images;
+    return data;
+  }
+}
+
+class ResponseAssetOnline {
+  bool status;
+  List<ModelDataAsset> data;
+  String message;
+
+  ResponseAssetOnline({this.status, this.data, this.message});
+
+  ResponseAssetOnline.fromJson(Map<String, dynamic> json) {
+    status = json['Status'];
+    message = json['Message'];
+    if (json['Data'] != null) {
+      data = new List<ModelDataAsset>();
+      json['Data'].forEach((v) {
+        data.add(new ModelDataAsset.fromJson(v));
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['Status'] = this.status;
+    data['Message'] = this.message;
+    if (this.data != null) {
+      data['Data'] = this.data.map((v) => v.toJson()).toList();
+    }
     return data;
   }
 }

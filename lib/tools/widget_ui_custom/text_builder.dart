@@ -10,7 +10,7 @@ class TextBuilder {
     int maxLine,
   }) {
     return Text(
-      title,
+      title??"Text Empty",
       style: style ?? TextStyleCustom.STYLE_LABEL,
       textAlign: textAlign,
       overflow: textOverflow,

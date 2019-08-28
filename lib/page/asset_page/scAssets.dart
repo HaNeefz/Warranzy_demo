@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +11,7 @@ import 'package:warranzy_demo/models/model_respository_asset.dart';
 import 'package:warranzy_demo/page/asset_page/add_assets_page/scFillInformation.dart';
 import 'package:warranzy_demo/page/profile_page/scProfile.dart';
 import 'package:warranzy_demo/page/splash_screen/scSplash_screen.dart';
+import 'package:warranzy_demo/services/api/api_service_assets.dart';
 import 'package:warranzy_demo/services/api/jwt_service.dart';
 import 'package:warranzy_demo/services/method/scan_qr.dart';
 import 'package:warranzy_demo/services/sqflit/db_asset.dart';
@@ -20,8 +23,9 @@ import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/carouselImage.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
-import 'widget_assets/widget_asset.dart';
 import 'package:http/http.dart' as http;
+
+import 'detail_asset_page/scDetailAsset.dart';
 
 class AssetPage extends StatefulWidget {
   @override
@@ -33,14 +37,39 @@ class _AssetPageState extends State<AssetPage> {
   final allTranslations = getIt.get<GlobalTranslations>();
   ModelAssetsData assetData = ModelAssetsData();
   final Dio dio = Dio();
+  Future getAssetTen;
+  Future<List<ModelDataAsset>> getModelData;
 
   List<ModelAssetsData> listAssetData;
   JWTService jwtService;
+
+  Future<List<ModelDataAsset>> getModelDataAsset() async {
+    return await DBProviderAsset.db.getAllDataAsset();
+  }
+
+  Future<ResponseAssetOnline> getUrlAssetTen() async {
+    try {
+      var response = await dio.get(
+          "http://192.168.0.36:9999/API/v1/Asset/getMyAsset",
+          options: Options(
+              headers: {"Authorization": await JWTService.getTokenJWT()}));
+      if (response.statusCode == 200) {
+        ecsLib.printJson(jsonDecode(response.data));
+        return ResponseAssetOnline.fromJson(jsonDecode(response.data));
+      } else
+        throw Exception();
+    } catch (e) {
+      print(e);
+      return null;
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     listAssetData = assetData.pushData();
+    getModelData = getModelDataAsset();
+    getAssetTen = getUrlAssetTen();
   }
 
   @override
@@ -65,164 +94,74 @@ class _AssetPageState extends State<AssetPage> {
   Column buildYourAssets() {
     return Column(
       children: <Widget>[
-        // FutureBuilder<Iterable<RepositoryOfAssetFromSqflite>>(
-        //   future: DBProviderAsset.db.getAllDataAsset(),
-        //   builder: (BuildContext context,
-        //       AsyncSnapshot<Iterable<RepositoryOfAssetFromSqflite>> snapshot) {
-        //     if (snapshot.connectionState == ConnectionState.done) {
-        //       if (!(snapshot.hasError)) {
-        //         return Padding(
-        //           padding: const EdgeInsets.fromLTRB(10, 15, 10, 10),
-        //           child: Column(
-        //             crossAxisAlignment: CrossAxisAlignment.start,
-        //             mainAxisSize: MainAxisSize.min,
-        //             children: <Widget>[
-        //               Column(
-        //                   children: snapshot.data
-        //                       .map((data) => Card(
-        //                             elevation: 5.0,
-        //                             child: Padding(
-        //                               padding: const EdgeInsets.all(8.0),
-        //                               child: Container(
-        //                                 child: Row(
-        //                                   children: <Widget>[
-        //                                     Expanded(
-        //                                       flex: 1,
-        //                                       child: Container(
-        //                                         width: 150,
-        //                                         height: 150,
-        //                                         decoration: BoxDecoration(
-        //                                             border: Border.all(
-        //                                                 width: 0.3,
-        //                                                 color: ThemeColors
-        //                                                     .COLOR_THEME_APP),
-        //                                             borderRadius:
-        //                                                 BorderRadius.circular(
-        //                                                     10)),
-        //                                         child: Center(
-        //                                           child: FlutterLogo(),
-        //                                         ),
-        //                                       ),
-        //                                     ),
-        //                                     Expanded(
-        //                                       flex: 2,
-        //                                       child: Container(
-        //                                         padding: EdgeInsets.symmetric(
-        //                                             vertical: 10,
-        //                                             horizontal: 10),
-        //                                         child: Column(
-        //                                           crossAxisAlignment:
-        //                                               CrossAxisAlignment.start,
-        //                                           children: <Widget>[
-        //                                             TextBuilder.build(
-        //                                                 title: data.title ??
-        //                                                     "Empty title",
-        //                                                 style: TextStyleCustom
-        //                                                     .STYLE_LABEL_BOLD),
-        //                                             TextBuilder.build(
-        //                                                 title:
-        //                                                     data.custRemark ??
-        //                                                         "Empty Remark",
-        //                                                 style: TextStyleCustom
-        //                                                     .STYLE_CONTENT,
-        //                                                 textOverflow:
-        //                                                     TextOverflow
-        //                                                         .ellipsis,
-        //                                                 maxLine: 2),
-        //                                             TextBuilder.build(
-        //                                                 title: data.fileID ??
-        //                                                     "Empty Remark | ${data.fileName}",
-        //                                                 style: TextStyleCustom
-        //                                                     .STYLE_CONTENT,
-        //                                                 textOverflow:
-        //                                                     TextOverflow
-        //                                                         .ellipsis,
-        //                                                 maxLine: 2),
-        //                                             TextBuilder.build(
-        //                                                 title: "\nExpire Date : ${data.warrantyExpire}" ??
-        //                                                     "Empty warrantyExpire",
-        //                                                 style: TextStyleCustom
-        //                                                     .STYLE_CONTENT
-        //                                                     .copyWith(
-        //                                                         fontSize: 12),
-        //                                                 textOverflow:
-        //                                                     TextOverflow
-        //                                                         .ellipsis,
-        //                                                 maxLine: 2),
-        //                                             Container(
-        //                                               margin:
-        //                                                   EdgeInsets.symmetric(
-        //                                                       vertical: 10),
-        //                                               width: 80,
-        //                                               height: 30,
-        //                                               decoration: BoxDecoration(
-        //                                                   borderRadius:
-        //                                                       BorderRadius
-        //                                                           .circular(20),
-        //                                                   color: ThemeColors
-        //                                                       .COLOR_GREY
-        //                                                       .withOpacity(
-        //                                                           0.3)),
-        //                                               child: Center(
-        //                                                 child: TextBuilder.build(
-        //                                                     title:
-        //                                                         data.pdtCatCode,
-        //                                                     style:
-        //                                                         TextStyleCustom
-        //                                                             .STYLE_LABEL
-        //                                                             .copyWith(
-        //                                                                 fontSize:
-        //                                                                     12),
-        //                                                     textOverflow:
-        //                                                         TextOverflow
-        //                                                             .ellipsis,
-        //                                                     maxLine: 2),
-        //                                               ),
-        //                                             ),
-        //                                           ],
-        //                                         ),
-        //                                       ),
-        //                                     ),
-        //                                   ],
-        //                                 ),
-        //                               ),
-        //                             ),
-        //                           ))
-        //                       .toList()),
-        //
-        //             ],
-        //           ),
-        //         );
-        //       } else {
-        //         return Text("Error");
-        //       }
-        //     } else if (snapshot.connectionState == ConnectionState.waiting) {
-        //       return CircularProgressIndicator();
-        //     } else {
-        //       return Text("Something wrong.!!");
-        //     }
-        //   },
-        // ),
-        FutureBuilder(
-          future: DBProviderAsset.db.getAllDataAssetTest(),
-          builder: (BuildContext context, AsyncSnapshot snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              if (!(snapshot.hasError)) {
-                return Text("${snapshot.data}");
-              } else
-                return Text("Error");
-            } else if (snapshot.connectionState == ConnectionState.waiting)
-              return CircularProgressIndicator();
-            else
-              return Text("Somthing wrong.");
-          },
-        ),
-        Column(
-          children: listAssetData.map((i) {
-            return ModelAssetWidget(i);
-          }).toList(),
-        )
+        buildAssetOffine(),
+        buildAssetOnline(),
+        // Column(
+        //   children: listAssetData.map((i) {
+        //     return ModelAssetWidget(i);
+        //   }).toList(),
+        // )
       ],
+    );
+  }
+
+  FutureBuilder<ResponseAssetOnline> buildAssetOnline() {
+    return FutureBuilder<ResponseAssetOnline>(
+      future: getAssetTen,
+      builder:
+          (BuildContext context, AsyncSnapshot<ResponseAssetOnline> snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          var data = snapshot.data;
+          if (data?.status == true) {
+            return Column(
+              children: data.data
+                  .map((data) => new MyAssetOnline(data: data))
+                  .toList(),
+            );
+          } else {
+            return Text("Somethig wrong");
+          }
+        } else
+          return CircularProgressIndicator();
+      },
+    );
+  }
+
+  FutureBuilder<List<ModelDataAsset>> buildAssetOffine() {
+    return FutureBuilder<List<ModelDataAsset>>(
+      future: getModelData,
+      builder:
+          (BuildContext context, AsyncSnapshot<List<ModelDataAsset>> snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          if (!(snapshot.hasError)) {
+            if (snapshot.data.isNotEmpty)
+              return Padding(
+                padding: const EdgeInsets.fromLTRB(10, 15, 10, 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Column(
+                        children: snapshot.data
+                            .map((data) => new MyAssetFormSQLite(data: data))
+                            .toList()),
+                  ],
+                ),
+              );
+            else {
+              return Center(
+                child: TextBuilder.build(title: "Data is empty"),
+              );
+            }
+          } else {
+            return Text("Error");
+          }
+        } else if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        } else {
+          return Text("Something wrong.!!");
+        }
+      },
     );
   }
 
@@ -295,10 +234,13 @@ class _AssetPageState extends State<AssetPage> {
                 child: IconButton(
                   icon: Icon(Icons.clear_all),
                   onPressed: () async {
-                    // try {
-                    //   await DBProviderAsset.db.deleteAllAsset();
-                    // } catch (e) {}
-                    
+                    try {
+                      await DBProviderAsset.db
+                          .deleteAllAsset()
+                          .whenComplete(() => setState(() {
+                                getModelData = getModelDataAsset();
+                              }));
+                    } catch (e) {}
                   },
                 ),
               )
@@ -444,6 +386,210 @@ class _AssetPageState extends State<AssetPage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class MyAssetFormSQLite extends StatelessWidget {
+  // final RepositoryOfAssetFromSqflite data;
+  final Dio dio = Dio();
+  final ModelDataAsset data;
+  MyAssetFormSQLite({
+    Key key,
+    this.data,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 5.0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Container(
+        child: ListTile(
+          title: Row(
+            children: <Widget>[
+              Expanded(
+                flex: 1,
+                child: Container(
+                  width: 150,
+                  height: 150,
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                          width: 0.3, color: ThemeColors.COLOR_THEME_APP),
+                      borderRadius: BorderRadius.circular(10)),
+                  child: Center(
+                    child: FlutterLogo(),
+                  ),
+                ),
+              ),
+              Expanded(
+                flex: 2,
+                child: Container(
+                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      TextBuilder.build(
+                          title: data.title ?? "Empty title",
+                          style: TextStyleCustom.STYLE_LABEL_BOLD),
+                      TextBuilder.build(
+                          title: data.custRemark ?? "Empty Remark",
+                          style: TextStyleCustom.STYLE_CONTENT,
+                          textOverflow: TextOverflow.ellipsis,
+                          maxLine: 2),
+                      TextBuilder.build(
+                          title: data.fileAttachID ??
+                              "Empty Remark | ${data.custRemark}",
+                          style: TextStyleCustom.STYLE_CONTENT,
+                          textOverflow: TextOverflow.ellipsis,
+                          maxLine: 2),
+                      TextBuilder.build(
+                          title: "\nExpire Date : ${data.warrantyExpire}" ??
+                              "Empty warrantyExpire",
+                          style: TextStyleCustom.STYLE_CONTENT
+                              .copyWith(fontSize: 12),
+                          textOverflow: TextOverflow.ellipsis,
+                          maxLine: 2),
+                      Container(
+                        margin: EdgeInsets.symmetric(vertical: 10),
+                        width: 80,
+                        height: 30,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: ThemeColors.COLOR_GREY.withOpacity(0.3)),
+                        child: Center(
+                          child: TextBuilder.build(
+                              title: data.pdtCatCode,
+                              style: TextStyleCustom.STYLE_LABEL
+                                  .copyWith(fontSize: 12),
+                              textOverflow: TextOverflow.ellipsis,
+                              maxLine: 2),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          onTap: () async {
+            ecsLib.pushPage(
+              context: context,
+              pageWidget: DetailAsset(
+                dataAsset: data,
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class MyAssetOnline extends StatelessWidget {
+  final ModelDataAsset data;
+  final Dio dio = Dio();
+  MyAssetOnline({
+    Key key,
+    this.data,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 5,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: ListTile(
+        title: Row(
+          children: <Widget>[
+            CachedNetworkImage(
+              imageUrl: data.imageMain,
+              imageBuilder: (context, imageProvider) => Container(
+                width: 150,
+                height: 150,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  image: DecorationImage(
+                      image: imageProvider,
+                      fit: BoxFit.cover,
+                      colorFilter:
+                          ColorFilter.mode(Colors.red, BlendMode.dstATop)),
+                ),
+              ),
+              placeholder: (context, url) => CircularProgressIndicator(),
+              errorWidget: (context, url, error) => Icon(Icons.error),
+            ),
+            Expanded(
+              flex: 2,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    TextBuilder.build(
+                        title: data.title ?? "NULL",
+                        style:
+                            TextStyleCustom.STYLE_TITLE.copyWith(fontSize: 25)),
+                    TextBuilder.build(
+                        title: data.custRemark ?? "Empty",
+                        style: TextStyleCustom.STYLE_CONTENT),
+                    TextBuilder.build(
+                        title: "\nWarranty Date " + "${data.warrantyExpire}" ??
+                            "Empty",
+                        style: TextStyleCustom.STYLE_CONTENT
+                            .copyWith(fontSize: 14)),
+                    Container(
+                      padding: EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                          color: ThemeColors.COLOR_GREY.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(10)),
+                      child: TextBuilder.build(
+                          title: data.pdtCatCode,
+                          style: TextStyleCustom.STYLE_CONTENT.copyWith(
+                              fontSize: 14, color: ThemeColors.COLOR_BLACK)),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        onTap: () async {
+          try {
+            ecsLib.showDialogLoadingLib(context);
+            await APIServiceAssets.getDetailAseet(data.wTokenID).then((res) {
+              ecsLib.cancelDialogLoadindLib(context);
+              if (res?.status == true) {
+                ecsLib.pushPage(
+                  context: context,
+                  pageWidget: DetailAsset(
+                    dataAsset: res.data,
+                  ),
+                );
+              } else if (res.status == false) {
+                ecsLib.showDialogLib(
+                    content: "status false",
+                    context: context,
+                    textOnButton: allTranslations.text("close"),
+                    title: "ERROR STATUS");
+              } else {
+                ecsLib.showDialogLib(
+                    content: "Something wrong",
+                    context: context,
+                    textOnButton: allTranslations.text("close"),
+                    title: "ERROR SERVER");
+              }
+            });
+          } catch (e) {
+            ecsLib.showDialogLib(
+                content: "Something wrong",
+                context: context,
+                textOnButton: allTranslations.text("close"),
+                title: "CATCH ERROR");
+          }
+        },
       ),
     );
   }

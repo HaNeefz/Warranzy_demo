@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:warranzy_demo/models/model_cust_temp_data.dart';
 import 'package:warranzy_demo/models/model_mas_cust.dart';
@@ -52,14 +53,18 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
     var dvID = pref?.getString("DeviceID");
     var pinCIde = dataCust?.pINcode;
     var custID = dataCust?.custUserID;
+    var countryCode = dataCust?.countryCode;
     var postData = {
       "DeviceID": dvID,
       "PINcode": pinCIde,
       "CustUserID": custID,
+      "TimeZone": await FlutterNativeTimezone.getLocalTimezone(),
+      "CountryCode": countryCode
     };
     print("Data before send Api => $postData");
 
-    await APIServiceUser.apiVerifyLogin(postData: postData).then((response) {
+    await APIServiceUser.apiVerifyLoginTest(postData: postData)
+        .then((response) {
       if (response?.status == true) {
         gotoMainPage();
       } else if (response?.status == false) {

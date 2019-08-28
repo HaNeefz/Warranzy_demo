@@ -2,17 +2,19 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:progress_indicators/progress_indicators.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
+import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
+import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 import 'assets.dart';
 
 class ECSLib {
+  final allTranslations = GlobalTranslations();
   Widget logoApp({double width = 300, double height = 300}) {
     return Image.asset(
       Assets.ICON_APP_TRANSPARENT,
@@ -98,7 +100,7 @@ class ECSLib {
                 borderRadius: BorderRadius.circular(20.0)),
             // backgroundColor: Theme.of(context).backgroundColor,
             title: Text(
-              title,
+              title ?? "",
             ),
             content: Text(content ?? ""),
             actions: <Widget>[
@@ -178,7 +180,7 @@ class ECSLib {
                 borderRadius: BorderRadius.circular(20.0)),
             // backgroundColor: Theme.of(context).backgroundColor,
             title: Text(
-              title,
+              title ?? "",
               // style: normalText.copyWith(fontWeight: FontWeight.bold),
             ),
             content: TextField(
@@ -187,16 +189,16 @@ class ECSLib {
               textInputAction: TextInputAction.done,
               // style: normalText.copyWith(color: Colors.grey),
               decoration: InputDecoration(
-                labelText: label,
+                labelText: label ?? "",
                 // labelStyle: normalText.copyWith(color: Colors.white),
-                hintText: hintText,
+                hintText: hintText ?? "",
                 // hintStyle: normalText.copyWith(color: Colors.grey),
               ),
             ),
             actions: <Widget>[
               FlatButton(
                 child: Text(
-                  textOnButton,
+                  textOnButton ?? "",
                   // style: normalText,
                 ),
                 onPressed: () {
@@ -227,17 +229,17 @@ class ECSLib {
                 borderRadius: BorderRadius.circular(20.0)),
             // backgroundColor: Theme.of(context).backgroundColor,
             title: Text(
-              title,
+              title ?? "",
               // style: normalText.copyWith(fontWeight: FontWeight.bold),
             ),
             content: Text(
-              content,
+              content ?? "",
               // style: normalText
             ),
             actions: <Widget>[
               FlatButton(
                 child: Text(
-                  textCancel,
+                  textCancel ?? "",
                   // style: normalText,
                 ),
                 onPressed: () {
@@ -259,12 +261,55 @@ class ECSLib {
     return res;
   }
 
+  Future<dynamic> showDialogConnectApi(context,
+      {@required Widget child}) async {
+    var res = await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => child);
+    print(res);
+    return res;
+  }
+
+  alertDialogSucces(context, msg) {
+    return AlertDialog(
+      title: TextBuilder.build(
+          title: "Warranzy", style: TextStyleCustom.STYLE_LABEL_BOLD),
+      content: TextBuilder.build(title: msg ?? ""),
+      actions: <Widget>[
+        FlatButton(
+          child: TextBuilder.build(title: allTranslations.text("close")),
+          onPressed: () {
+            Navigator.pop(context, true);
+          },
+        )
+      ],
+    );
+  }
+
+  alertDialogError(context, msg) {
+    return AlertDialog(
+      title: TextBuilder.build(
+          title: "Warranzy", style: TextStyleCustom.STYLE_LABEL_BOLD),
+      content: TextBuilder.build(title: msg ?? ""),
+      actions: <Widget>[
+        FlatButton(
+          child: TextBuilder.build(title: allTranslations.text("close")),
+          onPressed: () {
+            Navigator.pop(context, false);
+          },
+        )
+      ],
+    );
+  }
+
   Future<File> getImage() async {
     var image;
     try {
       image = await ImagePicker.pickImage(source: ImageSource.camera);
     } on PlatformException catch (e) {
       print("Error $e");
+      image = null;
     }
     return image;
   }
@@ -275,6 +320,7 @@ class ECSLib {
       image = await ImagePicker.pickImage(source: ImageSource.gallery);
     } on PlatformException catch (e) {
       print("Error $e");
+      image = null;
     }
     return image;
   }

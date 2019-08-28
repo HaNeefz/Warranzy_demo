@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:warranzy_demo/models/model_repository_init_app.dart';
 import 'package:warranzy_demo/models/model_respository_asset.dart';
+import 'package:warranzy_demo/page/main_page/scMain_page.dart';
 import 'package:warranzy_demo/services/api/base_url.dart';
 import 'package:warranzy_demo/services/api/jwt_service.dart';
 import 'package:warranzy_demo/services/sqflit/db_asset.dart';
@@ -117,48 +118,52 @@ class _AddImageDemoState extends State<AddImageDemo> {
               ecsLib.showDialogLoadingLib(context, content: "Adding assets");
               try {
                 print(
-                    "sending Api URL => https://testwarranty-239103.appspot.com/API/v1/Asset/AddAsset");
+                    "sending Api URL => http://192.168.0.36:9999/API/v1/Asset/AddAsset"); //https://testwarranty-239103.appspot.com/API/v1/Asset/AddAsset
                 await dio
                     .post(
-                  "http://192.168.0.36:9999/API/v1/Asset/AddAsset",
-                  //http://192.168.0.36:9999/API/v1/Asset/AddAsset
-                  data: formData,
-                  options: Options(
-                    headers: {"Authorization": await JWTService.getTokenJWT()},
-                  ),
-                )
+                      "http://192.168.0.36:9999/API/v1/Asset/AddAsset",
+                      //http://192.168.0.36:9999/API/v1/Asset/AddAsset
+                      data: formData,
+                      options: Options(
+                        headers: {
+                          "Authorization": await JWTService.getTokenJWT()
+                        },
+                      ),
+                    )
+                    .timeout(Duration(seconds: 60))
                     .then((res) async {
                   print("<--- Response");
                   ecsLib.printJson(jsonDecode(res.data));
                   ecsLib.cancelDialogLoadindLib(context);
-                  // var temp = RepositoryOfAsset.fromJson(jsonDecode(res.data));
-                  // try {
-                  //   await DBProviderAsset.db
-                  //       .insertDataWarranzyUesd(temp.warranzyUsed)
-                  //       .catchError(
-                  //           (onError) => print("warranzyUsed : $onError"));
-                  // } catch (e) {
-                  //   print("insertDataWarranzyUesd => $e");
-                  // }
-                  // try {
-                  //   await DBProviderAsset.db
-                  //       .insertDataWarranzyLog(temp.warranzyLog)
-                  //       .catchError((onError) => print("warranzyLog $onError"));
-                  // } catch (e) {
-                  //   print("insertDataWarranzyLog => $e");
-                  // }
-                  // temp.filePool.forEach((data) async {
-                  //   try {
-                  //     await DBProviderAsset.db
-                  //         .insertDataFilePool(data)
-                  //         .catchError((onError) => print("filePool $onError"))
-                  //         .whenComplete(() {
-                  //       ecsLib.stepBackScene(context, 2);
-                  //     });
-                  //   } catch (e) {
-                  //     print("insertDataFilePool => $e");
-                  //   }
-                  // });
+                  var temp = RepositoryOfAsset.fromJson(jsonDecode(res.data));
+                  try {
+                    await DBProviderAsset.db
+                        .insertDataWarranzyUesd(temp.warranzyUsed)
+                        .catchError(
+                            (onError) => print("warranzyUsed : $onError"));
+                  } catch (e) {
+                    print("insertDataWarranzyUesd => $e");
+                  }
+                  try {
+                    await DBProviderAsset.db
+                        .insertDataWarranzyLog(temp.warranzyLog)
+                        .catchError((onError) => print("warranzyLog $onError"));
+                  } catch (e) {
+                    print("insertDataWarranzyLog => $e");
+                  }
+                  temp.filePool.forEach((data) async {
+                    try {
+                      await DBProviderAsset.db
+                          .insertDataFilePool(data)
+                          .catchError((onError) => print("filePool $onError"))
+                          .whenComplete(() {
+                        ecsLib.pushPageAndClearAllScene(
+                            context: context, pageWidget: MainPage());
+                      });
+                    } catch (e) {
+                      print("insertDataFilePool => $e");
+                    }
+                  });
                 }).catchError((e) {
                   print(e);
                   ecsLib.cancelDialogLoadindLib(context);

@@ -97,50 +97,25 @@ class DBProviderAsset {
         .then((v) => print("Delete tableFilePool => $v"));
   }
 
-  Future<Iterable<RepositoryOfAssetFromSqflite>> getAllDataAsset() async {
+  Future<List<ModelDataAsset>> getAllDataAsset() async {
     final db = await database;
     var res = await db.rawQuery(
-        "SELECT * FROM $tableWarranzyUsed,$tableFilePool"); // $tableWarranzyLog, $tableFilePool
+        "SELECT * FROM $tableWarranzyUsed, $tableWarranzyLog WHERE $tableWarranzyUsed.WTokenID = $tableWarranzyLog.WTokenID"); // $tableWarranzyLog, $tableFilePool
+    JsonEncoder encoder = JsonEncoder.withIndent(" ");
+    List<ModelDataAsset> temp = [];
 
-    // List<RepositoryOfAssetFromSqflite> response = res.isNotEmpty
-    //     ? res.map((v) => RepositoryOfAssetFromSqflite.fromJson(v))
-    //     : [];
-    // return response;
     if (res.isNotEmpty) {
-      // JsonEncoder encoder = JsonEncoder.withIndent(" ");
-      Iterable<RepositoryOfAssetFromSqflite> temp =
-          res.map((v) => RepositoryOfAssetFromSqflite.fromJson(v));
+      res.forEach((v) {
+        // String prettyprint = encoder.convert(v);
+        // print("Data => " + prettyprint);
+        // var map = {"Status":true,"Data":}
+        temp.add(ModelDataAsset.fromJson(v));
+      });
+
+      // print("added[0] ${encoder.convert(temp[0].toJson())}");
+      // print("added[1] ${encoder.convert(temp[1].toJson())}");
+
       return temp;
-      // res.map((v) {
-      //   String prettyprint = encoder.convert(v);
-      //   print("WarranzyUsed => " + prettyprint);
-      //   // RepositoryOfAssetFromSqflite.fromJson(v);
-      //   print("gotAllDataAsset");
-      // }).toList();
-      // return temp;
-    } else
-      return [];
-  }
-
-  Future getAllDataAssetTest() async {
-    final db = await database;
-    var res = await db.rawQuery(
-        "SELECT * FROM $tableWarranzyUsed"); // $tableWarranzyLog, $tableFilePool
-    var filePool = await db.query(tableFilePool);
-    if (res.isNotEmpty) {
-      if (filePool.isNotEmpty) {
-        // res.addAll(filePool);
-        print(res);
-      } else
-        return [];
-      // JsonEncoder encoder = JsonEncoder.withIndent(" ");
-      // res.map((v) {
-      //   String prettyprint = encoder.convert(v);
-      //   print("WarranzyUsed => " + prettyprint);
-      //   // RepositoryOfAssetFromSqflite.fromJson(v);
-      //   print("<----------------gotAllDataAsset");
-      // }).toList();
-      // return temp;
     } else {
       return [];
     }

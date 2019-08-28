@@ -123,7 +123,7 @@ class _FillInformationState extends State<FillInformation> {
       ),
       body: ecsLib.dismissedKeyboard(
         context,
-        child: FormBuilder(
+        child: FormBuilder(          
           key: _fbk,
           child: Padding(
             padding: const EdgeInsets.only(left: 15.0, right: 10, top: 20),
