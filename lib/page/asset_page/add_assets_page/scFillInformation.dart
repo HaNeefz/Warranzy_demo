@@ -39,12 +39,12 @@ class _FillInformationState extends State<FillInformation> {
       GlobalKey();
   final Dio dio = Dio();
   AutoCompleteTextField searchTextField;
-  TextEditingController txtCtrlBrandCode = TextEditingController(text: "");
-  TextEditingController txtCtrlBrandName = TextEditingController(text: "");
-  TextEditingController txtCtrlSerialNo = TextEditingController(text: "");
-  TextEditingController txtCtrlNote = TextEditingController(text: "");
-  TextEditingController txtCtrlLotNo = TextEditingController(text: "");
-  TextEditingController txtCtrlPrice = TextEditingController(text: "");
+  final txtCtrlBrandCode = TextEditingController();
+  final txtCtrlBrandName = TextEditingController();
+  final txtCtrlSerialNo = TextEditingController();
+  final txtCtrlNote = TextEditingController();
+  final txtCtrlLotNo = TextEditingController();
+  final txtCtrlPrice = TextEditingController();
   String brandActive = "N";
   var valueBrandName = "DysonElectric";
   List<GetBrandName> listBrandName = [];
@@ -67,14 +67,21 @@ class _FillInformationState extends State<FillInformation> {
   @override
   void initState() {
     super.initState();
-    // streamController = StreamController<List<String>>();
-    // streamController.sink.add(["test1", "test2", "test3", "test4"]);
-
-    // getBrandName();
     getProductCategory = DBProviderInitialApp.db.getAllDataProductCategory();
     Future.delayed(Duration(milliseconds: 1500), () {
       getBrandName();
     });
+  }
+
+  @override
+  void dispose() {
+    txtCtrlBrandCode.dispose();
+    txtCtrlBrandName.dispose();
+    txtCtrlSerialNo.dispose();
+    txtCtrlNote.dispose();
+    txtCtrlLotNo.dispose();
+    txtCtrlPrice.dispose();
+    super.dispose();
   }
 
   getBrandName() {
@@ -123,7 +130,7 @@ class _FillInformationState extends State<FillInformation> {
       ),
       body: ecsLib.dismissedKeyboard(
         context,
-        child: FormBuilder(          
+        child: FormBuilder(
           key: _fbk,
           child: Padding(
             padding: const EdgeInsets.only(left: 15.0, right: 10, top: 20),

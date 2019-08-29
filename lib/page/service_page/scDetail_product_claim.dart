@@ -113,7 +113,6 @@ class _DetailProductClaimState extends State<DetailProductClaim> {
                     ecsLib.pushPage(
                       context: context,
                       pageWidget: DetailAsset(
-                        assetsData: assetsData,
                         editAble: false,
                       ),
                     );

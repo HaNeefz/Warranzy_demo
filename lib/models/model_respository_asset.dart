@@ -270,34 +270,39 @@ class ModelDataAsset {
   String fileAttachID;
   String imageMain;
   String images;
+  String alertDate;
+  int alertDateNo;
 
-  ModelDataAsset(
-      {this.wTokenID,
-      this.custUserID,
-      this.custCountryCode,
-      this.pdtCatCode,
-      this.pdtGroup,
-      this.pdtPlace,
-      this.brandCode,
-      this.title,
-      this.serialNo,
-      this.lotNo,
-      this.salesPrice,
-      this.warrantyNo,
-      this.warrantyExpire,
-      this.custRemark,
-      this.createType,
-      this.createDate,
-      this.lastModiflyDate,
-      this.exWarrantyStatus,
-      this.tradeStatus,
-      this.logDate,
-      this.logType,
-      this.partyCode,
-      this.partyCountryCode,
-      this.warranzyEndDate,
-      this.fileAttachID,
-      this.images});
+  ModelDataAsset({
+    this.wTokenID,
+    this.custUserID,
+    this.custCountryCode,
+    this.pdtCatCode,
+    this.pdtGroup,
+    this.pdtPlace,
+    this.brandCode,
+    this.title,
+    this.serialNo,
+    this.lotNo,
+    this.salesPrice,
+    this.warrantyNo,
+    this.warrantyExpire,
+    this.custRemark,
+    this.createType,
+    this.createDate,
+    this.lastModiflyDate,
+    this.exWarrantyStatus,
+    this.tradeStatus,
+    this.logDate,
+    this.logType,
+    this.partyCode,
+    this.partyCountryCode,
+    this.warranzyEndDate,
+    this.fileAttachID,
+    this.images,
+    this.alertDate,
+    this.alertDateNo,
+  });
 
   ModelDataAsset.fromJson(Map<String, dynamic> json) {
     wTokenID = json['WTokenID'];
@@ -327,6 +332,8 @@ class ModelDataAsset {
     fileAttachID = json['FileAttach_ID'];
     imageMain = json['ImageMain'];
     images = json['Images'];
+    alertDate = json['AlertDate'];
+    alertDateNo = json['AlertDateNo'];
   }
 
   Map<String, dynamic> toJson() {
@@ -357,8 +364,12 @@ class ModelDataAsset {
     data['WarranzyEndDate'] = this.warranzyEndDate;
     data['FileAttach_ID'] = this.fileAttachID;
     data['Images'] = this.images;
+    data['AlertDate'] = alertDate;
+    data['AlertDateNo'] = alertDateNo;
     return data;
   }
+
+  //เอา function getImageJson มาไว้ในนี้
 }
 
 class ResponseAssetOnline {

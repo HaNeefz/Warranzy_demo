@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -5,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:warranzy_demo/models/model_asset_data.dart';
 import 'package:warranzy_demo/models/model_respository_asset.dart';
+import 'package:warranzy_demo/page/asset_page/add_assets_page/scAdd_image_demo.dart';
 import 'package:warranzy_demo/page/asset_page/add_assets_page/scFillInformation.dart';
 import 'package:warranzy_demo/page/asset_page/detail_asset_page/scTranfer_asset.dart';
 import 'package:warranzy_demo/page/main_page/scMain_page.dart';
@@ -17,21 +19,22 @@ import 'package:warranzy_demo/tools/widget_ui_custom/button_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/carouselImage.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 
+import 'scEditDetailAsset.dart';
 import 'scRequest_service.dart';
 import 'scTrade_asset.dart';
 
 class DetailAsset extends StatefulWidget {
-  final ModelAssetsData assetsData;
   final String heroTag;
   final bool editAble;
+  final bool showDetailOnline;
   final ModelDataAsset dataAsset;
 
   const DetailAsset(
       {Key key,
-      this.assetsData,
       this.heroTag,
       this.editAble = true,
-      this.dataAsset})
+      this.dataAsset,
+      this.showDetailOnline})
       : super(key: key);
 
   @override
@@ -42,8 +45,26 @@ class _DetailAssetState extends State<DetailAsset> {
   final ecsLib = getIt.get<ECSLib>();
   final allTranslations = getIt.get<GlobalTranslations>();
   ModelDataAsset get _data => widget.dataAsset;
+  List<ImageKeepData> imageKeepData = [];
+  List<String> listImageUrl = [];
 
-  @override
+  void initState() {
+    super.initState();
+    if (_data.createType == "C") {
+      getImage(_data);
+    }
+  }
+
+  goToEditPageForEditImage(bool edit) {
+    ecsLib.pushPage(
+      context: context,
+      pageWidget: EditDetailAsset(
+        editingImage: edit,
+        modelDataAsset: _data,
+      ),
+    );
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
@@ -63,34 +84,62 @@ class _DetailAssetState extends State<DetailAsset> {
               ),
               actions: <Widget>[
                 widget.editAble == true
-                    ? FlatButton(
-                        child: TextBuilder.build(
-                            title: "Edit",
-                            style: TextStyleCustom.STYLE_LABEL
-                                .copyWith(color: ThemeColors.COLOR_WHITE)),
-                        onPressed: () {
-                          ecsLib.pushPage(
-                              context: context,
-                              pageWidget: FillInformation(
-                                onClickAddAssetPage: PageAction.SCAN_QR_CODE,
-                                hasDataAssetAlready: true,
-                              ));
-                        },
-                      )
+                    ? widget.showDetailOnline == true
+                        ? Container(
+                            width: 80,
+                            height: 80,
+                            child: Center(
+                              child: RaisedButton(
+                                shape: CircleBorder(),
+                                color: Colors.teal,
+                                child: Icon(
+                                  Icons.edit,
+                                  color: Colors.white,
+                                ),
+                                onPressed: () {
+                                  goToEditPageForEditImage(true);
+                                  // ecsLib.pushPage(
+                                  //     context: context,
+                                  //     pageWidget: FillInformation(
+                                  //       onClickAddAssetPage:
+                                  //           PageAction.SCAN_QR_CODE,
+                                  //       hasDataAssetAlready: true,
+                                  //     ));
+                                },
+                              ),
+                            ),
+                          )
+                        : Container()
                     : Container()
               ],
               flexibleSpace: CarouselWithIndicator(
-                autoPlay: false,
-                height: 400,
-                viewportFraction: 1.0,
-                items: <Widget>[
-                  testImage(),
-                  testImage(),
-                  testImage(),
-                  testImage(),
-                  testImage(),
-                ],
-              ),
+                  autoPlay: false,
+                  height: 400,
+                  viewportFraction: 1.0,
+                  items: listImageUrl != null && listImageUrl.length > 0
+                      ? Iterable.generate(
+                          listImageUrl.length,
+                          (i) => CachedNetworkImage(
+                            imageUrl: listImageUrl[i],
+                            imageBuilder: (context, imageProvider) => Container(
+                              width: 150,
+                              height: 150,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(40),
+                                image: DecorationImage(
+                                    image: imageProvider,
+                                    fit: BoxFit.cover,
+                                    colorFilter: ColorFilter.mode(
+                                        Colors.red, BlendMode.dstATop)),
+                              ),
+                            ),
+                            placeholder: (context, url) =>
+                                Center(child: CircularProgressIndicator()),
+                            errorWidget: (context, url, error) =>
+                                Icon(Icons.error),
+                          ),
+                        ).toList()
+                      : Iterable.generate(4, (i) => testImage()).toList()),
             ),
             SliverList(
               delegate: SliverChildListDelegate([
@@ -120,14 +169,16 @@ class _DetailAssetState extends State<DetailAsset> {
     switch (typeAsset) {
       case "C":
         return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            buildProductPhotoByCustomer(),
+            buildProductPhotoByCustomerEdit(),
             buildLastAssetInformation(),
           ],
         );
         break;
       case "T":
         return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             buildHeader(context),
             buildAssetInformation(),
@@ -258,10 +309,6 @@ class _DetailAssetState extends State<DetailAsset> {
         });
   }
 
-  Future deleteAsset() async {
-    try {} on SocketException catch (e) {} on DioError catch (e) {} catch (e) {}
-  }
-
   Widget buildLastAssetInformation() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -274,27 +321,36 @@ class _DetailAssetState extends State<DetailAsset> {
             //     title: "Shop Branch", data: "_assetsData.brandName"),
             // textTitleWithData(
             //     title: "Shop Country", data: "_assetsData.shopCountry"),
-            // textTitleWithData(
-            //     title: "Purchase Date", data: "_assetsData.purchaseDate"),
-
+            textTitleWithData(title: "Asset Name", data: _data.title ?? "-"),
             textTitleWithData(
-                title: "Warranty No",
-                data: _data.warrantyNo ?? "_assetsData.warrantyNo"),
+                title: "Brand Name", data: _data.brandCode ?? "-"),
+            textTitleWithData(
+                title: "Product Category", data: _data.pdtCatCode ?? "-"),
+            textTitleWithData(
+                title: "Product Group", data: _data.pdtGroup ?? "-"),
+            textTitleWithData(
+                title: "Product Place", data: _data.pdtPlace ?? "-"),
+            textTitleWithData(
+                title: "Product Price", data: _data.salesPrice ?? "-"),
+            textTitleWithData(
+                title: "Warranty No", data: _data.warrantyNo ?? "-"),
             textTitleWithData(
                 title: "Warranty Expire Date",
-                data: _data.warrantyExpire ?? "_assetsData.warrantyExpireDate"),
+                data: _data.warrantyExpire ?? "-"),
             textTitleWithData(
-                title: "Product Category",
-                data: _data.pdtCatCode ?? "_assetsData.productCategory"),
+                title: "AlerDate Date", data: _data.alertDate ?? "-"),
             textTitleWithData(
-                title: "Product Group",
-                data: _data.pdtGroup ?? "_assetsData.productGroup"),
+                title: "Alert Date No.", data: "${_data.alertDateNo ?? "-"}"),
             textTitleWithData(
-                title: "Product Place",
-                data: _data.pdtPlace ?? "_assetsData.productPlace"),
-            // textTitleWithData(
-            //     title: "Product Price",
-            //     data: _data.salesPrice ?? "_assetsData.productPrice"),
+                title: "Serial No.",
+                data:
+                    "${_data.serialNo == null ? "-" : _data.serialNo == "" ? "-" : _data.serialNo}"),
+            textTitleWithData(
+                title: "Lot No.",
+                data:
+                    "${_data.lotNo == null ? "-" : _data.lotNo == "" ? "-" : _data.lotNo}"),
+            textTitleWithData(
+                title: "Note (Optional)", data: "${_data.custRemark}" ?? "-"),
           ],
         ),
       ),
@@ -333,6 +389,39 @@ class _DetailAssetState extends State<DetailAsset> {
               },
             ),
           )
+        ],
+      ),
+    );
+  }
+
+  Container buildProductPhotoByCustomerEdit() {
+    return Container(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              RichText(
+                text: TextSpan(children: [
+                  TextSpan(
+                      text: "Information\n",
+                      style: TextStyleCustom.STYLE_TITLE),
+                  TextSpan(
+                      text: "Product (By Customer)",
+                      style: TextStyleCustom.STYLE_CONTENT),
+                ]),
+              ),
+              widget.showDetailOnline == true
+                  ? IconButton(
+                      icon: Icon(Icons.edit),
+                      onPressed: () {
+                        goToEditPageForEditImage(false);
+                      },
+                    )
+                  : Container()
+            ],
+          ),
         ],
       ),
     );
@@ -385,7 +474,7 @@ class _DetailAssetState extends State<DetailAsset> {
           textTitleWithData(
               title: "Product Detail",
               data: "\n" + "${_data.custRemark}" ??
-                  "_assetsData?.productDetail ??"),
+                  "_assetsData?.productDetail ??"), //_data.custRemark
           // Product Detail
         ],
       ),
@@ -404,7 +493,7 @@ class _DetailAssetState extends State<DetailAsset> {
     );
   }
 
-  Widget testImage() {
+  Widget testImage({Widget child, bool hasWidget = false}) {
     return Container(
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
@@ -417,27 +506,36 @@ class _DetailAssetState extends State<DetailAsset> {
         ],
       )),
       child: Center(
-        child: _data.imageMain != null
-            ? CachedNetworkImage(
-                imageUrl: _data.imageMain,
-                imageBuilder: (context, imageProvider) => Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    image: DecorationImage(
-                        image: imageProvider,
-                        fit: BoxFit.cover,
-                        colorFilter:
-                            ColorFilter.mode(Colors.red, BlendMode.dstATop)),
-                  ),
-                ),
-                placeholder: (context, url) => CircularProgressIndicator(),
-                errorWidget: (context, url, error) => Icon(Icons.error),
-              )
-            : FlutterLogo(
+        child: hasWidget == false
+            ? FlutterLogo(
                 size: 200,
                 colors: ThemeColors.COLOR_THEME_APP,
-              ),
+              )
+            : child,
       ),
     );
   }
+
+  List<ImageKeepData> getImage(ModelDataAsset images) {
+    Map<String, dynamic> tempImages;
+    List<ImageKeepData> tempImageKeepData = [];
+    if (images.images != null) {
+      tempImages = jsonDecode(images.images);
+      tempImages.forEach((String k, dynamic v) {
+        var listTemp = v as List;
+        for (var item in listTemp) {
+          setState(() {
+            listImageUrl.add(item);
+          });
+        }
+        tempImageKeepData.add(ImageKeepData(title: k, imageUrl: listImageUrl));
+        // tempImageKeepData.forEach((v) {
+        //   print("Title : ${v.title} | url ${v.imageUrl}");
+        // });
+      });
+    }
+    return tempImageKeepData;
+  }
 }
+
+class ImagesParse {}

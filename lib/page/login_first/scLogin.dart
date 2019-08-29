@@ -127,33 +127,33 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(
                 height: 20.0,
               ),
-              RaisedButton(
-                child: Text("AddImageDemoPage Test"),
-                onPressed: () {
-                  ecsLib.pushPage(
-                    context: context,
-                    pageWidget: AddImageDemo(),
-                  );
-                },
-              ),
-              RaisedButton(
-                child: Text("getDataCountry"),
-                onPressed: () async {
-                  await DBProviderInitialApp.db.getAllDataCountry();
-                },
-              ),
-              RaisedButton(
-                child: Text("getDataTimeZone"),
-                onPressed: () async {
-                  await DBProviderInitialApp.db.getAllDataTimeZone();
-                },
-              ),
-              RaisedButton(
-                child: Text("getDataProducCategory"),
-                onPressed: () async {
-                  await DBProviderInitialApp.db.getAllDataProductCategory();
-                },
-              ),
+              // RaisedButton(
+              //   child: Text("AddImageDemoPage Test"),
+              //   onPressed: () {
+              //     ecsLib.pushPage(
+              //       context: context,
+              //       pageWidget: AddImageDemo(),
+              //     );
+              //   },
+              // ),
+              // RaisedButton(
+              //   child: Text("getDataCountry"),
+              //   onPressed: () async {
+              //     await DBProviderInitialApp.db.getAllDataCountry();
+              //   },
+              // ),
+              // RaisedButton(
+              //   child: Text("getDataTimeZone"),
+              //   onPressed: () async {
+              //     await DBProviderInitialApp.db.getAllDataTimeZone();
+              //   },
+              // ),
+              // RaisedButton(
+              //   child: Text("getDataProducCategory"),
+              //   onPressed: () async {
+              //     await DBProviderInitialApp.db.getAllDataProductCategory();
+              //   },
+              // ),
             ],
           ),
         ),

@@ -23,7 +23,6 @@ class ModelAssetWidget extends StatelessWidget {
             ecsLib.pushPage(
                 context: context,
                 pageWidget: DetailAsset(
-                  assetsData: assetData,
                   heroTag: "thumbnail_${assetData.id}",
                 ));
           },

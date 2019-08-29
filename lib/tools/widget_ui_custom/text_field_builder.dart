@@ -201,4 +201,69 @@ class TextFieldBuilder {
       ),
     );
   }
+
+  static Widget textFormFieldCustom({
+    @required final TextEditingController controller,
+    @required String title,
+    bool borderOutLine = false,
+    int maxLength,
+    int maxLine = 1,
+    bool validet = true,
+  }) {
+    return Column(
+      children: <Widget>[
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            Expanded(
+                child: Center(
+                    child: Text(
+              "${title ?? "title's empty"}:",
+              textAlign: TextAlign.center,
+            ))),
+            Expanded(
+              flex: 3,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: TextFormField(
+                    controller: controller,
+                    validator: (s) {
+                      if(validet == true)
+                      if (s.isEmpty) {
+                        return "Please enter data";
+                      }
+                      return null;
+                    },
+                    maxLength: maxLength,
+                    maxLines: maxLine,
+                    decoration: InputDecoration(
+                      fillColor: Colors.grey[100],
+                      filled: true,
+                      contentPadding: EdgeInsets.all(15),
+                      border:
+                          // borderOutLine
+                          //     ? OutlineInputBorder(
+                          //         borderRadius: BorderRadius.circular(30),
+                          //         borderSide: BorderSide(color: Colors.teal[300]))
+                          //     : UnderlineInputBorder(
+                          //         borderRadius: BorderRadius.circular(30),
+                          //         borderSide: BorderSide(color: Colors.teal[300])),
+                          InputBorder.none,
+                      errorBorder: InputBorder.none,
+                      // borderOutLine
+                      //     ? OutlineInputBorder(
+                      //         borderRadius: BorderRadius.circular(30),
+                      //         borderSide: BorderSide(color: Colors.teal[300]))
+                      //     : UnderlineInputBorder(
+                      //         borderRadius: BorderRadius.circular(30),
+                      //         borderSide: BorderSide(color: Colors.teal[300])),
+                    )),
+              ),
+            ),
+          ],
+        ),
+        Divider()
+      ],
+    );
+  }
 }

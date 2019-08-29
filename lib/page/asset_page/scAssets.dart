@@ -35,9 +35,8 @@ class AssetPage extends StatefulWidget {
 class _AssetPageState extends State<AssetPage> {
   final ecsLib = getIt.get<ECSLib>();
   final allTranslations = getIt.get<GlobalTranslations>();
-  ModelAssetsData assetData = ModelAssetsData();
   final Dio dio = Dio();
-  Future getAssetTen;
+  Future getAssetOnline;
   Future<List<ModelDataAsset>> getModelData;
 
   List<ModelAssetsData> listAssetData;
@@ -47,7 +46,7 @@ class _AssetPageState extends State<AssetPage> {
     return await DBProviderAsset.db.getAllDataAsset();
   }
 
-  Future<ResponseAssetOnline> getUrlAssetTen() async {
+  Future<ResponseAssetOnline> getUrlAssetOnline() async {
     try {
       var response = await dio.get(
           "http://192.168.0.36:9999/API/v1/Asset/getMyAsset",
@@ -67,9 +66,8 @@ class _AssetPageState extends State<AssetPage> {
   @override
   void initState() {
     super.initState();
-    listAssetData = assetData.pushData();
     getModelData = getModelDataAsset();
-    getAssetTen = getUrlAssetTen();
+    getAssetOnline = getUrlAssetOnline();
   }
 
   @override
@@ -107,7 +105,7 @@ class _AssetPageState extends State<AssetPage> {
 
   FutureBuilder<ResponseAssetOnline> buildAssetOnline() {
     return FutureBuilder<ResponseAssetOnline>(
-      future: getAssetTen,
+      future: getAssetOnline,
       builder:
           (BuildContext context, AsyncSnapshot<ResponseAssetOnline> snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
@@ -478,6 +476,7 @@ class MyAssetFormSQLite extends StatelessWidget {
               context: context,
               pageWidget: DetailAsset(
                 dataAsset: data,
+                showDetailOnline: false,
               ),
             );
           },
@@ -531,20 +530,28 @@ class MyAssetOnline extends StatelessWidget {
                     TextBuilder.build(
                         title: data.title ?? "NULL",
                         style:
-                            TextStyleCustom.STYLE_TITLE.copyWith(fontSize: 25)),
+                            TextStyleCustom.STYLE_TITLE.copyWith(fontSize: 20),
+                        maxLine: 2,
+                        textOverflow: TextOverflow.ellipsis),
                     TextBuilder.build(
                         title: data.custRemark ?? "Empty",
-                        style: TextStyleCustom.STYLE_CONTENT),
+                        style: TextStyleCustom.STYLE_CONTENT
+                            .copyWith(fontSize: 13),
+                        maxLine: 3,
+                        textOverflow: TextOverflow.ellipsis),
                     TextBuilder.build(
-                        title: "\nWarranty Date " + "${data.warrantyExpire}" ??
+                        title: "Warranty Date " + "${data.warrantyExpire}" ??
                             "Empty",
                         style: TextStyleCustom.STYLE_CONTENT
-                            .copyWith(fontSize: 14)),
+                            .copyWith(fontSize: 12),
+                        maxLine: 1,
+                        textOverflow: TextOverflow.ellipsis),
                     Container(
-                      padding: EdgeInsets.all(5),
+                      margin: EdgeInsets.all(5),
+                      padding: EdgeInsets.all(2),
                       decoration: BoxDecoration(
                           color: ThemeColors.COLOR_GREY.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(10)),
+                          borderRadius: BorderRadius.circular(20)),
                       child: TextBuilder.build(
                           title: data.pdtCatCode,
                           style: TextStyleCustom.STYLE_CONTENT.copyWith(
@@ -559,13 +566,15 @@ class MyAssetOnline extends StatelessWidget {
         onTap: () async {
           try {
             ecsLib.showDialogLoadingLib(context);
-            await APIServiceAssets.getDetailAseet(data.wTokenID).then((res) {
+            await APIServiceAssets.getDetailAseet(wtokenID: data.wTokenID)
+                .then((res) {
               ecsLib.cancelDialogLoadindLib(context);
               if (res?.status == true) {
                 ecsLib.pushPage(
                   context: context,
                   pageWidget: DetailAsset(
                     dataAsset: res.data,
+                    showDetailOnline: true,
                   ),
                 );
               } else if (res.status == false) {

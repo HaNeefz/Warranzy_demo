@@ -114,7 +114,6 @@ class _TradeDetailState extends State<TradeDetail> {
                     ecsLib.pushPage(
                       context: context,
                       pageWidget: DetailAsset(
-                        assetsData: assetsData,
                         editAble: false,
                       ),
                     );
