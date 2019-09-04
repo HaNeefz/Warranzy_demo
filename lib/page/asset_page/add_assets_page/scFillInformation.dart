@@ -1,24 +1,10 @@
-import 'dart:async';
-import 'package:autocomplete_textfield/autocomplete_textfield.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:intl/intl.dart';
-import 'package:warranzy_demo/models/model_get_brand_name.dart';
-import 'package:warranzy_demo/models/model_repository_init_app.dart';
-import 'package:warranzy_demo/services/method/mark_text_input_format.dart';
-import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/const.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
-import 'package:warranzy_demo/tools/widget_ui_custom/button_builder.dart';
-import 'package:warranzy_demo/tools/widget_ui_custom/form_input_data.dart';
+import 'package:warranzy_demo/tools/widget_ui_custom/form_data_asset.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
-import 'package:dio/dio.dart';
-
-import 'scAdd_image.dart';
-import 'scAdd_image_demo.dart';
 
 class FillInformation extends StatefulWidget {
   final PageAction onClickAddAssetPage;
@@ -34,92 +20,11 @@ class FillInformation extends StatefulWidget {
 class _FillInformationState extends State<FillInformation> {
   final ecsLib = getIt.get<ECSLib>();
   final allTranslations = getIt.get<GlobalTranslations>();
-  final GlobalKey<FormBuilderState> _fbk = GlobalKey<FormBuilderState>();
-  final GlobalKey<AutoCompleteTextFieldState<GetBrandName>> keyAutoComplete =
-      GlobalKey();
-  final Dio dio = Dio();
-  AutoCompleteTextField searchTextField;
-  final txtCtrlBrandCode = TextEditingController();
-  final txtCtrlBrandName = TextEditingController();
-  final txtCtrlSerialNo = TextEditingController();
-  final txtCtrlNote = TextEditingController();
-  final txtCtrlLotNo = TextEditingController();
-  final txtCtrlPrice = TextEditingController();
-  String brandActive = "N";
-  var valueBrandName = "DysonElectric";
-  List<GetBrandName> listBrandName = [];
-  List<String> listBrandID = [];
-
-  List<String> _dataBrandNameDD = [
-    "Dyson Electric",
-    "Dyson Phone",
-    "Doyson TV"
-  ];
-  var valueMenufacturer = "Dyson V7 Trigger";
-  List<String> _dataMenufacturerDD = [
-    "Dyson V7 Trigger",
-    "Dyson V6 Trigger",
-    "Dyson V5 Trigger"
-  ];
 
   PageAction get page => widget.onClickAddAssetPage;
-  Future<List<ProductCatagory>> getProductCategory;
-  @override
-  void initState() {
-    super.initState();
-    getProductCategory = DBProviderInitialApp.db.getAllDataProductCategory();
-    Future.delayed(Duration(milliseconds: 1500), () {
-      getBrandName();
-    });
-  }
-
-  @override
-  void dispose() {
-    txtCtrlBrandCode.dispose();
-    txtCtrlBrandName.dispose();
-    txtCtrlSerialNo.dispose();
-    txtCtrlNote.dispose();
-    txtCtrlLotNo.dispose();
-    txtCtrlPrice.dispose();
-    super.dispose();
-  }
-
-  getBrandName() {
-    Firestore.instance.collection('BrandName').snapshots().listen((onData) {
-      for (var temp in onData.documents) {
-        listBrandName.add(GetBrandName.fromJson(temp.data));
-        listBrandName[onData.documents.indexOf(temp)].brandCode =
-            temp.documentID;
-        // print(
-        //     "${listBrandName[onData.documents.indexOf(temp)].brandID} | ${listBrandName[onData.documents.indexOf(temp)].modelBrandName.modelEN.en}");
-      }
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
-    List<String> _title = [
-      "Brand Name",
-      "Manufacturer Name",
-      "Manufacturer Product ID",
-      "Serial No.",
-      "Lot No.",
-      "MFG Date",
-      "Expire Date"
-    ];
-
-    List<String> _place = [
-      "Home",
-      "Office",
-      "School",
-      "Kitchen",
-    ];
-    List<String> _group = [
-      "Car",
-      "Living Room",
-      "Meeting Room",
-      "Bed room",
-    ];
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -128,294 +33,33 @@ class _FillInformationState extends State<FillInformation> {
                 widget.hasDataAssetAlready == true ? "Edit Asset" : "New Asset",
             style: TextStyleCustom.STYLE_APPBAR),
       ),
-      body: ecsLib.dismissedKeyboard(
-        context,
-        child: FormBuilder(
-          key: _fbk,
-          child: Padding(
-            padding: const EdgeInsets.only(left: 15.0, right: 10, top: 20),
-            child: ListView(
-              children: <Widget>[
-                buildTitle(),
-                SizedBox(
-                  height: 20,
-                ),
-                if (page == PageAction.SCAN_QR_CODE)
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      buildInformation(
-                          title: "Brand Name", data: "Dyson Electric"),
-                      buildInformation(
-                          title: "Manufacturer Name", data: "Dyson V7 Trigger"),
-                    ],
-                  )
-                else
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      FormWidgetBuilder.formInputData(
-                          key: "Title",
-                          title: "Asset Name*",
-                          validators: [FormBuilderValidators.required()]),
-                      FutureBuilder<List<ProductCatagory>>(
-                        future: getProductCategory,
-                        builder: (BuildContext context,
-                            AsyncSnapshot<List<ProductCatagory>> snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.done) {
-                            if (!(snapshot.hasError)) {
-                              return FormWidgetBuilder.formDropDownCategory(
-                                  key: "PdtCatCode",
-                                  title: "Category*",
-                                  hint: "Choose your category",
-                                  validate: [
-                                    FormBuilderValidators.required(),
-                                  ],
-                                  items: snapshot.data,
-                                  onChange: (value) {
-                                    print(value);
-                                  });
-                            } else {
-                              return TextBuilder.build(title: "Error data");
-                            }
-                          } else if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return CircularProgressIndicator();
-                          } else {
-                            return TextBuilder.build(title: "Something Wrong.");
-                          }
-                        },
-                      ),
-                      FormWidgetBuilder.formDropDown(
-                        key: "PdtGroup",
-                        title: "Group*",
-                        hint: "Choose your group",
-                        validate: [
-                          FormBuilderValidators.required(),
-                        ],
-                        items: _group,
-                      ),
-                      FormWidgetBuilder.formDropDown(
-                        key: "PdtPlace",
-                        title: "Place*",
-                        hint: "Choose your place",
-                        validate: [
-                          FormBuilderValidators.required(),
-                        ],
-                        items: _place,
-                      ),
-                    ],
-                  ),
-                FormWidgetBuilder.formWidget(
-                    title: "BrandName*", child: autoCompleteTextField()),
-                FormWidgetBuilder.formInputData(
-                    key: "WarrantyNo",
-                    title: "Warranty No.*",
-                    validators: [FormBuilderValidators.required()]),
-                FormWidgetBuilder.formInputData(
-                    key: "WarrantyExpire",
-                    title: "Warranty Expire*",
-                    inputFormatters: [
-                      MaskedTextInputFormatter(
-                        mask: 'xxxx-xx-xx',
-                        separator: '-',
-                      ),
-                    ],
-                    hintText: "yyyy/mm/dd",
-                    validators: [FormBuilderValidators.required()]),
-                FormWidgetBuilder.formDropDown(
-                  key: "AlertDate",
-                  title: "Choose notification before expire* (Day)",
-                  hint: "Ex. 30 days",
-                  validate: [
-                    FormBuilderValidators.required(),
-                  ],
-                  items: [60, 30, 7, 0],
-                ),
-                FormWidgetBuilder.formWidget(
-                    title: "Optional",
-                    showTitle: false,
-                    child: ExpansionTile(
-                      title: TextBuilder.build(
-                          title: "Optional",
-                          style: TextStyleCustom.STYLE_LABEL_BOLD),
-                      children: <Widget>[
-                        FormWidgetBuilder.formInputDataNotValidate(
-                          controller: txtCtrlSerialNo,
-                          title: "Serial No.",
-                        ),
-                        FormWidgetBuilder.formInputDataNotValidate(
-                          controller: txtCtrlLotNo,
-                          title: "Lot No.",
-                        ),
-                        FormWidgetBuilder.formInputDataNotValidate(
-                          title: "Price",
-                          controller: txtCtrlPrice,
-                        ),
-                      ],
-                    )),
-                FormWidgetBuilder.formInputDataNotValidate(
-                  controller: txtCtrlNote,
-                  title: "Note",
-                  maxLine: 5,
-                ),
-                if (page == PageAction.SCAN_QR_CODE)
-                  Column(
-                    children: <Widget>[
-                      buildProductImage(),
-                      buildDetailProduct(),
-                    ],
-                  ),
-                buildContinue(context)
-              ],
-            ),
-          ),
-        ),
-      ),
+      body: checkActionPage(page),
     );
   }
 
-  AutoCompleteTextField<GetBrandName> autoCompleteTextField() {
-    return searchTextField = AutoCompleteTextField<GetBrandName>(
-      key: keyAutoComplete,
-      suggestions: listBrandName,
-      clearOnSubmit: false,
-      controller: txtCtrlBrandName,
-      decoration: InputDecoration(
-          contentPadding: EdgeInsets.fromLTRB(10, 30, 10, 20),
-          hintText: "Search"),
-      itemFilter: (item, query) {
-        return item.modelBrandName.modelEN.en
-            .toLowerCase()
-            .startsWith(query.toLowerCase());
-      },
-      itemSorter: (a, b) => //
-          a.modelBrandName.modelEN.en.compareTo(b.modelBrandName.modelEN.en),
-      itemBuilder: (context, item) {
-        return buildTextAutoComplete(item);
-      },
-      itemSubmitted: (item) {
-        setState(() {
-          txtCtrlBrandCode.text = item.brandCode;
-          print("BrandCode => ${txtCtrlBrandCode.text}");
-          searchTextField.textField.controller.text =
-              item.modelBrandName.modelEN.en;
-          txtCtrlBrandName.text = item.modelBrandName.modelEN.en;
-          brandActive = item.brandActive;
-        });
-      },
-    );
-  }
-
-  Widget buildTextAutoComplete(GetBrandName item) => Container(
-        height: 50,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget checkActionPage(PageAction page) {
+    switch (page) {
+      case PageAction.MANUAL_ADD:
+        return FormDataAsset(
+          onClickAddAssetPage: page,
+          actionPageForAdd: true,
+        );
+        break;
+      case PageAction.SCAN_QR_CODE:
+        return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: TextBuilder.build(
-                  title: "${item.modelBrandName.modelEN.en}",
-                  style: TextStyleCustom.STYLE_LABEL_BOLD),
-            ),
-            Divider()
+            buildInformation(title: "Brand Name", data: "Dyson Electric"),
+            buildInformation(
+                title: "Manufacturer Name", data: "Dyson V7 Trigger"),
+            buildProductImage(),
+            buildDetailProduct(),
           ],
-        ),
-      );
-
-  Widget buildBrandAndMenufacturer() {
-    return Column(
-      children: <Widget>[
-        Container(
-          padding: EdgeInsets.all(10),
-          decoration: BoxDecoration(
-              border: Border.all(width: 0.3, color: ThemeColors.COLOR_GREY),
-              borderRadius: BorderRadius.circular(5)),
-          child: DropdownButton<String>(
-            isExpanded: true,
-            value: valueBrandName,
-            items: ["Dyson Electric", "Dyson Phone", "Doyson TV"]
-                .map<DropdownMenuItem<String>>((data) {
-              return DropdownMenuItem<String>(
-                value: data,
-                child: TextBuilder.build(title: data),
-              );
-            }).toList(),
-            onChanged: (value) {
-              valueBrandName = value;
-            },
-          ),
-        ),
-        Container(
-          padding: EdgeInsets.all(10),
-          decoration: BoxDecoration(
-              border: Border.all(width: 0.3, color: ThemeColors.COLOR_GREY),
-              borderRadius: BorderRadius.circular(5)),
-          child: DropdownButton<String>(
-            isExpanded: true,
-            value: valueMenufacturer,
-            items: ["Dyson V7 Trigger", "Dyson V6 Trigger", "Dyson V5 Trigger"]
-                .map<DropdownMenuItem<String>>((data) {
-              return DropdownMenuItem<String>(
-                value: data,
-                child: TextBuilder.build(title: data),
-              );
-            }).toList(),
-            onChanged: (value) {
-              valueMenufacturer = value;
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Padding buildContinue(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(0, 20, 0, 15),
-      child: ButtonBuilder.buttonCustom(
-          paddingValue: 10,
-          context: context,
-          label: allTranslations.text("continue"),
-          onPressed: () {
-            print("tap");
-            _fbk.currentState.save();
-            if (_fbk.currentState.validate()) {
-              var dataAsset = _fbk.currentState.value;
-              var formatDateExpire = dataAsset['WarrantyExpire'];
-              dataAsset['WarrantyExpire'] =
-                  ecsLib.setDateFormat(formatDateExpire);
-              dataAsset.addAll(addTextController());
-              ecsLib.pushPage(
-                context: context,
-                pageWidget: AddImageDemo(
-                  dataAsset: dataAsset,
-                ),
-                //   // AddImage(
-                //   //   hasDataAssetAlready: widget.hasDataAssetAlready,
-                //   //   dataAsset: dataAsset,
-                //   // ),
-              );
-            }
-          }),
-    );
-  }
-
-  Map<String, dynamic> addTextController() {
-    Map<String, dynamic> mapData = {
-      "BrandCode": txtCtrlBrandCode.text,
-      "BrandName": txtCtrlBrandName.text,
-      "BrandActive": brandActive,
-      "SerialNo": txtCtrlSerialNo.text,
-      "LotNo": txtCtrlLotNo.text,
-      "SalesPrice": txtCtrlPrice.text == "" ? 0 : int.parse(txtCtrlPrice.text),
-      "CustRemark": txtCtrlNote.text,
-      "CreateType":
-          widget.onClickAddAssetPage == PageAction.MANUAL_ADD ? "C" : "T"
-    };
-    return mapData;
+        );
+        break;
+      default:
+        return Container();
+    }
   }
 
   Padding buildDetailProduct() {
@@ -491,24 +135,6 @@ class _FillInformationState extends State<FillInformation> {
               text: data,
               style: TextStyleCustom.STYLE_TITLE.copyWith(fontSize: 25)),
         ]),
-      ),
-    );
-  }
-
-  RichText buildTitle() {
-    return RichText(
-      text: TextSpan(
-        children: [
-          TextSpan(
-            text: "Product Detail\n",
-            style: TextStyleCustom.STYLE_TITLE
-                .copyWith(color: ThemeColors.COLOR_THEME_APP),
-          ),
-          TextSpan(
-              text:
-                  "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
-              style: TextStyleCustom.STYLE_CONTENT),
-        ],
       ),
     );
   }

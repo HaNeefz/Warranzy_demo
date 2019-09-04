@@ -26,7 +26,7 @@ class ShowDataAPI {
 }
 
 class APIServiceUser {
-  static const int TIMEOUT = 300;
+  static const int TIMEOUT = 60;
   static final String baseUrl = BaseUrl.baseUrl;
   // static Future apiVerifyNumberTest({String url, dynamic postData}) async {
   //   printAPIName("apiVerfyNumber");

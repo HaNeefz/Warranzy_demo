@@ -5,6 +5,6 @@ class BaseUrl {
   static final _baseUrlLocal = GlobalConfiguration().getString("BaseUrlTest");
   static final _versionApp = GlobalConfiguration().getString("appVersion");
 
-  static get baseUrl => _baseUrlLocal;
-  static get versionApp => _versionApp;
+  static String get baseUrl => _baseUrlLocal;
+  static String get versionApp => _versionApp;
 }

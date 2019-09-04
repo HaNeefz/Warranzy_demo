@@ -1,258 +1,39 @@
 import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 
-import 'package:autocomplete_textfield/autocomplete_textfield.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:warranzy_demo/models/model_get_brand_name.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:warranzy_demo/models/model_repository_init_app.dart';
 import 'package:warranzy_demo/models/model_respository_asset.dart';
+import 'package:warranzy_demo/page/asset_page/add_assets_page/scAdd_image_demo.dart';
 import 'package:warranzy_demo/services/api/api_service_assets.dart';
-import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
-import 'package:warranzy_demo/tools/widget_ui_custom/button_builder.dart';
+import 'package:warranzy_demo/tools/widget_ui_custom/form_data_asset.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
-import 'package:warranzy_demo/tools/widget_ui_custom/text_field_builder.dart';
-
-import 'scDetailAsset.dart';
 
 class EditDetailAsset extends StatefulWidget {
   final bool editingImage;
   final ModelDataAsset modelDataAsset;
+  final List<ImageDataEachGroup> imageDataEachGroup;
 
-  const EditDetailAsset({Key key, this.editingImage, this.modelDataAsset})
+  const EditDetailAsset(
+      {Key key,
+      this.editingImage,
+      this.modelDataAsset,
+      this.imageDataEachGroup})
       : super(key: key);
   @override
   _EditDetailAssetState createState() => _EditDetailAssetState();
 }
 
 class _EditDetailAssetState extends State<EditDetailAsset> {
-  final ecsLib = getIt.get<ECSLib>();
-  final allTranslations = getIt.get<GlobalTranslations>();
-  final Dio dio = Dio();
   bool get editor => widget.editingImage == true ? true : false;
   ModelDataAsset get _data => widget.modelDataAsset;
-  Future<List<ProductCatagory>> getProductCategory;
-  final GlobalKey<AutoCompleteTextFieldState<GetBrandName>> keyAutoComplete =
-      GlobalKey();
-  AutoCompleteTextField searchTextField;
-  String brandActive;
-  List<GetBrandName> listBrandName = [];
-  List<String> listBrandID = [];
-  final _fkey = GlobalKey<FormState>();
-  TextEditingController txtAssetName;
-  TextEditingController txtBrandName;
-  TextEditingController txtBrandCode;
-  TextEditingController txtWarranzyNo;
-  TextEditingController txtWarranzyExpire;
-  TextEditingController txtAlertDateNo;
-  TextEditingController txtPdtCat;
-  TextEditingController txtPdtGroup;
-  TextEditingController txtPdtPlace;
-  TextEditingController txtPrice;
-  TextEditingController txtSerialNo;
-  TextEditingController txtLotNo;
-  TextEditingController txtNote;
-  List<String> alertDate = ["60", "30", "7", "0"];
-
-  @override
-  void initState() {
-    getProductCategory = DBProviderInitialApp.db.getAllDataProductCategory();
-    brandActive = _data.brandCode != null ? "Y" : "N";
-    txtAssetName = TextEditingController(text: _data.title ?? "");
-    txtBrandName = TextEditingController(text: "");
-    txtBrandCode = TextEditingController(text: _data.brandCode ?? "");
-    txtWarranzyNo = TextEditingController(text: _data.warrantyNo ?? "");
-    txtWarranzyExpire = TextEditingController(text: _data.warrantyExpire ?? "");
-    txtAlertDateNo =
-        TextEditingController(text: _data.alertDateNo.toString() ?? "");
-    txtPdtCat = TextEditingController(text: _data.pdtCatCode ?? "");
-    txtPdtGroup = TextEditingController(text: _data.pdtGroup ?? "");
-    txtPdtPlace = TextEditingController(text: _data.pdtPlace ?? "");
-    txtPrice = TextEditingController(text: _data.salesPrice ?? "");
-    txtSerialNo = TextEditingController(text: _data.serialNo ?? "");
-    txtLotNo = TextEditingController(text: _data.lotNo ?? "");
-    txtNote = TextEditingController(text: _data.custRemark ?? "");
-
-    Future.delayed(Duration(milliseconds: 1500), () {
-      getBrandName();
-    });
-
-    super.initState();
-  }
-
-  void dispose() {
-    txtAssetName.dispose();
-    txtBrandCode.dispose();
-    txtBrandName.dispose();
-    txtWarranzyNo.dispose();
-    txtWarranzyExpire.dispose();
-    txtAlertDateNo.dispose();
-    txtPdtCat.dispose();
-    txtPdtGroup.dispose();
-    txtPdtPlace.dispose();
-    txtPrice.dispose();
-    txtNote.dispose();
-    txtSerialNo.dispose();
-    txtLotNo.dispose();
-    super.dispose();
-  }
-
-  AutoCompleteTextField<GetBrandName> autoCompleteTextField() {
-    return searchTextField = AutoCompleteTextField<GetBrandName>(
-      key: keyAutoComplete,
-      suggestions: listBrandName,
-      clearOnSubmit: false,
-      controller: txtBrandName,
-      decoration: InputDecoration(
-          contentPadding: EdgeInsets.fromLTRB(10, 30, 10, 20),
-          hintText: "Search"),
-      itemFilter: (item, query) {
-        return item.modelBrandName.modelEN.en
-            .toLowerCase()
-            .startsWith(query.toLowerCase());
-      },
-      itemSorter: (a, b) => //
-          a.modelBrandName.modelEN.en.compareTo(b.modelBrandName.modelEN.en),
-      itemBuilder: (context, item) {
-        return buildTextAutoComplete(item);
-      },
-      itemSubmitted: (item) {
-        setState(() {
-          txtBrandCode.text = item.brandCode;
-          print("BrandCode => ${txtBrandCode.text}");
-          searchTextField.textField.controller.text =
-              item.modelBrandName.modelEN.en;
-          txtBrandName.text = item.modelBrandName.modelEN.en;
-          brandActive = item.brandActive;
-        });
-      },
-    );
-  }
-
-  Widget buildTextAutoComplete(GetBrandName item) => Container(
-        height: 50,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: TextBuilder.build(
-                  title: "${item.modelBrandName.modelEN.en}",
-                  style: TextStyleCustom.STYLE_LABEL_BOLD),
-            ),
-            Divider()
-          ],
-        ),
-      );
-
-  printTxtController() {
-    var postData = {
-      "WTokenID": _data.wTokenID,
-      "CreateType": _data.createType,
-      "PdtCatCode": txtPdtCat.text,
-      "PdtGroup": txtPdtGroup.text,
-      "PdtPlace": txtPdtPlace.text,
-      "BrandCode": txtBrandCode.text,
-      "BrandActive": brandActive,
-      "BrandName": txtBrandName.text,
-      "Title": txtAssetName.text,
-      "SerialNo": txtSerialNo.text,
-      "LotNo": txtLotNo.text,
-      "SalesPrice": txtPrice.text != null || txtPrice.text == ""
-          ? int.parse(txtPrice.text)
-          : 0,
-      "WarrantyNo": txtWarranzyNo.text,
-      "WarrantyExpire": txtWarranzyExpire.text,
-      "AlertDate": txtAlertDateNo.text,
-      "CustRemark": txtNote.text,
-    };
-    ecsLib.printJson(postData);
-    sendApiEdit(postData: postData);
-  }
-
-  sendApiEdit({postData}) async {
-    try {
-      ecsLib.showDialogLoadingLib(context, content: "Updating");
-      await APIServiceAssets.editAseet(postData: postData)
-          .then((resEdit) async {
-        ecsLib.cancelDialogLoadindLib(context);
-        if (resEdit?.status == true) {
-          ecsLib.showDialogLoadingLib(context, content: "Loading Detail Asset");
-          await APIServiceAssets.getDetailAseet(wtokenID: _data.wTokenID)
-              .then((resDetail) {
-            ecsLib.cancelDialogLoadindLib(context);
-            if (resDetail?.status == true) {
-              ecsLib.cancelDialogLoadindLib(context);
-              ecsLib.pushPageReplacement(
-                context: context,
-                pageWidget: DetailAsset(
-                  dataAsset: resDetail.data,
-                ),
-              );
-            } else if (resDetail?.status == false) {
-              ecsLib.showDialogLib(
-                context: context,
-                title: "Warranzy",
-                content: resDetail.message ?? "",
-                textOnButton: allTranslations.text("close"),
-              );
-            } else {
-              ecsLib.showDialogLib(
-                context: context,
-                title: "Warranzy",
-                content: resDetail.message ?? "",
-                textOnButton: allTranslations.text("close"),
-              );
-            }
-          });
-        } else if (resEdit?.status == false) {
-          ecsLib.showDialogLib(
-            context: context,
-            title: "Warranzy",
-            content: resEdit.message ?? "",
-            textOnButton: allTranslations.text("close"),
-          );
-        } else {
-          ecsLib.showDialogLib(
-            context: context,
-            title: "Warranzy",
-            content: resEdit.message ?? "",
-            textOnButton: allTranslations.text("close"),
-          );
-        }
-      });
-    } catch (e) {
-      print("Catch => $e");
-    }
-  }
-
-  getBrandName() {
-    Firestore.instance.collection('BrandName').snapshots().listen((onData) {
-      for (var temp in onData.documents) {
-        listBrandName.add(GetBrandName.fromJson(temp.data));
-        listBrandName[onData.documents.indexOf(temp)].brandCode =
-            temp.documentID;
-        if (temp.documentID == _data.brandCode) {
-          print(listBrandName[onData.documents.indexOf(temp)]
-              .modelBrandName
-              .modelEN
-              .en);
-          setState(() {
-            txtBrandName.text = listBrandName[onData.documents.indexOf(temp)]
-                .modelBrandName
-                .modelEN
-                .en;
-          });
-        }
-        // print(
-        //     "${listBrandName[onData.documents.indexOf(temp)].brandID} | ${listBrandName[onData.documents.indexOf(temp)].modelBrandName.modelEN.en}");
-      }
-    });
-  }
-
+  List<ImageDataEachGroup> get imageDataEachGroup => widget.imageDataEachGroup;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -274,218 +55,318 @@ class _EditDetailAssetState extends State<EditDetailAsset> {
     Widget child = Container();
     switch (editorImage) {
       case true:
-        return editImage();
+        return EditImages(
+          modelDataAsset: _data,
+          imageEachGroup: imageDataEachGroup,
+        );
         break;
       case false:
-        return editData();
+        return EditInformation(
+          modelDataAsset: _data,
+        );
         break;
       default:
         return child;
     }
   }
+}
 
-  Widget editImage() {
+class EditInformation extends StatelessWidget {
+  final ModelDataAsset modelDataAsset;
+  const EditInformation({Key key, this.modelDataAsset}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      child: Text("edit image"),
-    );
+        child: FormDataAsset(
+      actionPageForAdd: false,
+      modelDataAsset: modelDataAsset,
+    ));
+  }
+}
+
+class EditImages extends StatefulWidget {
+  final ModelDataAsset modelDataAsset;
+  final List<ImageDataEachGroup> imageEachGroup;
+  const EditImages({Key key, this.modelDataAsset, this.imageEachGroup})
+      : super(key: key);
+  @override
+  _EditImagesState createState() => _EditImagesState();
+}
+
+class _EditImagesState extends State<EditImages> {
+  final Dio dio = Dio();
+  final ecsLib = getIt.get<ECSLib>();
+  ModelDataAsset get _data => widget.modelDataAsset;
+  List<ImageDataEachGroup> get imageEachGroup => widget.imageEachGroup;
+  List<ImageDataEachGroup> listTempData;
+  RelatedImage relatedImage;
+  List<String> imageOld = [];
+  List<Uint8List> image = [];
+  @override
+  void initState() {
+    super.initState();
+    // relatedImage = RelatedImage(category: _data);
+    // var tempRelated = relatedImage.listRelatedImage();
+    // print(tempRelated);
+    listTempData = List.of(imageEachGroup);
+    getImageToBase64();
   }
 
-  Widget editData() {
-    return Container(
-      child: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            Form(
-              key: _fkey,
-              child: Column(
-                children: <Widget>[
-                  TextFieldBuilder.textFormFieldCustom(
-                      controller: txtAssetName,
-                      borderOutLine: false,
-                      title: "Asset Name"),
-                  formWidget(
-                    title: "Category",
-                    child: FutureBuilder<List<ProductCatagory>>(
-                      future: getProductCategory,
-                      builder: (BuildContext context,
-                          AsyncSnapshot<List<ProductCatagory>> snapshot) {
-                        if (snapshot.connectionState == ConnectionState.done) {
-                          if (!(snapshot.hasError)) {
-                            return ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: DropdownButtonFormField(
-                                decoration: InputDecoration(
-                                    filled: true, fillColor: Colors.grey[100]),
-                                value: txtPdtCat.text,
-                                items: snapshot.data.map((v) {
-                                  return DropdownMenuItem(
-                                    value: v.catCode,
-                                    child: TextBuilder.build(
-                                        title: "${v.catCode}. ${v.catName}",
-                                        style: TextStyleCustom.STYLE_LABEL
-                                            .copyWith(fontSize: 15),
-                                        maxLine: 1,
-                                        textOverflow: TextOverflow.ellipsis),
-                                  );
-                                }).toList(),
-                                onChanged: (value) => setState(() {
-                                  txtPdtCat.text = value;
-                                  print(txtPdtCat.text);
-                                }),
-                              ),
-                            );
-                          } else {
-                            return TextBuilder.build(title: "Error data");
-                          }
-                        } else if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return CircularProgressIndicator();
-                        } else {
-                          return TextBuilder.build(title: "Something Wrong.");
-                        }
-                      },
-                    ),
-                  ),
-                  formWidget(
-                      title: "Group",
-                      child: dropdownFormfield(
-                        initalData: txtPdtGroup.text,
-                        items: [
-                          "Car",
-                          "Living Room",
-                          "Meeting Room",
-                          "Bed room",
-                        ],
-                        onChange: (value) {
-                          setState(() {
-                            txtPdtGroup.text = value;
-                          });
-                        },
-                      )),
-                  formWidget(
-                      title: "Place",
-                      child: dropdownFormfield(
-                        initalData: txtPdtPlace.text,
-                        items: [
-                          "Home",
-                          "Office",
-                          "School",
-                          "Kitchen",
-                        ],
-                        onChange: (value) {
-                          setState(() {
-                            txtPdtPlace.text = value;
-                          });
-                        },
-                      )),
-                  formWidget(
-                      title: "Alert Date",
-                      child: dropdownFormfield(
-                        initalData: txtAlertDateNo.text,
-                        items: [
-                          "60",
-                          "30",
-                          "7",
-                          "0",
-                        ],
-                        onChange: (value) {
-                          setState(() {
-                            txtAlertDateNo.text = value;
-                          });
-                        },
-                      )),
-                  formWidget(
-                      title: "Brand Name", child: autoCompleteTextField()),
-                  TextFieldBuilder.textFormFieldCustom(
-                      controller: txtWarranzyNo,
-                      borderOutLine: false,
-                      title: "Warranzy No"),
-                  TextFieldBuilder.textFormFieldCustom(
-                      controller: txtWarranzyExpire,
-                      borderOutLine: false,
-                      title: "Warranzy Expire"),
-                  TextFieldBuilder.textFormFieldCustom(
-                      controller: txtSerialNo,
-                      borderOutLine: false,
-                      validet: false,
-                      title: "Serial No"),
-                  TextFieldBuilder.textFormFieldCustom(
-                      controller: txtLotNo,
-                      borderOutLine: false,
-                      validet: false,
-                      title: "Lot No"),
-                  TextFieldBuilder.textFormFieldCustom(
-                      controller: txtPrice,
-                      borderOutLine: false,
-                      title: "Salse price"),
-                  TextFieldBuilder.textFormFieldCustom(
-                      controller: txtNote,
-                      maxLine: 5,
-                      borderOutLine: false,
-                      validet: false,
-                      title: "Note"),
-                  ButtonBuilder.buttonCustom(
-                    paddingValue: 5,
-                    onPressed: () {
-                      if (_fkey.currentState.validate()) {
-                        printTxtController();
-                      }
-                    },
-                    context: context,
-                    label: "Edit",
-                  )
-                ],
-              ),
-            )
-          ],
-        ),
+  Future<List<Uint8List>> getImageToBase64() async {
+    List<Uint8List> listImage = [];
+    for (int i = 0; i < imageEachGroup.length; i++) {
+      for (int j = 0; j < imageEachGroup[i].imageUrl.length; j++) {
+        try {
+          // print("URL => imageEachGroup[$i].imageUrl[$j]");
+          var response = await http.get(imageEachGroup[i].imageUrl[j]);
+          listImage.add(response.bodyBytes);
+        } catch (e) {
+          print(e);
+        }
+      }
+    }
+    return listImage;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+        children: <Widget>[
+          Column(
+            children:
+                imageEachGroup.map((v) => buildDetialEachGroup(v)).toList(),
+          ),
+        ],
       ),
     );
   }
 
-  Widget formWidget({String title, Widget child}) {
+  Widget buildDetialEachGroup(ImageDataEachGroup v) {
     return Column(
       children: <Widget>[
-        Row(
-          children: <Widget>[
-            Expanded(
-                child: Center(
-                    child: Text(
-              "${title ?? "title's empty"}:",
-              textAlign: TextAlign.center,
-            ))),
-            Expanded(
-              flex: 3,
-              child: child,
+        ListTile(
+          title: Text("${v.title}"),
+          trailing: Container(
+            // color: Colors.red,
+            width: 100,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Text("${v.imageUrl.length}"),
+                Icon(Icons.arrow_forward_ios),
+              ],
             ),
-          ],
+          ),
+          onTap: () async {
+            await ecsLib
+                .pushPage(
+              context: context,
+              pageWidget: ModifyImage(
+                image: v,
+                data: _data,
+              ),
+            )
+                .then((_) {
+              setState(() {});
+            });
+          },
         ),
         Divider()
       ],
     );
   }
+}
 
-  Widget dropdownFormfield(
-      {String initalData, List<String> items, Function onChange}) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(10),
-      child: DropdownButtonFormField<String>(
-        decoration: InputDecoration(filled: true, fillColor: Colors.grey[100]),
-        value: initalData ?? "",
-        items: items.isNotEmpty
-            ? items.map((v) {
-                return DropdownMenuItem<String>(
-                  value: v,
-                  child: TextBuilder.build(title: "$v"),
-                );
-              }).toList()
-            : [
-                DropdownMenuItem(
-                  child: TextBuilder.build(title: "-"),
-                )
-              ],
-        onChanged: onChange,
+class ModifyImage extends StatefulWidget {
+  final ImageDataEachGroup image;
+  final ModelDataAsset data;
+  ModifyImage({Key key, this.image, this.data}) : super(key: key);
+
+  ModifytImageState createState() => ModifytImageState();
+}
+
+class ModifytImageState extends State<ModifyImage> {
+  final ecsLib = getIt.get<ECSLib>();
+  final allTranslations = getIt.get<GlobalTranslations>();
+  ImageDataEachGroup get imageDataEachGroup => widget.image;
+  Future<List<Uint8List>> tempImageLoading;
+  List<File> imageNew = [];
+  List<Uint8List> imageOld = [];
+
+  void initState() {
+    super.initState();
+    print(imageDataEachGroup.title);
+    print(imageDataEachGroup.imageUrl);
+    tempImageLoading = getImageToBase64();
+  }
+
+  Future<List<Uint8List>> getImageToBase64() async {
+    List<Uint8List> listImage = [];
+    for (int i = 0; i < imageDataEachGroup.imageUrl.length; i++) {
+      try {
+        print("loading");
+        var response = await http.get(imageDataEachGroup.imageUrl[i]);
+        listImage.add(response.bodyBytes);
+        imageOld = listImage;
+      } catch (e) {
+        print(e);
+        return null;
+      }
+    }
+
+    return listImage;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: TextBuilder.build(
+            title: "Modify Image", style: TextStyleCustom.STYLE_APPBAR),
+        actions: <Widget>[
+          FlatButton(
+              child: TextBuilder.build(title: allTranslations.text("submit")),
+              onPressed: submitUpdateImage)
+        ],
+      ),
+      body: Container(
+        padding: EdgeInsets.all(10),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            TextBuilder.build(title: "${imageDataEachGroup.title}"),
+            SizedBox(height: 5),
+            Center(child: TextBuilder.build(title: "Old Image")),
+            SizedBox(height: 5),
+            FutureBuilder<List<Uint8List>>(
+              future: tempImageLoading,
+              builder: (BuildContext context,
+                  AsyncSnapshot<List<Uint8List>> snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  if (snapshot.hasError) {
+                    return Text("Error");
+                  } else {
+                    var data = snapshot.data;
+                    return Container(
+                        child: Column(
+                      children: <Widget>[
+                        GridView(
+                          shrinkWrap: true,
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 5,
+                            mainAxisSpacing: 5,
+                          ),
+                          children: <Widget>[
+                            for (var _imageData in data)
+                              if (_imageData != null && _imageData.length > 0)
+                                Image.memory(_imageData, fit: BoxFit.cover),
+                          ],
+                        ),
+                        imageNew.length > 0
+                            ? Column(
+                                children: <Widget>[
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.only(top: 5, bottom: 10),
+                                    child:
+                                        TextBuilder.build(title: "New Image"),
+                                  ),
+                                  GridView(
+                                    shrinkWrap: true,
+                                    gridDelegate:
+                                        SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2,
+                                      crossAxisSpacing: 5,
+                                      mainAxisSpacing: 5,
+                                    ),
+                                    children: <Widget>[
+                                      for (var _imageNew in imageNew)
+                                        if (_imageNew != null &&
+                                            imageNew.length > 0)
+                                          Image.file(_imageNew,
+                                              fit: BoxFit.cover)
+                                    ],
+                                  ),
+                                ],
+                              )
+                            : Container()
+                      ],
+                    ));
+                  }
+                } else if (snapshot.connectionState ==
+                    ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else {
+                  return Text("Something wrong...!");
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add_a_photo),
+        onPressed: () async {
+          try {
+            var resPhoto = await ecsLib.getImage();
+            if (resPhoto != null)
+              setState(() {
+                imageNew.add(resPhoto);
+              });
+          } catch (e) {
+            print(e);
+          }
+        },
       ),
     );
+  }
+
+  submitUpdateImage() async {
+    ecsLib.showDialogLoadingLib(context, content: "compressing photo");
+    Map<String, dynamic> postData = {
+      "WTokenID": "${widget.data.wTokenID}",
+      "${imageDataEachGroup.title}": {}
+    };
+    int counter = imageOld.length + imageNew.length;
+    List<String> imageTobase64 = [];
+    imageOld.forEach((v) {
+      imageTobase64.add(base64.encode(v));
+    });
+    imageNew.forEach((v) async {
+      var tempDir = await getTemporaryDirectory();
+      var _newSize = await ecsLib.compressFile(
+        file: v,
+        targetPath: tempDir.path + "/${v.path.split("/").last}",
+        minWidth: 600,
+        minHeight: 480,
+        quality: 80,
+      );
+      var imageByte = _newSize.readAsBytesSync();
+      imageTobase64.add(base64Encode(imageByte));
+
+      if (imageTobase64.length == counter) {
+        print("imageToBase64 length => ${imageTobase64.length}");
+        for (var data in imageTobase64) {
+          postData["${imageDataEachGroup.title}"].addAll({
+            "${imageTobase64.indexOf(data)}": data,
+          });
+        }
+        ecsLib.cancelDialogLoadindLib(context);
+        ecsLib.printJson(postData);
+        sendAPIUpdateImage(postData: postData);
+      }
+    });
+  }
+
+  sendAPIUpdateImage({dynamic postData}) async {
+    ecsLib.showDialogLoadingLib(context, content: "Updating Image");
+    await APIServiceAssets.updateImage(postData: postData).then((response) {
+      ecsLib.cancelDialogLoadindLib(context);
+    });
   }
 }

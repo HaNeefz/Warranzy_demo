@@ -172,4 +172,23 @@ class DBProviderInitialApp {
       return [];
     }
   }
+
+  Future<String> getProductCatName({String id, String lang}) async {
+    final db = await database;
+    try {
+      var response = await db.rawQuery(
+          "SELECT CatName FROM $tableProductCategory WHERE CatCode = '$id'");
+      if (response.isNotEmpty) {
+        var catNameDecode = jsonDecode(response.first["CatName"]);
+        // print("CatName : ${catNameDecode[lang.toUpperCase()]}");
+        return catNameDecode[lang.toUpperCase()];
+      } else {
+        print("data is empty");
+        return "CatName is empty";
+      }
+    } catch (e) {
+      print("catch => $e");
+      return "catch $e";
+    }
+  }
 }

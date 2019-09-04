@@ -48,6 +48,7 @@ dependencies:
   jaguar_jwt: ^2.1.6
   global_configuration: ^1.2.0
   progress_indicators: ^0.1.4
+  keyboard_avoider: ^0.1.2
 
 dev_dependencies:
   flutter_test:

@@ -57,7 +57,8 @@ class DBProviderAsset {
       CreateDate TEXT,
       LastModiflyDate TEXT,
       ExWarrantyStatus TEXT,
-      TradeStatus TEXT
+      TradeStatus TEXT,
+      SLCName TEXT
         )""");
     await database.execute("""create table $tableWarranzyLog (
       WTokenID TEXT,

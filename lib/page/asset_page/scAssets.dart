@@ -16,6 +16,7 @@ import 'package:warranzy_demo/services/api/jwt_service.dart';
 import 'package:warranzy_demo/services/method/scan_qr.dart';
 import 'package:warranzy_demo/services/sqflit/db_asset.dart';
 import 'package:warranzy_demo/services/sqflit/db_customers.dart';
+import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
 import 'package:warranzy_demo/tools/assets.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/const.dart';
@@ -38,6 +39,7 @@ class _AssetPageState extends State<AssetPage> {
   final Dio dio = Dio();
   Future getAssetOnline;
   Future<List<ModelDataAsset>> getModelData;
+  String username = "Username";
 
   List<ModelAssetsData> listAssetData;
   JWTService jwtService;
@@ -47,16 +49,9 @@ class _AssetPageState extends State<AssetPage> {
   }
 
   Future<ResponseAssetOnline> getUrlAssetOnline() async {
+    // ResponseAssetOnline response;
     try {
-      var response = await dio.get(
-          "http://192.168.0.36:9999/API/v1/Asset/getMyAsset",
-          options: Options(
-              headers: {"Authorization": await JWTService.getTokenJWT()}));
-      if (response.statusCode == 200) {
-        ecsLib.printJson(jsonDecode(response.data));
-        return ResponseAssetOnline.fromJson(jsonDecode(response.data));
-      } else
-        throw Exception();
+      return await APIServiceAssets.getAllAseet();
     } catch (e) {
       print(e);
       return null;
@@ -66,8 +61,16 @@ class _AssetPageState extends State<AssetPage> {
   @override
   void initState() {
     super.initState();
+    getUsername();
     getModelData = getModelDataAsset();
     getAssetOnline = getUrlAssetOnline();
+  }
+
+  getUsername() async {
+    var name = await DBProviderCustomer.db.getNameCustomer();
+    setState(() {
+      username = name;
+    });
   }
 
   @override
@@ -254,7 +257,7 @@ class _AssetPageState extends State<AssetPage> {
       print("Check Session Expire");
       ecsLib.showDialogLoadingLib(context);
       await dio
-          .post("http://192.168.0.36:9999/API/v1/Asset/AddAsset",
+          .post("https://testwarranty-239103.appspot.com/API/v1/Asset/AddAsset",
               options:
                   Options(headers: {"Authorization": JWTService.getTokenJWT()}))
           .then((res) async {
@@ -296,7 +299,7 @@ class _AssetPageState extends State<AssetPage> {
                 TextBuilder.build(
                     title: date, style: TextStyleCustom.STYLE_LABEL_BOLD),
                 TextBuilder.build(
-                    title: "Hello, Username",
+                    title: "Hello, $username",
                     style: TextStyleCustom.STYLE_TITLE
                         .copyWith(color: ThemeColors.COLOR_GREY))
               ],
@@ -389,14 +392,35 @@ class _AssetPageState extends State<AssetPage> {
   }
 }
 
-class MyAssetFormSQLite extends StatelessWidget {
+class MyAssetFormSQLite extends StatefulWidget {
   // final RepositoryOfAssetFromSqflite data;
-  final Dio dio = Dio();
   final ModelDataAsset data;
   MyAssetFormSQLite({
     Key key,
     this.data,
   }) : super(key: key);
+
+  @override
+  _MyAssetFormSQLiteState createState() => _MyAssetFormSQLiteState();
+}
+
+class _MyAssetFormSQLiteState extends State<MyAssetFormSQLite> {
+  final Dio dio = Dio();
+  String catName = '';
+
+  getProductCateName() async {
+    var _catName = await DBProviderInitialApp.db.getProductCatName(
+        id: widget.data.pdtCatCode, lang: allTranslations.currentLanguage);
+    setState(() {
+      catName = _catName;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getProductCateName();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -429,42 +453,39 @@ class MyAssetFormSQLite extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       TextBuilder.build(
-                          title: data.title ?? "Empty title",
+                          title: widget.data.title ?? "Empty title",
                           style: TextStyleCustom.STYLE_LABEL_BOLD),
                       TextBuilder.build(
-                          title: data.custRemark ?? "Empty Remark",
+                          title: widget.data.custRemark ?? "Empty Remark",
                           style: TextStyleCustom.STYLE_CONTENT,
                           textOverflow: TextOverflow.ellipsis,
                           maxLine: 2),
                       TextBuilder.build(
-                          title: data.fileAttachID ??
-                              "Empty Remark | ${data.custRemark}",
+                          title: widget.data.fileAttachID ??
+                              "Empty Remark | ${widget.data.custRemark}",
                           style: TextStyleCustom.STYLE_CONTENT,
                           textOverflow: TextOverflow.ellipsis,
                           maxLine: 2),
                       TextBuilder.build(
-                          title: "\nExpire Date : ${data.warrantyExpire}" ??
-                              "Empty warrantyExpire",
+                          title:
+                              "\nExpire Date : ${widget.data.warrantyExpire}" ??
+                                  "Empty warrantyExpire",
                           style: TextStyleCustom.STYLE_CONTENT
                               .copyWith(fontSize: 12),
                           textOverflow: TextOverflow.ellipsis,
                           maxLine: 2),
                       Container(
-                        margin: EdgeInsets.symmetric(vertical: 10),
-                        width: 80,
-                        height: 30,
+                        margin: EdgeInsets.all(5),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 5, vertical: 5),
                         decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            color: ThemeColors.COLOR_GREY.withOpacity(0.3)),
-                        child: Center(
-                          child: TextBuilder.build(
-                              title: data.pdtCatCode,
-                              style: TextStyleCustom.STYLE_LABEL
-                                  .copyWith(fontSize: 12),
-                              textOverflow: TextOverflow.ellipsis,
-                              maxLine: 2),
-                        ),
-                      ),
+                            color: ThemeColors.COLOR_GREY.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(20)),
+                        child: TextBuilder.build(
+                            title: catName ?? "",
+                            style: TextStyleCustom.STYLE_CONTENT.copyWith(
+                                fontSize: 14, color: ThemeColors.COLOR_BLACK)),
+                      )
                     ],
                   ),
                 ),
@@ -475,7 +496,7 @@ class MyAssetFormSQLite extends StatelessWidget {
             ecsLib.pushPage(
               context: context,
               pageWidget: DetailAsset(
-                dataAsset: data,
+                dataAsset: widget.data,
                 showDetailOnline: false,
               ),
             );
@@ -486,13 +507,34 @@ class MyAssetFormSQLite extends StatelessWidget {
   }
 }
 
-class MyAssetOnline extends StatelessWidget {
+class MyAssetOnline extends StatefulWidget {
   final ModelDataAsset data;
-  final Dio dio = Dio();
+
   MyAssetOnline({
     Key key,
     this.data,
   }) : super(key: key);
+
+  @override
+  _MyAssetOnlineState createState() => _MyAssetOnlineState();
+}
+
+class _MyAssetOnlineState extends State<MyAssetOnline> {
+  final Dio dio = Dio();
+  String catName = '';
+
+  getProductCateName() async {
+    var _catName = await DBProviderInitialApp.db.getProductCatName(
+        id: widget.data.pdtCatCode, lang: allTranslations.currentLanguage);
+    setState(() {
+      catName = _catName;
+    });
+  }
+
+  void initState() {
+    super.initState();
+    getProductCateName();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -503,7 +545,7 @@ class MyAssetOnline extends StatelessWidget {
         title: Row(
           children: <Widget>[
             CachedNetworkImage(
-              imageUrl: data.imageMain,
+              imageUrl: widget.data.imageMain,
               imageBuilder: (context, imageProvider) => Container(
                 width: 150,
                 height: 150,
@@ -528,19 +570,20 @@ class MyAssetOnline extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     TextBuilder.build(
-                        title: data.title ?? "NULL",
+                        title: widget.data.title ?? "NULL",
                         style:
                             TextStyleCustom.STYLE_TITLE.copyWith(fontSize: 20),
                         maxLine: 2,
                         textOverflow: TextOverflow.ellipsis),
                     TextBuilder.build(
-                        title: data.custRemark ?? "Empty",
+                        title: widget.data.custRemark ?? "Empty",
                         style: TextStyleCustom.STYLE_CONTENT
                             .copyWith(fontSize: 13),
                         maxLine: 3,
                         textOverflow: TextOverflow.ellipsis),
                     TextBuilder.build(
-                        title: "Warranty Date " + "${data.warrantyExpire}" ??
+                        title: "Warranty Date " +
+                                "${widget.data.warrantyExpire}" ??
                             "Empty",
                         style: TextStyleCustom.STYLE_CONTENT
                             .copyWith(fontSize: 12),
@@ -548,12 +591,12 @@ class MyAssetOnline extends StatelessWidget {
                         textOverflow: TextOverflow.ellipsis),
                     Container(
                       margin: EdgeInsets.all(5),
-                      padding: EdgeInsets.all(2),
+                      padding: EdgeInsets.only(left: 5, right: 5),
                       decoration: BoxDecoration(
                           color: ThemeColors.COLOR_GREY.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(20)),
                       child: TextBuilder.build(
-                          title: data.pdtCatCode,
+                          title: catName ?? "",
                           style: TextStyleCustom.STYLE_CONTENT.copyWith(
                               fontSize: 14, color: ThemeColors.COLOR_BLACK)),
                     )
@@ -566,7 +609,8 @@ class MyAssetOnline extends StatelessWidget {
         onTap: () async {
           try {
             ecsLib.showDialogLoadingLib(context);
-            await APIServiceAssets.getDetailAseet(wtokenID: data.wTokenID)
+            await APIServiceAssets.getDetailAseet(
+                    wtokenID: widget.data.wTokenID)
                 .then((res) {
               ecsLib.cancelDialogLoadindLib(context);
               if (res?.status == true) {
@@ -579,13 +623,13 @@ class MyAssetOnline extends StatelessWidget {
                 );
               } else if (res.status == false) {
                 ecsLib.showDialogLib(
-                    content: "status false",
+                    content: res?.message ?? "status false",
                     context: context,
                     textOnButton: allTranslations.text("close"),
                     title: "ERROR STATUS");
               } else {
                 ecsLib.showDialogLib(
-                    content: "Something wrong",
+                    content: res?.message ?? "Something wrong",
                     context: context,
                     textOnButton: allTranslations.text("close"),
                     title: "ERROR SERVER");
@@ -593,7 +637,7 @@ class MyAssetOnline extends StatelessWidget {
             });
           } catch (e) {
             ecsLib.showDialogLib(
-                content: "Something wrong",
+                content: "Catch Something wrong",
                 context: context,
                 textOnButton: allTranslations.text("close"),
                 title: "CATCH ERROR");

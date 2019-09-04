@@ -10,6 +10,31 @@ class APIServiceAssets {
   static final Dio _dio = Dio();
   static final String _baseUrl = BaseUrl.baseUrl;
 
+  static Future<ResponseAssetOnline> getAllAseet() async {
+    try {
+      var res = await _dio.get("$_baseUrl/Asset/getMyAsset",
+          options: Options(
+              headers: {"Authorization": await JWTService.getTokenJWT()}));
+      if (res.statusCode == 200) {
+        print(res.data);
+        return ResponseAssetOnline.fromJson(jsonDecode(res.data));
+      } else
+        throw Exception("Failed to load post");
+    } on SocketException catch (e) {
+      print("SocketException => $e");
+      return ResponseAssetOnline(message: "SocketException => $e");
+    } on FormatException catch (e) {
+      print("FormatException => $e");
+      return ResponseAssetOnline(message: "FormatException => $e");
+    } on Exception catch (e) {
+      print("Exception => $e");
+      return ResponseAssetOnline(message: "Exception => $e");
+    } catch (e) {
+      print("catch => $e");
+      return ResponseAssetOnline(message: "catch => $e");
+    }
+  }
+
   static Future<RepositoryOfAsset> addAsset({postData}) async {
     FormData formData = FormData.from(postData);
     try {
@@ -94,7 +119,7 @@ class APIServiceAssets {
     }
   }
 
-  static Future<ResponseDetailOfAsset> editAseet({dynamic postData}) async {
+  static Future<ResponseDetailOfAsset> updateData({dynamic postData}) async {
     FormData formData = FormData.from(postData);
     try {
       var res = await _dio.post("$_baseUrl/Asset/editDetailAsset",
@@ -118,6 +143,33 @@ class APIServiceAssets {
     } catch (e) {
       print("catch => $e");
       return ResponseDetailOfAsset(message: "catch => $e");
+    }
+  }
+
+  static Future updateImage({dynamic postData}) async {
+    FormData formData = FormData.from(postData);
+    try {
+      var res = await _dio.post("$_baseUrl/Asset/UpdateImagesAsset",
+          data: formData,
+          options: Options(
+              headers: {"Authorization": await JWTService.getTokenJWT()}));
+      if (res.statusCode == 200) {
+        print(res.data);
+        // return ResponseDetailOfAsset.fromJson(jsonDecode(res.data));
+      } else
+        throw Exception("Failed to load post");
+    } on SocketException catch (e) {
+      print("SocketException => $e");
+      // return ResponseDetailOfAsset(message: "SocketException => $e");
+    } on FormatException catch (e) {
+      print("FormatException => $e");
+      // return ResponseDetailOfAsset(message: "FormatException => $e");
+    } on Exception catch (e) {
+      print("Exception => $e");
+      // return ResponseDetailOfAsset(message: "Exception => $e");
+    } catch (e) {
+      print("catch => $e");
+      // return ResponseDetailOfAsset(message: "catch => $e");
     }
   }
 }

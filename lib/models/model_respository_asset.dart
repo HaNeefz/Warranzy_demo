@@ -1,3 +1,5 @@
+import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
+
 class RepositoryOfAsset {
   bool status;
   WarranzyUsed warranzyUsed;
@@ -271,6 +273,7 @@ class ModelDataAsset {
   String imageMain;
   String images;
   String alertDate;
+  String slcName;
   int alertDateNo;
 
   ModelDataAsset({
@@ -300,6 +303,7 @@ class ModelDataAsset {
     this.warranzyEndDate,
     this.fileAttachID,
     this.images,
+    this.slcName,
     this.alertDate,
     this.alertDateNo,
   });
@@ -332,6 +336,7 @@ class ModelDataAsset {
     fileAttachID = json['FileAttach_ID'];
     imageMain = json['ImageMain'];
     images = json['Images'];
+    slcName = json['SLCName'];
     alertDate = json['AlertDate'];
     alertDateNo = json['AlertDateNo'];
   }
@@ -364,12 +369,18 @@ class ModelDataAsset {
     data['WarranzyEndDate'] = this.warranzyEndDate;
     data['FileAttach_ID'] = this.fileAttachID;
     data['Images'] = this.images;
+    data['SLCName'] = this.slcName;
     data['AlertDate'] = alertDate;
     data['AlertDateNo'] = alertDateNo;
     return data;
   }
 
   //เอา function getImageJson มาไว้ในนี้
+  Future<String> getProductCateName(String pdtCatCode, String lang) async {
+    var _catName = await DBProviderInitialApp.db
+        .getProductCatName(id: pdtCatCode, lang: lang);
+    return _catName;
+  }
 }
 
 class ResponseAssetOnline {

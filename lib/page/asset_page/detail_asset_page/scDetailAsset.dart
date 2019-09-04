@@ -11,6 +11,7 @@ import 'package:warranzy_demo/page/asset_page/add_assets_page/scFillInformation.
 import 'package:warranzy_demo/page/asset_page/detail_asset_page/scTranfer_asset.dart';
 import 'package:warranzy_demo/page/main_page/scMain_page.dart';
 import 'package:warranzy_demo/services/api/api_service_assets.dart';
+import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/const.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
@@ -45,13 +46,13 @@ class _DetailAssetState extends State<DetailAsset> {
   final ecsLib = getIt.get<ECSLib>();
   final allTranslations = getIt.get<GlobalTranslations>();
   ModelDataAsset get _data => widget.dataAsset;
-  List<ImageKeepData> imageKeepData = [];
+  List<ImageDataEachGroup> imageDataEachGroup = [];
   List<String> listImageUrl = [];
 
   void initState() {
     super.initState();
     if (_data.createType == "C") {
-      getImage(_data);
+      imageDataEachGroup = getImage(_data);
     }
   }
 
@@ -61,6 +62,7 @@ class _DetailAssetState extends State<DetailAsset> {
       pageWidget: EditDetailAsset(
         editingImage: edit,
         modelDataAsset: _data,
+        imageDataEachGroup: imageDataEachGroup,
       ),
     );
   }
@@ -330,15 +332,17 @@ class _DetailAssetState extends State<DetailAsset> {
                 title: "Product Group", data: _data.pdtGroup ?? "-"),
             textTitleWithData(
                 title: "Product Place", data: _data.pdtPlace ?? "-"),
+            textTitleWithData(title: "SLCName", data: _data.slcName ?? "-"),
             textTitleWithData(
                 title: "Product Price", data: _data.salesPrice ?? "-"),
             textTitleWithData(
                 title: "Warranty No", data: _data.warrantyNo ?? "-"),
             textTitleWithData(
                 title: "Warranty Expire Date",
-                data: _data.warrantyExpire ?? "-"),
+                data: _data.warrantyExpire.split(" ").first ?? "-"),
             textTitleWithData(
-                title: "AlerDate Date", data: _data.alertDate ?? "-"),
+                title: "AlerDate Date",
+                data: _data.alertDate.split(" ").first ?? "-"),
             textTitleWithData(
                 title: "Alert Date No.", data: "${_data.alertDateNo ?? "-"}"),
             textTitleWithData(
@@ -516,25 +520,28 @@ class _DetailAssetState extends State<DetailAsset> {
     );
   }
 
-  List<ImageKeepData> getImage(ModelDataAsset images) {
+  List<ImageDataEachGroup> getImage(ModelDataAsset images) {
     Map<String, dynamic> tempImages;
-    List<ImageKeepData> tempImageKeepData = [];
+    List<ImageDataEachGroup> tempImageDataEachGroup = [];
     if (images.images != null) {
       tempImages = jsonDecode(images.images);
       tempImages.forEach((String k, dynamic v) {
         var listTemp = v as List;
+        List<String> tempUrl = [];
         for (var item in listTemp) {
+          tempUrl.add(item);
           setState(() {
             listImageUrl.add(item);
           });
         }
-        tempImageKeepData.add(ImageKeepData(title: k, imageUrl: listImageUrl));
-        // tempImageKeepData.forEach((v) {
-        //   print("Title : ${v.title} | url ${v.imageUrl}");
-        // });
+        tempImageDataEachGroup
+            .add(ImageDataEachGroup(title: k, imageUrl: tempUrl));
+      });
+      tempImageDataEachGroup.forEach((v) {
+        print("Title : ${v.title} | url[${v.imageUrl.length}] ${v.imageUrl}");
       });
     }
-    return tempImageKeepData;
+    return tempImageDataEachGroup;
   }
 }
 

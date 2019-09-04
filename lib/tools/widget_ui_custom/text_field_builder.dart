@@ -202,68 +202,95 @@ class TextFieldBuilder {
     );
   }
 
-  static Widget textFormFieldCustom({
-    @required final TextEditingController controller,
-    @required String title,
-    bool borderOutLine = false,
-    int maxLength,
-    int maxLine = 1,
-    bool validet = true,
-  }) {
+  static Widget textFormFieldCustom(
+      {@required final TextEditingController controller,
+      @required String title,
+      bool borderOutLine = false,
+      TextInputType keyboardType = TextInputType.text,
+      int maxLength,
+      int maxLine = 1,
+      bool validate = true,
+      bool necessary = false}) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            Expanded(
-                child: Center(
-                    child: Text(
-              "${title ?? "title's empty"}:",
-              textAlign: TextAlign.center,
-            ))),
-            Expanded(
-              flex: 3,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: TextFormField(
-                    controller: controller,
-                    validator: (s) {
-                      if(validet == true)
-                      if (s.isEmpty) {
-                        return "Please enter data";
-                      }
-                      return null;
-                    },
-                    maxLength: maxLength,
-                    maxLines: maxLine,
-                    decoration: InputDecoration(
-                      fillColor: Colors.grey[100],
-                      filled: true,
-                      contentPadding: EdgeInsets.all(15),
-                      border:
-                          // borderOutLine
-                          //     ? OutlineInputBorder(
-                          //         borderRadius: BorderRadius.circular(30),
-                          //         borderSide: BorderSide(color: Colors.teal[300]))
-                          //     : UnderlineInputBorder(
-                          //         borderRadius: BorderRadius.circular(30),
-                          //         borderSide: BorderSide(color: Colors.teal[300])),
-                          InputBorder.none,
-                      errorBorder: InputBorder.none,
-                      // borderOutLine
-                      //     ? OutlineInputBorder(
-                      //         borderRadius: BorderRadius.circular(30),
-                      //         borderSide: BorderSide(color: Colors.teal[300]))
-                      //     : UnderlineInputBorder(
-                      //         borderRadius: BorderRadius.circular(30),
-                      //         borderSide: BorderSide(color: Colors.teal[300])),
-                    )),
-              ),
-            ),
-          ],
+        Text(
+          "${title ?? "title's empty"}${necessary == true ? "*" : ""} :",
+          // textAlign: TextAlign.center,
+          style: TextStyleCustom.STYLE_CONTENT
+              .copyWith(fontSize: 14, color: Colors.teal),
+        ),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: TextFormField(
+              controller: controller,
+              validator: (s) {
+                if (validate == true) if (s.isEmpty) {
+                  return "Invalide, Please enter data.";
+                }
+                return null;
+              },
+              maxLength: maxLength,
+              keyboardType: keyboardType,
+              maxLines: maxLine,
+              decoration: InputDecoration(
+                // hintText: title,
+                // hintStyle: TextStyleCustom.STYLE_LABEL
+                //     .copyWith(fontSize: 13, color: Colors.grey),
+                fillColor: Colors.grey[100],
+                filled: true,
+                contentPadding: EdgeInsets.all(15),
+                errorStyle: TextStyleCustom.STYLE_ERROR,
+                border: borderOutLine
+                    ? OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(color: Colors.teal[300]))
+                    : UnderlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(color: Colors.teal[300])),
+                // InputBorder.none,
+                errorBorder:
+                    // InputBorder.none,
+                    borderOutLine
+                        ? OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: Colors.teal[300]))
+                        : UnderlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: Colors.teal[300])),
+              )),
         ),
         Divider()
       ],
+    );
+  }
+
+  static Widget dropdownFormfield({
+    String initalData,
+    List<String> items,
+    Function(String) onChange,
+    Function(String) onSaved,
+  }) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(10),
+      child: DropdownButtonFormField<String>(
+        decoration: InputDecoration(filled: true, fillColor: Colors.grey[100]),
+        value: initalData ?? "",
+        items: items.isNotEmpty
+            ? items.map((v) {
+                return DropdownMenuItem<String>(
+                  value: v,
+                  child: TextBuilder.build(title: "$v"),
+                );
+              }).toList()
+            : [
+                DropdownMenuItem(
+                  child: TextBuilder.build(title: "-"),
+                )
+              ],
+        onChanged: onChange,
+        onSaved: onSaved,
+      ),
     );
   }
 }

@@ -377,9 +377,9 @@ class ECSLib {
     return result;
   }
 
-  String setDateFormat(String dateTime, [formate = "yyyy-MM-dd"]) {
+  String setDateFormat(DateTime dateTime, [formate = "yyyy-MM-dd HH:mm:ss"]) {
     DateFormat _format = DateFormat(formate);
-    return _format.parseUTC(dateTime).toString();
+    return _format.format(dateTime);
   }
 
   stepBackScene(BuildContext context, int step) {

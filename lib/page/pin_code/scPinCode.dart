@@ -40,12 +40,20 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
   List<Widget> listDot = List<Widget>(6);
   List<int> listPinTemp = List<int>();
   List<int> listPinCorrect = [0, 0, 0, 0, 0, 0];
+  String username = "Username";
   Future<SharedPreferences> _pref = SharedPreferences.getInstance();
   // bool get setPinCodePage => widget.setPin;
   // bool usedFingerprintOrFaceID = false;
   PageType get type => widget.type;
   bool get usedPin => widget.usedPin;
   ModelMasCustomer get modelMasCustomer => widget.modelMasCustomer;
+
+  getUsername() async {
+    var name = await DBProviderCustomer.db.getNameCustomer();
+    setState(() {
+      username = name;
+    });
+  }
 
   void sendApiLogin() async {
     SharedPreferences pref = await _pref;
@@ -141,6 +149,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
   @override
   void initState() {
     super.initState();
+    getUsername();
   }
 
   bool get pinCorrect => listEquals(listPinTemp, listPinCorrect);
@@ -389,7 +398,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
             style: TextStyleCustom.STYLE_TITLE);
         break;
       default:
-        widgetTitle = getUername();
+        widgetTitle = showUsername();
     }
     return widgetTitle;
   }
@@ -481,10 +490,10 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
   }
 
 //------get Profile And Username
-  Widget getUername() {
+  Widget showUsername() {
     return Container(
       child: TextBuilder.build(
-          title: "Username", style: TextStyleCustom.STYLE_TITLE),
+          title: username, style: TextStyleCustom.STYLE_TITLE),
     );
   }
 

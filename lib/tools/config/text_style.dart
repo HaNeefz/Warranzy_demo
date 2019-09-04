@@ -68,7 +68,7 @@ class TextStyleCustom {
 
   static const TextStyle STYLE_ERROR = TextStyle(
       color: ThemeColors.COLOR_ERROR,
-      height: 1.4,
+      // height: 1.4,
       // letterSpacing: 1,
       fontSize: 13.0,
       fontFamily: fontFamily);

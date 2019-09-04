@@ -1,15 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:warranzy_demo/models/model_repository_init_app.dart';
-import 'package:warranzy_demo/models/model_respository_asset.dart';
 import 'package:warranzy_demo/page/main_page/scMain_page.dart';
 import 'package:warranzy_demo/services/api/api_service_assets.dart';
-import 'package:warranzy_demo/services/api/base_url.dart';
-import 'package:warranzy_demo/services/api/jwt_service.dart';
 import 'package:warranzy_demo/services/sqflit/db_asset.dart';
 import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
@@ -33,7 +29,7 @@ class _AddImageDemoState extends State<AddImageDemo> {
   ProductCatagory productCatagory = ProductCatagory();
   RelatedImage relatedImage;
   List<String> listRelated = [];
-  List<ImageKeepData> listKeepImageData;
+  List<ImageDataEachGroup> listKeepImageData;
 
   getPrudcutCategory() async {
     var catTemp = await DBProviderInitialApp.db.getAllDataProductCategory();
@@ -48,10 +44,10 @@ class _AddImageDemoState extends State<AddImageDemo> {
     });
     relatedImage = RelatedImage(category: category);
     listRelated = relatedImage.listRelatedImage();
-    listKeepImageData = List<ImageKeepData>(listRelated.length);
+    listKeepImageData = List<ImageDataEachGroup>(listRelated.length);
     for (int i = 0; i < listRelated.length; i++) {
-      listKeepImageData[i] =
-          ImageKeepData(title: listRelated[i], imagesList: [], imageBase64: []);
+      listKeepImageData[i] = ImageDataEachGroup(
+          title: listRelated[i], imagesList: [], imageBase64: []);
     }
   }
 
@@ -73,6 +69,7 @@ class _AddImageDemoState extends State<AddImageDemo> {
           FlatButton(
             child: TextBuilder.build(title: allTranslations.text("submit")),
             onPressed: () async {
+              var dataPost = {"Data": widget.dataAsset, "Images": {}};
               print("Submit");
               ecsLib.showDialogLoadingLib(context,
                   content: "Image compressing");
@@ -93,26 +90,33 @@ class _AddImageDemoState extends State<AddImageDemo> {
                     listImages = _newSize;
                     tempModelImage.imageBase64[j] =
                         base64Encode(listImages.readAsBytesSync());
+
                     print(
                         "------ ${tempModelImage.title} No. $i => Image No. $j");
                   }
+                }
+                var imageData = {};
+                try {
+                  for (var modelImage in listKeepImageData) {
+                    imageData.addAll({"${modelImage.title}": {}});
+                    for (var imageBase64Data in modelImage.imageBase64) {
+                      imageData["${modelImage.title}"].addAll({
+                        "${modelImage.imageBase64.indexOf(imageBase64Data)}":
+                            imageBase64Data
+                      });
+                    }
+                  }
+                  dataPost.addAll({"Images": imageData});
+
+                  ecsLib.printJson(dataPost);
+                } catch (e) {
+                  print(e);
                 }
               } catch (e) {
                 print(e);
               }
               ecsLib.cancelDialogLoadindLib(context);
-              var dataPost = {"Data": widget.dataAsset, "Images": {}};
 
-              listKeepImageData.forEach((modelImage) {
-                modelImage.imageBase64.forEach((imageBase64) {
-                  dataPost['Images'].addAll({
-                    "${modelImage.title}": {
-                      "${modelImage.imageBase64.indexOf(imageBase64)}":
-                          imageBase64
-                    }
-                  });
-                });
-              });
               ecsLib.printJson(dataPost);
               ecsLib.showDialogLoadingLib(context, content: "Adding assets");
               try {
@@ -319,13 +323,13 @@ class _TakePhotosState extends State<TakePhotos> {
   }
 }
 
-class ImageKeepData {
+class ImageDataEachGroup {
   final String title;
   List<File> imagesList;
   List<String> imageBase64;
   List<String> imageUrl;
 
-  ImageKeepData(
+  ImageDataEachGroup(
       {this.title,
       this.imagesList = const [],
       this.imageBase64 = const [],

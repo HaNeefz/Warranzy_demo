@@ -37,7 +37,7 @@ class FormWidgetBuilder {
       @required List items,
       @required validate,
       String hint,
-      Function onChange}) {
+      Function(String value) onChange}) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 5),
       padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
