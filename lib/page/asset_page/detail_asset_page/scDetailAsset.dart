@@ -48,12 +48,21 @@ class _DetailAssetState extends State<DetailAsset> {
   ModelDataAsset get _data => widget.dataAsset;
   List<ImageDataEachGroup> imageDataEachGroup = [];
   List<String> listImageUrl = [];
-
+  String catName = "";
   void initState() {
     super.initState();
+    getProductCateName();
     if (_data.createType == "C") {
       imageDataEachGroup = getImage(_data);
     }
+  }
+
+  getProductCateName() async {
+    var _catName = await DBProviderInitialApp.db.getProductCatName(
+        id: _data.pdtCatCode, lang: allTranslations.currentLanguage);
+    setState(() {
+      catName = _catName;
+    });
   }
 
   goToEditPageForEditImage(bool edit) {
@@ -326,8 +335,7 @@ class _DetailAssetState extends State<DetailAsset> {
             textTitleWithData(title: "Asset Name", data: _data.title ?? "-"),
             textTitleWithData(
                 title: "Brand Name", data: _data.brandCode ?? "-"),
-            textTitleWithData(
-                title: "Product Category", data: _data.pdtCatCode ?? "-"),
+            textTitleWithData(title: "Product Category", data: catName),
             textTitleWithData(
                 title: "Product Group", data: _data.pdtGroup ?? "-"),
             textTitleWithData(
