@@ -68,6 +68,7 @@ class WarranzyUsed {
   String lastModiflyDate;
   String exWarrantyStatus;
   String tradeStatus;
+  String slcName;
 
   WarranzyUsed(
       {this.wTokenID,
@@ -88,6 +89,7 @@ class WarranzyUsed {
       this.createDate,
       this.lastModiflyDate,
       this.exWarrantyStatus,
+      this.slcName,
       this.tradeStatus});
 
   WarranzyUsed.fromJson(Map<String, dynamic> json) {
@@ -108,6 +110,7 @@ class WarranzyUsed {
     createType = json['CreateType'];
     createDate = json['CreateDate'];
     lastModiflyDate = json['LastModiflyDate'];
+    slcName = json['SLCName'] ?? "-";
     exWarrantyStatus = json['ExWarrantyStatus'];
     tradeStatus = json['TradeStatus'];
   }
@@ -132,6 +135,7 @@ class WarranzyUsed {
     data['CreateDate'] = this.createDate;
     data['LastModiflyDate'] = this.lastModiflyDate;
     data['ExWarrantyStatus'] = this.exWarrantyStatus;
+    data['SLCName'] = this.slcName;
     data['TradeStatus'] = this.tradeStatus;
     return data;
   }

@@ -188,8 +188,7 @@ class APIServiceUser {
     try {
       final response = await http
           .post(urlPost, body: postData)
-          .timeout(Duration(seconds: TIMEOUT))
-          .catchError((e) => print("message: CatchError ${e.toString()}")); //
+          .timeout(Duration(seconds: TIMEOUT));
       if (response.statusCode == 200) {
         ShowDataAPI.printResponse("${json.decode(response.body)}");
         return ModelVerifyLogin.fromJson(json.decode(response.body));

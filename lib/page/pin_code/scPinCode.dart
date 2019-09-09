@@ -5,10 +5,14 @@ import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:warranzy_demo/models/model_cust_temp_data.dart';
 import 'package:warranzy_demo/models/model_mas_cust.dart';
+import 'package:warranzy_demo/models/model_verify_login.dart';
 import 'package:warranzy_demo/page/login_first/scLogin.dart';
 import 'package:warranzy_demo/page/main_page/scMain_page.dart';
 import 'package:warranzy_demo/services/api/api_services_user.dart';
 import 'package:warranzy_demo/services/api/jwt_service.dart';
+import 'package:warranzy_demo/services/api_provider/api_bloc.dart';
+import 'package:warranzy_demo/services/api_provider/api_bloc_widget.dart';
+import 'package:warranzy_demo/services/api_provider/api_response.dart';
 import 'package:warranzy_demo/services/sqflit/db_customers.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/const.dart';
@@ -47,6 +51,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
   PageType get type => widget.type;
   bool get usedPin => widget.usedPin;
   ModelMasCustomer get modelMasCustomer => widget.modelMasCustomer;
+  ApiBloc<ModelVerifyLogin> _loginBloc;
 
   getUsername() async {
     var name = await DBProviderCustomer.db.getNameCustomer();
@@ -70,9 +75,51 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
       "CountryCode": countryCode
     };
     print("Data before send Api => $postData");
+    ecsLib.showDialogLoadingLib(context);
+    // var url = "/User/Login";
+    // _loginBloc = ApiBloc<ModelVerifyLogin>(url: url, body: postData);
 
-    await APIServiceUser.apiVerifyLoginTest(postData: postData)
-        .then((response) {
+    // await ecsLib
+    //     .showDialogConnectApi(
+    //   context,
+    //   child: StreamBuilder<ApiResponse<ModelVerifyLogin>>(
+    //     stream: _loginBloc.stmStream,
+    //     builder: (BuildContext context,
+    //         AsyncSnapshot<ApiResponse<ModelVerifyLogin>> snapshot) {
+    //       if (snapshot.hasData) {
+    //         switch (snapshot.data.status) {
+    //           case Status.LOADING:
+    //             return ecsLib.loadingLogoWarranzy();
+    //             break;
+    //           case Status.COMPLETED:
+    //             return Text("${snapshot.data.data.status}");
+    //             break;
+    //           case Status.ERROR:
+    //             return Column(
+    //               mainAxisSize: MainAxisSize.min,
+    //               children: <Widget>[
+    //                 Text(snapshot.data.message),
+    //                 RaisedButton(
+    //                   shape: CircleBorder(),
+    //                   child: Icon(Icons.refresh),
+    //                   onPressed: () {
+    //                     _loginBloc.fetchData();
+    //                   },
+    //                 )
+    //               ],
+    //             );
+    //             break;
+    //         }
+    //       }
+    //       return Container();
+    //     },
+    //   ),
+    // )
+    //     .then((res) {
+    //   print(res);
+    // });
+
+    await APIServiceUser.apiVerifyLogin(postData: postData).then((response) {
       if (response?.status == true) {
         gotoMainPage();
       } else if (response?.status == false) {
@@ -475,11 +522,18 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
                             paddingValue: 0,
                             label: allTranslations.text("forgot_pin"),
                             onPressed: () async {
-                              print("tap");
-
-                              print(await JWTService.getTokenJWT());
+                              print("forgot pin");
+                              // print(await JWTService.getTokenJWT());
                             }),
                       ),
+                      // RaisedButton(
+                      //   onPressed: () {
+                      //     Navigator.push(
+                      //         context,
+                      //         MaterialPageRoute(
+                      //             builder: (context) => NewApiStructure()));
+                      //   },
+                      // ),
                     ],
                   ),
                 )
@@ -623,7 +677,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
         //pinCorrect == true
         print("Correct");
         // gotoMainPage();
-        ecsLib.showDialogLoadingLib(context);
+
         sendApiLogin();
         setState(() {
           listPinTemp.clear();
@@ -676,5 +730,83 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
       });
       print("Removed => " + listPinTemp.toString());
     }
+  }
+}
+
+class NewApiStructure extends StatefulWidget {
+  NewApiStructure({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  _NewApiStructureState createState() => _NewApiStructureState();
+}
+
+class _NewApiStructureState extends State<NewApiStructure> {
+  final body = {
+    "CustUserID": "ca3f58b3a0214aaaa68a",
+    "PINcode": "111111",
+    "DeviceID": "7BAE0E71-C3C2-4532-8C99-DCA7BB713A69",
+    "CountryCode": "TH",
+    "TimeZone": "Asia/Bangkok"
+  };
+
+  var url = "/User/Login";
+
+  ApiBloc<ModelVerifyLogin> _loginBloc;
+
+  @override
+  void initState() {
+    super.initState();
+    _loginBloc = ApiBloc<ModelVerifyLogin>(url: url, body: body);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _loginBloc.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Api"),
+      ),
+      body: //Container(),
+          StreamBuilder<ApiResponse<ModelVerifyLogin>>(
+        stream: _loginBloc.stmStream,
+        builder: (BuildContext context,
+            AsyncSnapshot<ApiResponse<ModelVerifyLogin>> snapshot) {
+          if (snapshot.hasData) {
+            switch (snapshot.data.status) {
+              case Status.LOADING:
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+                break;
+              case Status.COMPLETED:
+                return Text("${snapshot.data.data.status}");
+                break;
+              case Status.ERROR:
+                return Column(
+                  children: <Widget>[
+                    Text(snapshot.data.message),
+                    RaisedButton(
+                      shape: CircleBorder(),
+                      child: Icon(Icons.refresh),
+                      onPressed: () {
+                        _loginBloc.fetchData();
+                      },
+                    )
+                  ],
+                );
+                break;
+            }
+          }
+          return Container();
+        },
+      ),
+    );
   }
 }

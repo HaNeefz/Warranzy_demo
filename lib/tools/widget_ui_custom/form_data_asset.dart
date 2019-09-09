@@ -57,7 +57,7 @@ class _FormDataAssetState extends State<FormDataAsset> {
   TextEditingController txtSerialNo;
   TextEditingController txtLotNo;
   TextEditingController txtNote;
-  TextEditingController txtSLCCode;
+  TextEditingController txtSLCName;
 
   // String _showDate = "-";
   // String _valueDate = "";
@@ -82,6 +82,7 @@ class _FormDataAssetState extends State<FormDataAsset> {
   @override
   void initState() {
     getProductCategory = DBProviderInitialApp.db.getAllDataProductCategory();
+    print(_data?.salesPrice);
     if (_data != null) {
       brandActive = _data?.brandCode != null ? "Y" : "N";
       txtAssetName = TextEditingController(text: _data?.title ?? "");
@@ -100,7 +101,7 @@ class _FormDataAssetState extends State<FormDataAsset> {
       txtSerialNo = TextEditingController(text: _data?.serialNo ?? "");
       txtLotNo = TextEditingController(text: _data?.lotNo ?? "");
       txtNote = TextEditingController(text: _data?.custRemark ?? "");
-      txtSLCCode = TextEditingController(text: _data?.custRemark ?? "");
+      txtSLCName = TextEditingController(text: _data?.slcName ?? "");
     } else {
       brandActive = _data?.brandCode != null ? "Y" : "N";
       txtAssetName = TextEditingController(text: "");
@@ -108,7 +109,7 @@ class _FormDataAssetState extends State<FormDataAsset> {
       txtBrandCode = TextEditingController(text: "");
       txtWarranzyNo = TextEditingController(text: "");
       txtWarranzyExpire = TextEditingController(text: "");
-      txtAlertDate = TextEditingController(text: "7");
+      txtAlertDate = TextEditingController(text: "60");
       txtPdtCat = TextEditingController(text: "A001");
       txtPdtGroup = TextEditingController(text: _group.elementAt(0));
       txtPdtPlace = TextEditingController(text: _place.elementAt(0));
@@ -116,7 +117,7 @@ class _FormDataAssetState extends State<FormDataAsset> {
       txtSerialNo = TextEditingController(text: "");
       txtLotNo = TextEditingController(text: "");
       txtNote = TextEditingController(text: "");
-      txtSLCCode = TextEditingController(text: "");
+      txtSLCName = TextEditingController(text: "");
     }
 
     Future.delayed(Duration(milliseconds: 1500), () {
@@ -139,7 +140,7 @@ class _FormDataAssetState extends State<FormDataAsset> {
     txtPrice?.dispose();
     txtNote?.dispose();
     txtSerialNo?.dispose();
-    txtSLCCode?.dispose();
+    txtSLCName?.dispose();
     txtLotNo?.dispose();
     super.dispose();
   }
@@ -157,10 +158,6 @@ class _FormDataAssetState extends State<FormDataAsset> {
             child: ListView(
               controller: _scrollController,
               children: <Widget>[
-                if (actionPageForAdd == true) buildTitle(),
-                SizedBox(
-                  height: 20,
-                ),
                 TextFieldBuilder.textFormFieldCustom(
                     controller: txtAssetName,
                     borderOutLine: false,
@@ -248,18 +245,6 @@ class _FormDataAssetState extends State<FormDataAsset> {
                       },
                     )),
                 formWidget(
-                    title: "Alert Date",
-                    necessary: true,
-                    child: dropdownFormfield(
-                      initalData: txtAlertDate.text,
-                      items: ["60", "30", "7", "0"],
-                      onChange: (value) {
-                        setState(() {
-                          txtAlertDate.text = value;
-                        });
-                      },
-                    )),
-                formWidget(
                     title: "Brand Name",
                     necessary: true,
                     child: ClipRRect(
@@ -271,11 +256,6 @@ class _FormDataAssetState extends State<FormDataAsset> {
                           ),
                           child: autoCompleteTextField()),
                     )),
-                TextFieldBuilder.textFormFieldCustom(
-                    controller: txtWarranzyNo,
-                    necessary: true,
-                    borderOutLine: false,
-                    title: "Warranzy No"),
                 formWidget(
                   title: "Warranzy Expire",
                   necessary: true,
@@ -298,10 +278,15 @@ class _FormDataAssetState extends State<FormDataAsset> {
                       title: TextBuilder.build(title: ""),
                       children: <Widget>[
                         TextFieldBuilder.textFormFieldCustom(
-                            controller: txtSLCCode,
+                            controller: txtWarranzyNo,
                             borderOutLine: false,
                             validate: false,
-                            title: "SCCCode"),
+                            title: "Warranty No"),
+                        TextFieldBuilder.textFormFieldCustom(
+                            controller: txtSLCName,
+                            borderOutLine: false,
+                            validate: false,
+                            title: "SLCName"),
                         TextFieldBuilder.textFormFieldCustom(
                             controller: txtSerialNo,
                             validate: false,
@@ -338,7 +323,7 @@ class _FormDataAssetState extends State<FormDataAsset> {
                     onPressed: () {
                       _formKey.currentState.save();
                       if (_formKey.currentState.validate()) {
-                        printTxtController();
+                        buttonEditInformation();
                       }
                     },
                     context: context,
@@ -439,7 +424,7 @@ class _FormDataAssetState extends State<FormDataAsset> {
     );
   }
 
-  printTxtController() {
+  buttonEditInformation() {
     var postData = {
       "WTokenID": _data?.wTokenID ?? "",
       "CreateType": _data?.createType ?? "",
@@ -452,11 +437,12 @@ class _FormDataAssetState extends State<FormDataAsset> {
       "Title": txtAssetName.text,
       "SerialNo": txtSerialNo.text,
       "LotNo": txtLotNo.text,
-      "SalesPrice": txtPrice.text != null || txtPrice.text == ""
+      "SalesPrice": txtPrice.text != null || txtPrice.text != ""
           ? int.parse(txtPrice.text)
           : 0,
       "WarrantyNo": txtWarranzyNo.text,
       "WarrantyExpire": txtWarranzyExpire.text,
+      "SLCName": txtSLCName.text,
       "AlertDate": txtAlertDate.text,
       "CustRemark": txtNote.text,
     };
@@ -549,7 +535,7 @@ class _FormDataAssetState extends State<FormDataAsset> {
           ],
         ),
       );
-  Map<String, dynamic> addTextController() {
+  Map<String, dynamic> postDataForAdd() {
     Map<String, dynamic> mapData = {
       "WarrantyNo": txtWarranzyNo.text,
       "WarrantyExpire": txtWarranzyExpire.text,
@@ -565,6 +551,7 @@ class _FormDataAssetState extends State<FormDataAsset> {
       "LotNo": txtLotNo.text,
       "SalesPrice": txtPrice.text == "" ? 0 : int.parse(txtPrice.text),
       "CustRemark": txtNote.text,
+      "SLCName": txtSLCName.text,
       "CreateType":
           widget.onClickAddAssetPage == PageAction.MANUAL_ADD ? "C" : "T"
     };
@@ -582,37 +569,24 @@ class _FormDataAssetState extends State<FormDataAsset> {
             print("tap");
             _formKey.currentState.save();
             if (_formKey.currentState.validate()) {
-              print(addTextController());
-              ecsLib.pushPage(
-                context: context,
-                pageWidget: AddImageDemo(
-                  dataAsset: addTextController(),
-                ),
-                //   // AddImage(
-                //   //   hasDataAssetAlready: widget.hasDataAssetAlready,
-                //   //   dataAsset: dataAsset,
-                //   // ),
-              );
+              print(txtBrandName.text);
+              if (txtBrandName.text == "") {
+                ecsLib.showDialogLib(
+                    context: context,
+                    content: "Invalide Brand Name.",
+                    textOnButton: allTranslations.text("close"),
+                    title: "Warranzy");
+              } else {
+                print(postDataForAdd());
+                ecsLib.pushPage(
+                  context: context,
+                  pageWidget: AddImageDemo(
+                    dataAsset: postDataForAdd(),
+                  ),
+                );
+              }
             }
           }),
-    );
-  }
-
-  RichText buildTitle() {
-    return RichText(
-      text: TextSpan(
-        children: [
-          TextSpan(
-            text: "Product Detail\n",
-            style: TextStyleCustom.STYLE_TITLE
-                .copyWith(color: ThemeColors.COLOR_THEME_APP),
-          ),
-          TextSpan(
-              text:
-                  "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
-              style: TextStyleCustom.STYLE_CONTENT),
-        ],
-      ),
     );
   }
 }

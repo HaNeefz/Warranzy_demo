@@ -301,7 +301,9 @@ class _AssetPageState extends State<AssetPage> {
                 TextBuilder.build(
                     title: "Hello, $username",
                     style: TextStyleCustom.STYLE_TITLE
-                        .copyWith(color: ThemeColors.COLOR_GREY))
+                        .copyWith(color: ThemeColors.COLOR_GREY),
+                    maxLine: 1,
+                    textOverflow: TextOverflow.ellipsis)
               ],
             ),
           ),
@@ -355,7 +357,7 @@ class _AssetPageState extends State<AssetPage> {
               title: TextBuilder.build(title: "Scan QR Code"),
               onTap: () async {
                 var res = await MethodLib.scanQR(context);
-                print("Scan QR Code");
+                print("Scan QR Code $res");
                 if (res.isNotEmpty) Navigator.pop(context);
                 ecsLib.pushPage(
                   context: context,
@@ -457,12 +459,6 @@ class _MyAssetFormSQLiteState extends State<MyAssetFormSQLite> {
                           style: TextStyleCustom.STYLE_LABEL_BOLD),
                       TextBuilder.build(
                           title: widget.data.custRemark ?? "Empty Remark",
-                          style: TextStyleCustom.STYLE_CONTENT,
-                          textOverflow: TextOverflow.ellipsis,
-                          maxLine: 2),
-                      TextBuilder.build(
-                          title: widget.data.fileAttachID ??
-                              "Empty Remark | ${widget.data.custRemark}",
                           style: TextStyleCustom.STYLE_CONTENT,
                           textOverflow: TextOverflow.ellipsis,
                           maxLine: 2),
@@ -583,7 +579,7 @@ class _MyAssetOnlineState extends State<MyAssetOnline> {
                         textOverflow: TextOverflow.ellipsis),
                     TextBuilder.build(
                         title: "Warranty Date " +
-                                "${widget.data.warrantyExpire}" ??
+                                "${widget.data.warrantyExpire.split(" ")?.first}" ??
                             "Empty",
                         style: TextStyleCustom.STYLE_CONTENT
                             .copyWith(fontSize: 12),

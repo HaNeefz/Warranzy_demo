@@ -163,7 +163,6 @@ class _DetailAssetState extends State<DetailAsset> {
                         height: 20,
                       ),
                       checkTypeAsset(_data.createType),
-                      if (widget.editAble == true) buildButtonDelete(context)
                     ],
                   ),
                 ),
@@ -184,6 +183,7 @@ class _DetailAssetState extends State<DetailAsset> {
           children: <Widget>[
             buildProductPhotoByCustomerEdit(),
             buildLastAssetInformation(),
+            if (widget.showDetailOnline == true) buildButtonDelete(context)
           ],
         );
         break;
@@ -349,8 +349,10 @@ class _DetailAssetState extends State<DetailAsset> {
                 title: "Warranty Expire Date",
                 data: _data.warrantyExpire.split(" ").first ?? "-"),
             textTitleWithData(
-                title: "AlerDate Date",
-                data: _data.alertDate.split(" ").first ?? "-"),
+                title: "AlerDate",
+                data: _data.alertDate != null
+                    ? _data.alertDate.split(" ").first
+                    : "-"),
             textTitleWithData(
                 title: "Alert Date No.", data: "${_data.alertDateNo ?? "-"}"),
             textTitleWithData(
@@ -494,6 +496,7 @@ class _DetailAssetState extends State<DetailAsset> {
   }
 
   TextSpan textTitleWithData({title, data}) {
+    if (data == "") data = "-";
     return TextSpan(
       children: [
         TextSpan(text: title ?? "", style: TextStyleCustom.STYLE_CONTENT),

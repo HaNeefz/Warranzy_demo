@@ -262,11 +262,16 @@ class ECSLib {
   }
 
   Future<dynamic> showDialogConnectApi(context,
-      {@required Widget child}) async {
+      {@required Widget child,
+      title,
+      content,
+      bool barrierDismissible = true}) async {
     var res = await showDialog(
         context: context,
-        barrierDismissible: false,
-        builder: (context) => child);
+        barrierDismissible: barrierDismissible,
+        builder: (context) => DialogCustoms(
+              child: child,
+            ));
     print(res);
     return res;
   }
@@ -300,6 +305,19 @@ class ECSLib {
           },
         )
       ],
+    );
+  }
+
+  Widget loadingLogoWarranzy() {
+    return Center(
+      child: HeartbeatProgressIndicator(
+        child: Image.asset(
+          Assets.LOGO_APP_LOADING,
+          scale: 0.2,
+          width: 80,
+          height: 80,
+        ),
+      ),
     );
   }
 
@@ -389,12 +407,28 @@ class ECSLib {
   }
 }
 
+class DialogCustoms extends StatelessWidget {
+  final Widget child;
+
+  DialogCustoms({Key key, this.child}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        elevation: 0.0,
+        backgroundColor: Colors.transparent,
+        child: child);
+  }
+}
+
 class DialogCustom extends StatelessWidget {
   final String title;
   final String description;
   final String buttonText;
+  final Widget child;
 
-  DialogCustom({Key key, this.title, this.description, this.buttonText})
+  DialogCustom(
+      {Key key, this.title, this.description, this.buttonText, this.child})
       : super(key: key);
   @override
   Widget build(BuildContext context) {
@@ -427,6 +461,7 @@ class DialogCustom extends StatelessWidget {
           SizedBox(
             height: 40.0,
           ),
+          child ?? Container(),
           Text(
             description ?? "",
             style: TextStyleCustom.STYLE_LABEL_BOLD

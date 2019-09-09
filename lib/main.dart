@@ -120,12 +120,14 @@ class _MyHomePageState extends State<MyHomePage> {
       title: 'Flutter Demo',
       theme: ThemeData(
           primarySwatch: Colors.teal,
+          brightness: Brightness.light,
           // primaryColor: Colors.white,
           scaffoldBackgroundColor: Colors.white,
           appBarTheme: AppBarTheme(),
           iconTheme: IconThemeData(color: ThemeColors.COLOR_THEME_APP)
           // fontFamily: "Ekkamai"
           ), //Supermarket
+      darkTheme: ThemeData(brightness: Brightness.dark),
       home: SplashScreenPage(),
     );
   }

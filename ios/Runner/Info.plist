@@ -17,21 +17,9 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>$(FLUTTER_BUILD_NAME)</string>
+	<string>1.0</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
-	<key>CFBundleVersion</key>
-	<string>$(FLUTTER_BUILD_NUMBER)</string>
-	<key>LSRequiresIPhoneOS</key>
-	<true/>
-	<key>NSCameraUsageDescription</key>
-	<string>Camera permission is required for take a photo and scaning QR code.</string>
-	<key>NSFaceIDUsageDescription</key>
-	<string>Please use the faceID for safety</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>Microphone permission is required for recording.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>PhotoLibrary permission is required for get Picture.</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -43,6 +31,22 @@
 			</array>
 		</dict>
 	</array>
+	<key>CFBundleVersion</key>
+	<string>2019.9.062339</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Camera permission is required for take a photo and scaning QR code.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Please use the faceID for safety</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>This app needs access to location when in the background.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app needs access to location when open.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Microphone permission is required for recording.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>PhotoLibrary permission is required for get Picture.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>

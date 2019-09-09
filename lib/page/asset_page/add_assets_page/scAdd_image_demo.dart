@@ -107,8 +107,6 @@ class _AddImageDemoState extends State<AddImageDemo> {
                     }
                   }
                   dataPost.addAll({"Images": imageData});
-
-                  ecsLib.printJson(dataPost);
                 } catch (e) {
                   print(e);
                 }
@@ -124,7 +122,6 @@ class _AddImageDemoState extends State<AddImageDemo> {
                     .timeout(Duration(seconds: 60))
                     .then((res) async {
                   print("<--- Response");
-                  // ecsLib.printJson(jsonDecode(res.status));
                   ecsLib.cancelDialogLoadindLib(context);
                   try {
                     await DBProviderAsset.db
