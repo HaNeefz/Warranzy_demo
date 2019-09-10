@@ -8,11 +8,14 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:warranzy_demo/models/model_asset_data.dart';
 import 'package:warranzy_demo/models/model_respository_asset.dart';
+import 'package:warranzy_demo/models/model_verify_login.dart';
 import 'package:warranzy_demo/page/asset_page/add_assets_page/scFillInformation.dart';
 import 'package:warranzy_demo/page/profile_page/scProfile.dart';
 import 'package:warranzy_demo/page/splash_screen/scSplash_screen.dart';
 import 'package:warranzy_demo/services/api/api_service_assets.dart';
 import 'package:warranzy_demo/services/api/jwt_service.dart';
+import 'package:warranzy_demo/services/api_provider/api_bloc.dart';
+import 'package:warranzy_demo/services/api_provider/api_response.dart';
 import 'package:warranzy_demo/services/method/scan_qr.dart';
 import 'package:warranzy_demo/services/sqflit/db_asset.dart';
 import 'package:warranzy_demo/services/sqflit/db_customers.dart';
@@ -23,7 +26,9 @@ import 'package:warranzy_demo/tools/const.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/carouselImage.dart';
+import 'package:warranzy_demo/tools/widget_ui_custom/loading_api.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
+import 'package:warranzy_demo/tools/widget_ui_custom/error_api.dart';
 import 'package:http/http.dart' as http;
 
 import 'detail_asset_page/scDetailAsset.dart';
@@ -43,27 +48,28 @@ class _AssetPageState extends State<AssetPage> {
 
   List<ModelAssetsData> listAssetData;
   JWTService jwtService;
+  ApiBlocGetAllAsset<ResponseAssetOnline> getAllAssetBloc;
 
   Future<List<ModelDataAsset>> getModelDataAsset() async {
     return await DBProviderAsset.db.getAllDataAsset();
   }
 
-  Future<ResponseAssetOnline> getUrlAssetOnline() async {
-    // ResponseAssetOnline response;
-    try {
-      return await APIServiceAssets.getAllAseet();
-    } catch (e) {
-      print(e);
-      return null;
-    }
-  }
+  // Future<ResponseAssetOnline> getUrlAssetOnline() async {
+  //   // ResponseAssetOnline response;
+  //   try {
+  //     return await APIServiceAssets.getAllAseet();
+  //   } catch (e) {
+  //     print(e);
+  //     return null;
+  //   }
+  // }
 
   @override
   void initState() {
     super.initState();
     getUsername();
     getModelData = getModelDataAsset();
-    getAssetOnline = getUrlAssetOnline();
+    // getAssetOnline = getUrlAssetOnline();
   }
 
   getUsername() async {
@@ -75,28 +81,38 @@ class _AssetPageState extends State<AssetPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: ListView(
-          children: <Widget>[
-            buildHeaderAndProfile(),
-            CarouselWithIndicator(
-              height: 250,
-              items: ["1", "2", "3", "5"],
-            ),
-            buildLabelAndSeeAll(),
-            buildYourAssets(),
-          ],
-        ),
+    return Scaffold(
+      body: ListView(
+        children: <Widget>[
+          buildHeaderAndProfile(),
+          CarouselWithIndicator(
+            height: 250,
+            items: ["1", "2", "3", "5"],
+          ),
+          buildLabelAndSeeAll(),
+          buildYourAssets(),
+        ],
       ),
     );
   }
 
   Column buildYourAssets() {
+    /*body: {
+      "CustUserID": "ca3f58b3a0214aaaa68a",
+      "PINcode": "111111",
+      "DeviceID": "7BAE0E71-C3C2-4532-8C99-DCA7BB713A69",
+      "CountryCode": "TH",
+      "TimeZone": "Asia/Bangkok"
+    } */
+    var url = "/Asset/getMyAsset";
+    getAllAssetBloc = ApiBlocGetAllAsset<ResponseAssetOnline>(
+      url: url,
+    );
     return Column(
       children: <Widget>[
         buildAssetOffine(),
         buildAssetOnline(),
+
         // Column(
         //   children: listAssetData.map((i) {
         //     return ModelAssetWidget(i);
@@ -106,27 +122,57 @@ class _AssetPageState extends State<AssetPage> {
     );
   }
 
-  FutureBuilder<ResponseAssetOnline> buildAssetOnline() {
-    return FutureBuilder<ResponseAssetOnline>(
-      future: getAssetOnline,
-      builder:
-          (BuildContext context, AsyncSnapshot<ResponseAssetOnline> snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          var data = snapshot.data;
-          if (data?.status == true) {
-            return Column(
-              children: data.data
-                  .map((data) => new MyAssetOnline(data: data))
-                  .toList(),
-            );
-          } else {
-            return Text("Somethig wrong");
+  StreamBuilder<ApiResponse<ResponseAssetOnline>> buildAssetOnline() {
+    return StreamBuilder<ApiResponse<ResponseAssetOnline>>(
+      stream: getAllAssetBloc.stmStream,
+      builder: (BuildContext context,
+          AsyncSnapshot<ApiResponse<ResponseAssetOnline>> snapshot) {
+        if (snapshot.hasData) {
+          switch (snapshot.data.status) {
+            case Status.LOADING:
+              return CircularProgressIndicator();
+              break;
+            case Status.COMPLETED:
+              return Column(
+                children: snapshot.data.data.data
+                    .map((data) => new MyAssetOnline(data: data))
+                    .toList(),
+              );
+              //
+              break;
+            case Status.ERROR:
+              return Error(
+                errorMessage: snapshot.data.message,
+                onRetryPressed: () => getAllAssetBloc.fetchData(),
+              );
+              break;
           }
-        } else
-          return CircularProgressIndicator();
+        }
+        return Container();
       },
     );
   }
+  // FutureBuilder<ResponseAssetOnline> buildAssetOnline() {
+  //   return FutureBuilder<ResponseAssetOnline>(
+  //     future: getAssetOnline,
+  //     builder:
+  //         (BuildContext context, AsyncSnapshot<ResponseAssetOnline> snapshot) {
+  //       if (snapshot.connectionState == ConnectionState.done) {
+  //         var data = snapshot.data;
+  //         if (data?.status == true) {
+  //           return Column(
+  //             children: data.data
+  //                 .map((data) => new MyAssetOnline(data: data))
+  //                 .toList(),
+  //           );
+  //         } else {
+  //           return Text("Somethig wrong");
+  //         }
+  //       } else
+  //         return CircularProgressIndicator();
+  //     },
+  //   );
+  // }
 
   FutureBuilder<List<ModelDataAsset>> buildAssetOffine() {
     return FutureBuilder<List<ModelDataAsset>>(
@@ -288,7 +334,7 @@ class _AssetPageState extends State<AssetPage> {
     var dateTime = DateTime.now();
     String date = DateFormat('EEEE, d MMMM').format(dateTime);
     return Padding(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(8.0),
       child: Row(
         children: <Widget>[
           Expanded(
@@ -603,41 +649,48 @@ class _MyAssetOnlineState extends State<MyAssetOnline> {
           ],
         ),
         onTap: () async {
-          try {
-            ecsLib.showDialogLoadingLib(context);
-            await APIServiceAssets.getDetailAseet(
-                    wtokenID: widget.data.wTokenID)
-                .then((res) {
-              ecsLib.cancelDialogLoadindLib(context);
-              if (res?.status == true) {
-                ecsLib.pushPage(
-                  context: context,
-                  pageWidget: DetailAsset(
-                    dataAsset: res.data,
-                    showDetailOnline: true,
-                  ),
-                );
-              } else if (res.status == false) {
-                ecsLib.showDialogLib(
-                    content: res?.message ?? "status false",
-                    context: context,
-                    textOnButton: allTranslations.text("close"),
-                    title: "ERROR STATUS");
-              } else {
-                ecsLib.showDialogLib(
-                    content: res?.message ?? "Something wrong",
-                    context: context,
-                    textOnButton: allTranslations.text("close"),
-                    title: "ERROR SERVER");
-              }
-            });
-          } catch (e) {
-            ecsLib.showDialogLib(
-                content: "Catch Something wrong",
-                context: context,
-                textOnButton: allTranslations.text("close"),
-                title: "CATCH ERROR");
-          }
+          ecsLib.pushPage(
+            context: context,
+            pageWidget: LoadingDetailAsset(
+              dataAsset: widget.data,
+              online: true,
+            ),
+          );
+          // try {
+          //   ecsLib.showDialogLoadingLib(context);
+          //   await APIServiceAssets.getDetailAseet(
+          //           wtokenID: widget.data.wTokenID)
+          //       .then((res) {
+          //     ecsLib.cancelDialogLoadindLib(context);
+          //     if (res?.status == true) {
+          //       ecsLib.pushPage(
+          //         context: context,
+          //         pageWidget: DetailAsset(
+          //           dataAsset: res.data,
+          //           showDetailOnline: true,
+          //         ),
+          //       );
+          //     } else if (res.status == false) {
+          //       ecsLib.showDialogLib(
+          //           content: res?.message ?? "status false",
+          //           context: context,
+          //           textOnButton: allTranslations.text("close"),
+          //           title: "ERROR STATUS");
+          //     } else {
+          //       ecsLib.showDialogLib(
+          //           content: res?.message ?? "Something wrong",
+          //           context: context,
+          //           textOnButton: allTranslations.text("close"),
+          //           title: "ERROR SERVER");
+          //     }
+          //   });
+          // } catch (e) {
+          //   ecsLib.showDialogLib(
+          //       content: "Catch Something wrong",
+          //       context: context,
+          //       textOnButton: allTranslations.text("close"),
+          //       title: "CATCH ERROR");
+          // }
         },
       ),
     );

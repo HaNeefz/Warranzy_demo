@@ -51,7 +51,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
   PageType get type => widget.type;
   bool get usedPin => widget.usedPin;
   ModelMasCustomer get modelMasCustomer => widget.modelMasCustomer;
-  ApiBloc<ModelVerifyLogin> _loginBloc;
+  ApiBlocGetAllAsset<ModelVerifyLogin> _loginBloc;
 
   getUsername() async {
     var name = await DBProviderCustomer.db.getNameCustomer();
@@ -76,50 +76,8 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
     };
     print("Data before send Api => $postData");
     ecsLib.showDialogLoadingLib(context);
-    // var url = "/User/Login";
-    // _loginBloc = ApiBloc<ModelVerifyLogin>(url: url, body: postData);
-
-    // await ecsLib
-    //     .showDialogConnectApi(
-    //   context,
-    //   child: StreamBuilder<ApiResponse<ModelVerifyLogin>>(
-    //     stream: _loginBloc.stmStream,
-    //     builder: (BuildContext context,
-    //         AsyncSnapshot<ApiResponse<ModelVerifyLogin>> snapshot) {
-    //       if (snapshot.hasData) {
-    //         switch (snapshot.data.status) {
-    //           case Status.LOADING:
-    //             return ecsLib.loadingLogoWarranzy();
-    //             break;
-    //           case Status.COMPLETED:
-    //             return Text("${snapshot.data.data.status}");
-    //             break;
-    //           case Status.ERROR:
-    //             return Column(
-    //               mainAxisSize: MainAxisSize.min,
-    //               children: <Widget>[
-    //                 Text(snapshot.data.message),
-    //                 RaisedButton(
-    //                   shape: CircleBorder(),
-    //                   child: Icon(Icons.refresh),
-    //                   onPressed: () {
-    //                     _loginBloc.fetchData();
-    //                   },
-    //                 )
-    //               ],
-    //             );
-    //             break;
-    //         }
-    //       }
-    //       return Container();
-    //     },
-    //   ),
-    // )
-    //     .then((res) {
-    //   print(res);
-    // });
-
-    await APIServiceUser.apiVerifyLogin(postData: postData).then((response) {
+    await APIServiceUser.apiVerifyLogin(postData: postData)
+        .then((response) {
       if (response?.status == true) {
         gotoMainPage();
       } else if (response?.status == false) {
@@ -753,12 +711,12 @@ class _NewApiStructureState extends State<NewApiStructure> {
 
   var url = "/User/Login";
 
-  ApiBloc<ModelVerifyLogin> _loginBloc;
+  ApiBlocGetAllAsset<ModelVerifyLogin> _loginBloc;
 
   @override
   void initState() {
     super.initState();
-    _loginBloc = ApiBloc<ModelVerifyLogin>(url: url, body: body);
+    _loginBloc = ApiBlocGetAllAsset<ModelVerifyLogin>(url: url, body: body);
   }
 
   @override

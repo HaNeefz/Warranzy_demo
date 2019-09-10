@@ -5,7 +5,7 @@ import 'api_bloc.dart';
 import 'api_response.dart';
 
 class ApiBlocWidget<T> extends StatefulWidget {
-  ApiBloc<T> apiBloc;
+  ApiBlocGetAllAsset<T> apiBloc;
   final String url;
   final dynamic body;
 
@@ -22,7 +22,7 @@ class _ApiBlocWidgetState<T> extends State<ApiBlocWidget<T>> {
   @override
   void initState() {
     super.initState();
-    widget.apiBloc = ApiBloc<T>(url: url, body: body);
+    widget.apiBloc = ApiBlocGetAllAsset<T>(url: url, body: body);
   }
 
   @override

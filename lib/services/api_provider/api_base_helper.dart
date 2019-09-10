@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:warranzy_demo/services/api/base_url.dart';
+import 'package:warranzy_demo/services/api/jwt_service.dart';
 import 'dart:convert';
 import 'dart:async';
 
@@ -13,8 +14,9 @@ class ApiBaseHelper {
     print('Api Get, url $url');
     var responseJson;
     try {
-      final response =
-          await http.get(_baseUrl + url).timeout(Duration(seconds: 60));
+      final response = await http.get(_baseUrl + url, headers: {
+        "Authorization": await JWTService.getTokenJWT()
+      }).timeout(Duration(seconds: 60));
       responseJson = ReturnResponse.response(response);
     } on SocketException {
       print('No net');
@@ -28,9 +30,9 @@ class ApiBaseHelper {
     print('Api Post, url $url');
     var responseJson;
     try {
-      final response = await http
-          .post(_baseUrl + url, body: body)
-          .timeout(Duration(seconds: 60));
+      final response = await http.post(_baseUrl + url, body: body, headers: {
+        "Authorization": await JWTService.getTokenJWT()
+      }).timeout(Duration(seconds: 60));
       responseJson = ReturnResponse.response(response);
     } on SocketException {
       print('No net');

@@ -437,7 +437,7 @@ class _FormDataAssetState extends State<FormDataAsset> {
       "Title": txtAssetName.text,
       "SerialNo": txtSerialNo.text,
       "LotNo": txtLotNo.text,
-      "SalesPrice": txtPrice.text != null || txtPrice.text != ""
+      "SalesPrice": txtPrice.text != null && txtPrice.text != ""
           ? int.parse(txtPrice.text)
           : 0,
       "WarrantyNo": txtWarranzyNo.text,
