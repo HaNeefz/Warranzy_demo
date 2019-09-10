@@ -4,6 +4,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:warranzy_demo/models/model_repository_init_app.dart';
 import 'package:warranzy_demo/services/method/scan_qr.dart';
+import 'package:warranzy_demo/tools/export_lib.dart';
 
 /*
   All this file db.asset.dart have 3 table
@@ -15,7 +16,8 @@ import 'package:warranzy_demo/services/method/scan_qr.dart';
 class DBProviderInitialApp {
   DBProviderInitialApp._();
   static final DBProviderInitialApp db = DBProviderInitialApp._();
-
+  final ecsLib = getIt.get<ECSLib>();
+  final allTranslations = getIt.get<GlobalTranslations>();
   static Database _database;
   get getDB => database;
   final String tableCountry = "Country";

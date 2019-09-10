@@ -8,10 +8,12 @@ import 'package:warranzy_demo/models/model_respository_asset.dart';
 import 'package:warranzy_demo/page/asset_page/add_assets_page/scAdd_image_demo.dart';
 import 'package:warranzy_demo/page/asset_page/detail_asset_page/scDetailAsset.dart';
 import 'package:warranzy_demo/services/api/api_service_assets.dart';
+import 'package:warranzy_demo/services/method/scan_qr.dart';
 import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 
+import '../assets.dart';
 import '../const.dart';
 import '../theme_color.dart';
 import 'button_builder.dart';
@@ -287,11 +289,37 @@ class _FormDataAssetState extends State<FormDataAsset> {
                             borderOutLine: false,
                             validate: false,
                             title: "SLCName"),
-                        TextFieldBuilder.textFormFieldCustom(
-                            controller: txtSerialNo,
-                            validate: false,
-                            borderOutLine: false,
-                            title: "Serial No"),
+                        Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: TextFieldBuilder.textFormFieldCustom(
+                                  controller: txtSerialNo,
+                                  validate: false,
+                                  borderOutLine: false,
+                                  title: "Serial No"),
+                            ),
+                            GestureDetector(
+                                onTap: () async {
+                                  print("ScanBarCode or QR");
+                                  var dataScan =
+                                      await MethodLib.scanQR(context);
+                                  if (dataScan != null)
+                                    setState(() {
+                                      txtSerialNo.text = dataScan;
+                                    });
+                                },
+                                child: Column(
+                                  children: <Widget>[
+                                    Image.asset(Assets.ICON_SCANNER,
+                                        width: 40, height: 40),
+                                    TextBuilder.build(
+                                        title: "Scan",
+                                        style: TextStyleCustom.STYLE_LABEL
+                                            .copyWith(fontSize: 10))
+                                  ],
+                                ))
+                          ],
+                        ),
                         TextFieldBuilder.textFormFieldCustom(
                             controller: txtLotNo,
                             keyboardType: TextInputType.number,

@@ -455,7 +455,8 @@ class MyAssetFormSQLite extends StatefulWidget {
 class _MyAssetFormSQLiteState extends State<MyAssetFormSQLite> {
   final Dio dio = Dio();
   String catName = '';
-
+  final ecsLib = getIt.get<ECSLib>();
+  final allTranslations = getIt.get<GlobalTranslations>();
   getProductCateName() async {
     var _catName = await DBProviderInitialApp.db.getProductCatName(
         id: widget.data.pdtCatCode, lang: allTranslations.currentLanguage);
@@ -564,6 +565,8 @@ class MyAssetOnline extends StatefulWidget {
 class _MyAssetOnlineState extends State<MyAssetOnline> {
   final Dio dio = Dio();
   String catName = '';
+  final ecsLib = getIt.get<ECSLib>();
+  final allTranslations = getIt.get<GlobalTranslations>();
 
   getProductCateName() async {
     var _catName = await DBProviderInitialApp.db.getProductCatName(

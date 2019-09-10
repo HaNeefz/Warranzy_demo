@@ -3,10 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 
-final ecsLib = getIt.get<ECSLib>();
-final allTranslations = getIt.get<GlobalTranslations>();
-
 class MethodLib {
+  static final _ecsLib = getIt.get<ECSLib>();
+  // final allTranslations = getIt.get<GlobalTranslations>();
   static Future<String> scanQR(BuildContext context) async {
     String barcode = "";
     try {
@@ -14,14 +13,14 @@ class MethodLib {
     } on PlatformException catch (e) {
       if (e.code == BarcodeScanner.CameraAccessDenied) {
         // The user did not grant the camera permission.
-        ecsLib.showDialogLib(
+        _ecsLib.showDialogLib(
             context: context,
             title: "PlatformException",
             content: "$e",
             textOnButton: "close");
       } else {
         // Unknown error.
-        ecsLib.showDialogLib(
+        _ecsLib.showDialogLib(
             context: context,
             title: "Unknown error",
             content: "$e",
@@ -30,7 +29,7 @@ class MethodLib {
     } on FormatException {
       // User returned using the "back"-button before scanning anything.
     } catch (e) {
-      ecsLib.showDialogLib(
+      _ecsLib.showDialogLib(
           context: context,
           title: "Unknown error",
           content: "$e",
