@@ -52,8 +52,7 @@ class APIServiceUser {
     try {
       final response = await http
           .post(urlPost, body: postData)
-          .timeout(Duration(seconds: TIMEOUT))
-          .catchError((e) => ModelVerifyNumber(message: "CatchError => $e"));
+          .timeout(Duration(seconds: TIMEOUT));
       if (response.statusCode == 200) {
         ShowDataAPI.printResponse("${json.decode(response.body)}");
         return ModelVerifyNumber.fromJson(json.decode(response.body));
@@ -79,8 +78,7 @@ class APIServiceUser {
     try {
       final response = await http
           .post(urlPost, body: postData)
-          .timeout(Duration(seconds: TIMEOUT))
-          .catchError((e) => ModelVerifyNumber(message: "CatchError => $e"));
+          .timeout(Duration(seconds: TIMEOUT));
       if (response.statusCode == 200) {
         ShowDataAPI.printResponse("${json.decode(response.body)}");
         return ModelVerifyNumber.fromJson(json.decode(response.body));
@@ -106,9 +104,7 @@ class APIServiceUser {
     try {
       final response = await http
           .post(urlPost, body: postData)
-          .timeout(Duration(seconds: TIMEOUT))
-          .catchError(
-              (e) => InformationMasCustomners(message: "CatchError => $e"));
+          .timeout(Duration(seconds: TIMEOUT));
       if (response.statusCode == 200) {
         ShowDataAPI.printResponse("${json.decode(response.body)}");
         return InformationMasCustomners.fromJson(json.decode(response.body));
@@ -135,9 +131,7 @@ class APIServiceUser {
     try {
       final response = await http
           .post(urlPost, body: postData)
-          .timeout(Duration(seconds: TIMEOUT))
-          .catchError(
-              (e) => InformationMasCustomners(message: "CatchError => $e"));
+          .timeout(Duration(seconds: TIMEOUT));
       if (response.statusCode == 200) {
         ShowDataAPI.printResponse("${json.decode(response.body)}");
         return InformationMasCustomners.fromJson(json.decode(response.body));
@@ -162,8 +156,7 @@ class APIServiceUser {
     try {
       final response = await http
           .post(urlPost, body: postData)
-          .timeout(Duration(seconds: TIMEOUT))
-          .catchError((e) => ModelVerifyNumber(message: "CatchError => $e"));
+          .timeout(Duration(seconds: TIMEOUT));
       if (response.statusCode == 200) {
         ShowDataAPI.printResponse("${json.decode(response.body)}");
         return ModelVerifyNumber.fromJson(json.decode(response.body));

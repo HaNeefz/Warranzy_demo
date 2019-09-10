@@ -160,12 +160,14 @@ class _EditImagesState extends State<EditImages> {
             ),
           ),
           onTap: () async {
+            v.imageUrl.forEach((v) {
+              print(v);
+            });
             await ecsLib
                 .pushPage(
               context: context,
               pageWidget: ModifyImage(
                 image: v,
-                data: _data,
               ),
             )
                 .then((_) {
@@ -253,48 +255,49 @@ class ModifytImageState extends State<ModifyImage> {
                     return Container(
                         child: Column(
                       children: <Widget>[
-                        GridView(
-                          shrinkWrap: true,
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 5,
-                            mainAxisSpacing: 5,
-                          ),
-                          children: <Widget>[
-                            for (var _imageData in data)
-                              if (_imageData != null && _imageData.length > 0)
-                                Image.memory(_imageData, fit: BoxFit.cover),
-                          ],
-                        ),
-                        imageNew.length > 0
-                            ? Column(
-                                children: <Widget>[
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.only(top: 5, bottom: 10),
-                                    child:
-                                        TextBuilder.build(title: "New Image"),
-                                  ),
-                                  GridView(
-                                    shrinkWrap: true,
-                                    gridDelegate:
-                                        SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 2,
-                                      crossAxisSpacing: 5,
-                                      mainAxisSpacing: 5,
-                                    ),
-                                    children: <Widget>[
-                                      for (var _imageNew in imageNew)
-                                        if (_imageNew != null &&
-                                            imageNew.length > 0)
-                                          Image.file(_imageNew,
-                                              fit: BoxFit.cover)
-                                    ],
-                                  ),
-                                ],
-                              )
-                            : Container()
+                        Text("Eieie")
+                        // GridView(
+                        //   shrinkWrap: true,
+                        //   gridDelegate:
+                        //       SliverGridDelegateWithFixedCrossAxisCount(
+                        //     crossAxisCount: 2,
+                        //     crossAxisSpacing: 5,
+                        //     mainAxisSpacing: 5,
+                        //   ),
+                        //   children: <Widget>[
+                        //     for (var _imageData in data)
+                        //       if (_imageData != null && _imageData.length > 0)
+                        //         Image.memory(_imageData, fit: BoxFit.cover),
+                        //   ],
+                        // ),
+                        // imageNew.length > 0
+                        //     ? Column(
+                        //         children: <Widget>[
+                        //           Padding(
+                        //             padding:
+                        //                 EdgeInsets.only(top: 5, bottom: 10),
+                        //             child:
+                        //                 TextBuilder.build(title: "New Image"),
+                        //           ),
+                        //           GridView(
+                        //             shrinkWrap: true,
+                        //             gridDelegate:
+                        //                 SliverGridDelegateWithFixedCrossAxisCount(
+                        //               crossAxisCount: 2,
+                        //               crossAxisSpacing: 5,
+                        //               mainAxisSpacing: 5,
+                        //             ),
+                        //             children: <Widget>[
+                        //               for (var _imageNew in imageNew)
+                        //                 if (_imageNew != null &&
+                        //                     imageNew.length > 0)
+                        //                   Image.file(_imageNew,
+                        //                       fit: BoxFit.cover)
+                        //             ],
+                        //           ),
+                        //         ],
+                        //       )
+                        //     : Container()
                       ],
                     ));
                   }
@@ -309,19 +312,38 @@ class ModifytImageState extends State<ModifyImage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add_a_photo),
-        onPressed: () async {
-          try {
-            var resPhoto = await ecsLib.getImage();
-            if (resPhoto != null)
-              setState(() {
-                imageNew.add(resPhoto);
-              });
-          } catch (e) {
-            print(e);
-          }
-        },
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: <Widget>[
+          FloatingActionButton(
+            child: Icon(Icons.add_a_photo),
+            onPressed: () async {
+              try {
+                var resPhoto = await ecsLib.getImage();
+                if (resPhoto != null)
+                  setState(() {
+                    imageNew.add(resPhoto);
+                  });
+              } catch (e) {
+                print(e);
+              }
+            },
+          ),
+          FloatingActionButton(
+            child: Icon(Icons.add_a_photo),
+            onPressed: () async {
+              try {
+                var resPhoto = await ecsLib.getImageFromGallery();
+                if (resPhoto != null)
+                  setState(() {
+                    imageNew.add(resPhoto);
+                  });
+              } catch (e) {
+                print(e);
+              }
+            },
+          ),
+        ],
       ),
     );
   }

@@ -67,6 +67,10 @@ class _AssetPageState extends State<AssetPage> {
   @override
   void initState() {
     super.initState();
+    var url = "/Asset/getMyAsset";
+    getAllAssetBloc = ApiBlocGetAllAsset<ResponseAssetOnline>(
+      url: url,
+    );
     getUsername();
     getModelData = getModelDataAsset();
     // getAssetOnline = getUrlAssetOnline();
@@ -104,10 +108,7 @@ class _AssetPageState extends State<AssetPage> {
       "CountryCode": "TH",
       "TimeZone": "Asia/Bangkok"
     } */
-    var url = "/Asset/getMyAsset";
-    getAllAssetBloc = ApiBlocGetAllAsset<ResponseAssetOnline>(
-      url: url,
-    );
+
     return Column(
       children: <Widget>[
         buildAssetOffine(),
