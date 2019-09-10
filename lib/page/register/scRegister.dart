@@ -142,7 +142,7 @@ class _RegisterState extends State<Register> {
         // ); // Skip verify phone number
 
         APIServiceUser.apiVerifyNumber(postData: data).then((response) async {
-          print(response);
+          print(response.message);
           if (response?.status == true) {
             ecsLib.cancelDialogLoadindLib(context);
             ecsLib.pushPage(
@@ -154,10 +154,10 @@ class _RegisterState extends State<Register> {
           } else if (response?.status == false) {
             ecsLib.cancelDialogLoadindLib(context);
             ecsLib.showDialogLib(
-                content: response?.message ?? "Duplicate number",
+                content: response?.message,
                 context: context,
                 textOnButton: allTranslations.text("close"),
-                title: "DUPLICATE PHONE NUMBER");
+                title: "ERROR");
           } else {
             ecsLib.cancelDialogLoadindLib(context);
             ecsLib.showDialogLib(

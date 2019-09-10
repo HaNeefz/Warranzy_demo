@@ -57,7 +57,7 @@ class APIServiceUser {
         ShowDataAPI.printResponse("${json.decode(response.body)}");
         return ModelVerifyNumber.fromJson(json.decode(response.body));
       } else
-        throw ModelVerifyNumber(message: "Error ${response.statusCode}");
+        throw Exception("Failed to load");
     } on TimeoutException catch (_) {
       print("TimeOut");
       return ModelVerifyNumber(message: "Time Out. Try again.");
@@ -83,7 +83,7 @@ class APIServiceUser {
         ShowDataAPI.printResponse("${json.decode(response.body)}");
         return ModelVerifyNumber.fromJson(json.decode(response.body));
       } else
-        throw ModelVerifyNumber(message: "Error ${response.statusCode}");
+        throw Exception("Failed to load");
     } on TimeoutException catch (_) {
       print("TimeOut");
       return ModelVerifyNumber(message: "Time Out. Try again.");
@@ -109,7 +109,7 @@ class APIServiceUser {
         ShowDataAPI.printResponse("${json.decode(response.body)}");
         return InformationMasCustomners.fromJson(json.decode(response.body));
       } else
-        throw InformationMasCustomners(message: "Error ${response.statusCode}");
+        throw Exception("Failed to load");
     } on TimeoutException catch (_) {
       print("TimeOut");
       return InformationMasCustomners(message: "Time Out. Try again.");
@@ -136,7 +136,7 @@ class APIServiceUser {
         ShowDataAPI.printResponse("${json.decode(response.body)}");
         return InformationMasCustomners.fromJson(json.decode(response.body));
       } else
-        throw InformationMasCustomners(message: "Error ${response.statusCode}");
+        throw Exception("Failed to load");
     } on TimeoutException catch (_) {
       print("TimeOut");
       return InformationMasCustomners(message: "Time Out. Try again.");
@@ -161,7 +161,7 @@ class APIServiceUser {
         ShowDataAPI.printResponse("${json.decode(response.body)}");
         return ModelVerifyNumber.fromJson(json.decode(response.body));
       } else
-        throw ModelVerifyNumber(message: "Error ${response.statusCode}");
+        throw Exception("Failed to load");
     } on TimeoutException catch (_) {
       print("TimeOut");
       return ModelVerifyNumber(message: "Time out. Try again");
@@ -186,7 +186,7 @@ class APIServiceUser {
         ShowDataAPI.printResponse("${json.decode(response.body)}");
         return ModelVerifyLogin.fromJson(json.decode(response.body));
       } else {
-        throw Exception("Error ${response.request}");
+        throw Exception("Failed to load");
       } //ModelVerifyLogin(message: "Error ${response.statusCode}")
     } on SocketException catch (e) {
       print(e);
@@ -218,7 +218,7 @@ class APIServiceUser {
         ShowDataAPI.printResponse("${json.decode(response.data)}");
         return ModelVerifyLogin.fromJson(json.decode(response.data));
       } else {
-        throw Exception(ModelVerifyLogin(message: "Throw Error"));
+        throw Exception("Failed to load");
       }
     } on DioError catch (e) {
       print("DioError ${e.request}");
