@@ -315,20 +315,20 @@ class ModifytImageState extends State<ModifyImage> {
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
-          FloatingActionButton(
-            child: Icon(Icons.add_a_photo),
-            onPressed: () async {
-              try {
-                var resPhoto = await ecsLib.getImage();
-                if (resPhoto != null)
-                  setState(() {
-                    imageNew.add(resPhoto);
-                  });
-              } catch (e) {
-                print(e);
-              }
-            },
-          ),
+          // FloatingActionButton(
+          //   child: Icon(Icons.add_a_photo),
+          //   onPressed: () async {
+          //     try {
+          //       var resPhoto = await ecsLib.getImage();
+          //       if (resPhoto != null)
+          //         setState(() {
+          //           imageNew.add(resPhoto);
+          //         });
+          //     } catch (e) {
+          //       print(e);
+          //     }
+          //   },
+          // ),
           FloatingActionButton(
             child: Icon(Icons.add_a_photo),
             onPressed: () async {

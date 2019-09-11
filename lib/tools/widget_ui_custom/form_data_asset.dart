@@ -310,8 +310,8 @@ class _FormDataAssetState extends State<FormDataAsset> {
                                 },
                                 child: Column(
                                   children: <Widget>[
-                                    Image.asset(Assets.ICON_SCANNER,
-                                        width: 40, height: 40),
+                                    Image.asset(Assets.ICON_BARCODE,
+                                        width: 35, height: 35),
                                     TextBuilder.build(
                                         title: "Scan",
                                         style: TextStyleCustom.STYLE_LABEL

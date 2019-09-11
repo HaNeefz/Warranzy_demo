@@ -7,6 +7,7 @@ class Assets {
   static const String ICON_FACE_ID = "assets/icons/face_id.png";
   static const String ICON_FINGER_PRINT = "assets/icons/fingerprint.png";
   static const String ICON_SCANNER = "assets/icons/scanner.png";
+  static const String ICON_BARCODE = "assets/icons/barcode.png";
 
   static const String ICON_APP_TRANSPARENT =
       "assets/logo/warranzy_logo_transparent.png";
