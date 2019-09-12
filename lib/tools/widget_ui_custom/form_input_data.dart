@@ -166,7 +166,7 @@ class FormWidgetBuilder {
             obscureText: obsecure,
             initialValue: initialValue,
             keyboardType: keyboardType ??= TextInputType.text,
-            readonly: readOnly,
+            readOnly: readOnly,
             textInputAction: textInputAction ??= TextInputAction.done,
             style: TextStyleCustom.STYLE_LABEL.copyWith(fontSize: 15),
             decoration: InputDecoration(

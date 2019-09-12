@@ -10,6 +10,7 @@ import 'package:warranzy_demo/services/sqflit/db_asset.dart';
 import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
+import 'package:warranzy_demo/tools/widget_ui_custom/image_list_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 
 class AddImageDemo extends StatefulWidget {
@@ -68,113 +69,7 @@ class _AddImageDemoState extends State<AddImageDemo> {
         actions: <Widget>[
           FlatButton(
             child: TextBuilder.build(title: allTranslations.text("submit")),
-            onPressed: () async {
-              var dataPost = {"Data": widget.dataAsset, "Images": {}};
-              print("Submit");
-              ecsLib.showDialogLoadingLib(context,
-                  content: "Image compressing");
-              try {
-                for (int i = 0; i < listKeepImageData.length; i++) {
-                  var tempModelImage = listKeepImageData[i];
-                  for (int j = 0; j < tempModelImage.imagesList.length; j++) {
-                    var listImages = tempModelImage.imagesList[j];
-                    var tempDir = await getTemporaryDirectory();
-                    var _newSize = await ecsLib.compressFile(
-                      file: listImages,
-                      targetPath:
-                          tempDir.path + "/${listImages.path.split("/").last}",
-                      minWidth: 600,
-                      minHeight: 480,
-                      quality: 80,
-                    );
-                    listImages = _newSize;
-                    tempModelImage.imageBase64[j] =
-                        base64Encode(listImages.readAsBytesSync());
-
-                    print(
-                        "------ ${tempModelImage.title} No. $i => Image No. $j");
-                  }
-                }
-                var imageData = {};
-                try {
-                  for (var modelImage in listKeepImageData) {
-                    imageData.addAll({"${modelImage.title}": {}});
-                    for (var imageBase64Data in modelImage.imageBase64) {
-                      imageData["${modelImage.title}"].addAll({
-                        "${modelImage.imageBase64.indexOf(imageBase64Data)}":
-                            imageBase64Data
-                      });
-                    }
-                  }
-                  dataPost.addAll({"Images": imageData});
-                } catch (e) {
-                  print(e);
-                }
-              } catch (e) {
-                print(e);
-              }
-              ecsLib.cancelDialogLoadindLib(context);
-
-              ecsLib.printJson(dataPost);
-              ecsLib.showDialogLoadingLib(context, content: "Adding assets");
-              try {
-                APIServiceAssets.addAsset(postData: dataPost)
-                    .timeout(Duration(seconds: 60))
-                    .then((res) async {
-                  print("<--- Response");
-                  ecsLib.cancelDialogLoadindLib(context);
-                  try {
-                    await DBProviderAsset.db
-                        .insertDataWarranzyUesd(res.warranzyUsed)
-                        .catchError(
-                            (onError) => print("warranzyUsed : $onError"));
-                  } catch (e) {
-                    print("insertDataWarranzyUesd => $e");
-                  }
-                  try {
-                    await DBProviderAsset.db
-                        .insertDataWarranzyLog(res.warranzyLog)
-                        .catchError((onError) => print("warranzyLog $onError"));
-                  } catch (e) {
-                    print("insertDataWarranzyLog => $e");
-                  }
-                  res.filePool.forEach((data) async {
-                    try {
-                      await DBProviderAsset.db
-                          .insertDataFilePool(data)
-                          .catchError((onError) => print("filePool $onError"))
-                          .whenComplete(() {
-                        ecsLib.pushPageAndClearAllScene(
-                            context: context, pageWidget: MainPage());
-                      });
-                    } catch (e) {
-                      print("insertDataFilePool => $e");
-                    }
-                  });
-                }).catchError((e) {
-                  print(e);
-                  ecsLib.cancelDialogLoadindLib(context);
-                });
-              } on DioError catch (error) {
-                print("DIO ERROR => ${error.error}\nMsg => ${error.message}");
-                ecsLib.cancelDialogLoadindLib(context);
-              } on SocketException catch (e) {
-                print(e);
-                ecsLib.cancelDialogLoadindLib(context);
-              } on HttpException catch (e) {
-                print(e);
-                ecsLib.cancelDialogLoadindLib(context);
-              } on FormatException catch (e) {
-                print(e);
-                ecsLib.cancelDialogLoadindLib(context);
-              } on Exception catch (e) {
-                print(e);
-                ecsLib.cancelDialogLoadindLib(context);
-              } catch (e) {
-                print("Catch $e");
-                ecsLib.cancelDialogLoadindLib(context);
-              }
-            },
+            onPressed: submitAsset,
           )
         ],
       ),
@@ -185,55 +80,89 @@ class _AddImageDemoState extends State<AddImageDemo> {
                   itemCount: listRelated.length,
                   itemBuilder: (BuildContext context, int index) {
                     var data = listKeepImageData[index];
-                    return Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 10.0, vertical: 10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text("${data.title}\t\t"),
-                          Row(
-                            children: <Widget>[
-                              Expanded(
-                                flex: 4,
-                                child: Container(
-                                    width: 100,
-                                    height: 100,
-                                    child: TextBuilder.build(
-                                        title:
-                                            "Images have ${data.imagesList.length} items.")),
-                              ),
-                              Expanded(
-                                child: Container(
-                                  width: 50,
-                                  height: 50,
-                                  child: RaisedButton(
-                                    child: Icon(Icons.add),
-                                    onPressed: () async {
-                                      List<File> images = await ecsLib.pushPage(
-                                          context: context,
-                                          pageWidget: TakePhotos());
-                                      setState(() {
-                                        if (images != null) {
-                                          print(
-                                              "return Images = ${images.length}");
-                                          for (var fileImage in images) {
-                                            data.imagesList.add(fileImage);
-                                            data.imageBase64.add("temp");
-                                          }
-                                          print(data.imagesList.length);
-                                        }
-                                      });
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ],
+                    return Column(
+                      children: <Widget>[
+                        ListTile(
+                          title: Text("${data.title}\t\t"),
+                          trailing: Container(
+                            // color: Colors.red,
+                            width: 150,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Text("${data.imagesList.length}"),
+                                Text("Items"),
+                                Icon(Icons.add_circle),
+                              ],
+                            ),
                           ),
-                          Divider(),
-                        ],
-                      ),
+                          onTap: () async {
+                            List<File> images = await ecsLib.pushPage(
+                                context: context, pageWidget: TakePhotos());
+                            setState(() {
+                              if (images != null) {
+                                print("return Images = ${images.length}");
+                                for (var fileImage in images) {
+                                  data.imagesList.add(fileImage);
+                                  data.imageBase64.add("temp");
+                                }
+                                print(data.imagesList.length);
+                              }
+                            });
+                          },
+                        ),
+                        Divider()
+                      ],
                     );
+                    // Container(
+                    //   padding:
+                    //       EdgeInsets.symmetric(horizontal: 10.0, vertical: 10),
+                    //   child: Column(
+                    //     crossAxisAlignment: CrossAxisAlignment.start,
+                    //     children: <Widget>[
+                    //       Text("${data.title}\t\t"),
+                    //       Row(
+                    //         children: <Widget>[
+                    //           Expanded(
+                    //             flex: 4,
+                    //             child: Container(
+                    //                 width: 100,
+                    //                 height: 100,
+                    //                 child: TextBuilder.build(
+                    //                     title:
+                    //                         "Images have ${data.imagesList.length} items.")),
+                    //           ),
+                    //           Expanded(
+                    //             child: Container(
+                    //               width: 50,
+                    //               height: 50,
+                    //               child: RaisedButton(
+                    //                 child: Icon(Icons.add),
+                    //                 onPressed: () async {
+                    //                   List<File> images = await ecsLib.pushPage(
+                    //                       context: context,
+                    //                       pageWidget: TakePhotos());
+                    //                   setState(() {
+                    //                     if (images != null) {
+                    //                       print(
+                    //                           "return Images = ${images.length}");
+                    //                       for (var fileImage in images) {
+                    //                         data.imagesList.add(fileImage);
+                    //                         data.imageBase64.add("temp");
+                    //                       }
+                    //                       print(data.imagesList.length);
+                    //                     }
+                    //                   });
+                    //                 },
+                    //               ),
+                    //             ),
+                    //           ),
+                    //         ],
+                    //       ),
+                    //       Divider(),
+                    //     ],
+                    //   ),
+                    // );
                   },
                 )
               : Container(
@@ -242,6 +171,110 @@ class _AddImageDemoState extends State<AddImageDemo> {
                   ),
                 )),
     );
+  }
+
+  submitAsset() async {
+    var dataPost = {"Data": widget.dataAsset, "Images": {}};
+    print("Submit");
+    ecsLib.showDialogLoadingLib(context, content: "Image compressing");
+    try {
+      for (int i = 0; i < listKeepImageData.length; i++) {
+        var tempModelImage = listKeepImageData[i];
+        for (int j = 0; j < tempModelImage.imagesList.length; j++) {
+          var listImages = tempModelImage.imagesList[j];
+          var tempDir = await getTemporaryDirectory();
+          var _newSize = await ecsLib.compressFile(
+            file: listImages,
+            targetPath: tempDir.path + "/${listImages.path.split("/").last}",
+            minWidth: 600,
+            minHeight: 480,
+            quality: 80,
+          );
+          listImages = _newSize;
+          tempModelImage.imageBase64[j] =
+              base64Encode(listImages.readAsBytesSync());
+
+          print("------ ${tempModelImage.title} No. $i => Image No. $j");
+        }
+      }
+      var imageData = {};
+      try {
+        for (var modelImage in listKeepImageData) {
+          imageData.addAll({"${modelImage.title}": {}});
+          for (var imageBase64Data in modelImage.imageBase64) {
+            imageData["${modelImage.title}"].addAll({
+              "${modelImage.imageBase64.indexOf(imageBase64Data)}":
+                  imageBase64Data
+            });
+          }
+        }
+        dataPost.addAll({"Images": imageData});
+      } catch (e) {
+        print(e);
+      }
+    } catch (e) {
+      print(e);
+    }
+    ecsLib.cancelDialogLoadindLib(context);
+
+    ecsLib.printJson(dataPost);
+    ecsLib.showDialogLoadingLib(context, content: "Adding assets");
+    try {
+      APIServiceAssets.addAsset(postData: dataPost)
+          .timeout(Duration(seconds: 60))
+          .then((res) async {
+        print("<--- Response");
+        ecsLib.cancelDialogLoadindLib(context);
+        try {
+          await DBProviderAsset.db
+              .insertDataWarranzyUesd(res.warranzyUsed)
+              .catchError((onError) => print("warranzyUsed : $onError"));
+        } catch (e) {
+          print("insertDataWarranzyUesd => $e");
+        }
+        try {
+          await DBProviderAsset.db
+              .insertDataWarranzyLog(res.warranzyLog)
+              .catchError((onError) => print("warranzyLog $onError"));
+        } catch (e) {
+          print("insertDataWarranzyLog => $e");
+        }
+        res.filePool.forEach((data) async {
+          try {
+            await DBProviderAsset.db
+                .insertDataFilePool(data)
+                .catchError((onError) => print("filePool $onError"))
+                .whenComplete(() {
+              ecsLib.pushPageAndClearAllScene(
+                  context: context, pageWidget: MainPage());
+            });
+          } catch (e) {
+            print("insertDataFilePool => $e");
+          }
+        });
+      }).catchError((e) {
+        print(e);
+        ecsLib.cancelDialogLoadindLib(context);
+      });
+    } on DioError catch (error) {
+      print("DIO ERROR => ${error.error}\nMsg => ${error.message}");
+      ecsLib.cancelDialogLoadindLib(context);
+    } on SocketException catch (e) {
+      print(e);
+      ecsLib.cancelDialogLoadindLib(context);
+    } on HttpException catch (e) {
+      print(e);
+      ecsLib.cancelDialogLoadindLib(context);
+    } on FormatException catch (e) {
+      print(e);
+      ecsLib.cancelDialogLoadindLib(context);
+    } on Exception catch (e) {
+      print(e);
+      ecsLib.cancelDialogLoadindLib(context);
+    } catch (e) {
+      print("Catch $e");
+      ecsLib.cancelDialogLoadindLib(context);
+    }
   }
 }
 
@@ -263,59 +296,78 @@ class _TakePhotosState extends State<TakePhotos> {
             'Take a Photos',
             style: TextStyleCustom.STYLE_APPBAR,
           ),
+          actions: <Widget>[
+            FlatButton(
+              child: TextBuilder.build(title: "Save"),
+              onPressed: () {
+                Navigator.pop(context, images);
+              },
+            )
+          ],
         ),
-        body: SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              images.length > 0
-                  ? GridView.builder(
-                      shrinkWrap: true,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          crossAxisSpacing: 5,
-                          mainAxisSpacing: 5),
-                      itemCount: images.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return Container(
-                          width: 100.0,
-                          height: 100.0,
-                          child: Image.file(
-                            images[index],
-                            fit: BoxFit.cover,
-                          ),
-                        );
-                      },
-                    )
-                  : Center(
-                      child: TextBuilder.build(
-                          title: "Empty photos, Please take a photos."),
-                    ),
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    child: RaisedButton(
-                      child: TextBuilder.build(title: "Save"),
-                      onPressed: () {
-                        Navigator.pop(context, images);
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ],
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Center(
+            child: images.length > 0
+                ? Column(
+                    children: <Widget>[
+                      if (images.isNotEmpty && images.length > 0)
+                        ImageListBuilder.build(
+                            context: context,
+                            imageData: images,
+                            crossAxisCount: 2,
+                            heroTag: "imageOld",
+                            editAble: true,
+                            onClicked: (index) {
+                              print("ImageOld indexOf($index)");
+                              if (images.length > 0)
+                                setState(() {
+                                  images.removeAt(index);
+                                });
+                            }),
+                    ],
+                  )
+                : TextBuilder.build(
+                    title: "Empty photos, Please take a photos."),
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.add_a_photo),
-          onPressed: () async {
-            var image = await ecsLib.getImage();
-            print(image);
-            if (image != null) {
-              setState(() {
-                images.add(image);
-              });
-            }
-          },
+        floatingActionButton: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            FloatingActionButton(
+              heroTag: "TakePhoto",
+              child: Icon(Icons.add_a_photo, size: 35),
+              onPressed: () async {
+                var image = await ecsLib.getImage();
+                print(image);
+                if (image != null) {
+                  setState(() {
+                    images.add(image);
+                  });
+                }
+              },
+            ),
+            SizedBox(
+              height: 5,
+            ),
+            FloatingActionButton(
+              backgroundColor: Colors.red[200],
+              heroTag: "Gallery",
+              child: Icon(
+                Icons.add_photo_alternate,
+                size: 35,
+              ),
+              onPressed: () async {
+                var image = await ecsLib.getImageFromGallery();
+                print(image);
+                if (image != null) {
+                  setState(() {
+                    images.add(image);
+                  });
+                }
+              },
+            ),
+          ],
         ));
   }
 }

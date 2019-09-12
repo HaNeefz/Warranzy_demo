@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -363,6 +364,23 @@ class ECSLib {
   Widget modelImageFile({@required File file, BoxFit fit = BoxFit.cover}) {
     if (file != null) {
       return Image.file(
+        file,
+        fit: fit,
+        filterQuality: FilterQuality.high,
+      );
+    } else {
+      return Container(
+        child: Center(
+          child: Text("File empty."),
+        ),
+      );
+    }
+  }
+
+  Widget modelImageUint8List(
+      {@required Uint8List file, BoxFit fit = BoxFit.cover}) {
+    if (file != null) {
+      return Image.memory(
         file,
         fit: fit,
         filterQuality: FilterQuality.high,

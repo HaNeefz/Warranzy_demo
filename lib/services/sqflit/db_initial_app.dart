@@ -175,6 +175,21 @@ class DBProviderInitialApp {
     }
   }
 
+  Future<ProductCatagory> getDataProductCategoryByID(String catCode) async {
+    final db = await database;
+    try {
+      var res = await db.rawQuery(
+          "SELECT * FROM $tableProductCategory WHERE CatCode = '$catCode'"); //query(tableProductCategory)
+      // JsonEncoder encoder = JsonEncoder.withIndent(" ");
+      // String prettyprint = encoder.convert(v);
+      // print("$tableProductCategory => " + prettyprint);
+      return ProductCatagory.fromJson(res.first);
+    } catch (e) {
+      print("Error $tableProductCategory => $e");
+      return null;
+    }
+  }
+
   Future<String> getProductCatName({String id, String lang}) async {
     final db = await database;
     try {

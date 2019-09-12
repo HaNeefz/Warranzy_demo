@@ -653,7 +653,7 @@ class _MyAssetOnlineState extends State<MyAssetOnline> {
           ],
         ),
         onTap: () async {
-          ecsLib.pushPage(
+          await ecsLib.pushPage(
             context: context,
             pageWidget: LoadingDetailAsset(
               dataAsset: widget.data,

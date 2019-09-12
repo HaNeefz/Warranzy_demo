@@ -10,9 +10,12 @@ import 'package:warranzy_demo/models/model_repository_init_app.dart';
 import 'package:warranzy_demo/models/model_respository_asset.dart';
 import 'package:warranzy_demo/page/asset_page/add_assets_page/scAdd_image_demo.dart';
 import 'package:warranzy_demo/services/api/api_service_assets.dart';
+import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/form_data_asset.dart';
+import 'package:warranzy_demo/tools/widget_ui_custom/image_builder.dart';
+import 'package:warranzy_demo/tools/widget_ui_custom/image_list_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 
 class EditDetailAsset extends StatefulWidget {
@@ -101,25 +104,53 @@ class _EditImagesState extends State<EditImages> {
   List<ImageDataEachGroup> get imageEachGroup => widget.imageEachGroup;
   List<ImageDataEachGroup> listTempData;
   RelatedImage relatedImage;
+  List<String> listRelated = [];
+  List<String> tempListRelated = [];
   List<String> imageOld = [];
   List<Uint8List> image = [];
+
+  getProductCat() async {
+    var res = await DBProviderInitialApp.db
+        .getDataProductCategoryByID(_data.pdtCatCode);
+    relatedImage = RelatedImage(category: res);
+    listRelated = relatedImage.listRelatedImage();
+    tempListRelated = List.of(listRelated);
+    print(listRelated);
+    print(
+        "listTempData Old => ${listTempData.length} is ${listTempData.first.title}");
+    for (var tempData in listTempData) {
+      print("${listTempData.indexOf(tempData)} => ${tempData.title}");
+      for (var tempReleted in tempListRelated) {
+        if (tempReleted == tempData.title) {
+          print("Remove cause :$tempReleted == ${tempData.title}");
+          print("Data listRelated before rm => ${listRelated.length} items");
+          listRelated.removeAt(tempListRelated.indexOf(tempReleted));
+          print("Data listRelated After rm => ${listRelated.length} items");
+        }
+      }
+    }
+    listRelated.forEach((v) {
+      setState(() {
+        listTempData.add(ImageDataEachGroup(
+            title: v, imageUrl: [], imageBase64: [], imagesList: []));
+      });
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    // relatedImage = RelatedImage(category: _data);
-    // var tempRelated = relatedImage.listRelatedImage();
-    // print(tempRelated);
     listTempData = List.of(imageEachGroup);
+    getProductCat();
     getImageToBase64();
   }
 
   Future<List<Uint8List>> getImageToBase64() async {
     List<Uint8List> listImage = [];
-    for (int i = 0; i < imageEachGroup.length; i++) {
-      for (int j = 0; j < imageEachGroup[i].imageUrl.length; j++) {
+    for (int i = 0; i < listTempData.length; i++) {
+      for (int j = 0; j < listTempData[i].imageUrl.length; j++) {
         try {
-          // print("URL => imageEachGroup[$i].imageUrl[$j]");
-          var response = await http.get(imageEachGroup[i].imageUrl[j]);
+          var response = await http.get(listTempData[i].imageUrl[j]);
           listImage.add(response.bodyBytes);
         } catch (e) {
           print(e);
@@ -135,8 +166,7 @@ class _EditImagesState extends State<EditImages> {
       child: Column(
         children: <Widget>[
           Column(
-            children:
-                imageEachGroup.map((v) => buildDetialEachGroup(v)).toList(),
+            children: listTempData.map((v) => buildDetialEachGroup(v)).toList(),
           ),
         ],
       ),
@@ -150,24 +180,22 @@ class _EditImagesState extends State<EditImages> {
           title: Text("${v.title}"),
           trailing: Container(
             // color: Colors.red,
-            width: 100,
+            width: 150,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Text("${v.imageUrl.length}"),
-                Icon(Icons.arrow_forward_ios),
+                Text("${v.imageUrl.length}\t\titems"),
+                Icon(Icons.edit),
               ],
             ),
           ),
           onTap: () async {
-            v.imageUrl.forEach((v) {
-              print(v);
-            });
             await ecsLib
                 .pushPage(
               context: context,
               pageWidget: ModifyImage(
                 image: v,
+                assetData: _data,
               ),
             )
                 .then((_) {
@@ -183,8 +211,8 @@ class _EditImagesState extends State<EditImages> {
 
 class ModifyImage extends StatefulWidget {
   final ImageDataEachGroup image;
-  final ModelDataAsset data;
-  ModifyImage({Key key, this.image, this.data}) : super(key: key);
+  final ModelDataAsset assetData;
+  ModifyImage({Key key, this.image, this.assetData}) : super(key: key);
 
   ModifytImageState createState() => ModifytImageState();
 }
@@ -193,12 +221,14 @@ class ModifytImageState extends State<ModifyImage> {
   final ecsLib = getIt.get<ECSLib>();
   final allTranslations = getIt.get<GlobalTranslations>();
   ImageDataEachGroup get imageDataEachGroup => widget.image;
+  ModelDataAsset get assetData => widget.assetData;
   Future<List<Uint8List>> tempImageLoading;
   List<File> imageNew = [];
   List<Uint8List> imageOld = [];
 
   void initState() {
     super.initState();
+
     print(imageDataEachGroup.title);
     print(imageDataEachGroup.imageUrl);
     tempImageLoading = getImageToBase64();
@@ -233,81 +263,86 @@ class ModifytImageState extends State<ModifyImage> {
               onPressed: submitUpdateImage)
         ],
       ),
-      body: Container(
-        padding: EdgeInsets.all(10),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ListView(
+          shrinkWrap: true,
           children: <Widget>[
-            TextBuilder.build(title: "${imageDataEachGroup.title}"),
-            SizedBox(height: 5),
-            Center(child: TextBuilder.build(title: "Old Image")),
-            SizedBox(height: 5),
-            FutureBuilder<List<Uint8List>>(
-              future: tempImageLoading,
-              builder: (BuildContext context,
-                  AsyncSnapshot<List<Uint8List>> snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  if (snapshot.hasError) {
-                    return Text("Error");
-                  } else {
-                    var data = snapshot.data;
-                    return Container(
-                        child: Column(
-                      children: <Widget>[
-                        Text("Eieie")
-                        // GridView(
-                        //   shrinkWrap: true,
-                        //   gridDelegate:
-                        //       SliverGridDelegateWithFixedCrossAxisCount(
-                        //     crossAxisCount: 2,
-                        //     crossAxisSpacing: 5,
-                        //     mainAxisSpacing: 5,
-                        //   ),
-                        //   children: <Widget>[
-                        //     for (var _imageData in data)
-                        //       if (_imageData != null && _imageData.length > 0)
-                        //         Image.memory(_imageData, fit: BoxFit.cover),
-                        //   ],
-                        // ),
-                        // imageNew.length > 0
-                        //     ? Column(
-                        //         children: <Widget>[
-                        //           Padding(
-                        //             padding:
-                        //                 EdgeInsets.only(top: 5, bottom: 10),
-                        //             child:
-                        //                 TextBuilder.build(title: "New Image"),
-                        //           ),
-                        //           GridView(
-                        //             shrinkWrap: true,
-                        //             gridDelegate:
-                        //                 SliverGridDelegateWithFixedCrossAxisCount(
-                        //               crossAxisCount: 2,
-                        //               crossAxisSpacing: 5,
-                        //               mainAxisSpacing: 5,
-                        //             ),
-                        //             children: <Widget>[
-                        //               for (var _imageNew in imageNew)
-                        //                 if (_imageNew != null &&
-                        //                     imageNew.length > 0)
-                        //                   Image.file(_imageNew,
-                        //                       fit: BoxFit.cover)
-                        //             ],
-                        //           ),
-                        //         ],
-                        //       )
-                        //     : Container()
-                      ],
-                    ));
-                  }
-                } else if (snapshot.connectionState ==
-                    ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                } else {
-                  return Text("Something wrong...!");
-                }
-              },
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                TextBuilder.build(
+                    title: "${imageDataEachGroup.title}",
+                    style: TextStyleCustom.STYLE_TITLE),
+                SizedBox(height: 5),
+                SizedBox(height: 5),
+                FutureBuilder<List<Uint8List>>(
+                  future: tempImageLoading,
+                  builder: (BuildContext context,
+                      AsyncSnapshot<List<Uint8List>> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done) {
+                      if (snapshot.hasError) {
+                        return Text("Error");
+                      } else {
+                        var data = snapshot.data;
+                        return Container(
+                            child: Column(
+                          children: <Widget>[
+                            if (data.isNotEmpty && data.length > 0)
+                              Column(
+                                children: <Widget>[
+                                  Center(
+                                      child: TextBuilder.build(
+                                          title: "Old Image")),
+                                  ImageListBuilder.build(
+                                      context: context,
+                                      imageData: data,
+                                      heroTag: "imageOld",
+                                      editAble: true,
+                                      onClicked: (index) {
+                                        print("ImageOld indexOf($index)");
+                                        if (data.length > 1)
+                                          setState(() {
+                                            imageOld.removeAt(index);
+                                          });
+                                      }),
+                                ],
+                              )
+                          ],
+                        ));
+                      }
+                    } else if (snapshot.connectionState ==
+                        ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    } else {
+                      return Text("Something wrong...!");
+                    }
+                  },
+                ),
+                SizedBox(height: 20),
+                imageNew.length > 0
+                    ? Column(
+                        children: <Widget>[
+                          TextBuilder.build(title: "New Image"),
+                          SizedBox(height: 10),
+                          if (imageNew.isNotEmpty && imageNew.length > 0)
+                            ImageListBuilder.build(
+                                context: context,
+                                imageData: imageNew,
+                                heroTag: "imageNew",
+                                editAble: true,
+                                onClicked: (index) {
+                                  print("imageNew indexOf($index)");
+                                  if (imageNew.length > 0)
+                                    setState(() {
+                                      imageNew.removeAt(index);
+                                    });
+                                })
+                        ],
+                      )
+                    : Container()
+              ],
             ),
           ],
         ),
@@ -315,22 +350,26 @@ class ModifytImageState extends State<ModifyImage> {
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
-          // FloatingActionButton(
-          //   child: Icon(Icons.add_a_photo),
-          //   onPressed: () async {
-          //     try {
-          //       var resPhoto = await ecsLib.getImage();
-          //       if (resPhoto != null)
-          //         setState(() {
-          //           imageNew.add(resPhoto);
-          //         });
-          //     } catch (e) {
-          //       print(e);
-          //     }
-          //   },
-          // ),
           FloatingActionButton(
-            child: Icon(Icons.add_a_photo),
+            heroTag: "takePhoto",
+            child: Icon(Icons.add_a_photo, size: 35),
+            onPressed: () async {
+              try {
+                var resPhoto = await ecsLib.getImage();
+                if (resPhoto != null)
+                  setState(() {
+                    imageNew.add(resPhoto);
+                  });
+              } catch (e) {
+                print(e);
+              }
+            },
+          ),
+          SizedBox(height: 5),
+          FloatingActionButton(
+            heroTag: "gallery",
+            backgroundColor: Colors.red[300],
+            child: Icon(Icons.add_photo_alternate, size: 35),
             onPressed: () async {
               try {
                 var resPhoto = await ecsLib.getImageFromGallery();
@@ -351,26 +390,46 @@ class ModifytImageState extends State<ModifyImage> {
   submitUpdateImage() async {
     ecsLib.showDialogLoadingLib(context, content: "compressing photo");
     Map<String, dynamic> postData = {
-      "WTokenID": "${widget.data.wTokenID}",
+      "WTokenID": "${assetData.wTokenID}",
       "${imageDataEachGroup.title}": {}
     };
     int counter = imageOld.length + imageNew.length;
     List<String> imageTobase64 = [];
-    imageOld.forEach((v) {
-      imageTobase64.add(base64.encode(v));
-    });
-    imageNew.forEach((v) async {
-      var tempDir = await getTemporaryDirectory();
-      var _newSize = await ecsLib.compressFile(
-        file: v,
-        targetPath: tempDir.path + "/${v.path.split("/").last}",
-        minWidth: 600,
-        minHeight: 480,
-        quality: 80,
-      );
-      var imageByte = _newSize.readAsBytesSync();
-      imageTobase64.add(base64Encode(imageByte));
+    if (imageNew.length > 0)
+      imageNew.forEach((v) async {
+        if (imageNew.indexOf(v) == 0) {
+          print("index ${imageNew.indexOf(v)}");
+          imageOld.forEach((v) {
+            imageTobase64.add(base64.encode(v));
+          });
+        }
+        var tempDir = await getTemporaryDirectory();
+        var _newSize = await ecsLib.compressFile(
+          file: v,
+          targetPath: tempDir.path + "/${v.path.split("/").last}",
+          minWidth: 600,
+          minHeight: 480,
+          quality: 80,
+        );
+        var imageByte = _newSize.readAsBytesSync();
+        imageTobase64.add(base64Encode(imageByte));
 
+        if (imageTobase64.length == counter) {
+          print("imageToBase64 length => ${imageTobase64.length}");
+          for (var data in imageTobase64) {
+            postData["${imageDataEachGroup.title}"].addAll({
+              "${imageTobase64.indexOf(data)}": data,
+            });
+          }
+          ecsLib.cancelDialogLoadindLib(context);
+          ecsLib.printJson(postData);
+          sendAPIUpdateImage(postData: postData);
+        }
+      });
+    else {
+      imageOld.forEach((v) {
+        imageTobase64.add(base64.encode(v));
+      });
       if (imageTobase64.length == counter) {
         print("imageToBase64 length => ${imageTobase64.length}");
         for (var data in imageTobase64) {
@@ -382,7 +441,7 @@ class ModifytImageState extends State<ModifyImage> {
         ecsLib.printJson(postData);
         sendAPIUpdateImage(postData: postData);
       }
-    });
+    }
   }
 
   sendAPIUpdateImage({dynamic postData}) async {
@@ -391,4 +450,59 @@ class ModifytImageState extends State<ModifyImage> {
       ecsLib.cancelDialogLoadindLib(context);
     });
   }
+
+  List<String> imageOldToBase64() {
+    List<String> tempImage = [];
+    if (imageOld.length > 0)
+      imageOld.forEach((v) {
+        tempImage.add(base64.encode(v));
+      });
+    else
+      tempImage = [];
+    return tempImage;
+  }
+
+  List<String> imageNewToBase64() {
+    List<String> tempImage = [];
+    if (imageNew.length > 0) {
+      imageNew.forEach((v) async {
+        var tempDir = await getTemporaryDirectory();
+        var _newSize = await ecsLib.compressFile(
+          file: v,
+          targetPath: tempDir.path + "/${v.path.split("/").last}",
+          minWidth: 600,
+          minHeight: 480,
+          quality: 80,
+        );
+        var imageByte = _newSize.readAsBytesSync();
+        tempImage.add(base64Encode(imageByte));
+      });
+    } else
+      tempImage = [];
+    return tempImage;
+  }
+
+  // List<String> imageToBase64() {
+  //   List<String> tempImage = [];
+  //   int counterAllImage = imageOld.length + imageNew.length;
+  //   imageOld.forEach((v) {
+  //     tempImage.add(base64.encode(v));
+  //   });
+  //   imageNew.forEach((v) async {
+  //     var tempDir = await getTemporaryDirectory();
+  //     var _newSize = await ecsLib.compressFile(
+  //       file: v,
+  //       targetPath: tempDir.path + "/${v.path.split("/").last}",
+  //       minWidth: 600,
+  //       minHeight: 480,
+  //       quality: 80,
+  //     );
+  //     var imageByte = _newSize.readAsBytesSync();
+  //     tempImage.add(base64Encode(imageByte));
+  //   });
+  //   if (tempImage.length == counterAllImage) {
+  //     return tempImage;
+  //   } else
+  //     return [];
+  // }
 }

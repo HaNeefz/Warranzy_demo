@@ -33,7 +33,7 @@ class FormImageList {
                       padding: const EdgeInsets.only(right: 8.0),
                       child: ImageBuilder.build(
                         context: context,
-                        filePath: path[index],
+                        imageData: path[index],
                         index: index + 1,
                         editAble: editAble,
                         onPressed: () {

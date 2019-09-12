@@ -11,7 +11,7 @@ final ecsLib = getIt.get<ECSLib>();
 class ImageBuilder {
   static Widget build(
       {@required BuildContext context,
-      @required File filePath,
+      @required imageData,
       int index,
       bool editAble = false,
       double cornerRadius = 20.0,
@@ -27,7 +27,7 @@ class ImageBuilder {
         Navigator.of(context).push(TransparentMaterialPageRoute(
             fullscreenDialog: true,
             builder: (BuildContext context) => PhotoViewPage(
-                  image: filePath,
+                  image: imageData,
                   heroTag: "${heroTag}image$index",
                 )));
         // ecsLib.pushPage(
@@ -43,9 +43,11 @@ class ImageBuilder {
               tag: "${heroTag}image$index",
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(cornerRadius),
-                child: ecsLib.modelImageFile(
-                  file: filePath,
-                ),
+                child: imageData is File
+                    ? ecsLib.modelImageFile(
+                        file: imageData,
+                      )
+                    : ecsLib.modelImageUint8List(file: imageData),
               )),
           editAble == true ? numberImage(index) : Container(),
           editAble == true ? removeImage(onPressed) : Container(),
@@ -90,7 +92,7 @@ Positioned numberImage(int index) {
 }
 
 class PhotoViewPage extends StatefulWidget {
-  final File image;
+  final image;
   final String heroTag;
   PhotoViewPage({
     Key key,
@@ -155,17 +157,29 @@ class _PhotoViewPageState extends State<PhotoViewPage> {
     return Hero(
         tag: widget.heroTag,
         child: ExtendedImageSlidePage(
-          child: ExtendedImage.file(
-            widget.image,
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            enableSlideOutPage: true,
-            mode: ExtendedImageMode.Gesture,
-            filterQuality: FilterQuality.high,
-            fit: BoxFit.contain,
-            clearMemoryCacheIfFailed: true,
-            enableMemoryCache: true,
-          ), //Image.file(widget.image),
+          child: widget.image is File
+              ? ExtendedImage.file(
+                  widget.image,
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  enableSlideOutPage: true,
+                  mode: ExtendedImageMode.gesture,
+                  filterQuality: FilterQuality.high,
+                  fit: BoxFit.contain,
+                  clearMemoryCacheIfFailed: true,
+                  enableMemoryCache: true,
+                )
+              : ExtendedImage.memory(
+                  widget.image,
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  enableSlideOutPage: true,
+                  mode: ExtendedImageMode.gesture,
+                  filterQuality: FilterQuality.high,
+                  fit: BoxFit.contain,
+                  clearMemoryCacheIfFailed: true,
+                  enableMemoryCache: true,
+                ), //Image.file(widget.image),
           slideAxis: SlideAxis.vertical,
           slideType: SlideType.onlyImage,
           resetPageDuration: Duration(milliseconds: 300),
@@ -180,12 +194,13 @@ class _PhotoViewPageState extends State<PhotoViewPage> {
         child: Container(
           width: 40.0,
           height: 40.0,
-          decoration: BoxDecoration(shape: BoxShape.circle, color: ThemeColors.COLOR_BLACK),
+          // decoration: BoxDecoration(
+          //     shape: BoxShape.circle, color: ThemeColors.COLOR_BLACK),
           child: Center(
             child: IconButton(
               icon: Icon(
                 Icons.close,
-                color: ThemeColors.COLOR_THEME_APP,
+                color: ThemeColors.COLOR_BLACK,
               ),
               onPressed: () => Navigator.pop(context),
             ),

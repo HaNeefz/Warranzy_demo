@@ -240,8 +240,8 @@ class RelatedImage {
 
   List<String> listRelatedImage() {
     String wanted = "Y";
-    if (category.imageBox == wanted) _reletedImage.add("Image_Box");
     if (category.imageProduct == wanted) _reletedImage.add("Image_Product");
+    if (category.imageBox == wanted) _reletedImage.add("Image_Box");
     if (category.imageDocument == wanted) _reletedImage.add("Image_Document");
     if (category.imageSerial == wanted) _reletedImage.add("Image_Serial");
     if (category.imageChassisNo == wanted) _reletedImage.add("Image_ChassisNo");

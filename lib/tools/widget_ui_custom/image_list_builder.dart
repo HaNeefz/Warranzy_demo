@@ -8,56 +8,82 @@ import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 import '../theme_color.dart';
 
-final ecsLib = getIt.get<ECSLib>();
-
 class ImageListBuilder {
+  static final _ecsLib = getIt.get<ECSLib>();
   static Widget build(
       {@required BuildContext context,
-      @required List<File> filePath,
+      @required List imageData,
       bool editAble = false,
       double cornerRadius = 20.0,
+      int crossAxisCount = 3,
       String heroTag = "",
-      Function onPressed}) {
+      Function(int) onClicked}) {
     return Container(
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height / 2,
-      margin: EdgeInsets.symmetric(vertical: 8),
-      decoration: BoxDecoration(
-          border: null, borderRadius: BorderRadius.circular(20.0)),
+      // width: MediaQuery.of(context).size.width,
+      // height: MediaQuery.of(context).size.height / 2,
+      // margin: EdgeInsets.symmetric(vertical: 8),
+      // decoration: BoxDecoration(
+      // color: Colors.red,
+      //     border: null, borderRadius: BorderRadius.circular(20.0)),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: filePath.length ?? 0,
+        child: GridView.builder(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: 0,
+            mainAxisSpacing: 5,
+          ),
+          // scrollDirection: Axis.horizontal,
+          shrinkWrap: true,
+          itemCount: imageData.length ?? 0,
           itemBuilder: (BuildContext context, int index) {
-            return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.of(context).push(TransparentMaterialPageRoute(
-                      fullscreenDialog: true,
-                      builder: (BuildContext context) => PhotoViewPage(
-                            image: filePath,
-                            heroTag: "${heroTag}image$index",
-                            currentIndex: index,
-                          )));
-                },
-                child: Stack(
-                  children: <Widget>[
-                    Hero(
+            return GestureDetector(
+              onTap: () {
+                Navigator.of(context).push(TransparentMaterialPageRoute(
+                    fullscreenDialog: true,
+                    builder: (BuildContext context) => PhotoViewPage(
+                          image: imageData,
+                          heroTag: "${heroTag}image$index",
+                          currentIndex: index,
+                        )));
+              },
+              child: Stack(
+                children: <Widget>[
+                  Container(
+                    margin: EdgeInsets.all(8),
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height,
+                    child: Hero(
                         tag: "${heroTag}image$index",
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(cornerRadius),
-                          child: ecsLib.modelImageFile(
-                            file: filePath[index],
-                          ),
+                          child: imageData is List<File>
+                              ? _ecsLib.modelImageFile(
+                                  file: imageData[index],
+                                )
+                              : _ecsLib.modelImageUint8List(
+                                  file: imageData[index], fit: BoxFit.cover),
                         )),
-                    editAble == true ? numberImage(index + 1) : Container(),
-                    editAble == true
-                        ? removeImage(context, index)
-                        : Container(),
-                  ],
-                ),
+                  ),
+                  // removeImageTest(index, onClicked),
+                  editAble == true
+                      ? Positioned(
+                          top: 0.0,
+                          right: 0.0,
+                          child: IconButton(
+                              icon: CircleAvatar(
+                                backgroundColor: Colors.black,
+                                child: Icon(
+                                  Icons.close,
+                                  color: ThemeColors.COLOR_TEXT_ICON_WHITE,
+                                ),
+                              ),
+                              onPressed: () => onClicked(index)),
+                        )
+                      : Container(),
+                  // editAble == true ? numberImage(index + 1) : Container(),
+                  // editAble == true ? removeImage(context, index) : Container(),
+                ],
               ),
             );
           },
@@ -118,7 +144,7 @@ Positioned numberImage(int index) {
 }
 
 class PhotoViewPage extends StatefulWidget {
-  final List<File> image;
+  final List image;
   final String heroTag;
   int currentIndex;
   PhotoViewPage({
@@ -136,7 +162,6 @@ class _PhotoViewPageState extends State<PhotoViewPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _pageController = PageController(
       initialPage: widget.currentIndex,
@@ -193,17 +218,65 @@ class _PhotoViewPageState extends State<PhotoViewPage> {
     return Hero(
         tag: widget.heroTag,
         child: ExtendedImageSlidePage(
-          child: ExtendedImage.file(
-            widget.image[index],
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            enableSlideOutPage: true,
-            mode: ExtendedImageMode.Gesture,
-            filterQuality: FilterQuality.high,
-            fit: BoxFit.contain,
-            clearMemoryCacheIfFailed: true,
-            enableMemoryCache: true,
-          ), //Image.file(widget.image),
+          child: widget.image is List<File>
+              ? ExtendedImage.file(
+                  widget.image[index],
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  enableSlideOutPage: true,
+                  mode: ExtendedImageMode.gesture,
+                  filterQuality: FilterQuality.high,
+                  fit: BoxFit.contain,
+                  clearMemoryCacheIfFailed: true,
+                  enableMemoryCache: true,
+                  initGestureConfigHandler: (state) {
+                    return GestureConfig(
+                        minScale: 0.9,
+                        animationMinScale: 0.7,
+                        maxScale: 3.0,
+                        animationMaxScale: 3.5,
+                        speed: 1.0,
+                        initialScale: 1.0,
+                        inertialSpeed: 100,
+                        inPageView: false);
+                  },
+                  initEditorConfigHandler: (state) {
+                    return EditorConfig(
+                      maxScale: 8.0,
+                      cropRectPadding: EdgeInsets.all(20.0),
+                      hitTestSize: 20.0,
+                    );
+                  },
+                )
+              : ExtendedImage.memory(
+                  widget.image[index],
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  enableSlideOutPage: true,
+                  mode: ExtendedImageMode.gesture,
+                  filterQuality: FilterQuality.high,
+                  fit: BoxFit.contain,
+                  clearMemoryCacheIfFailed: true,
+                  enableMemoryCache: true,
+                  initGestureConfigHandler: (state) {
+                    return GestureConfig(
+                        minScale: 0.9,
+                        animationMinScale: 0.7,
+                        maxScale: 3.0,
+                        animationMaxScale: 3.5,
+                        speed: 1.0,
+                        initialScale: 1.0,
+                        inertialSpeed: 100,
+                        inPageView: false);
+                  },
+                  initEditorConfigHandler: (state) {
+                    return EditorConfig(
+                      maxScale: 8.0,
+                      cropRectPadding: EdgeInsets.all(20.0),
+                      hitTestSize: 20.0,
+                    );
+                  },
+                ), //Image.file(widget.image),
           slideAxis: SlideAxis.vertical,
           slideType: SlideType.onlyImage,
           resetPageDuration: Duration(milliseconds: 300),
@@ -222,7 +295,7 @@ class _PhotoViewPageState extends State<PhotoViewPage> {
             child: IconButton(
               icon: Icon(
                 Icons.close,
-                color: ThemeColors.COLOR_THEME_APP,
+                color: ThemeColors.COLOR_BLACK,
               ),
               onPressed: () => Navigator.pop(context),
             ),
@@ -245,16 +318,3 @@ class _PageViewImageState extends State<PageViewImage> {
     return PageView();
   }
 }
-
-// ExtendedImageSlidePage(
-//     child: Hero(
-//       tag: "${heroTag}image$index",
-//       child: ExtendedImage.file(
-//         filePath,
-//         enableSlideOutPage: true,
-//         mode: ExtendedImageMode.Gesture,
-//       ),
-//     ), //Image.file(widget.image),
-//     slideAxis: SlideAxis.both,
-//     slideType: SlideType.onlyImage,
-//     resetPageDuration: Duration(milliseconds: 300))
