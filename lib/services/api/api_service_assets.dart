@@ -146,7 +146,7 @@ class APIServiceAssets {
     }
   }
 
-  static Future updateImage({dynamic postData}) async {
+  static Future<ResponseImage> updateImage({dynamic postData}) async {
     FormData formData = FormData.from(postData);
     try {
       var res = await _dio.post("$_baseUrl/Asset/UpdateImagesAsset",
@@ -155,21 +155,21 @@ class APIServiceAssets {
               headers: {"Authorization": await JWTService.getTokenJWT()}));
       if (res.statusCode == 200) {
         print(res.data);
-        // return ResponseDetailOfAsset.fromJson(jsonDecode(res.data));
+        return ResponseImage.fromJson(jsonDecode(res.data));
       } else
         throw Exception("Failed to load post");
     } on SocketException catch (e) {
       print("SocketException => $e");
-      // return ResponseDetailOfAsset(message: "SocketException => $e");
+      return ResponseImage(message: "SocketException => $e");
     } on FormatException catch (e) {
       print("FormatException => $e");
-      // return ResponseDetailOfAsset(message: "FormatException => $e");
+      return ResponseImage(message: "FormatException => $e");
     } on Exception catch (e) {
       print("Exception => $e");
-      // return ResponseDetailOfAsset(message: "Exception => $e");
+      return ResponseImage(message: "Exception => $e");
     } catch (e) {
       print("catch => $e");
-      // return ResponseDetailOfAsset(message: "catch => $e");
+      return ResponseImage(message: "catch => $e");
     }
   }
 }

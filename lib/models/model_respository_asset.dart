@@ -415,3 +415,32 @@ class ResponseAssetOnline {
     return data;
   }
 }
+
+class ResponseImage {
+  bool status;
+  String message;
+  List<FilePool> filePool;
+
+  ResponseImage({this.status, this.filePool, this.message});
+
+  ResponseImage.fromJson(Map<String, dynamic> json) {
+    status = json['Status'];
+    message = json['Message'];
+    if (json['FilePool'] != null) {
+      filePool = new List<FilePool>();
+      json['FilePool'].forEach((v) {
+        filePool.add(new FilePool.fromJson(v));
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['Status'] = this.status;
+    data['Message'] = this.message;
+    if (this.filePool != null) {
+      data['FilePool'] = this.filePool.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}

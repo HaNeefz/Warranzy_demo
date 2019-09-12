@@ -18,6 +18,8 @@ import 'package:warranzy_demo/tools/widget_ui_custom/image_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/image_list_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 
+import 'scDetailAsset.dart';
+
 class EditDetailAsset extends StatefulWidget {
   final bool editingImage;
   final ModelDataAsset modelDataAsset;
@@ -251,6 +253,8 @@ class ModifytImageState extends State<ModifyImage> {
     return listImage;
   }
 
+  alert(String content) {}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -388,32 +392,49 @@ class ModifytImageState extends State<ModifyImage> {
   }
 
   submitUpdateImage() async {
-    ecsLib.showDialogLoadingLib(context, content: "compressing photo");
-    Map<String, dynamic> postData = {
-      "WTokenID": "${assetData.wTokenID}",
-      "${imageDataEachGroup.title}": {}
-    };
-    int counter = imageOld.length + imageNew.length;
-    List<String> imageTobase64 = [];
-    if (imageNew.length > 0)
-      imageNew.forEach((v) async {
-        if (imageNew.indexOf(v) == 0) {
-          print("index ${imageNew.indexOf(v)}");
-          imageOld.forEach((v) {
-            imageTobase64.add(base64.encode(v));
-          });
-        }
-        var tempDir = await getTemporaryDirectory();
-        var _newSize = await ecsLib.compressFile(
-          file: v,
-          targetPath: tempDir.path + "/${v.path.split("/").last}",
-          minWidth: 600,
-          minHeight: 480,
-          quality: 80,
-        );
-        var imageByte = _newSize.readAsBytesSync();
-        imageTobase64.add(base64Encode(imageByte));
+    if (imageOld.isNotEmpty || imageNew.isNotEmpty) {
+      ecsLib.showDialogLoadingLib(context, content: "compressing photo");
+      Map<String, dynamic> postData = {
+        "WTokenID": "${assetData.wTokenID}",
+        "${imageDataEachGroup.title}": {}
+      };
+      int counter = imageOld.length + imageNew.length;
+      List<String> imageTobase64 = [];
+      if (imageNew.length > 0)
+        imageNew.forEach((v) async {
+          if (imageNew.indexOf(v) == 0) {
+            print("index ${imageNew.indexOf(v)}");
+            imageOld.forEach((v) {
+              imageTobase64.add(base64.encode(v));
+            });
+          }
+          var tempDir = await getTemporaryDirectory();
+          var _newSize = await ecsLib.compressFile(
+            file: v,
+            targetPath: tempDir.path + "/${v.path.split("/").last}",
+            minWidth: 600,
+            minHeight: 480,
+            quality: 80,
+          );
+          var imageByte = _newSize.readAsBytesSync();
+          imageTobase64.add(base64Encode(imageByte));
 
+          if (imageTobase64.length == counter) {
+            print("imageToBase64 length => ${imageTobase64.length}");
+            for (var data in imageTobase64) {
+              postData["${imageDataEachGroup.title}"].addAll({
+                "${imageTobase64.indexOf(data)}": data,
+              });
+            }
+            ecsLib.cancelDialogLoadindLib(context);
+            ecsLib.printJson(postData);
+            sendAPIUpdateImage(postData: postData);
+          }
+        });
+      else {
+        imageOld.forEach((v) {
+          imageTobase64.add(base64.encode(v));
+        });
         if (imageTobase64.length == counter) {
           print("imageToBase64 length => ${imageTobase64.length}");
           for (var data in imageTobase64) {
@@ -425,29 +446,42 @@ class ModifytImageState extends State<ModifyImage> {
           ecsLib.printJson(postData);
           sendAPIUpdateImage(postData: postData);
         }
-      });
-    else {
-      imageOld.forEach((v) {
-        imageTobase64.add(base64.encode(v));
-      });
-      if (imageTobase64.length == counter) {
-        print("imageToBase64 length => ${imageTobase64.length}");
-        for (var data in imageTobase64) {
-          postData["${imageDataEachGroup.title}"].addAll({
-            "${imageTobase64.indexOf(data)}": data,
-          });
-        }
-        ecsLib.cancelDialogLoadindLib(context);
-        ecsLib.printJson(postData);
-        sendAPIUpdateImage(postData: postData);
       }
+    } else {
+      alert("Image is empty. Please add Image.");
     }
   }
 
   sendAPIUpdateImage({dynamic postData}) async {
-    ecsLib.showDialogLoadingLib(context, content: "Updating Image");
-    await APIServiceAssets.updateImage(postData: postData).then((response) {
+    ecsLib.showDialogLoadingLib(context, content: "Editing Image Asset");
+    await APIServiceAssets.updateImage(postData: postData)
+        .then((response) async {
       ecsLib.cancelDialogLoadindLib(context);
+      if (response.status == true) {
+        ecsLib.showDialogLoadingLib(context, content: "Updating Image Asset");
+        await APIServiceAssets.getDetailAseet(wtokenID: assetData.wTokenID)
+            .then((responseDetail) {
+          ecsLib.cancelDialogLoadindLib(context);
+          if (responseDetail.status == true) {
+            ecsLib.stepBackScene(context, 1);
+            ecsLib.pushPageReplacement(
+              context: context,
+              pageWidget: DetailAsset(
+                dataAsset: responseDetail.data,
+                showDetailOnline: true,
+              ),
+            );
+          } else if (responseDetail.status == false) {
+            alert("${responseDetail.message}");
+          } else {
+            alert("${responseDetail.message}");
+          }
+        });
+      } else if (response.status == false) {
+        alert("${response.message}");
+      } else {
+        alert("${response.message}");
+      }
     });
   }
 

@@ -114,55 +114,6 @@ class _AddImageDemoState extends State<AddImageDemo> {
                         Divider()
                       ],
                     );
-                    // Container(
-                    //   padding:
-                    //       EdgeInsets.symmetric(horizontal: 10.0, vertical: 10),
-                    //   child: Column(
-                    //     crossAxisAlignment: CrossAxisAlignment.start,
-                    //     children: <Widget>[
-                    //       Text("${data.title}\t\t"),
-                    //       Row(
-                    //         children: <Widget>[
-                    //           Expanded(
-                    //             flex: 4,
-                    //             child: Container(
-                    //                 width: 100,
-                    //                 height: 100,
-                    //                 child: TextBuilder.build(
-                    //                     title:
-                    //                         "Images have ${data.imagesList.length} items.")),
-                    //           ),
-                    //           Expanded(
-                    //             child: Container(
-                    //               width: 50,
-                    //               height: 50,
-                    //               child: RaisedButton(
-                    //                 child: Icon(Icons.add),
-                    //                 onPressed: () async {
-                    //                   List<File> images = await ecsLib.pushPage(
-                    //                       context: context,
-                    //                       pageWidget: TakePhotos());
-                    //                   setState(() {
-                    //                     if (images != null) {
-                    //                       print(
-                    //                           "return Images = ${images.length}");
-                    //                       for (var fileImage in images) {
-                    //                         data.imagesList.add(fileImage);
-                    //                         data.imageBase64.add("temp");
-                    //                       }
-                    //                       print(data.imagesList.length);
-                    //                     }
-                    //                   });
-                    //                 },
-                    //               ),
-                    //             ),
-                    //           ),
-                    //         ],
-                    //       ),
-                    //       Divider(),
-                    //     ],
-                    //   ),
-                    // );
                   },
                 )
               : Container(
