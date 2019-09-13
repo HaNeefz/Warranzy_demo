@@ -8,6 +8,7 @@ import 'package:warranzy_demo/models/model_country_birth_year.dart';
 import 'package:warranzy_demo/models/model_cust_temp_data.dart';
 import 'package:warranzy_demo/services/api/api_services_user.dart';
 import 'package:warranzy_demo/services/api/base_url.dart';
+import 'package:warranzy_demo/services/method/methode_helper.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
@@ -83,7 +84,7 @@ class _ChangeDeviceState extends State<ChangeDevice> {
     if (_fbKey.currentState.validate()) {
       if (modelCountry.selectedCountry == true) {
         savePinCode();
-        String currentTimeZone = await FlutterNativeTimezone.getLocalTimezone();
+        String currentTimeZone = await MethodHelper.timeZone;
         _fbKey.currentState.value["MobilePhone"] =
             chenkNumberStartWith(_fbKey.currentState.value["MobilePhone"]);
         var masCustomersData = _fbKey.currentState.value

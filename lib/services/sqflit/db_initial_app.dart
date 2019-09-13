@@ -149,6 +149,18 @@ class DBProviderInitialApp {
     }
   }
 
+  Future<String> getCountryCodeByTimeZone(String timezone) async {
+    final db = await database;
+    try {
+      var res = await db.rawQuery(
+          "SELECT Code FROM $tableTimeZone WHERE TimeZone = '$timezone'");
+      return res.first["Code"];
+    } catch (e) {
+      print("Error $tableTimeZone => $e");
+      return "";
+    }
+  }
+
   Future<List<ProductCatagory>> getAllDataProductCategory() async {
     final db = await database;
     try {

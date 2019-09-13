@@ -6,6 +6,7 @@ import 'package:warranzy_demo/models/model_mas_cust.dart';
 import 'package:warranzy_demo/page/login_first/scLogin.dart';
 import 'package:warranzy_demo/page/splash_screen/scSplash_screen.dart';
 import 'package:warranzy_demo/services/calls_and_message/calls_and_message.dart';
+import 'package:warranzy_demo/services/method/methode_helper.dart';
 import 'package:warranzy_demo/services/sqflit/db_customers.dart';
 import 'package:warranzy_demo/tools/assets.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
@@ -87,6 +88,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     color: ThemeColors.COLOR_WHITE,
                   ),
                   onPressed: () {
+                    MethodHelper.clearTimeZoneAndCountryCode();
                     ecsLib.pushPageAndClearAllScene(
                       context: context,
                       pageWidget: SplashScreenPage(),

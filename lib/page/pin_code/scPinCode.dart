@@ -9,10 +9,12 @@ import 'package:warranzy_demo/models/model_verify_login.dart';
 import 'package:warranzy_demo/page/login_first/scLogin.dart';
 import 'package:warranzy_demo/page/main_page/scMain_page.dart';
 import 'package:warranzy_demo/services/api/api_services_user.dart';
+import 'package:warranzy_demo/services/api/base_url.dart';
 import 'package:warranzy_demo/services/api/jwt_service.dart';
 import 'package:warranzy_demo/services/api_provider/api_bloc.dart';
 import 'package:warranzy_demo/services/api_provider/api_bloc_widget.dart';
 import 'package:warranzy_demo/services/api_provider/api_response.dart';
+import 'package:warranzy_demo/services/method/methode_helper.dart';
 import 'package:warranzy_demo/services/sqflit/db_customers.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/const.dart';
@@ -66,18 +68,16 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
     var dvID = pref?.getString("DeviceID");
     var pinCIde = dataCust?.pINcode;
     var custID = dataCust?.custUserID;
-    var countryCode = dataCust?.countryCode;
     var postData = {
       "DeviceID": dvID,
       "PINcode": pinCIde,
       "CustUserID": custID,
-      "TimeZone": await FlutterNativeTimezone.getLocalTimezone(),
-      "CountryCode": countryCode
+      "TimeZone": await MethodHelper.timeZone,
+      "CountryCode": await MethodHelper.countryCode
     };
     print("Data before send Api => $postData");
     ecsLib.showDialogLoadingLib(context);
-    await APIServiceUser.apiVerifyLogin(postData: postData)
-        .then((response) {
+    await APIServiceUser.apiVerifyLogin(postData: postData).then((response) {
       if (response?.status == true) {
         gotoMainPage();
       } else if (response?.status == false) {
@@ -480,7 +480,32 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
                             paddingValue: 0,
                             label: allTranslations.text("forgot_pin"),
                             onPressed: () async {
-                              print("forgot pin");
+                              print(DateTime.now());
+                              print(DateTime.now().toUtc());
+                              print(DateTime.now().timeZoneOffset);
+
+                              print(DateTime.now().timeZoneName);
+                              // Dio dio = Dio();
+                              // FormData form = FormData.from({
+                              //   "Time":
+                              //       "${DateTime.now().toUtc().toString()} ${DateTime.now().timeZoneOffset.toString()}"
+                              // });
+                              // print(form);
+                              // try {
+                              //   print("sendTime");
+                              //   ecsLib.showDialogLoadingLib(context);
+                              //   await dio
+                              //       .post(
+                              //           "http://192.168.0.36:9999/API/v1/User/TestTime",
+                              //           data: form)
+                              //       .then((response) {
+                              //     ecsLib.cancelDialogLoadindLib(context);
+                              //     print("response");
+                              //     print(response);
+                              //   });
+                              // } catch (e) {
+                              //   print("$e");
+                              // }
                               // print(await JWTService.getTokenJWT());
                             }),
                       ),
@@ -705,7 +730,7 @@ class _NewApiStructureState extends State<NewApiStructure> {
     "CustUserID": "ca3f58b3a0214aaaa68a",
     "PINcode": "111111",
     "DeviceID": "7BAE0E71-C3C2-4532-8C99-DCA7BB713A69",
-    "CountryCode": "TH",
+    "CountryCode": MethodHelper.timeZone,
     "TimeZone": "Asia/Bangkok"
   };
 

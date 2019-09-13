@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:intl/intl.dart';
 import 'package:warranzy_demo/models/model_asset_data.dart';
 import 'package:warranzy_demo/models/model_respository_asset.dart';
@@ -16,6 +17,7 @@ import 'package:warranzy_demo/services/api/api_service_assets.dart';
 import 'package:warranzy_demo/services/api/jwt_service.dart';
 import 'package:warranzy_demo/services/api_provider/api_bloc.dart';
 import 'package:warranzy_demo/services/api_provider/api_response.dart';
+import 'package:warranzy_demo/services/method/methode_helper.dart';
 import 'package:warranzy_demo/services/method/scan_qr.dart';
 import 'package:warranzy_demo/services/sqflit/db_asset.dart';
 import 'package:warranzy_demo/services/sqflit/db_customers.dart';
@@ -134,18 +136,23 @@ class _AssetPageState extends State<AssetPage> {
               return CircularProgressIndicator();
               break;
             case Status.COMPLETED:
-              return Column(
-                children: snapshot.data.data.data
-                    .map((data) => new MyAssetOnline(data: data))
-                    .toList(),
-              );
+              if (snapshot.data.data.data != null)
+                return Column(
+                  children: snapshot.data.data.data
+                      .map((data) => new MyAssetOnline(data: data))
+                      .toList(),
+                );
+              else {
+                return Text("Data is empty.");
+              }
               //
               break;
             case Status.ERROR:
-              return Error(
-                errorMessage: snapshot.data.message,
-                onRetryPressed: () => getAllAssetBloc.fetchData(),
-              );
+              return Text("${snapshot.data.message}");
+              // Error(
+              //   errorMessage: snapshot.data.message,
+              //   onRetryPressed: () => getAllAssetBloc.fetchData(),
+              // );
               break;
           }
         }
@@ -252,29 +259,31 @@ class _AssetPageState extends State<AssetPage> {
                   icon: Icon(Icons.sort),
                   tooltip: "Sort Asset",
                   onPressed: () async {
-                    try {
-                      var filePool = await DBProviderAsset.db
-                          .getAllDataFilePool()
-                          .catchError((onError) =>
-                              print("getAllDataFilePool => $onError"));
-                      var waranzyUsed = await DBProviderAsset.db
-                          .getAllDataWarranzyUsed()
-                          .catchError((onError) =>
-                              print("getAllDataWarranzyUsed => $onError"));
-                      var warranzyLog = await DBProviderAsset.db
-                          .getAllDataWarranzyLog()
-                          .catchError((onError) =>
-                              print("getAllDataWarranzyLog => $onError"));
+                    print(await MethodHelper.timeZone);
+                    print(await MethodHelper.countryCode);
+                    //   try {
+                    //     var filePool = await DBProviderAsset.db
+                    //         .getAllDataFilePool()
+                    //         .catchError((onError) =>
+                    //             print("getAllDataFilePool => $onError"));
+                    //     var waranzyUsed = await DBProviderAsset.db
+                    //         .getAllDataWarranzyUsed()
+                    //         .catchError((onError) =>
+                    //             print("getAllDataWarranzyUsed => $onError"));
+                    //     var warranzyLog = await DBProviderAsset.db
+                    //         .getAllDataWarranzyLog()
+                    //         .catchError((onError) =>
+                    //             print("getAllDataWarranzyLog => $onError"));
 
-                      filePool.forEach(
-                          (v) => print("filePool => ${v.fileDescription}"));
-                      waranzyUsed.forEach(
-                          (v) => print("waranzyUsed => ${v.custUserID}"));
-                      warranzyLog.forEach(
-                          (v) => print("warranzyLog => ${v.fileAttachID}"));
-                    } catch (e) {
-                      print(e);
-                    }
+                    //     filePool.forEach(
+                    //         (v) => print("filePool => ${v.fileDescription}"));
+                    //     waranzyUsed.forEach(
+                    //         (v) => print("waranzyUsed => ${v.custUserID}"));
+                    //     warranzyLog.forEach(
+                    //         (v) => print("warranzyLog => ${v.fileAttachID}"));
+                    //   } catch (e) {
+                    //     print(e);
+                    //   }
                   },
                 ),
               ),
@@ -282,13 +291,13 @@ class _AssetPageState extends State<AssetPage> {
                 child: IconButton(
                   icon: Icon(Icons.clear_all),
                   onPressed: () async {
-                    try {
-                      await DBProviderAsset.db
-                          .deleteAllAsset()
-                          .whenComplete(() => setState(() {
-                                getModelData = getModelDataAsset();
-                              }));
-                    } catch (e) {}
+                    // try {
+                    //   await DBProviderAsset.db
+                    //       .deleteAllAsset()
+                    //       .whenComplete(() => setState(() {
+                    //             getModelData = getModelDataAsset();
+                    //           }));
+                    // } catch (e) {}
                   },
                 ),
               )

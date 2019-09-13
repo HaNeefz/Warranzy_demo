@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:jaguar_jwt/jaguar_jwt.dart';
 import 'package:warranzy_demo/models/model_mas_cust.dart';
+import 'package:warranzy_demo/services/method/methode_helper.dart';
 import 'package:warranzy_demo/services/sqflit/db_customers.dart';
 
 class JWTService {
@@ -16,9 +17,9 @@ class JWTService {
         defaultIatExp: true,
         otherClaims: <String, dynamic>{
           "CustUserID": customer.custUserID,
-          "CountryCode": customer.countryCode,
+          "CountryCode": await MethodHelper.countryCode,
           "MobilePhone": customer.mobilePhone,
-          "TimeZone": await FlutterNativeTimezone.getLocalTimezone()
+          "TimeZone": await MethodHelper.timeZone
         },
         maxAge: Duration(minutes: 1));
 

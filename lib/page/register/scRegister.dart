@@ -14,6 +14,7 @@ import 'package:warranzy_demo/models/model_cust_temp_data.dart';
 import 'package:warranzy_demo/models/model_verify_phone.dart';
 import 'package:warranzy_demo/page/pin_code/scPinCode.dart';
 import 'package:warranzy_demo/services/api/api_services_user.dart';
+import 'package:warranzy_demo/services/method/methode_helper.dart';
 import 'package:warranzy_demo/services/providers/notification_state.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/const.dart';
@@ -110,7 +111,7 @@ class _RegisterState extends State<Register> {
     _fbKey.currentState.save();
     if (_fbKey.currentState.validate()) {
       if (checkSelectCountryAndBirthYear(context)) {
-        String currentTimeZone = await FlutterNativeTimezone.getLocalTimezone();
+        String currentTimeZone = await MethodHelper.timeZone;
         var deviceIDAndPlayerIDAndTimeZone = {
           "DeviceID": _dvID,
           "NotificationID": _notiID,
