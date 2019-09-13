@@ -1,6 +1,7 @@
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_picker/flutter_picker.dart';
 import 'package:keyboard_avoider/keyboard_avoider.dart';
 import 'package:warranzy_demo/models/model_get_brand_name.dart';
 import 'package:warranzy_demo/models/model_repository_init_app.dart';
@@ -61,12 +62,11 @@ class _FormDataAssetState extends State<FormDataAsset> {
   TextEditingController txtNote;
   TextEditingController txtSLCName;
 
-  // String _showDate = "-";
-  // String _valueDate = "";
   String brandActive = "N";
   var valueBrandName = "DysonElectric";
   List<GetBrandName> listBrandName = [];
   List<String> listBrandID = [];
+  String dataTime = '';
   Future<List<ProductCatagory>> getProductCategory;
   List<String> _place = [
     "Home",
@@ -94,6 +94,7 @@ class _FormDataAssetState extends State<FormDataAsset> {
       ButtonDatePickerCustom.setShowDate = _data?.warrantyExpire ?? "";
       txtWarranzyExpire =
           TextEditingController(text: ButtonDatePickerCustom.showDate);
+      dataTime = txtWarranzyExpire.text;
       txtAlertDate =
           TextEditingController(text: _data?.alertDateNo.toString() ?? "");
       txtPdtCat = TextEditingController(text: _data?.pdtCatCode ?? "");
@@ -259,16 +260,70 @@ class _FormDataAssetState extends State<FormDataAsset> {
                           child: autoCompleteTextField()),
                     )),
                 formWidget(
-                  title: "Warranzy Expire",
-                  necessary: true,
-                  child: ButtonDatePickerCustom.buttonDatePicker(context, () {
-                    print(ButtonDatePickerCustom.showDate);
-                    setState(() {
-                      // _showDate = ButtonDatePickerCustom.showDate;
-                      txtWarranzyExpire.text = ButtonDatePickerCustom.valueDate;
-                    });
-                  }),
-                ),
+                    title: "Warranzy Expire",
+                    necessary: true,
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: 50,
+                      child: RaisedButton(
+                        elevation: 0,
+                        color: Colors.grey[100],
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                        child: TextBuilder.build(title: dataTime),
+                        onPressed: () {
+                          Picker(
+                              itemExtent: 40,
+                              adapter: DateTimePickerAdapter(customColumnType: [
+                                0,
+                                1,
+                                2
+                              ], months: [
+                                allTranslations.text("jan"),
+                                allTranslations.text("feb"),
+                                allTranslations.text("mar"),
+                                allTranslations.text("apr"),
+                                allTranslations.text("may"),
+                                allTranslations.text("Jun"),
+                                allTranslations.text("jul"),
+                                allTranslations.text("aug"),
+                                allTranslations.text("sep"),
+                                allTranslations.text("oct"),
+                                allTranslations.text("nov"),
+                                allTranslations.text("dec")
+                              ]),
+                              delimiter: [PickerDelimiter(child: Container())],
+                              hideHeader: true,
+                              confirmText: allTranslations.text("confirm"),
+                              cancelText: allTranslations.text("cancel"),
+                              title: new Text("Please Select"),
+                              onConfirm: (Picker picker, List value) {
+                                print(
+                                    "Picker value : ${(picker.adapter as DateTimePickerAdapter).value}");
+                                setState(() {
+                                  dataTime =
+                                      (picker.adapter as DateTimePickerAdapter)
+                                          .value
+                                          .toString()
+                                          .split(" ")
+                                          .first;
+                                  txtWarranzyExpire.text =
+                                      (picker.adapter as DateTimePickerAdapter)
+                                          .value
+                                          .toString();
+                                });
+                              }).showDialog(context);
+                        },
+                      ),
+                    )
+                    // ButtonDatePickerCustom.buttonDatePicker(context, () {
+                    //   print(ButtonDatePickerCustom.showDate);
+                    //   setState(() {
+                    //     // _showDate = ButtonDatePickerCustom.showDate;
+                    //     txtWarranzyExpire.text = ButtonDatePickerCustom.valueDate;
+                    //   });
+                    // }),
+                    ),
                 formWidget(
                   title: "Optional",
                   child: Container(
@@ -602,6 +657,12 @@ class _FormDataAssetState extends State<FormDataAsset> {
                 ecsLib.showDialogLib(
                     context: context,
                     content: "Invalide Brand Name.",
+                    textOnButton: allTranslations.text("close"),
+                    title: "Warranzy");
+              } else if (txtWarranzyExpire.text == "") {
+                ecsLib.showDialogLib(
+                    context: context,
+                    content: "Invalide Warranty Expire.",
                     textOnButton: allTranslations.text("close"),
                     title: "Warranzy");
               } else {

@@ -463,7 +463,7 @@ class ModifytImageState extends State<ModifyImage> {
             .then((responseDetail) {
           ecsLib.cancelDialogLoadindLib(context);
           if (responseDetail.status == true) {
-            ecsLib.stepBackScene(context, 1);
+            ecsLib.stepBackScene(context, 2);
             ecsLib.pushPageReplacement(
               context: context,
               pageWidget: DetailAsset(

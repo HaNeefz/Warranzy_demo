@@ -125,7 +125,22 @@
     "forgot_pin":"Forgot PIN",
     "loading" : "Please waiting...",
 
-    "pin_incorrect" : "Pin Incorrect"
+    "pin_incorrect" : "Pin Incorrect",
+
+    "---------------Month":"---------------------",
+    "jan": "Jan","_comment_Month_january":"january",
+    "feb": "Feb","_comment_Month_february":"february",
+    "mar": "Mar","_comment_Month_Mar":"Mar",
+    "apr": "Apr","_comment_Month_april":"april",
+    "may": "May","_comment_Month_may":"may",
+    "Jun": "Jun","_comment_Month_June":"June",
+    "jul": "Jul","_comment_Month_july":"july",
+    "aug": "Aug","_comment_Month_august":"august",
+    "sep": "Sep","_comment_Month_september":"september",
+    "oct": "Oct","_comment_Month_october":"october",
+    "nov": "Nov","_comment_Month_november":"november",
+    "dec": "Dec","_comment_Month_december":"december"
+    
 
 
     
