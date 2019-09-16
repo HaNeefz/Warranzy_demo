@@ -98,13 +98,18 @@ class _AddImageDemoState extends State<AddImageDemo> {
                           ),
                           onTap: () async {
                             List<File> images = await ecsLib.pushPage(
-                                context: context, pageWidget: TakePhotos());
+                                context: context,
+                                pageWidget: TakePhotos(
+                                  title: data.title,
+                                  images: data.imagesList,
+                                ));
                             setState(() {
                               if (images != null) {
                                 print("return Images = ${images.length}");
+                                data.imagesList = images;
+                                data.imageBase64.clear();
                                 for (var fileImage in images) {
-                                  data.imagesList.add(fileImage);
-                                  data.imageBase64.add("temp");
+                                  data.imageBase64.add("${fileImage.path}");
                                 }
                                 print(data.imagesList.length);
                               }
@@ -230,7 +235,9 @@ class _AddImageDemoState extends State<AddImageDemo> {
 }
 
 class TakePhotos extends StatefulWidget {
-  TakePhotos({Key key}) : super(key: key);
+  final String title;
+  final List<File> images;
+  TakePhotos({Key key, this.title, this.images}) : super(key: key);
 
   _TakePhotosState createState() => _TakePhotosState();
 }
@@ -238,49 +245,56 @@ class TakePhotos extends StatefulWidget {
 class _TakePhotosState extends State<TakePhotos> {
   final ecsLib = getIt.get<ECSLib>();
   final allTranslations = getIt.get<GlobalTranslations>();
-  List<File> images = List<File>();
+  List<File> images;
+  @override
+  void initState() {
+    super.initState();
+    images = widget.images;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           title: Text(
-            'Take a Photos',
+            widget.title ?? 'Take a Photos',
             style: TextStyleCustom.STYLE_APPBAR,
           ),
-          
-          actions: <Widget>[
-            FlatButton(
-              child: TextBuilder.build(title: "Save"),
+          leading: IconButton(
+              icon: Icon(Icons.arrow_back_ios),
               onPressed: () {
                 Navigator.pop(context, images);
-              },
-            )
-          ],
+              }),
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Center(
-            child: images.length > 0
-                ? Column(
-                    children: <Widget>[
-                      if (images.isNotEmpty && images.length > 0)
-                        ImageListBuilder.build(
-                            context: context,
-                            imageData: images,
-                            crossAxisCount: 2,
-                            heroTag: "imageOld",
-                            editAble: true,
-                            onClicked: (index) {
-                              print("ImageOld indexOf($index)");
-                              if (images.length > 0)
-                                setState(() {
-                                  images.removeAt(index);
-                                });
-                            }),
-                    ],
-                  )
-                : TextBuilder.build(
-                    title: "Empty photos, Please take a photos."),
+        body: WillPopScope(
+          onWillPop: () async {
+            return false;
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Center(
+              child: images.length > 0
+                  ? Column(
+                      children: <Widget>[
+                        if (images.isNotEmpty && images.length > 0)
+                          ImageListBuilder.build(
+                              context: context,
+                              imageData: images,
+                              crossAxisCount: 2,
+                              heroTag: "imageOld",
+                              editAble: true,
+                              onClicked: (index) {
+                                print("ImageOld indexOf($index)");
+                                if (images.length > 0)
+                                  setState(() {
+                                    images.removeAt(index);
+                                  });
+                              }),
+                      ],
+                    )
+                  : TextBuilder.build(
+                      title: "Empty photos, Please take a photos."),
+            ),
           ),
         ),
         floatingActionButton: Column(

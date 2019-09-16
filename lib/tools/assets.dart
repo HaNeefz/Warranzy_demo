@@ -8,6 +8,10 @@ class Assets {
   static const String ICON_FINGER_PRINT = "assets/icons/fingerprint.png";
   static const String ICON_SCANNER = "assets/icons/scanner.png";
   static const String ICON_BARCODE = "assets/icons/barcode.png";
+  static const String ICON_ASSET = "assets/icons/Asset.png";
+  static const String ICON_SERVICE = "assets/icons/Service.png";
+  static const String ICON_TRADE = "assets/icons/Trade.png";
+  static const String ICON_NOTIFICATION = "assets/icons/Notification.png";
 
   static const String ICON_APP_TRANSPARENT =
       "assets/logo/warranzy_logo_transparent.png";
