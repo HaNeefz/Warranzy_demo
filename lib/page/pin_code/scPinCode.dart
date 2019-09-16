@@ -112,9 +112,6 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
         Duration(milliseconds: 200),
         () => localAuth.authenticate().then((_authorized) async {
               if (_authorized) {
-                ecsLib.showDialogLoadingLib(
-                  context,
-                );
                 sendApiLogin();
               }
             }));
