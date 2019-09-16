@@ -247,6 +247,7 @@ class _TakePhotosState extends State<TakePhotos> {
             'Take a Photos',
             style: TextStyleCustom.STYLE_APPBAR,
           ),
+          
           actions: <Widget>[
             FlatButton(
               child: TextBuilder.build(title: "Save"),
