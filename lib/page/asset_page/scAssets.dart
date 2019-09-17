@@ -490,18 +490,15 @@ class _MyAssetFormSQLiteState extends State<MyAssetFormSQLite> {
         child: ListTile(
           title: Row(
             children: <Widget>[
-              Expanded(
-                flex: 1,
-                child: Container(
-                  width: 150,
-                  height: 150,
-                  decoration: BoxDecoration(
-                      border: Border.all(
-                          width: 0.3, color: ThemeColors.COLOR_THEME_APP),
-                      borderRadius: BorderRadius.circular(10)),
-                  child: Center(
-                    child: FlutterLogo(),
-                  ),
+              Container(
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                    border: Border.all(
+                        width: 0.3, color: ThemeColors.COLOR_THEME_APP),
+                    borderRadius: BorderRadius.circular(10)),
+                child: Center(
+                  child: FlutterLogo(),
                 ),
               ),
               Expanded(
@@ -521,14 +518,13 @@ class _MyAssetFormSQLiteState extends State<MyAssetFormSQLite> {
                           maxLine: 2),
                       TextBuilder.build(
                           title:
-                              "\nExpire Date : ${widget.data.warrantyExpire}" ??
-                                  "Empty warrantyExpire",
+                              "\nExpire Date : ${widget.data.warrantyExpire.split(" ").first ?? "Empty warrantyExpire"}\nRemaining : ${DateTime.now().difference(DateTime.parse(widget.data.warrantyExpire)).toString().split(".").first} h/s",
                           style: TextStyleCustom.STYLE_CONTENT
                               .copyWith(fontSize: 12),
                           textOverflow: TextOverflow.ellipsis,
-                          maxLine: 2),
+                          maxLine: 3),
                       Container(
-                        margin: EdgeInsets.all(5),
+                        margin: EdgeInsets.fromLTRB(0, 5, 5, 5),
                         padding:
                             EdgeInsets.symmetric(horizontal: 5, vertical: 5),
                         decoration: BoxDecoration(
@@ -599,23 +595,32 @@ class _MyAssetOnlineState extends State<MyAssetOnline> {
       child: ListTile(
         title: Row(
           children: <Widget>[
-            CachedNetworkImage(
-              imageUrl: widget.data.imageMain,
-              imageBuilder: (context, imageProvider) => Container(
-                width: 150,
-                height: 150,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  image: DecorationImage(
-                      image: imageProvider,
-                      fit: BoxFit.cover,
-                      colorFilter:
-                          ColorFilter.mode(Colors.red, BlendMode.dstATop)),
+            if (widget.data.imageMain != null)
+              CachedNetworkImage(
+                imageUrl: widget.data.imageMain,
+                imageBuilder: (context, imageProvider) => Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    image: DecorationImage(
+                        image: imageProvider,
+                        fit: BoxFit.cover,
+                        colorFilter:
+                            ColorFilter.mode(Colors.red, BlendMode.dstATop)),
+                  ),
                 ),
+                placeholder: (context, url) => CircularProgressIndicator(),
+                errorWidget: (context, url, error) => Icon(
+                  Icons.error,
+                  size: 100,
+                ),
+              )
+            else
+              Icon(
+                Icons.error,
+                size: 100,
               ),
-              placeholder: (context, url) => CircularProgressIndicator(),
-              errorWidget: (context, url, error) => Icon(Icons.error),
-            ),
             Expanded(
               flex: 2,
               child: Padding(
@@ -637,7 +642,7 @@ class _MyAssetOnlineState extends State<MyAssetOnline> {
                         maxLine: 3,
                         textOverflow: TextOverflow.ellipsis),
                     TextBuilder.build(
-                        title: "Warranty Date " +
+                        title: "Warranty Expired " +
                                 "${widget.data.warrantyExpire.split(" ")?.first}" ??
                             "Empty",
                         style: TextStyleCustom.STYLE_CONTENT
@@ -645,7 +650,7 @@ class _MyAssetOnlineState extends State<MyAssetOnline> {
                         maxLine: 1,
                         textOverflow: TextOverflow.ellipsis),
                     Container(
-                      margin: EdgeInsets.all(5),
+                      margin: EdgeInsets.fromLTRB(0, 5, 5, 5),
                       padding: EdgeInsets.only(left: 5, right: 5),
                       decoration: BoxDecoration(
                           color: ThemeColors.COLOR_GREY.withOpacity(0.2),

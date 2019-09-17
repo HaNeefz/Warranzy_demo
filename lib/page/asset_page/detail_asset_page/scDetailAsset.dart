@@ -21,6 +21,7 @@ import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/button_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/carouselImage.dart';
+import 'package:warranzy_demo/tools/widget_ui_custom/image_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/loading_api.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/error_api.dart';
