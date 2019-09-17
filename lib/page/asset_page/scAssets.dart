@@ -518,7 +518,7 @@ class _MyAssetFormSQLiteState extends State<MyAssetFormSQLite> {
                           maxLine: 2),
                       TextBuilder.build(
                           title:
-                              "\nExpire Date : ${widget.data.warrantyExpire.split(" ").first ?? "Empty warrantyExpire"}\nRemaining : ${DateTime.now().difference(DateTime.parse(widget.data.warrantyExpire)).toString().split(".").first} h/s",
+                              "\nExpire Date : ${widget.data.warrantyExpire.split(" ").first ?? "Empty warrantyExpire"}\nRemaining : ${showDateRemaining(widget.data.warrantyExpire)}",
                           style: TextStyleCustom.STYLE_CONTENT
                               .copyWith(fontSize: 12),
                           textOverflow: TextOverflow.ellipsis,
@@ -553,6 +553,18 @@ class _MyAssetFormSQLiteState extends State<MyAssetFormSQLite> {
         ),
       ),
     );
+  }
+
+  String showDateRemaining(String dateTime) {
+    int date = DateTime.parse(dateTime).difference(DateTime.now()).inDays;
+    int hours = DateTime.parse(dateTime).difference(DateTime.now()).inHours;
+    if (date > 0) {
+      return "$date day.";
+    } else if (date == 0 && hours > 0) {
+      return "$hours hours.";
+    } else {
+      return "Expired";
+    }
   }
 }
 
