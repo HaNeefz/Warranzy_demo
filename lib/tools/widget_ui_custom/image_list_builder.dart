@@ -240,43 +240,73 @@ class _PhotoViewPageState extends State<PhotoViewPage> {
                         inertialSpeed: 100,
                         inPageView: false);
                   },
-                  initEditorConfigHandler: (state) {
-                    return EditorConfig(
-                      maxScale: 8.0,
-                      cropRectPadding: EdgeInsets.all(20.0),
-                      hitTestSize: 20.0,
-                    );
-                  },
+                  // initEditorConfigHandler: (state) {
+                  //   return EditorConfig(
+                  //     maxScale: 8.0,
+                  //     cropRectPadding: EdgeInsets.all(20.0),
+                  //     hitTestSize: 20.0,
+                  //   );
+                  // },
                 )
-              : ExtendedImage.memory(
-                  widget.image[index],
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height,
-                  enableSlideOutPage: true,
-                  mode: ExtendedImageMode.gesture,
-                  filterQuality: FilterQuality.high,
-                  fit: BoxFit.contain,
-                  clearMemoryCacheIfFailed: true,
-                  enableMemoryCache: true,
-                  initGestureConfigHandler: (state) {
-                    return GestureConfig(
-                        minScale: 0.9,
-                        animationMinScale: 0.7,
-                        maxScale: 3.0,
-                        animationMaxScale: 3.5,
-                        speed: 1.0,
-                        initialScale: 1.0,
-                        inertialSpeed: 100,
-                        inPageView: false);
-                  },
-                  initEditorConfigHandler: (state) {
-                    return EditorConfig(
-                      maxScale: 8.0,
-                      cropRectPadding: EdgeInsets.all(20.0),
-                      hitTestSize: 20.0,
-                    );
-                  },
-                ), //Image.file(widget.image),
+              : widget.image is List<String>
+                  ? ExtendedImage.network(
+                      widget.image[index],
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height,
+                      enableSlideOutPage: true,
+                      mode: ExtendedImageMode.gesture,
+                      filterQuality: FilterQuality.high,
+                      fit: BoxFit.contain,
+                      clearMemoryCacheIfFailed: true,
+                      enableMemoryCache: true,
+                      initGestureConfigHandler: (state) {
+                        return GestureConfig(
+                            minScale: 0.9,
+                            animationMinScale: 0.7,
+                            maxScale: 3.0,
+                            animationMaxScale: 3.5,
+                            speed: 1.0,
+                            initialScale: 1.0,
+                            inertialSpeed: 100,
+                            inPageView: false);
+                      },
+                      // initEditorConfigHandler: (state) {
+                      //   return EditorConfig(
+                      //     maxScale: 8.0,
+                      //     cropRectPadding: EdgeInsets.all(20.0),
+                      //     hitTestSize: 20.0,
+                      //   );
+                      // },
+                    )
+                  : ExtendedImage.memory(
+                      widget.image[index],
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height,
+                      enableSlideOutPage: true,
+                      mode: ExtendedImageMode.gesture,
+                      filterQuality: FilterQuality.high,
+                      fit: BoxFit.contain,
+                      clearMemoryCacheIfFailed: true,
+                      enableMemoryCache: true,
+                      initGestureConfigHandler: (state) {
+                        return GestureConfig(
+                            minScale: 0.9,
+                            animationMinScale: 0.7,
+                            maxScale: 3.0,
+                            animationMaxScale: 3.5,
+                            speed: 1.0,
+                            initialScale: 1.0,
+                            inertialSpeed: 100,
+                            inPageView: false);
+                      },
+                      // initEditorConfigHandler: (state) {
+                      //   return EditorConfig(
+                      //     maxScale: 8.0,
+                      //     cropRectPadding: EdgeInsets.all(20.0),
+                      //     hitTestSize: 20.0,
+                      //   );
+                      // },
+                    ), //Image.file(widget.image),
           slideAxis: SlideAxis.vertical,
           slideType: SlideType.onlyImage,
           resetPageDuration: Duration(milliseconds: 300),

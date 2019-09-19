@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:warranzy_demo/page/asset_page/add_edit_asset.dart' as Asset;
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/const.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/form_data_asset.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
+
+import '../add_edit_asset.dart';
 
 class FillInformation extends StatefulWidget {
   final PageAction onClickAddAssetPage;
@@ -26,13 +29,6 @@ class _FillInformationState extends State<FillInformation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: TextBuilder.build(
-            title:
-                widget.hasDataAssetAlready == true ? "Edit Asset" : "New Asset",
-            style: TextStyleCustom.STYLE_APPBAR),
-      ),
       body: checkActionPage(page),
     );
   }
@@ -40,10 +36,16 @@ class _FillInformationState extends State<FillInformation> {
   Widget checkActionPage(PageAction page) {
     switch (page) {
       case PageAction.MANUAL_ADD:
-        return FormDataAsset(
-          onClickAddAssetPage: page,
-          actionPageForAdd: true,
-        );
+        return FormDataAssetTest(
+            modelDataAsset: null,
+            categoryID: null,
+            actionPageForAdd: true,
+            pageType: Asset.PageType.MANUAL,
+            listImageDataEachGroup: []);
+        // FormDataAsset(
+        //   onClickAddAssetPage: page,
+        //   actionPageForAdd: true,
+        // );
         break;
       case PageAction.SCAN_QR_CODE:
         return Column(

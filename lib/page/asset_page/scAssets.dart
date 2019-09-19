@@ -205,7 +205,7 @@ class _AssetPageState extends State<AssetPage> {
               );
             else {
               return Center(
-                child: TextBuilder.build(title: "Data is empty"),
+                child: TextBuilder.build(title: "Data offline is empty"),
               );
             }
           } else {
@@ -221,6 +221,7 @@ class _AssetPageState extends State<AssetPage> {
   }
 
   Row buildLabelAndSeeAll() {
+    List<String> _popUpItem = ["Search", "Sort"];
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
@@ -254,53 +255,34 @@ class _AssetPageState extends State<AssetPage> {
                   // await checkSessionExpired();
                 },
               ),
-              Expanded(
-                child: IconButton(
-                  icon: Icon(Icons.sort),
-                  tooltip: "Sort Asset",
-                  onPressed: () async {
-                    print(await MethodHelper.timeZone);
-                    print(await MethodHelper.countryCode);
-                    //   try {
-                    //     var filePool = await DBProviderAsset.db
-                    //         .getAllDataFilePool()
-                    //         .catchError((onError) =>
-                    //             print("getAllDataFilePool => $onError"));
-                    //     var waranzyUsed = await DBProviderAsset.db
-                    //         .getAllDataWarranzyUsed()
-                    //         .catchError((onError) =>
-                    //             print("getAllDataWarranzyUsed => $onError"));
-                    //     var warranzyLog = await DBProviderAsset.db
-                    //         .getAllDataWarranzyLog()
-                    //         .catchError((onError) =>
-                    //             print("getAllDataWarranzyLog => $onError"));
-
-                    //     filePool.forEach(
-                    //         (v) => print("filePool => ${v.fileDescription}"));
-                    //     waranzyUsed.forEach(
-                    //         (v) => print("waranzyUsed => ${v.custUserID}"));
-                    //     warranzyLog.forEach(
-                    //         (v) => print("warranzyLog => ${v.fileAttachID}"));
-                    //   } catch (e) {
-                    //     print(e);
-                    //   }
-                  },
-                ),
+              PopupMenuButton(
+                icon: Icon(Icons.more_vert),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                elevation: 5,
+                itemBuilder: (BuildContext context) {
+                  return _popUpItem.map((String choice) {
+                    return PopupMenuItem(
+                      value: choice,
+                      child: Text(choice),
+                    );
+                  }).toList();
+                },
               ),
-              Expanded(
-                child: IconButton(
-                  icon: Icon(Icons.clear_all),
-                  onPressed: () async {
-                    // try {
-                    //   await DBProviderAsset.db
-                    //       .deleteAllAsset()
-                    //       .whenComplete(() => setState(() {
-                    //             getModelData = getModelDataAsset();
-                    //           }));
-                    // } catch (e) {}
-                  },
-                ),
-              )
+              // Expanded(
+              //   child: IconButton(
+              //     icon: Icon(Icons.clear_all),
+              //     onPressed: () async {
+              //       try {
+              //         await DBProviderAsset.db
+              //             .deleteAllAsset()
+              //             .whenComplete(() => setState(() {
+              //                   getModelData = getModelDataAsset();
+              //                 }));
+              //       } catch (e) {}
+              //     },
+              //   ),
+              // )
             ],
           ),
         )),

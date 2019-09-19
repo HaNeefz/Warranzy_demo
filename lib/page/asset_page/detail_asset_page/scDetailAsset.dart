@@ -1,34 +1,28 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:dio/dio.dart';
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_animations/simple_animations.dart';
-import 'package:warranzy_demo/models/model_asset_data.dart';
 import 'package:warranzy_demo/models/model_respository_asset.dart';
 import 'package:warranzy_demo/page/asset_page/add_assets_page/scAdd_image_demo.dart';
-import 'package:warranzy_demo/page/asset_page/add_assets_page/scFillInformation.dart';
-import 'package:warranzy_demo/page/asset_page/detail_asset_page/scTranfer_asset.dart';
+import 'package:warranzy_demo/page/asset_page/add_edit_asset.dart';
 import 'package:warranzy_demo/page/main_page/scMain_page.dart';
 import 'package:warranzy_demo/services/api/api_service_assets.dart';
 import 'package:warranzy_demo/services/api_provider/api_bloc.dart';
 import 'package:warranzy_demo/services/api_provider/api_response.dart';
 import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
-import 'package:warranzy_demo/tools/const.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/button_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/carouselImage.dart';
-import 'package:warranzy_demo/tools/widget_ui_custom/image_builder.dart';
+import 'package:warranzy_demo/tools/widget_ui_custom/image_list_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/loading_api.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/error_api.dart';
 
 import 'scEditDetailAsset.dart';
-import 'scRequest_service.dart';
-import 'scTrade_asset.dart';
 
 class LoadingDetailAsset extends StatefulWidget {
   final ModelDataAsset dataAsset;
@@ -139,11 +133,12 @@ class _DetailAssetState extends State<DetailAsset> {
     });
   }
 
-  goToEditPageForEditImage(bool edit) {
+  goToEditPageForEditImage(bool editImage) {
+    // if (editImage == true)
     ecsLib.pushPage(
       context: context,
       pageWidget: EditDetailAsset(
-        editingImage: edit,
+        editingImage: editImage,
         modelDataAsset: _data,
         imageDataEachGroup: imageDataEachGroup,
       ),
@@ -156,6 +151,27 @@ class _DetailAssetState extends State<DetailAsset> {
     );
   }
 
+  Widget containerButton(IconData icons, {Function onPressed}) {
+    return Container(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Colors.transparent,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.teal,
+            spreadRadius: 2,
+            blurRadius: 30,
+          ),
+        ],
+      ),
+      child: IconButton(
+        icon: Icon(icons),
+        color: Colors.white,
+        onPressed: onPressed,
+      ),
+    );
+  }
+
   Container buildDetailAsset(BuildContext context) {
     return Container(
       child: CustomScrollView(
@@ -165,33 +181,13 @@ class _DetailAssetState extends State<DetailAsset> {
             expandedHeight: 300,
             backgroundColor: ThemeColors.COLOR_WHITE,
             automaticallyImplyLeading: false,
-            leading: IconButton(
-              icon: Icon(
-                Icons.arrow_back_ios,
-                color: ThemeColors.COLOR_BLACK,
-              ),
-              onPressed: () => Navigator.pop(context),
-            ),
+            leading: containerButton(Icons.arrow_back_ios,
+                onPressed: () => Navigator.pop(context)),
             actions: <Widget>[
               widget.editAble == true
                   ? widget.showDetailOnline == true
-                      ? Container(
-                          width: 80,
-                          height: 80,
-                          child: Center(
-                            child: RaisedButton(
-                              shape: CircleBorder(),
-                              color: Colors.teal,
-                              child: Icon(
-                                Icons.edit,
-                                color: Colors.white,
-                              ),
-                              onPressed: () {
-                                goToEditPageForEditImage(true);
-                              },
-                            ),
-                          ),
-                        )
+                      ? containerButton(Icons.mode_edit,
+                          onPressed: () => goToEditPageForEditImage(true))
                       : Container()
                   : Container()
             ],
@@ -202,24 +198,37 @@ class _DetailAssetState extends State<DetailAsset> {
                 items: listImageUrl != null && listImageUrl.length > 0
                     ? Iterable.generate(
                         listImageUrl.length,
-                        (i) => CachedNetworkImage(
-                          imageUrl: listImageUrl[i],
-                          imageBuilder: (context, imageProvider) => Container(
-                            width: 150,
-                            height: 150,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(40),
-                              image: DecorationImage(
-                                  image: imageProvider,
-                                  fit: BoxFit.cover,
-                                  colorFilter: ColorFilter.mode(
-                                      Colors.red, BlendMode.dstATop)),
+                        (i) => GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).push(
+                                TransparentMaterialPageRoute(
+                                    fullscreenDialog: true,
+                                    builder: (BuildContext context) =>
+                                        PhotoViewPage(
+                                          image: listImageUrl,
+                                          heroTag: "image$i",
+                                          currentIndex: i,
+                                        )));
+                          },
+                          child: CachedNetworkImage(
+                            imageUrl: listImageUrl[i],
+                            imageBuilder: (context, imageProvider) => Container(
+                              width: 150,
+                              height: 150,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(40),
+                                image: DecorationImage(
+                                    image: imageProvider,
+                                    fit: BoxFit.cover,
+                                    colorFilter: ColorFilter.mode(
+                                        Colors.red, BlendMode.dstATop)),
+                              ),
                             ),
+                            placeholder: (context, url) =>
+                                Center(child: CircularProgressIndicator()),
+                            errorWidget: (context, url, error) =>
+                                Icon(Icons.error),
                           ),
-                          placeholder: (context, url) =>
-                              Center(child: CircularProgressIndicator()),
-                          errorWidget: (context, url, error) =>
-                              Icon(Icons.error),
                         ),
                       ).toList()
                     : Iterable.generate(4, (i) => testImage()).toList()),
@@ -254,7 +263,14 @@ class _DetailAssetState extends State<DetailAsset> {
           children: <Widget>[
             buildProductPhotoByCustomerEdit(),
             buildLastAssetInformation(),
-            if (widget.showDetailOnline == true) buildButtonDelete(context)
+            if (widget.showDetailOnline == true)
+              Column(
+                children: <Widget>[
+                  buildButtonDuplicate(context),
+                  SizedBox(height: 10),
+                  buildButtonDelete(context),
+                ],
+              )
           ],
         );
         break;
@@ -352,7 +368,10 @@ class _DetailAssetState extends State<DetailAsset> {
 
   Widget buildButtonDelete(BuildContext context) {
     return ButtonBuilder.buttonCustom(
-        paddingValue: 5,
+        paddingValue: 0,
+        colorsButton: Colors.red[200],
+        labelStyle:
+            TextStyleCustom.STYLE_LABEL_BOLD.copyWith(color: Colors.white),
         context: context,
         label: allTranslations.text("delete"),
         onPressed: () async {
@@ -388,6 +407,25 @@ class _DetailAssetState extends State<DetailAsset> {
               }
             }
           });
+        });
+  }
+
+  Widget buildButtonDuplicate(BuildContext context) {
+    return ButtonBuilder.buttonCustom(
+        paddingValue: 0,
+        context: context,
+        label: "Duplicate",
+        onPressed: () async {
+          print("Duplicate");
+          ecsLib.pushPage(
+            context: context,
+            pageWidget: FormDataAssetTest(
+                modelDataAsset: _data,
+                categoryID: null,
+                actionPageForAdd: true,
+                pageType: PageType.MANUAL,
+                listImageDataEachGroup: []),
+          );
         });
   }
 
@@ -495,6 +533,14 @@ class _DetailAssetState extends State<DetailAsset> {
                       icon: Icon(Icons.edit),
                       onPressed: () {
                         goToEditPageForEditImage(false);
+                        // ecsLib.pushPage(
+                        //     context: context,
+                        //     pageWidget: FormDataAssetTest(
+                        //       actionPageForAdd: false,
+                        //       modelDataAsset: _data,
+                        //       pageType: PageType.MANUAL,
+                        //       listImageDataEachGroup: imageDataEachGroup,
+                        //     ));
                       },
                     )
                   : Container()

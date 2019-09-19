@@ -66,7 +66,8 @@ class _EditDetailAssetState extends State<EditDetailAsset> {
         );
         break;
       case false:
-        return EditInformation(
+        return FormDataAsset(
+          actionPageForAdd: false,
           modelDataAsset: _data,
         );
         break;
@@ -76,24 +77,17 @@ class _EditDetailAssetState extends State<EditDetailAsset> {
   }
 }
 
-class EditInformation extends StatelessWidget {
-  final ModelDataAsset modelDataAsset;
-  const EditInformation({Key key, this.modelDataAsset}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-        child: FormDataAsset(
-      actionPageForAdd: false,
-      modelDataAsset: modelDataAsset,
-    ));
-  }
-}
-
 class EditImages extends StatefulWidget {
   final ModelDataAsset modelDataAsset;
+  final bool editImageForAdd;
   final List<ImageDataEachGroup> imageEachGroup;
-  const EditImages({Key key, this.modelDataAsset, this.imageEachGroup})
+  final String categoryID;
+  const EditImages(
+      {Key key,
+      this.modelDataAsset,
+      this.imageEachGroup,
+      this.editImageForAdd = true,
+      this.categoryID})
       : super(key: key);
   @override
   _EditImagesState createState() => _EditImagesState();
@@ -104,6 +98,8 @@ class _EditImagesState extends State<EditImages> {
   final ecsLib = getIt.get<ECSLib>();
   ModelDataAsset get _data => widget.modelDataAsset;
   List<ImageDataEachGroup> get imageEachGroup => widget.imageEachGroup;
+  bool get editImageForAdd => widget.editImageForAdd;
+  String get categoryID => widget.categoryID;
   List<ImageDataEachGroup> listTempData;
   RelatedImage relatedImage;
   List<String> listRelated = [];
@@ -111,40 +107,43 @@ class _EditImagesState extends State<EditImages> {
   List<String> imageOld = [];
   List<Uint8List> image = [];
 
-  getProductCat() async {
+  getProductCat([String categoryID]) async {
+    // print("CatID => $categoryID");
     var res = await DBProviderInitialApp.db
-        .getDataProductCategoryByID(_data.pdtCatCode);
+        .getDataProductCategoryByID(categoryID ?? _data.pdtCatCode);
     relatedImage = RelatedImage(category: res);
     listRelated = relatedImage.listRelatedImage();
     tempListRelated = List.of(listRelated);
-    print(listRelated);
-    print(
-        "listTempData Old => ${listTempData.length} is ${listTempData.first.title}");
+    print("Related => $tempListRelated");
     for (var tempData in listTempData) {
       print("${listTempData.indexOf(tempData)} => ${tempData.title}");
-      for (var tempReleted in tempListRelated) {
+      for (var tempReleted in listRelated) {
         if (tempReleted == tempData.title) {
-          print("Remove cause :$tempReleted == ${tempData.title}");
-          print("Data listRelated before rm => ${listRelated.length} items");
-          listRelated.removeAt(tempListRelated.indexOf(tempReleted));
-          print("Data listRelated After rm => ${listRelated.length} items");
+          tempListRelated.removeAt(tempListRelated.indexOf(tempReleted));
+          print("rm => $tempListRelated");
         }
       }
     }
-    listRelated.forEach((v) {
+    tempListRelated.forEach((v) {
       setState(() {
         listTempData.add(ImageDataEachGroup(
             title: v, imageUrl: [], imageBase64: [], imagesList: []));
       });
     });
+    print("compact => $listRelated");
   }
 
   @override
   void initState() {
     super.initState();
-    listTempData = List.of(imageEachGroup);
-    getProductCat();
-    getImageToBase64();
+    listTempData = List.of(imageEachGroup ?? []);
+    if (editImageForAdd == false) {
+      getProductCat();
+      getImageToBase64();
+    } else {
+      print("editImageForAdd => $editImageForAdd");
+      getProductCat(categoryID);
+    }
   }
 
   Future<List<Uint8List>> getImageToBase64() async {
@@ -167,6 +166,7 @@ class _EditImagesState extends State<EditImages> {
     return SingleChildScrollView(
       child: Column(
         children: <Widget>[
+          // Text("EIeie")
           Column(
             children: listTempData.map((v) => buildDetialEachGroup(v)).toList(),
           ),
@@ -182,7 +182,7 @@ class _EditImagesState extends State<EditImages> {
           title: Text("${v.title}"),
           trailing: Container(
             // color: Colors.red,
-            width: 150,
+            width: 100,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
@@ -254,101 +254,116 @@ class ModifytImageState extends State<ModifyImage> {
   }
 
   alert(String content) {}
-
+  List returnImage = [];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: TextBuilder.build(
             title: "Modify Image", style: TextStyleCustom.STYLE_APPBAR),
+        automaticallyImplyLeading: true,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios),
+          onPressed: () {
+            // returnImage.add(imageOld);
+            // returnImage.add(imageNew);
+            // Navigator.pop(context, returnImage);
+            Navigator.pop(context);
+          },
+        ),
         actions: <Widget>[
           FlatButton(
               child: TextBuilder.build(title: allTranslations.text("submit")),
               onPressed: submitUpdateImage)
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: ListView(
-          shrinkWrap: true,
-          children: <Widget>[
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                TextBuilder.build(
-                    title: "${imageDataEachGroup.title}",
-                    style: TextStyleCustom.STYLE_TITLE),
-                SizedBox(height: 5),
-                SizedBox(height: 5),
-                FutureBuilder<List<Uint8List>>(
-                  future: tempImageLoading,
-                  builder: (BuildContext context,
-                      AsyncSnapshot<List<Uint8List>> snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done) {
-                      if (snapshot.hasError) {
-                        return Text("Error");
+      body: WillPopScope(
+        onWillPop: () async {
+          return false;
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ListView(
+            shrinkWrap: true,
+            children: <Widget>[
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  TextBuilder.build(
+                      title: "${imageDataEachGroup.title}",
+                      style: TextStyleCustom.STYLE_TITLE),
+                  SizedBox(height: 5),
+                  SizedBox(height: 5),
+                  FutureBuilder<List<Uint8List>>(
+                    future: tempImageLoading,
+                    builder: (BuildContext context,
+                        AsyncSnapshot<List<Uint8List>> snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        if (snapshot.hasError) {
+                          return Text("Error");
+                        } else {
+                          var data = snapshot.data;
+                          return Container(
+                              child: Column(
+                            children: <Widget>[
+                              if (data.isNotEmpty && data.length > 0)
+                                Column(
+                                  children: <Widget>[
+                                    Center(
+                                        child: TextBuilder.build(
+                                            title: "Old Image")),
+                                    ImageListBuilder.build(
+                                        context: context,
+                                        imageData: data,
+                                        heroTag: "imageOld",
+                                        editAble: true,
+                                        onClicked: (index) {
+                                          print("ImageOld indexOf($index)");
+                                          if (data.length > 1)
+                                            setState(() {
+                                              imageOld.removeAt(index);
+                                            });
+                                        }),
+                                  ],
+                                )
+                            ],
+                          ));
+                        }
+                      } else if (snapshot.connectionState ==
+                          ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
                       } else {
-                        var data = snapshot.data;
-                        return Container(
-                            child: Column(
-                          children: <Widget>[
-                            if (data.isNotEmpty && data.length > 0)
-                              Column(
-                                children: <Widget>[
-                                  Center(
-                                      child: TextBuilder.build(
-                                          title: "Old Image")),
-                                  ImageListBuilder.build(
-                                      context: context,
-                                      imageData: data,
-                                      heroTag: "imageOld",
-                                      editAble: true,
-                                      onClicked: (index) {
-                                        print("ImageOld indexOf($index)");
-                                        if (data.length > 1)
-                                          setState(() {
-                                            imageOld.removeAt(index);
-                                          });
-                                      }),
-                                ],
-                              )
-                          ],
-                        ));
+                        return Text("Something wrong...!");
                       }
-                    } else if (snapshot.connectionState ==
-                        ConnectionState.waiting) {
-                      return Center(child: CircularProgressIndicator());
-                    } else {
-                      return Text("Something wrong...!");
-                    }
-                  },
-                ),
-                SizedBox(height: 20),
-                imageNew.length > 0
-                    ? Column(
-                        children: <Widget>[
-                          TextBuilder.build(title: "New Image"),
-                          SizedBox(height: 10),
-                          if (imageNew.isNotEmpty && imageNew.length > 0)
-                            ImageListBuilder.build(
-                                context: context,
-                                imageData: imageNew,
-                                heroTag: "imageNew",
-                                editAble: true,
-                                onClicked: (index) {
-                                  print("imageNew indexOf($index)");
-                                  if (imageNew.length > 0)
-                                    setState(() {
-                                      imageNew.removeAt(index);
-                                    });
-                                })
-                        ],
-                      )
-                    : Container()
-              ],
-            ),
-          ],
+                    },
+                  ),
+                  SizedBox(height: 20),
+                  imageNew.length > 0
+                      ? Column(
+                          children: <Widget>[
+                            TextBuilder.build(title: "New Image"),
+                            SizedBox(height: 10),
+                            if (imageNew.isNotEmpty && imageNew.length > 0)
+                              ImageListBuilder.build(
+                                  context: context,
+                                  imageData: imageNew,
+                                  heroTag: "imageNew",
+                                  editAble: true,
+                                  onClicked: (index) {
+                                    print("imageNew indexOf($index)");
+                                    if (imageNew.length > 0)
+                                      setState(() {
+                                        imageNew.removeAt(index);
+                                      });
+                                  })
+                          ],
+                        )
+                      : Container()
+                ],
+              ),
+            ],
+          ),
         ),
       ),
       floatingActionButton: Column(

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
@@ -343,12 +344,14 @@ class ImageDataEachGroup {
   List<File> imagesList;
   List<String> imageBase64;
   List<String> imageUrl;
+  List<Uint8List> imageUint8List;
 
   ImageDataEachGroup(
       {this.title,
       this.imagesList = const [],
       this.imageBase64 = const [],
-      this.imageUrl});
+      this.imageUint8List = const [],
+      this.imageUrl = const []});
 }
 
 class Name<T> {

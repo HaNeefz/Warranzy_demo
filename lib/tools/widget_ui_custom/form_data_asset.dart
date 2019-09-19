@@ -270,7 +270,9 @@ class _FormDataAssetState extends State<FormDataAsset> {
                         color: Colors.grey[100],
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
-                        child: TextBuilder.build(title: dataTime),
+                        child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: TextBuilder.build(title: dataTime)),
                         onPressed: () {
                           Picker(
                               itemExtent: 40,
@@ -324,12 +326,27 @@ class _FormDataAssetState extends State<FormDataAsset> {
                     //   });
                     // }),
                     ),
+                actionPageForAdd == false
+                    ? formWidget(
+                        title: "Alert Date",
+                        child: dropdownFormfield(
+                          initalData: txtAlertDate.text,
+                          items: ["0", "7", "30", "60"],
+                          onChange: (value) {
+                            setState(() {
+                              txtAlertDate.text = value;
+                            });
+                          },
+                        ))
+                    : Container(),
                 formWidget(
                   title: "Optional",
                   child: Container(
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
-                        color: Colors.grey[100]),
+                        border: Border.all(color: Colors.grey[100], width: 3)
+                        // color: Colors.grey[100]
+                        ),
                     padding: EdgeInsets.all(5),
                     child: ExpansionTile(
                       title: TextBuilder.build(title: ""),

@@ -48,7 +48,7 @@ class LocalAuth {
 
     if (canCheckBiometrics == true) {
       // print(canCheckBiometrics);
-      // print(availableBiometrics);
+      print(availableBiometrics);
       if (authenticated == true) {
         print("Authorized");
         correct = true;
