@@ -41,7 +41,8 @@ class APIServiceAssets {
       var res = await _dio.post("$_baseUrl/Asset/AddAsset",
           data: formData,
           options: Options(
-              headers: {"Authorization": await JWTService.getTokenJWT()}));
+              headers: {"Authorization": await JWTService.getTokenJWT()},
+              connectTimeout: 60000));
       if (res.statusCode == 200) {
         print("<----- respone => ${res.data}");
         return RepositoryOfAsset.fromJson(jsonDecode(res.data));

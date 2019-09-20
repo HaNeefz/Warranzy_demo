@@ -13,6 +13,7 @@ import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 import 'assets.dart';
+import 'widget_ui_custom/button_builder.dart';
 
 class ECSLib {
   final allTranslations = GlobalTranslations();
@@ -258,6 +259,69 @@ class ECSLib {
               )
             ],
           );
+        });
+    return res;
+  }
+
+  Widget _buttonAlert(BuildContext context,
+      {String label, Function onPressed, Color colors}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: ButtonBuilder.buttonCustom(
+        context: context,
+        label: label,
+        paddingValue: 5,
+        labelStyle: TextStyleCustom.STYLE_LABEL_BOLD
+            .copyWith(color: ThemeColors.COLOR_WHITE),
+        colorsButton: colors,
+        onPressed: onPressed,
+      ),
+    );
+  }
+
+  Future<String> showDialogTripleAction(
+    BuildContext context, {
+    String title,
+    @required String content,
+    @required String labelFisrt,
+    @required String labelSecond,
+    @required String labelThird,
+    Color colorFirst,
+    Color colorSecond,
+    Color colorThird,
+    bool barrierDismissible = false,
+  }) async {
+    String res = await showDialog(
+        barrierDismissible: barrierDismissible,
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+              elevation: 20,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0)),
+              title: Text(
+                title ?? "Warranzy",
+                // style: normalText.copyWith(fontWeight: FontWeight.bold),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Text(content ?? ""),
+                  SizedBox(height: 20),
+                  _buttonAlert(context,
+                      label: labelFisrt,
+                      colors: colorFirst ?? Colors.teal[200],
+                      onPressed: () => Navigator.pop(context, "F")),
+                  _buttonAlert(context,
+                      label: labelSecond,
+                      colors: colorSecond ?? Colors.blue[200],
+                      onPressed: () => Navigator.pop(context, "S")),
+                  _buttonAlert(context,
+                      label: labelThird,
+                      colors: colorThird ?? Colors.red[200],
+                      onPressed: () => Navigator.pop(context, "T")),
+                ],
+              ));
         });
     return res;
   }

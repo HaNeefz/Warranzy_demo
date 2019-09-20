@@ -125,6 +125,33 @@ class _AssetPageState extends State<AssetPage> {
     );
   }
 
+  insertIntiSQLite(RepositoryOfAsset res) async {
+    try {
+      await DBProviderAsset.db
+          .insertDataWarranzyUesd(res.warranzyUsed)
+          .catchError((onError) => print("warranzyUsed : $onError"));
+    } catch (e) {
+      print("insertDataWarranzyUesd => $e");
+    }
+    try {
+      await DBProviderAsset.db
+          .insertDataWarranzyLog(res.warranzyLog)
+          .catchError((onError) => print("warranzyLog $onError"));
+    } catch (e) {
+      print("insertDataWarranzyLog => $e");
+    }
+    res.filePool.forEach((data) async {
+      try {
+        await DBProviderAsset.db
+            .insertDataFilePool(data)
+            .catchError((onError) => print("filePool $onError"))
+            .whenComplete(() {});
+      } catch (e) {
+        print("insertDataFilePool => $e");
+      }
+    });
+  }
+
   StreamBuilder<ApiResponse<ResponseAssetOnline>> buildAssetOnline() {
     return StreamBuilder<ApiResponse<ResponseAssetOnline>>(
       stream: getAllAssetBloc.stmStream,
@@ -255,19 +282,21 @@ class _AssetPageState extends State<AssetPage> {
                   // await checkSessionExpired();
                 },
               ),
-              PopupMenuButton(
-                icon: Icon(Icons.more_vert),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
-                elevation: 5,
-                itemBuilder: (BuildContext context) {
-                  return _popUpItem.map((String choice) {
-                    return PopupMenuItem(
-                      value: choice,
-                      child: Text(choice),
-                    );
-                  }).toList();
-                },
+              Expanded(
+                child: PopupMenuButton(
+                  icon: Icon(Icons.more_vert),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                  elevation: 5,
+                  itemBuilder: (BuildContext context) {
+                    return _popUpItem.map((String choice) {
+                      return PopupMenuItem(
+                        value: choice,
+                        child: Text(choice),
+                      );
+                    }).toList();
+                  },
+                ),
               ),
               // Expanded(
               //   child: IconButton(

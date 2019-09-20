@@ -24,6 +24,7 @@ import 'package:warranzy_demo/tools/assets.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/const.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
+import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/button_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_field_builder.dart';
@@ -323,41 +324,22 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
         // ecsLib.printJson(postData);
 
         if (actionPageForAdd == true) {
-          await showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20)),
-                  title: TextBuilder.build(
-                      title: "Warranzy",
-                      style: TextStyleCustom.STYLE_LABEL_BOLD),
-                  content: TextBuilder.build(
-                      title: "Are you sure you want to add asset"),
-                  actions: <Widget>[
-                    FlatButton(
-                      child: TextBuilder.build(title: "Save"),
-                      onPressed: () => Navigator.pop(context, "S"),
-                    ),
-                    FlatButton(
-                      child: TextBuilder.build(title: "Save and Duplicate"),
-                      onPressed: () => Navigator.pop(context, "SD"),
-                    ),
-                    FlatButton(
-                      child: TextBuilder.build(
-                          title: allTranslations.text("cancel")),
-                      onPressed: () => Navigator.pop(context, "C"),
-                    ),
-                  ],
-                );
-              }).then((response) async {
-            if (response == "S") {
+          await ecsLib
+              .showDialogTripleAction(
+            context,
+            content: "Are you sure you want to add asset ?",
+            labelFisrt: "Save",
+            labelSecond: "Save and Duplicate",
+            labelThird: allTranslations.text("cancel"),
+          )
+              .then((response) async {
+            if (response == "F") {
               print(response);
               await submitForAddAsset(
                   postData: postData,
                   whenCompleted: () => ecsLib.pushPageAndClearAllScene(
                       context: context, pageWidget: MainPage()));
-            } else if (response == "SD") {
+            } else if (response == "S") {
               print(response);
               await submitForAddAsset(
                   postData: postData,
@@ -377,6 +359,21 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
           sendApiEdit(postData: postData);
       }
     }
+  }
+
+  Widget buttonAlert({String label, Function onPressed, Color colors}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: ButtonBuilder.buttonCustom(
+        context: context,
+        label: label,
+        paddingValue: 5,
+        labelStyle: TextStyleCustom.STYLE_LABEL_BOLD
+            .copyWith(color: ThemeColors.COLOR_WHITE),
+        colorsButton: colors,
+        onPressed: onPressed,
+      ),
+    );
   }
 
   cancel() {
@@ -698,9 +695,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
     ecsLib.printJson(dataPost);
     ecsLib.showDialogLoadingLib(context, content: "Adding assets");
     try {
-      await APIServiceAssets.addAsset(postData: dataPost)
-          .timeout(Duration(seconds: 60))
-          .then((res) async {
+      await APIServiceAssets.addAsset(postData: dataPost).then((res) async {
         print("<--- Response");
         _completed = true;
         ecsLib.cancelDialogLoadindLib(context);
@@ -734,18 +729,6 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
       });
     } on DioError catch (error) {
       print("DIO ERROR => ${error.error}\nMsg => ${error.message}");
-      ecsLib.cancelDialogLoadindLib(context);
-    } on SocketException catch (e) {
-      print(e);
-      ecsLib.cancelDialogLoadindLib(context);
-    } on HttpException catch (e) {
-      print(e);
-      ecsLib.cancelDialogLoadindLib(context);
-    } on FormatException catch (e) {
-      print(e);
-      ecsLib.cancelDialogLoadindLib(context);
-    } on Exception catch (e) {
-      print(e);
       ecsLib.cancelDialogLoadindLib(context);
     } catch (e) {
       print("Catch $e");
