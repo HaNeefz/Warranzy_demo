@@ -122,6 +122,18 @@ class DBProviderAsset {
     }
   }
 
+  Future<bool> hasDataAsset() async {
+    final db = await database;
+    var res = await db.rawQuery(
+        "SELECT * FROM $tableWarranzyUsed, $tableWarranzyLog WHERE $tableWarranzyUsed.WTokenID = $tableWarranzyLog.WTokenID");
+
+    if (res.length > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   Future<bool> insertDataWarranzyUesd(WarranzyUsed data) async {
     final db = await database;
     try {
