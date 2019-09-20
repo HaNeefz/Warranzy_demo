@@ -53,8 +53,7 @@ class _TradeInformationState extends State<TradeInformation> {
                     onPressed: () {
                       widget.editAble
                           ? ecsLib
-                              .showDialogLib(
-                                  context: context,
+                              .showDialogLib(context,
                                   title: "EDIT TRADE",
                                   content: "Edit Trade Success!",
                                   textOnButton: allTranslations.text("success"))
@@ -62,8 +61,7 @@ class _TradeInformationState extends State<TradeInformation> {
                               if (response) Navigator.pop(context);
                             })
                           : ecsLib
-                              .showDialogLib(
-                                  context: context,
+                              .showDialogLib(context,
                                   title: "ADD TRADE",
                                   content: "Add Trade Success!",
                                   textOnButton: allTranslations.text("success"))

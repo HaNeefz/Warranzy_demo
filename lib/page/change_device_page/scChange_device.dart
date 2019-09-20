@@ -115,8 +115,7 @@ class _ChangeDeviceState extends State<ChangeDevice> {
             );
           } else if (response?.status == false) {
             ecsLib
-                .showDialogLib(
-              context: context,
+                .showDialogLib(context,
               title: "CAN'T FIND PHONE NUMBER",
               content: response?.message ?? "",
               textOnButton: allTranslations.text("close"),
@@ -126,8 +125,7 @@ class _ChangeDeviceState extends State<ChangeDevice> {
             });
           } else {
             ecsLib
-                .showDialogLib(
-              context: context,
+                .showDialogLib(context,
               title: "SERVER ERROR",
               content: response?.message,
               textOnButton: allTranslations.text("close"),
@@ -138,8 +136,7 @@ class _ChangeDeviceState extends State<ChangeDevice> {
           }
         });
       } else {
-        ecsLib.showDialogLib(
-          context: context,
+        ecsLib.showDialogLib(context,
           title: "SELECT COUNTRY",
           content: "Please select country.",
           textOnButton: allTranslations.text("close"),

@@ -273,20 +273,17 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
     if (_formKey.currentState.validate()) {
       print(txtBrandName.text);
       if (txtBrandName.text == "") {
-        ecsLib.showDialogLib(
-            context: context,
+        ecsLib.showDialogLib(context,
             content: "Invalide Brand Name.",
             textOnButton: allTranslations.text("close"),
             title: "Warranzy");
       } else if (txtWarranzyExpire.text == "") {
-        ecsLib.showDialogLib(
-            context: context,
+        ecsLib.showDialogLib(context,
             content: "Invalide Warranty Expire.",
             textOnButton: allTranslations.text("close"),
             title: "Warranzy");
       } else if (txtAssetName.text == "") {
-        ecsLib.showDialogLib(
-            context: context,
+        ecsLib.showDialogLib(context,
             content: "Invalide Asset Name.",
             textOnButton: allTranslations.text("close"),
             title: "Warranzy");
@@ -344,8 +341,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
               await submitForAddAsset(
                   postData: postData,
                   whenCompleted: () async {
-                    await ecsLib.showDialogLib(
-                      context: context,
+                    await ecsLib.showDialogLib(context,
                       title: "Warranzy",
                       content: "Added asset and Duplicated data.",
                       textOnButton: allTranslations.text("ok"),
@@ -512,8 +508,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
   }
 
   alerModel(String title, String content) {
-    ecsLib.showDialogLib(
-        context: context,
+    ecsLib.showDialogLib(context,
         title: "Warranzy",
         content: content ?? "",
         textOnButton: allTranslations.text("close"));
@@ -600,8 +595,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
 
   sendApiEdit({postData}) async {
     ecsLib
-        .showDialogAction(
-            context: context,
+        .showDialogAction(context,
             title: "Warranzy",
             content: "Are you sure to update asset data.",
             textOk: allTranslations.text("ok"),
@@ -820,14 +814,12 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
             if (_formKey.currentState.validate()) {
               print(txtBrandName.text);
               if (txtBrandName.text == "") {
-                ecsLib.showDialogLib(
-                    context: context,
+                ecsLib.showDialogLib(context,
                     content: "Invalide Brand Name.",
                     textOnButton: allTranslations.text("close"),
                     title: "Warranzy");
               } else if (txtWarranzyExpire.text == "") {
-                ecsLib.showDialogLib(
-                    context: context,
+                ecsLib.showDialogLib(context,
                     content: "Invalide Warranty Expire.",
                     textOnButton: allTranslations.text("close"),
                     title: "Warranzy");

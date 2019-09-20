@@ -184,8 +184,7 @@ class _ReceiveOTPState extends State<ReceiveOTP> {
           hasError = true;
         });
     } else {
-      ecsLib.showDialogLib(
-        context: context,
+      ecsLib.showDialogLib(context,
         title: "OTP TIME OUT",
         content: "OTP time out!. Please resend OTP.",
         textOnButton: allTranslations.text("close"),

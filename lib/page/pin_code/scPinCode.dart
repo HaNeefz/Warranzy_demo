@@ -82,8 +82,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
         gotoMainPage();
       } else if (response?.status == false) {
         ecsLib
-            .showDialogLib(
-                context: context,
+            .showDialogLib(context,
                 content: response.message ?? "PIN Incorrct, Try again.",
                 textOnButton: allTranslations.text("close"),
                 title: "SERVER ERROR")
@@ -95,8 +94,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
         });
       } else {
         ecsLib
-            .showDialogLib(
-                context: context,
+            .showDialogLib(context,
                 content: response?.message ?? "Catch Error",
                 textOnButton: allTranslations.text("close"),
                 title: "SERVER ERROR")
@@ -218,14 +216,12 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
                 context: context,
                 label: allTranslations.text("continue"),
                 onPressed: () async {
-                  await ecsLib.showDialogLib(
-                      context: context,
+                  await ecsLib.showDialogLib(context,
                       title: "SUCCESS!",
                       content: "Create your account successfully.",
                       textOnButton: allTranslations.text("ok"));
                   await ecsLib
-                      .showDialogAction(
-                    context: context,
+                      .showDialogAction(context,
                     title: "Use Scan to Authen",
                     content: "Do you need to Scan for sign in.",
                     textOk: "Yes, I do",
@@ -297,22 +293,19 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
           );
           // });
         } else {
-          ecsLib.showDialogLib(
-              context: context,
+          ecsLib.showDialogLib(context,
               title: "SQFLITE FAILD!",
               content: "Can't insert data into sqflite.",
               textOnButton: allTranslations.text("close"));
         }
       } else if (response?.status == false) {
-        ecsLib.showDialogLib(
-          context: context,
+        ecsLib.showDialogLib(context,
           title: "ERROR REGISTER",
           content: response?.message,
           textOnButton: allTranslations.text("close"),
         );
       } else {
-        ecsLib.showDialogLib(
-            context: context,
+        ecsLib.showDialogLib(context,
             title: "ERROR SERVER!",
             content: response?.message,
             textOnButton: allTranslations.text("close"));
@@ -665,8 +658,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
       } else {
         print("In Correct");
         ecsLib
-            .showDialogLib(
-                context: context,
+            .showDialogLib(context,
                 title: "PIN",
                 content: allTranslations.text("pin_incorrect"),
                 textOnButton: allTranslations.text("close"))

@@ -118,14 +118,12 @@ class _PinCodePageState extends State<PinCodePage> {
           context: context,
           label: allTranslations.text("continue"),
           onPressed: () async {
-            await ecsLib.showDialogLib(
-                context: context,
+            await ecsLib.showDialogLib(context,
                 title: "SUCCESS!",
                 content: "Create your account successfully.",
                 textOnButton: allTranslations.text("ok"));
             await ecsLib
-                .showDialogAction(
-              context: context,
+                .showDialogAction(context,
               title: "Use Fingerprint",
               content: "Do you need to use fingerprint for sign in.",
               textOk: "Yes, I do",

@@ -106,8 +106,7 @@ class _RequestServiceState extends State<RequestService> {
           label: "Send",
           onPressed: () {
             ecsLib
-                .showDialogLib(
-                    context: context,
+                .showDialogLib(context,
                     title: "REQUEST SERVICE",
                     content: "Send requset service",
                     textOnButton: allTranslations.text("ok"))

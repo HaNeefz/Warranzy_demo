@@ -334,8 +334,7 @@ class _AssetPageState extends State<AssetPage> {
           ecsLib.cancelDialogLoadindLib(context);
         } else {
           print(response);
-          await ecsLib.showDialogLib(
-            context: context,
+          await ecsLib.showDialogLib(context,
             title: "",
             content: response['Message'],
             textOnButton: allTranslations.text("close"),

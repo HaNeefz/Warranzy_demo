@@ -376,8 +376,7 @@ class _DetailAssetState extends State<DetailAsset> {
         label: allTranslations.text("delete"),
         onPressed: () async {
           await ecsLib
-              .showDialogAction(
-            context: context,
+              .showDialogAction(context,
             title: "DELETE ASSET",
             content: "Are you sure to delete asset ?",
             textOk: allTranslations.text("ok"),

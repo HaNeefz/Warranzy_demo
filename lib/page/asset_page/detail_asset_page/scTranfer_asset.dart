@@ -115,8 +115,7 @@ class _TranfersInformationState extends State<TranfersInformation> {
                         label: "Transfer",
                         onPressed: () {
                           ecsLib
-                              .showDialogLib(
-                                  context: context,
+                              .showDialogLib(context,
                                   title: "TRANSFER ASSET",
                                   content: "Transfer Success!",
                                   textOnButton: allTranslations.text("ok"))
