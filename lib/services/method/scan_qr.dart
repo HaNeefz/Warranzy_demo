@@ -13,27 +13,18 @@ class MethodLib {
     } on PlatformException catch (e) {
       if (e.code == BarcodeScanner.CameraAccessDenied) {
         // The user did not grant the camera permission.
-        _ecsLib.showDialogLib(
-            context: context,
-            title: "PlatformException",
-            content: "$e",
-            textOnButton: "close");
+        _ecsLib.showDialogLib(context,
+            title: "PlatformException", content: "$e", textOnButton: "close");
       } else {
         // Unknown error.
-        _ecsLib.showDialogLib(
-            context: context,
-            title: "Unknown error",
-            content: "$e",
-            textOnButton: "close");
+        _ecsLib.showDialogLib(context,
+            title: "Unknown error", content: "$e", textOnButton: "close");
       }
     } on FormatException {
       // User returned using the "back"-button before scanning anything.
     } catch (e) {
-      _ecsLib.showDialogLib(
-          context: context,
-          title: "Unknown error",
-          content: "$e",
-          textOnButton: "close");
+      _ecsLib.showDialogLib(context,
+          title: "Unknown error", content: "$e", textOnButton: "close");
       // Unknown error.
     }
     if (barcode.isNotEmpty) {
