@@ -155,6 +155,7 @@ class _VerifyChangeDeviceState extends State<VerifyChangeDevice> {
         "<================Update data complete==================>\n${dataCustShow.toJson()}\n===================================================");
     return res;
   }
+  
 
   void checkOTPCorrect(BuildContext context) async {
     if (checkOTPTimeOut() == false) {
@@ -181,39 +182,34 @@ class _VerifyChangeDeviceState extends State<VerifyChangeDevice> {
               if (await updatePINcode() == true) {
                 ecsLib.pushPageReplacement(
                     context: context, pageWidget: LoginPage());
-                ecsLib.showDialogLib(
-                  context: context,
+                ecsLib.showDialogLib(context,
                   title: "COMPLETED INFORMATION",
                   content:
                       "Download information completed. You can Sign in now.",
                   textOnButton: allTranslations.text("ok"),
                 );
               } else {
-                ecsLib.showDialogLib(
-                  context: context,
+                ecsLib.showDialogLib(context,
                   title: "UPDATE PINCODE",
                   content: "Update pin incomplete. Try again.",
                   textOnButton: allTranslations.text("ok"),
                 );
               }
             } else {
-              ecsLib.showDialogLib(
-                  context: context,
+              ecsLib.showDialogLib(context,
                   title: "DOWNLOAD INFORMATION FAILD",
                   content: "Download information incomplete. Try again.",
                   textOnButton: allTranslations.text("close"));
             }
           } else if (response?.status == false) {
             ecsLib.cancelDialogLoadindLib(context);
-            ecsLib.showDialogLib(
-                context: context,
+            ecsLib.showDialogLib(context,
                 title: "STATUS FAILD",
                 content: response?.message,
                 textOnButton: allTranslations.text("close"));
           } else {
             ecsLib.cancelDialogLoadindLib(context);
-            ecsLib.showDialogLib(
-                context: context,
+            ecsLib.showDialogLib(context,
                 title: "SERVER ERROR",
                 content: response?.message,
                 textOnButton: allTranslations.text("close"));
@@ -224,8 +220,7 @@ class _VerifyChangeDeviceState extends State<VerifyChangeDevice> {
           hasError = true;
         });
     } else {
-      ecsLib.showDialogLib(
-        context: context,
+      ecsLib.showDialogLib(context,
         title: "OTP TIME OUT",
         content: "OTP time out!. Please resend OTP.",
         textOnButton: allTranslations.text("close"),

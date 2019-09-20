@@ -85,8 +85,8 @@ class ECSLib {
     }
   }
 
-  Future<bool> showDialogLib({
-    @required BuildContext context,
+  Future<bool> showDialogLib(
+    BuildContext context, {
     @required String title,
     @required String content,
     @required String textOnButton,
@@ -164,8 +164,8 @@ class ECSLib {
         });
   }
 
-  Future<String> showDialogWithTextFieldLib({
-    @required BuildContext context,
+  Future<String> showDialogWithTextFieldLib(
+    BuildContext context, {
     @required String title,
     @required String label,
     @required String hintText,
@@ -213,8 +213,8 @@ class ECSLib {
     return res;
   }
 
-  Future<bool> showDialogAction({
-    @required BuildContext context,
+  Future<bool> showDialogAction(
+    BuildContext context, {
     @required String title,
     @required String content,
     @required String textCancel,

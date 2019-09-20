@@ -265,8 +265,7 @@ class _AddMoreInformationAssetState extends State<AddMoreInformationAsset> {
                 onPressed: () {
                   widget.hasDataAssetAlready == true
                       ? ecsLib
-                          .showDialogLib(
-                              context: context,
+                          .showDialogLib(context,
                               title: "EDIT ASSET",
                               content: "Edit Asset Success!",
                               textOnButton: allTranslations.text("ok"))
@@ -278,8 +277,7 @@ class _AddMoreInformationAssetState extends State<AddMoreInformationAsset> {
                           }
                         })
                       : ecsLib
-                          .showDialogAction(
-                              context: context,
+                          .showDialogAction(context,
                               title: "ADD ASSET",
                               content: allTranslations.text("finish"),
                               textOk: allTranslations.text("ok"),

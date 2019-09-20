@@ -464,8 +464,7 @@ class _FormDataAssetState extends State<FormDataAsset> {
   }
 
   alerModel(String title, String content) {
-    ecsLib.showDialogLib(
-        context: context,
+    ecsLib.showDialogLib(context,
         title: "Warranzy",
         content: content ?? "",
         textOnButton: allTranslations.text("close"));
@@ -671,14 +670,12 @@ class _FormDataAssetState extends State<FormDataAsset> {
             if (_formKey.currentState.validate()) {
               print(txtBrandName.text);
               if (txtBrandName.text == "") {
-                ecsLib.showDialogLib(
-                    context: context,
+                ecsLib.showDialogLib(context,
                     content: "Invalide Brand Name.",
                     textOnButton: allTranslations.text("close"),
                     title: "Warranzy");
               } else if (txtWarranzyExpire.text == "") {
-                ecsLib.showDialogLib(
-                    context: context,
+                ecsLib.showDialogLib(context,
                     content: "Invalide Warranty Expire.",
                     textOnButton: allTranslations.text("close"),
                     title: "Warranzy");

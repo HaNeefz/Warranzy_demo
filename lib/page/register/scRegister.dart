@@ -154,16 +154,14 @@ class _RegisterState extends State<Register> {
                 ));
           } else if (response?.status == false) {
             ecsLib.cancelDialogLoadindLib(context);
-            ecsLib.showDialogLib(
+            ecsLib.showDialogLib(context,
                 content: response?.message,
-                context: context,
                 textOnButton: allTranslations.text("close"),
                 title: "ERROR");
           } else {
             ecsLib.cancelDialogLoadindLib(context);
-            ecsLib.showDialogLib(
+            ecsLib.showDialogLib(context,
                 content: response?.message,
-                context: context,
                 textOnButton: allTranslations.text("close"),
                 title: "SERVER ERROR");
           }
@@ -229,14 +227,14 @@ class _RegisterState extends State<Register> {
       dataCorrect = true;
     } else if (modelCountry.selectedCountry == false)
       ecsLib.showDialogLib(
-        context: context,
+        context,
         title: "SELECT COUNTRY",
         content: "Please select country.",
         textOnButton: allTranslations.text("close"),
       );
     else //(modelBirthYear.selectedBirthYear == false)
       ecsLib.showDialogLib(
-        context: context,
+        context,
         title: "SELECT BIRTH YEAR",
         content: "Please select birth year.",
         textOnButton: allTranslations.text("close"),
