@@ -341,7 +341,8 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
               await submitForAddAsset(
                   postData: postData,
                   whenCompleted: () async {
-                    await ecsLib.showDialogLib(context,
+                    await ecsLib.showDialogLib(
+                      context,
                       title: "Warranzy",
                       content: "Added asset and Duplicated data.",
                       textOnButton: allTranslations.text("ok"),
@@ -878,7 +879,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
                               child: TextBuilder.build(
                                   title: "${v.catName}",
                                   style: TextStyleCustom.STYLE_LABEL
-                                      .copyWith(fontSize: 15),
+                                      .copyWith(fontSize: 14),
                                   maxLine: 1,
                                   textOverflow: TextOverflow.ellipsis),
                             );
@@ -1045,11 +1046,6 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
             padding: EdgeInsets.all(5),
             child: Column(
               children: <Widget>[
-                TextFieldBuilder.textFormFieldCustom(
-                    controller: txtWarranzyNo,
-                    borderOutLine: false,
-                    validate: false,
-                    title: "Warranty No"),
                 TextFieldBuilder.textFormFieldCustom(
                     controller: txtSLCName,
                     borderOutLine: false,
