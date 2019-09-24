@@ -3,7 +3,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
-import 'package:warranzy_demo/models/model_mas_cust.dart';
+// import 'package:warranzy_demo/models/model_mas_cust.dart';
+import 'package:warranzy_demo/models/model_user.dart';
 import 'package:warranzy_demo/models/model_verify_login.dart';
 import 'package:warranzy_demo/models/model_verify_phone.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
@@ -96,8 +97,7 @@ class APIServiceUser {
     }
   }
 
-  static Future<InformationMasCustomners> apiRegister(
-      {dynamic postData}) async {
+  static Future<RepositoryUser> apiRegister({dynamic postData}) async {
     ShowDataAPI.printAPIName("apiRegister");
     ShowDataAPI.printAPIRequestUrl("$baseUrl/User/UserRegister");
     String urlPost = "$baseUrl/User/UserRegister"; //User/CheckVerifyPhone;
@@ -107,22 +107,22 @@ class APIServiceUser {
           .timeout(Duration(seconds: TIMEOUT));
       if (response.statusCode == 200) {
         ShowDataAPI.printResponse("${json.decode(response.body)}");
-        return InformationMasCustomners.fromJson(json.decode(response.body));
+        return RepositoryUser.fromJson(json.decode(response.body));
       } else
         throw Exception("Failed to load");
     } on TimeoutException catch (_) {
       print("TimeOut");
-      return InformationMasCustomners(message: "Time Out. Try again.");
+      return RepositoryUser(message: "Time Out. Try again.");
     } on Exception catch (e) {
       print("Catch on Exception => $e");
-      return InformationMasCustomners(message: "$e");
+      return RepositoryUser(message: "$e");
     } catch (e) {
       print("$baseUrl/User/UserRegister => Catch Error $e");
-      return InformationMasCustomners(message: "Error => $e");
+      return RepositoryUser(message: "Error => $e");
     }
   }
 
-  static Future<InformationMasCustomners> apiVerifyChangeDevice(
+  static Future<RepositoryUser> apiVerifyChangeDevice(
       {dynamic postData}) async {
     ShowDataAPI.printAPIName("apiVerifyChangeDevice");
     ShowDataAPI.printAPIRequestUrl("$baseUrl/User/VerifyChangeDevice");
@@ -134,18 +134,18 @@ class APIServiceUser {
           .timeout(Duration(seconds: TIMEOUT));
       if (response.statusCode == 200) {
         ShowDataAPI.printResponse("${json.decode(response.body)}");
-        return InformationMasCustomners.fromJson(json.decode(response.body));
+        return RepositoryUser.fromJson(json.decode(response.body));
       } else
         throw Exception("Failed to load");
     } on TimeoutException catch (_) {
       print("TimeOut");
-      return InformationMasCustomners(message: "Time Out. Try again.");
+      return RepositoryUser(message: "Time Out. Try again.");
     } on Exception catch (e) {
       print("Catch on Exception => $e");
-      return InformationMasCustomners(message: "$e");
+      return RepositoryUser(message: "$e");
     } catch (e) {
       print("Catch Error => $e");
-      return InformationMasCustomners(message: "Error => $e");
+      return RepositoryUser(message: "Error => $e");
     }
   }
 

@@ -3,12 +3,16 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:pin_code_text_field/pin_code_text_field.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:warranzy_demo/models/model_cust_temp_data.dart';
-import 'package:warranzy_demo/models/model_mas_cust.dart';
+import 'package:warranzy_demo/models/model_user.dart';
+// import 'package:warranzy_demo/models/model_mas_cust.dart';
 import 'package:warranzy_demo/models/model_verify_phone.dart';
 import 'package:warranzy_demo/page/login_first/scLogin.dart';
+import 'package:warranzy_demo/page/pin_code/scPinCode.dart';
 import 'package:warranzy_demo/services/api/api_services_user.dart';
+import 'package:warranzy_demo/services/sqflit/db_asset.dart';
 import 'package:warranzy_demo/services/sqflit/db_customers.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
+import 'package:warranzy_demo/tools/const.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/app_bar_builder.dart';
@@ -135,6 +139,17 @@ class _VerifyChangeDeviceState extends State<VerifyChangeDevice> {
                         checkOTPCorrect(context);
                       }),
                 ),
+                // Padding(
+                //   padding: EdgeInsets.only(top: 32),
+                //   child: ButtonBuilder.buttonCustom(
+                //       context: context,
+                //       paddingValue: 20,
+                //       label: "Delete User and Asset",
+                //       onPressed: () async {
+                //         await DBProviderCustomer.db.deleteAllDataOfCustomer();
+                //         await DBProviderAsset.db.deleteAllAsset();
+                //       }),
+                // ),
               ],
             ),
           ),
@@ -155,7 +170,6 @@ class _VerifyChangeDeviceState extends State<VerifyChangeDevice> {
         "<================Update data complete==================>\n${dataCustShow.toJson()}\n===================================================");
     return res;
   }
-  
 
   void checkOTPCorrect(BuildContext context) async {
     if (checkOTPTimeOut() == false) {
@@ -176,20 +190,57 @@ class _VerifyChangeDeviceState extends State<VerifyChangeDevice> {
             if (await DBProviderCustomer.db.checkHasCustomer() == true) {
               print("Have information customer, deleting");
               await DBProviderCustomer.db.deleteAllDataOfCustomer();
+              await DBProviderAsset.db.deleteAllAsset();
             }
             if (await DBProviderCustomer.db.addDataCustomer(response.data) ==
                 true) {
               if (await updatePINcode() == true) {
-                ecsLib.pushPageReplacement(
-                    context: context, pageWidget: LoginPage());
-                ecsLib.showDialogLib(context,
-                  title: "COMPLETED INFORMATION",
-                  content:
-                      "Download information completed. You can Sign in now.",
-                  textOnButton: allTranslations.text("ok"),
-                );
+                try {
+                  for (var warranzyUsed in response.dataAssetUsed.warranzyUsed)
+                    await DBProviderAsset.db
+                        .insertDataWarranzyUesd(warranzyUsed)
+                        .catchError(
+                            (onError) => print("warranzyUsed : $onError"));
+                } catch (e) {
+                  print("insertDataWarranzyUesd => $e");
+                }
+                try {
+                  for (var warranzyLog in response.dataAssetUsed.warranzyLog)
+                    await DBProviderAsset.db
+                        .insertDataWarranzyLog(warranzyLog)
+                        .catchError((onError) => print("warranzyLog $onError"));
+                } catch (e) {
+                  print("insertDataWarranzyLog => $e");
+                }
+                response.dataAssetUsed.filePool.forEach((data) async {
+                  try {
+                    await DBProviderAsset.db
+                        .insertDataFilePool(data)
+                        .catchError((onError) => print("filePool $onError"))
+                        .whenComplete(() {
+                      Navigator.pop(context);
+                      ecsLib.pushPageReplacement(
+                        context: context,
+                        pageWidget: PinCodePageUpdate(
+                          type: PageType.login,
+                          usedPin: true,
+                        ),
+                      );
+                      ecsLib.showDialogLib(
+                        context,
+                        title: "COMPLETED INFORMATION",
+                        content:
+                            "Download information completed. You can Sign in now.",
+                        textOnButton: allTranslations.text("ok"),
+                      );
+                    });
+                  } catch (e) {
+                    print("insertDataFilePool => $e");
+                  }
+                });
               } else {
-                ecsLib.showDialogLib(context,
+                ecsLib.showDialogLib(
+                  context,
                   title: "UPDATE PINCODE",
                   content: "Update pin incomplete. Try again.",
                   textOnButton: allTranslations.text("ok"),
@@ -220,7 +271,8 @@ class _VerifyChangeDeviceState extends State<VerifyChangeDevice> {
           hasError = true;
         });
     } else {
-      ecsLib.showDialogLib(context,
+      ecsLib.showDialogLib(
+        context,
         title: "OTP TIME OUT",
         content: "OTP time out!. Please resend OTP.",
         textOnButton: allTranslations.text("close"),

@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:warranzy_demo/models/model_cust_temp_data.dart';
-import 'package:warranzy_demo/models/model_mas_cust.dart';
+import 'package:warranzy_demo/models/model_user.dart';
+// import 'package:warranzy_demo/models/model_mas_cust.dart';
 import 'package:warranzy_demo/models/model_verify_login.dart';
 import 'package:warranzy_demo/page/login_first/scLogin.dart';
 import 'package:warranzy_demo/page/main_page/scMain_page.dart';
@@ -55,10 +56,30 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
   ModelMasCustomer get modelMasCustomer => widget.modelMasCustomer;
   ApiBlocGetAllAsset<ModelVerifyLogin> _loginBloc;
 
+  getDataCustomer() async {
+    SharedPreferences pref = await _pref;
+    ModelCustomers dataCust = await DBProviderCustomer.db.getDataCustomer();
+    pref.setString("UserID", dataCust.custUserID);
+    pref.setString("UserName", dataCust.custName);
+    pref.setString("Email", dataCust.custEmail);
+    pref.setString("MobilePhone", dataCust.mobilePhone);
+    pref.setString("Address", dataCust.homeAddress);
+    pref.setString("BirthYear", dataCust.birthYear);
+    pref.setString("CountryCode", dataCust.countryCode);
+    pref.setString("CreateDate", dataCust.createDate);
+    pref.setString("Gender", dataCust.gender);
+    pref.setString("DeviceID", dataCust.deviceID);
+    pref.setString("NotificationID", dataCust.notificationID);
+    pref.setString("PackageType", dataCust.packageType);
+    pref.setString("PinCode", dataCust.pINcode);
+    pref.setString("SpecialPass", dataCust.specialPass);
+  }
+
   getUsername() async {
-    var name = await DBProviderCustomer.db.getNameCustomer();
-    setState(() {
-      username = name;
+    await SharedPreferences.getInstance().then((name) {
+      setState(() {
+        username = name.getString("UserName");
+      });
     });
   }
 
@@ -70,8 +91,8 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
     var custID = dataCust?.custUserID;
     var postData = {
       "DeviceID": dvID,
-      "PINcode": pinCIde,
-      "CustUserID": custID,
+      "PINcode": pref.getString("PinCode"),
+      "CustUserID": pref.getString("UserID"),
       "TimeZone": await MethodHelper.timeZone,
       "CountryCode": await MethodHelper.countryCode
     };
@@ -149,6 +170,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
   @override
   void initState() {
     super.initState();
+    getDataCustomer();
     getUsername();
   }
 
@@ -221,7 +243,8 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
                       content: "Create your account successfully.",
                       textOnButton: allTranslations.text("ok"));
                   await ecsLib
-                      .showDialogAction(context,
+                      .showDialogAction(
+                    context,
                     title: "Use Scan to Authen",
                     content: "Do you need to Scan for sign in.",
                     textOk: "Yes, I do",
@@ -299,7 +322,8 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
               textOnButton: allTranslations.text("close"));
         }
       } else if (response?.status == false) {
-        ecsLib.showDialogLib(context,
+        ecsLib.showDialogLib(
+          context,
           title: "ERROR REGISTER",
           content: response?.message,
           textOnButton: allTranslations.text("close"),

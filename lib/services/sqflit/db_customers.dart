@@ -1,6 +1,7 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:warranzy_demo/models/model_mas_cust.dart';
+import 'package:warranzy_demo/models/model_user.dart';
+// import 'package:warranzy_demo/models/model_mas_cust.dart';
 
 class DBProviderCustomer {
   DBProviderCustomer._();
@@ -22,6 +23,7 @@ class DBProviderCustomer {
   final String columnBirthYear = "BirthYear";
   final String columnSpecialPass = "SpecialPass";
   final String columnPackageType = "PackageType";
+  final String columnCreateType = "CreateDate";
 
   Future<Database> get database async {
     if (_database != null) return _database;
@@ -53,7 +55,8 @@ class DBProviderCustomer {
         "$columnGender TEXT,"
         "$columnBirthYear TEXT,"
         "$columnSpecialPass TEXT,"
-        "$columnPackageType TEXT"
+        "$columnPackageType TEXT,"
+        "$columnCreateType"
         ")");
   }
 

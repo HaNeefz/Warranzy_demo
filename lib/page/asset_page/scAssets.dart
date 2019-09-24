@@ -7,6 +7,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:warranzy_demo/models/model_asset_data.dart';
 import 'package:warranzy_demo/models/model_respository_asset.dart';
 import 'package:warranzy_demo/models/model_verify_login.dart';
@@ -53,6 +54,7 @@ class _AssetPageState extends State<AssetPage> {
   ApiBlocGetAllAsset<ResponseAssetOnline> getAllAssetBloc;
 
   Future<List<ModelDataAsset>> getModelDataAsset() async {
+    print("getAllAsset");
     return await DBProviderAsset.db.getAllDataAsset();
   }
 
@@ -79,9 +81,10 @@ class _AssetPageState extends State<AssetPage> {
   }
 
   getUsername() async {
-    var name = await DBProviderCustomer.db.getNameCustomer();
-    setState(() {
-      username = name;
+    await SharedPreferences.getInstance().then((name) {
+      setState(() {
+        username = name.getString("UserName");
+      });
     });
   }
 
@@ -334,7 +337,8 @@ class _AssetPageState extends State<AssetPage> {
           ecsLib.cancelDialogLoadindLib(context);
         } else {
           print(response);
-          await ecsLib.showDialogLib(context,
+          await ecsLib.showDialogLib(
+            context,
             title: "",
             content: response['Message'],
             textOnButton: allTranslations.text("close"),
@@ -541,7 +545,7 @@ class _MyAssetFormSQLiteState extends State<MyAssetFormSQLite> {
                             color: ThemeColors.COLOR_GREY.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(20)),
                         child: TextBuilder.build(
-                            title: catName ?? "",
+                            title: widget.data?.modelCatName?.eN ?? catName,
                             style: TextStyleCustom.STYLE_CONTENT.copyWith(
                                 fontSize: 14, color: ThemeColors.COLOR_BLACK)),
                       )

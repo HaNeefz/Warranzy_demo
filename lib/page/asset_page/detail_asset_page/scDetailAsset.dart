@@ -114,23 +114,12 @@ class _DetailAssetState extends State<DetailAsset> {
   ModelDataAsset get _data => widget.dataAsset;
   List<ImageDataEachGroup> imageDataEachGroup = [];
   List<String> listImageUrl = [];
-  String catName = "";
 
   void initState() {
     super.initState();
-
-    getProductCateName();
     if (_data.createType == "C") {
       imageDataEachGroup = getImage(_data);
     }
-  }
-
-  getProductCateName() async {
-    var _catName = await DBProviderInitialApp.db.getProductCatName(
-        id: _data.pdtCatCode, lang: allTranslations.currentLanguage);
-    setState(() {
-      catName = _catName;
-    });
   }
 
   goToEditPageForEditImage(bool editImage) {
@@ -376,7 +365,8 @@ class _DetailAssetState extends State<DetailAsset> {
         label: allTranslations.text("delete"),
         onPressed: () async {
           await ecsLib
-              .showDialogAction(context,
+              .showDialogAction(
+            context,
             title: "DELETE ASSET",
             content: "Are you sure to delete asset ?",
             textOk: allTranslations.text("ok"),
@@ -441,8 +431,12 @@ class _DetailAssetState extends State<DetailAsset> {
             // textTitleWithData(
             //     title: "Shop Country", data: "_assetsData.shopCountry"),
             textTitleWithData(title: "Asset Name", data: "${_data.title}"),
-            textTitleWithData(title: "Brand Name", data: "${_data.brandCode}"),
-            textTitleWithData(title: "Product Category", data: catName),
+            textTitleWithData(
+                title: "Brand Name",
+                data: "${_data.modelBrandName?.eN ?? "BrandName is Empty"}"),
+            textTitleWithData(
+                title: "Product Category",
+                data: "${_data.modelCatName?.eN ?? "CatName is Empty"}"),
             textTitleWithData(
                 title: "Product Group", data: "${_data.pdtGroup}"),
             textTitleWithData(

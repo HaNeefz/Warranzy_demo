@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
+
+import 'model_user.dart';
 
 class RepositoryOfAsset {
   bool status;
@@ -48,180 +52,180 @@ class RepositoryOfAsset {
   }
 }
 
-class WarranzyUsed {
-  String wTokenID;
-  String custUserID;
-  String custCountryCode;
-  String pdtCatCode;
-  String pdtGroup;
-  String pdtPlace;
-  String brandCode;
-  String title;
-  String serialNo;
-  String lotNo;
-  String salesPrice;
-  String warrantyNo;
-  String warrantyExpire;
-  String custRemark;
-  String createType;
-  String createDate;
-  String lastModiflyDate;
-  String exWarrantyStatus;
-  String tradeStatus;
-  String slcName;
+// class WarranzyUsed {
+//   String wTokenID;
+//   String custUserID;
+//   String custCountryCode;
+//   String pdtCatCode;
+//   String pdtGroup;
+//   String pdtPlace;
+//   String brandCode;
+//   String title;
+//   String serialNo;
+//   String lotNo;
+//   String salesPrice;
+//   String warrantyNo;
+//   String warrantyExpire;
+//   String custRemark;
+//   String createType;
+//   String createDate;
+//   String lastModiflyDate;
+//   String exWarrantyStatus;
+//   String tradeStatus;
+//   String slcName;
 
-  WarranzyUsed(
-      {this.wTokenID,
-      this.custUserID,
-      this.custCountryCode,
-      this.pdtCatCode,
-      this.pdtGroup,
-      this.pdtPlace,
-      this.brandCode,
-      this.title,
-      this.serialNo,
-      this.lotNo,
-      this.salesPrice,
-      this.warrantyNo,
-      this.warrantyExpire,
-      this.custRemark,
-      this.createType,
-      this.createDate,
-      this.lastModiflyDate,
-      this.exWarrantyStatus,
-      this.slcName,
-      this.tradeStatus});
+//   WarranzyUsed(
+//       {this.wTokenID,
+//       this.custUserID,
+//       this.custCountryCode,
+//       this.pdtCatCode,
+//       this.pdtGroup,
+//       this.pdtPlace,
+//       this.brandCode,
+//       this.title,
+//       this.serialNo,
+//       this.lotNo,
+//       this.salesPrice,
+//       this.warrantyNo,
+//       this.warrantyExpire,
+//       this.custRemark,
+//       this.createType,
+//       this.createDate,
+//       this.lastModiflyDate,
+//       this.exWarrantyStatus,
+//       this.slcName,
+//       this.tradeStatus});
 
-  WarranzyUsed.fromJson(Map<String, dynamic> json) {
-    wTokenID = json['WTokenID'];
-    custUserID = json['CustUserID'];
-    custCountryCode = json['CustCountryCode'];
-    pdtCatCode = json['PdtCatCode'];
-    pdtGroup = json['PdtGroup'];
-    pdtPlace = json['PdtPlace'];
-    brandCode = json['BrandCode'];
-    title = json['Title'];
-    serialNo = json['SerialNo'];
-    lotNo = json['LotNo'];
-    salesPrice = json['SalesPrice'];
-    warrantyNo = json['WarrantyNo'];
-    warrantyExpire = json['WarrantyExpire'];
-    custRemark = json['CustRemark'];
-    createType = json['CreateType'];
-    createDate = json['CreateDate'];
-    lastModiflyDate = json['LastModiflyDate'];
-    slcName = json['SLCName'] ?? "-";
-    exWarrantyStatus = json['ExWarrantyStatus'];
-    tradeStatus = json['TradeStatus'];
-  }
+//   WarranzyUsed.fromJson(Map<String, dynamic> json) {
+//     wTokenID = json['WTokenID'];
+//     custUserID = json['CustUserID'];
+//     custCountryCode = json['CustCountryCode'];
+//     pdtCatCode = json['PdtCatCode'];
+//     pdtGroup = json['PdtGroup'];
+//     pdtPlace = json['PdtPlace'];
+//     brandCode = json['BrandCode'];
+//     title = json['Title'];
+//     serialNo = json['SerialNo'];
+//     lotNo = json['LotNo'];
+//     salesPrice = json['SalesPrice'];
+//     warrantyNo = json['WarrantyNo'];
+//     warrantyExpire = json['WarrantyExpire'];
+//     custRemark = json['CustRemark'];
+//     createType = json['CreateType'];
+//     createDate = json['CreateDate'];
+//     lastModiflyDate = json['LastModiflyDate'];
+//     slcName = json['SLCName'] ?? "-";
+//     exWarrantyStatus = json['ExWarrantyStatus'];
+//     tradeStatus = json['TradeStatus'];
+//   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['WTokenID'] = this.wTokenID;
-    data['CustUserID'] = this.custUserID;
-    data['CustCountryCode'] = this.custCountryCode;
-    data['PdtCatCode'] = this.pdtCatCode;
-    data['PdtGroup'] = this.pdtGroup;
-    data['PdtPlace'] = this.pdtPlace;
-    data['BrandCode'] = this.brandCode;
-    data['Title'] = this.title;
-    data['SerialNo'] = this.serialNo;
-    data['LotNo'] = this.lotNo;
-    data['SalesPrice'] = this.salesPrice;
-    data['WarrantyNo'] = this.warrantyNo;
-    data['WarrantyExpire'] = this.warrantyExpire;
-    data['CustRemark'] = this.custRemark;
-    data['CreateType'] = this.createType;
-    data['CreateDate'] = this.createDate;
-    data['LastModiflyDate'] = this.lastModiflyDate;
-    data['ExWarrantyStatus'] = this.exWarrantyStatus;
-    data['SLCName'] = this.slcName;
-    data['TradeStatus'] = this.tradeStatus;
-    return data;
-  }
-}
+//   Map<String, dynamic> toJson() {
+//     final Map<String, dynamic> data = new Map<String, dynamic>();
+//     data['WTokenID'] = this.wTokenID;
+//     data['CustUserID'] = this.custUserID;
+//     data['CustCountryCode'] = this.custCountryCode;
+//     data['PdtCatCode'] = this.pdtCatCode;
+//     data['PdtGroup'] = this.pdtGroup;
+//     data['PdtPlace'] = this.pdtPlace;
+//     data['BrandCode'] = this.brandCode;
+//     data['Title'] = this.title;
+//     data['SerialNo'] = this.serialNo;
+//     data['LotNo'] = this.lotNo;
+//     data['SalesPrice'] = this.salesPrice;
+//     data['WarrantyNo'] = this.warrantyNo;
+//     data['WarrantyExpire'] = this.warrantyExpire;
+//     data['CustRemark'] = this.custRemark;
+//     data['CreateType'] = this.createType;
+//     data['CreateDate'] = this.createDate;
+//     data['LastModiflyDate'] = this.lastModiflyDate;
+//     data['ExWarrantyStatus'] = this.exWarrantyStatus;
+//     data['SLCName'] = this.slcName;
+//     data['TradeStatus'] = this.tradeStatus;
+//     return data;
+//   }
+// }
 
-class WarranzyLog {
-  String wTokenID;
-  String logDate;
-  String logType;
-  String partyCode;
-  String partyCountryCode;
-  String warrantyNo;
-  String warranzyEndDate;
-  String fileAttachID;
+// class WarranzyLog {
+//   String wTokenID;
+//   String logDate;
+//   String logType;
+//   String partyCode;
+//   String partyCountryCode;
+//   String warrantyNo;
+//   String warranzyEndDate;
+//   String fileAttachID;
 
-  WarranzyLog(
-      {this.wTokenID,
-      this.logDate,
-      this.logType,
-      this.partyCode,
-      this.partyCountryCode,
-      this.warrantyNo,
-      this.warranzyEndDate,
-      this.fileAttachID});
+//   WarranzyLog(
+//       {this.wTokenID,
+//       this.logDate,
+//       this.logType,
+//       this.partyCode,
+//       this.partyCountryCode,
+//       this.warrantyNo,
+//       this.warranzyEndDate,
+//       this.fileAttachID});
 
-  WarranzyLog.fromJson(Map<String, dynamic> json) {
-    wTokenID = json['WTokenID'];
-    logDate = json['LogDate'];
-    logType = json['LogType'];
-    partyCode = json['PartyCode'];
-    partyCountryCode = json['PartyCountryCode'];
-    warrantyNo = json['WarrantyNo'];
-    warranzyEndDate = json['WarranzyEndDate'];
-    fileAttachID = json['FileAttach_ID'];
-  }
+//   WarranzyLog.fromJson(Map<String, dynamic> json) {
+//     wTokenID = json['WTokenID'];
+//     logDate = json['LogDate'];
+//     logType = json['LogType'];
+//     partyCode = json['PartyCode'];
+//     partyCountryCode = json['PartyCountryCode'];
+//     warrantyNo = json['WarrantyNo'];
+//     warranzyEndDate = json['WarranzyEndDate'];
+//     fileAttachID = json['FileAttach_ID'];
+//   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['WTokenID'] = this.wTokenID;
-    data['LogDate'] = this.logDate;
-    data['LogType'] = this.logType;
-    data['PartyCode'] = this.partyCode;
-    data['PartyCountryCode'] = this.partyCountryCode;
-    data['WarrantyNo'] = this.warrantyNo;
-    data['WarranzyEndDate'] = this.warranzyEndDate;
-    data['FileAttach_ID'] = this.fileAttachID;
-    return data;
-  }
-}
+//   Map<String, dynamic> toJson() {
+//     final Map<String, dynamic> data = new Map<String, dynamic>();
+//     data['WTokenID'] = this.wTokenID;
+//     data['LogDate'] = this.logDate;
+//     data['LogType'] = this.logType;
+//     data['PartyCode'] = this.partyCode;
+//     data['PartyCountryCode'] = this.partyCountryCode;
+//     data['WarrantyNo'] = this.warrantyNo;
+//     data['WarranzyEndDate'] = this.warranzyEndDate;
+//     data['FileAttach_ID'] = this.fileAttachID;
+//     return data;
+//   }
+// }
 
-class FilePool {
-  String fileID;
-  String fileName;
-  String fileType;
-  String fileDescription;
-  String fileData;
-  String lastUpdate;
+// class FilePool {
+//   String fileID;
+//   String fileName;
+//   String fileType;
+//   String fileDescription;
+//   String fileData;
+//   String lastUpdate;
 
-  FilePool(
-      {this.fileID,
-      this.fileName,
-      this.fileType,
-      this.fileDescription,
-      this.fileData,
-      this.lastUpdate});
+//   FilePool(
+//       {this.fileID,
+//       this.fileName,
+//       this.fileType,
+//       this.fileDescription,
+//       this.fileData,
+//       this.lastUpdate});
 
-  FilePool.fromJson(Map<String, dynamic> json) {
-    fileID = json['FileID'];
-    fileName = json['FileName'];
-    fileType = json['FileType'];
-    fileDescription = json['FileDescription'];
-    fileData = json['FileData'];
-    lastUpdate = json['LastUpdate'];
-  }
+//   FilePool.fromJson(Map<String, dynamic> json) {
+//     fileID = json['FileID'];
+//     fileName = json['FileName'];
+//     fileType = json['FileType'];
+//     fileDescription = json['FileDescription'];
+//     fileData = json['FileData'];
+//     lastUpdate = json['LastUpdate'];
+//   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['FileID'] = this.fileID;
-    data['FileName'] = this.fileName;
-    data['FileType'] = this.fileType;
-    data['FileDescription'] = this.fileDescription;
-    data['FileData'] = this.fileData;
-    data['LastUpdate'] = this.lastUpdate;
-    return data;
-  }
-}
+//   Map<String, dynamic> toJson() {
+//     final Map<String, dynamic> data = new Map<String, dynamic>();
+//     data['FileID'] = this.fileID;
+//     data['FileName'] = this.fileName;
+//     data['FileType'] = this.fileType;
+//     data['FileDescription'] = this.fileDescription;
+//     data['FileData'] = this.fileData;
+//     data['LastUpdate'] = this.lastUpdate;
+//     return data;
+//   }
+// }
 
 class ResponseDetailOfAsset {
   bool status;
@@ -253,6 +257,8 @@ class ModelDataAsset {
   String custUserID;
   String custCountryCode;
   String pdtCatCode;
+  CatName modelCatName;
+  BrandName modelBrandName;
   String pdtGroup;
   String pdtPlace;
   String brandCode;
@@ -285,6 +291,8 @@ class ModelDataAsset {
     this.custUserID,
     this.custCountryCode,
     this.pdtCatCode,
+    this.modelCatName,
+    this.modelBrandName,
     this.pdtGroup,
     this.pdtPlace,
     this.brandCode,
@@ -317,6 +325,12 @@ class ModelDataAsset {
     custUserID = json['CustUserID'];
     custCountryCode = json['CustCountryCode'];
     pdtCatCode = json['PdtCatCode'];
+    modelCatName = json['CatName'] != null
+        ? CatName.fromJson(jsonDecode(json['CatName']))
+        : null;
+    modelBrandName = json['BrandName'] != null
+        ? BrandName.fromJson(jsonDecode(json['BrandName']))
+        : null;
     pdtGroup = json['PdtGroup'];
     pdtPlace = json['PdtPlace'];
     brandCode = json['BrandCode'];
@@ -351,6 +365,8 @@ class ModelDataAsset {
     data['CustUserID'] = this.custUserID;
     data['CustCountryCode'] = this.custCountryCode;
     data['PdtCatCode'] = this.pdtCatCode;
+    if (data != null) data['CatName'] = this.modelCatName.toJson();
+    if (data != null) data['BrandName'] = this.modelBrandName.toJson();
     data['PdtGroup'] = this.pdtGroup;
     data['PdtPlace'] = this.pdtPlace;
     data['BrandCode'] = this.brandCode;
@@ -377,13 +393,6 @@ class ModelDataAsset {
     data['AlertDate'] = alertDate;
     data['AlertDateNo'] = alertDateNo;
     return data;
-  }
-
-  //เอา function getImageJson มาไว้ในนี้
-  Future<String> getProductCateName(String pdtCatCode, String lang) async {
-    var _catName = await DBProviderInitialApp.db
-        .getProductCatName(id: pdtCatCode, lang: lang);
-    return _catName;
   }
 }
 

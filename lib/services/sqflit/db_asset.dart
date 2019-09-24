@@ -3,6 +3,8 @@ import 'package:sqflite/sqflite.dart';
 import 'package:warranzy_demo/models/model_respository_asset.dart';
 import 'dart:convert';
 
+import 'package:warranzy_demo/models/model_user.dart';
+
 /*
   All this file db.asset.dart have 3 table
     - Table Warranzyused
@@ -36,6 +38,18 @@ class DBProviderAsset {
 
     return database;
   }
+  /*
+CustBuyDate
+CatName****
+ManCode
+BranName****
+ProductID
+MFGDate
+EXPDate
+SLCCode
+SLCBranchNo
+SLCCountryCode
+BlockchainID */
 
   void onCreateAllTableAboutAsset(Database database, int version) async {
     await database.execute("""create table $tableWarranzyUsed ( 
@@ -58,7 +72,18 @@ class DBProviderAsset {
       LastModiflyDate TEXT,
       ExWarrantyStatus TEXT,
       TradeStatus TEXT,
-      SLCName TEXT
+      SLCName TEXT,
+      CustBuyDate TEXT,
+      CatName TEXT,
+      ManCode TEXT,
+      BrandName TEXT,
+      ProductID TEXT,
+      MFGDate TEXT,
+      EXPDate TEXT,
+      SLCCode TEXT,
+      SLCBranchNo TEXT,
+      SLCCountryCode TEXT,
+      BlockchainID TEXT
         )""");
     await database.execute("""create table $tableWarranzyLog (
       WTokenID TEXT,
@@ -69,8 +94,17 @@ class DBProviderAsset {
       WarrantyNo TEXT,
       WarranzyEndDate TEXT,
       FileAttach_ID TEXT,
+      PartyBranchNo TEXT,
+      WarranzyBeginDate TEXT,
+      WarranzyPrice TEXT,
+      BlockchainID TEXT,
       PRIMARY KEY("WTokenID","LogDate")
     )""");
+    /*
+PartyBranchNo
+WarranzyBeginDate
+WarranzyPrice
+BlockchainID */
 
     await database.execute("""create table $tableFilePool(
       FileID PRIMARY KEY,
@@ -104,11 +138,10 @@ class DBProviderAsset {
         "SELECT * FROM $tableWarranzyUsed, $tableWarranzyLog WHERE $tableWarranzyUsed.WTokenID = $tableWarranzyLog.WTokenID"); // $tableWarranzyLog, $tableFilePool
     JsonEncoder encoder = JsonEncoder.withIndent(" ");
     List<ModelDataAsset> temp = [];
-
     if (res.isNotEmpty) {
       res.forEach((v) {
-        // String prettyprint = encoder.convert(v);
-        // print("Data => " + prettyprint);
+        String prettyprint = encoder.convert(v);
+        print("Data => " + prettyprint);
         // var map = {"Status":true,"Data":}
         temp.add(ModelDataAsset.fromJson(v));
       });
@@ -136,19 +169,21 @@ class DBProviderAsset {
 
   Future<bool> insertDataWarranzyUesd(WarranzyUsed data) async {
     final db = await database;
-    try {
-      var res = await db.insert(tableWarranzyUsed, data.toJson());
-      if (res == 1) {
-        print("insert $tableWarranzyUsed complete");
-        return true;
-      } else
-        return false;
-    } catch (e) {
-      print("Error insertWarranzyUsed => $e");
+
+    var res = await db.insert(tableWarranzyUsed, data.toJson());
+    if (res > 1) {
+      print("insert $tableWarranzyUsed complete");
+      return true;
+    } else
       return false;
-    }
+    // } catch (e) {
+    // print("Error insertWarranzyUsed => $e");
+    // return false;
+    // }
   }
 
+  /*
+  SqfliteDatabaseException (DatabaseException(Error Domain=FMDatabase Code=1 "table WarranzyUsed has no column named BrandName" UserInfo={NSLocalizedDescription=table WarranzyUsed has no column named BrandName}) sql 'INSERT INTO WarranzyUsed (WTokenID, CustBuyDate, CustUserID, CustCountryCode, PdtCatCode, CatName, BrandName, PdtGroup, PdtPlace, CustRemark, ManCode, BrandCode, ProductID, SerialNo, LotNo, MFGDate, EXPDate, SalesPrice, CreateDate, CreateType, LastModiflyDate, WarrantyNo, WarrantyExpire, SLCCode, SLCBranchNo, SLCCountryCode, BlockchainID, ExWarrantyStatus, TradeStatus, Title, SLCName) VALUES (?, NULL, ?, ?, ?, NULL, NULL, ?, ?, ?, NULL, ?, NULL, ?, ?, NULL, NULL, ?, ?, ?, ?, ?, ?, NULL, NULL, NULL, NULL, NULL, NULL, ?, ?)' args [ca3f5-TH-1082acd47e204bd58004406e1, ca3f58b3a0214aaaa68a, TH, A001, Car, Home, ThunderBolt used connect others devices, 27afd78de7aa42d, 18274782919382891, 12, 131, 2019-09-12 09:05:32+00, C, 2019-09-19 04:25:51+00, , 2019-09-12 12:16:40+00, ThunderBolt, PowerBuy]}) */
   Future<bool> insertDataWarranzyLog(WarranzyLog data) async {
     final db = await database;
     var res = await db.insert(tableWarranzyLog, data.toJson());
