@@ -1,10 +1,10 @@
 import 'dart:convert';
-
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:warranzy_demo/models/model_repository_init_app.dart';
 import 'package:warranzy_demo/services/method/scan_qr.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
+import 'package:http/http.dart' as http;
 
 /*
   All this file db.asset.dart have 3 table
@@ -22,7 +22,8 @@ class DBProviderInitialApp {
   get getDB => database;
   final String tableCountry = "Country";
   final String tableTimeZone = "TimeZone";
-  final String tableProductCategory = "ProductCategory";
+  final String tableGroupCategory = "ProductCategory";
+  final String tableProductSubCategory = "ProductSubCategory";
 
   Future<Database> get database async {
     if (_database != null) return _database;
@@ -61,8 +62,14 @@ class DBProviderInitialApp {
       UpdateDate TEXT,
       PRIMARY KEY("Code","TimeZone")
     )""");
-
-    await database.execute("""CREATE TABLE $tableProductCategory(
+    await database.execute("""CREATE TABLE $tableGroupCategory(
+      GroupID PRIMARY KEY,
+      GroupName TEXT,
+      LastUpdate TEXT,
+      Logo TEXT,
+      KeepLogo TEXT
+    )""");
+    await database.execute("""CREATE TABLE $tableProductSubCategory(
       CatCode TEXT PRIMARY KEY,
       CatName TEXT,
       Image_Box TEXT,
@@ -74,7 +81,10 @@ class DBProviderInitialApp {
       Image_Receipt TEXT,
       Image_SellerCard TEXT,
       Image_Other TEXT,
-      LastUpdate TEXT
+      LastUpdate TEXT,
+      GroupID TEXT,
+      Logo TEXT,
+      KeepLogo TEXT
     )""");
   }
 
@@ -87,7 +97,7 @@ class DBProviderInitialApp {
         .delete(tableTimeZone)
         .then((v) => print("Delete tableTimeZone => $v"));
     await db
-        .delete(tableProductCategory)
+        .delete(tableProductSubCategory)
         .then((v) => print("Delete tableProductCategory => $v"));
   }
 
@@ -111,11 +121,50 @@ class DBProviderInitialApp {
       return false;
   }
 
-  Future<bool> insertDataInToTableProductCategory(ProductCatagory data) async {
+  Future<bool> insertDataInToTableProductSubCategory(
+      ProductCategory data) async {
     final db = await database;
-    var res = await db.insert(tableProductCategory, data.toJson());
+    var res = await db.insert(tableProductSubCategory, data.toJson());
     if (res == 1) {
-      print("insert $tableProductCategory complete");
+      print("insert $tableProductSubCategory complete");
+      return true;
+    } else
+      return false;
+  }
+
+  Future<bool> insertDataInToTableGroupCategory(GroupCategory data) async {
+    final db = await database;
+    var res = await db.insert(tableGroupCategory, data.toJson());
+    if (res == 1) {
+      print("insert $tableGroupCategory complete");
+      return true;
+    } else
+      return false;
+  }
+
+  Future<bool> updateIconGroupCategory(GroupCategory data) async {
+    final db = await database;
+    var getContentLogo = await http.get(data.logo);
+    var byte = getContentLogo.bodyBytes;
+    var base64 = base64Encode(byte);
+    var res = await db.rawUpdate(
+        "UPDATE $tableGroupCategory SET KeepLogo =  '$base64' WHERE GroupID = '${data.groupID}'");
+    if (res == 1) {
+      print("UpdateLogo $tableGroupCategory complete");
+      return true;
+    } else
+      return false;
+  }
+
+  Future<bool> updateIconSubCategory(ProductCategory data) async {
+    final db = await database;
+    var getContentLogo = await http.get(data.logo);
+    var byte = getContentLogo.bodyBytes;
+    var base64 = base64Encode(byte);
+    var res = await db.rawUpdate(
+        "UPDATE $tableProductSubCategory SET KeepLogo =  '$base64' WHERE CatCode = '${data.catCode}'");
+    if (res == 1) {
+      print("UpdateLogo $tableProductSubCategory complete");
       return true;
     } else
       return false;
@@ -161,43 +210,123 @@ class DBProviderInitialApp {
     }
   }
 
-  Future<List<ProductCatagory>> getAllDataProductCategory() async {
+  Future<List<GroupCategory>> getGroupCategory() async {
     final db = await database;
     try {
       var res = await db.rawQuery(
-          "SELECT * FROM $tableProductCategory ORDER BY $tableProductCategory.CatCode ASC"); //query(tableProductCategory)
-      // JsonEncoder encoder = JsonEncoder.withIndent(" ");
-      // String prettyprint = encoder.convert(v);
-      // print("$tableProductCategory => " + prettyprint);
-      List<ProductCatagory> listProductCat = List<ProductCatagory>();
+          "SELECT * FROM $tableGroupCategory ORDER BY $tableGroupCategory.GroupID ASC"); //query(tableGroupCategory)
+      List<GroupCategory> listProductCat = List<GroupCategory>();
       res.forEach((v) {
-        listProductCat.add(ProductCatagory.fromJson(v));
-      });
-      print("CurrentLanguage => ${allTranslations.currentLanguage}");
-      var lang = allTranslations.currentLanguage.toString().toUpperCase();
-      listProductCat.forEach((v) {
-        var decode = jsonDecode(v.catName)[lang];
-        v.catName = decode;
-        // print("${v.catCode} | ${v.catName}");
+        JsonEncoder encoder = JsonEncoder.withIndent(" ");
+        String prettyprint = encoder.convert(v);
+        print("$tableGroupCategory => " + prettyprint);
+        listProductCat.add(GroupCategory.fromJson(v));
       });
       return listProductCat;
     } catch (e) {
-      print("Error $tableProductCategory => $e");
+      print("Error $tableGroupCategory => $e");
       return [];
     }
   }
 
-  Future<ProductCatagory> getDataProductCategoryByID(String catCode) async {
+  Future<List<GroupCategory>> getAllGroupCategory() async {
     final db = await database;
     try {
       var res = await db.rawQuery(
-          "SELECT * FROM $tableProductCategory WHERE CatCode = '$catCode'"); //query(tableProductCategory)
+          "SELECT * FROM $tableGroupCategory ORDER BY $tableGroupCategory.GroupID ASC"); //query(tableGroupCategory)
+      List<GroupCategory> listProductCat = List<GroupCategory>();
+      res.forEach((v) {
+        // JsonEncoder encoder = JsonEncoder.withIndent(" ");
+        // String prettyprint = encoder.convert(v);
+        // print("$tableGroupCategory => " + prettyprint);
+        listProductCat.add(GroupCategory.fromJson(v));
+      });
+      return listProductCat;
+    } catch (e) {
+      print("Error $tableGroupCategory => $e");
+      return [];
+    }
+  }
+
+  Future<List<GroupCategory>> getGroupCategoryBySubCat({String groupID}) async {
+    final db = await database;
+    try {
+      var res = await db.rawQuery(
+          "SELECT * FROM $tableGroupCategory WHERE GroupID = '$groupID' ORDER BY $tableGroupCategory.GroupID ASC"); //query(tableGroupCategory)
+      List<GroupCategory> listProductCat = List<GroupCategory>();
+      res.forEach((v) {
+        // JsonEncoder encoder = JsonEncoder.withIndent(" ");
+        // String prettyprint = encoder.convert(v);
+        // print("$tableGroupCategory => " + prettyprint);
+        listProductCat.add(GroupCategory.fromJson(v));
+      });
+      return listProductCat;
+    } catch (e) {
+      print("Error $tableGroupCategory => $e");
+      return [];
+    }
+  }
+
+  Future<List<ProductCategory>> getSubCategoryByGroupID(
+      {String groupID}) async {
+    final db = await database;
+    try {
+      var res = await db.rawQuery(
+          "SELECT * FROM $tableProductSubCategory WHERE GroupID = '$groupID' ORDER BY $tableProductSubCategory.CatCode ASC"); //query(tableGroupCategory)
+      List<ProductCategory> listProductCat = List<ProductCategory>();
+      res.forEach((v) {
+        listProductCat.add(ProductCategory.fromJson(v));
+      });
+      return listProductCat;
+    } catch (e) {
+      print("Error $tableGroupCategory => $e");
+      return [];
+    }
+  }
+
+  Future<String> getGroupCategoryByCatCode({String catCode}) async {
+    final db = await database;
+    try {
+      var res = await db.rawQuery(
+          "SELECT GroupID FROM $tableProductSubCategory WHERE CatCode = '$catCode' ORDER BY $tableProductSubCategory.CatCode ASC"); //query(tableGroupCategory)
+
+      return res.first['GroupID'];
+    } catch (e) {
+      print("Error $tableGroupCategory => $e");
+      return null;
+    }
+  }
+
+  Future<List<ProductCategory>> getAllDataProductCategory() async {
+    final db = await database;
+    try {
+      var res = await db.rawQuery(
+          "SELECT * FROM $tableProductSubCategory ORDER BY $tableProductSubCategory.CatCode ASC"); //query(tableProductCategory)
       // JsonEncoder encoder = JsonEncoder.withIndent(" ");
       // String prettyprint = encoder.convert(v);
       // print("$tableProductCategory => " + prettyprint);
-      return ProductCatagory.fromJson(res.first);
+      List<ProductCategory> listProductCat = List<ProductCategory>();
+      res.forEach((v) {
+        listProductCat.add(ProductCategory.fromJson(v));
+      });
+      return listProductCat;
     } catch (e) {
-      print("Error $tableProductCategory => $e");
+      print("Error $tableProductSubCategory => $e");
+      return [];
+    }
+  }
+
+  Future<ProductCategory> getDataProductCategoryByID(String catCode) async {
+    final db = await database;
+    try {
+      var res = await db.rawQuery(
+          "SELECT * FROM $tableProductSubCategory WHERE CatCode = '$catCode'"); //query(tableProductCategory)
+      // JsonEncoder encoder = JsonEncoder.withIndent(" ");
+      // String prettyprint = encoder.convert(v);
+      // print("$tableProductCategory => " + prettyprint);
+      return ProductCategory.fromJson(res.first);
+    } catch (e) {
+      print("Error $tableProductSubCategory => $e");
       return null;
     }
   }
@@ -206,7 +335,7 @@ class DBProviderInitialApp {
     final db = await database;
     try {
       var response = await db.rawQuery(
-          "SELECT CatName FROM $tableProductCategory WHERE CatCode = '$id'");
+          "SELECT CatName FROM $tableProductSubCategory WHERE CatCode = '$id'");
       if (response.isNotEmpty) {
         var catNameDecode = jsonDecode(response.first["CatName"]);
         // print("CatName : ${catNameDecode[lang.toUpperCase()]}");

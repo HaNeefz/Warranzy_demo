@@ -48,7 +48,9 @@ class ReturnResponse {
     switch (response.statusCode) {
       case 200:
         var responseJson = json.decode(response.body.toString());
-        print(responseJson);
+        JsonEncoder encoder = JsonEncoder.withIndent(" ");
+        String prettyprint = encoder.convert(responseJson);
+        print("DataOnline => $prettyprint");
         return responseJson;
       case 400:
         throw BadRequestException(response.body.toString());

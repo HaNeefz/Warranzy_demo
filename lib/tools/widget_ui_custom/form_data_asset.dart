@@ -1,4 +1,5 @@
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_picker/flutter_picker.dart';
@@ -67,7 +68,6 @@ class _FormDataAssetState extends State<FormDataAsset> {
   List<GetBrandName> listBrandName = [];
   List<String> listBrandID = [];
   String dataTime = '';
-  Future<List<ProductCatagory>> getProductCategory;
   List<String> _place = [
     "Home",
     "Office",
@@ -80,6 +80,23 @@ class _FormDataAssetState extends State<FormDataAsset> {
     "Meeting Room",
     "Bed room",
   ];
+
+  String groupID;
+  Future<List<ProductCategory>> getProductCategory;
+  Future<List<GroupCategory>> getProductGroupCategory;
+  initialCategory(String catCode) async {
+    var getGroupCatID = await DBProviderInitialApp.db
+        .getGroupCategoryByCatCode(catCode: catCode);
+    setState(() {
+      groupID = getGroupCatID;
+    });
+    initialSubCategory(groupID);
+  }
+
+  initialSubCategory(String groupID) async {
+    getProductCategory =
+        DBProviderInitialApp.db.getSubCategoryByGroupID(groupID: groupID);
+  }
 
   @override
   void initState() {
@@ -105,7 +122,13 @@ class _FormDataAssetState extends State<FormDataAsset> {
       txtLotNo = TextEditingController(text: _data?.lotNo ?? "");
       txtNote = TextEditingController(text: _data?.custRemark ?? "");
       txtSLCName = TextEditingController(text: _data?.slcName ?? "");
+      initialCategory(_data?.pdtCatCode);
+      getProductGroupCategory = DBProviderInitialApp.db.getAllGroupCategory();
     } else {
+      groupID = "A";
+      getProductGroupCategory = DBProviderInitialApp.db.getAllGroupCategory();
+      getProductCategory =
+          DBProviderInitialApp.db.getSubCategoryByGroupID(groupID: groupID);
       brandActive = _data?.brandCode != null ? "Y" : "N";
       txtAssetName = TextEditingController(text: "");
       txtBrandName = TextEditingController(text: "");
@@ -170,10 +193,106 @@ class _FormDataAssetState extends State<FormDataAsset> {
                 formWidget(
                   title: "Category",
                   necessary: true,
-                  child: FutureBuilder<List<ProductCatagory>>(
+                  child: FutureBuilder<List<GroupCategory>>(
+                    future: getProductGroupCategory,
+                    builder: (BuildContext context,
+                        AsyncSnapshot<List<GroupCategory>> snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        if (!(snapshot.hasError)) {
+                          return ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: DropdownButtonFormField(
+                                decoration: InputDecoration(
+                                    // border: InputBorder.none,
+                                    filled: true,
+                                    fillColor: Colors.grey[100]),
+                                value: groupID,
+                                items: snapshot.data.map((v) {
+                                  return DropdownMenuItem(
+                                    value: v.groupID,
+                                    child: Container(
+                                      width: 250,
+                                      child: Row(
+                                        children: <Widget>[
+                                          // Image.memory(
+                                          //   base64Decode(v.keepLogo),
+                                          //   width: 30,
+                                          //   height: 30,
+                                          //   fit: BoxFit.contain,
+                                          // ),
+                                          Container(
+                                            child: CachedNetworkImage(
+                                              imageUrl: v.logo,
+                                              imageBuilder:
+                                                  (context, imageProvider) =>
+                                                      Container(
+                                                width: 30,
+                                                height: 30,
+                                                decoration: BoxDecoration(
+                                                  image: DecorationImage(
+                                                    image: imageProvider,
+                                                    fit: BoxFit.contain,
+                                                  ),
+                                                ),
+                                              ),
+                                              placeholder: (context, url) => Center(
+                                                  child:
+                                                      CircularProgressIndicator()),
+                                              errorWidget:
+                                                  (context, url, error) =>
+                                                      Icon(Icons.error),
+                                            ),
+                                          ),
+                                          SizedBox(width: 10),
+                                          Container(
+                                            width: 180,
+                                            child: TextBuilder.build(
+                                                title: v.groupName.eN,
+                                                style: TextStyleCustom
+                                                    .STYLE_LABEL
+                                                    .copyWith(fontSize: 13),
+                                                maxLine: 1,
+                                                textOverflow:
+                                                    TextOverflow.ellipsis),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                                onChanged: (value) async {
+                                  await DBProviderInitialApp.db
+                                      .getSubCategoryByGroupID(groupID: value)
+                                      .then((onValue) {
+                                    setState(() {
+                                      txtPdtCat.text = onValue.first.catCode;
+                                      groupID = value;
+                                      // print("${v.catCode} | ${v.groupID}");
+                                    });
+                                  });
+                                  getProductCategory = DBProviderInitialApp.db
+                                      .getSubCategoryByGroupID(groupID: value);
+                                }),
+                          );
+                        } else {
+                          return TextBuilder.build(title: "Error data");
+                        }
+                      } else if (snapshot.connectionState ==
+                          ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      } else {
+                        return TextBuilder.build(title: "Something Wrong.");
+                      }
+                    },
+                  ),
+                ),
+                formWidget(
+                  title: "Sub-Category",
+                  necessary: true,
+                  child: FutureBuilder<List<ProductCategory>>(
                     future: getProductCategory,
                     builder: (BuildContext context,
-                        AsyncSnapshot<List<ProductCatagory>> snapshot) {
+                        AsyncSnapshot<List<ProductCategory>> snapshot) {
                       if (snapshot.connectionState == ConnectionState.done) {
                         if (!(snapshot.hasError)) {
                           return ClipRRect(
@@ -187,12 +306,50 @@ class _FormDataAssetState extends State<FormDataAsset> {
                               items: snapshot.data.map((v) {
                                 return DropdownMenuItem(
                                   value: v.catCode,
-                                  child: TextBuilder.build(
-                                      title: "${v.catCode}. ${v.catName}",
-                                      style: TextStyleCustom.STYLE_LABEL
-                                          .copyWith(fontSize: 15),
-                                      maxLine: 1,
-                                      textOverflow: TextOverflow.ellipsis),
+                                  child: Container(
+                                    width: 250,
+                                    child: Row(
+                                      children: <Widget>[
+                                        // Image.memory(
+                                        //   base64Decode(v.keepLogo),
+                                        //   width: 30,
+                                        //   height: 30,
+                                        //   fit: BoxFit.contain,
+                                        // ),
+                                        CachedNetworkImage(
+                                          imageUrl: v.logo,
+                                          imageBuilder:
+                                              (context, imageProvider) =>
+                                                  Container(
+                                            width: 30,
+                                            height: 30,
+                                            decoration: BoxDecoration(
+                                              image: DecorationImage(
+                                                image: imageProvider,
+                                                fit: BoxFit.contain,
+                                              ),
+                                            ),
+                                          ),
+                                          placeholder: (context, url) => Center(
+                                              child:
+                                                  CircularProgressIndicator()),
+                                          errorWidget: (context, url, error) =>
+                                              Icon(Icons.error),
+                                        ),
+                                        SizedBox(width: 10),
+                                        Container(
+                                          width: 180,
+                                          child: TextBuilder.build(
+                                              title: v.modelCatName.eN,
+                                              style: TextStyleCustom.STYLE_LABEL
+                                                  .copyWith(fontSize: 13),
+                                              maxLine: 1,
+                                              textOverflow:
+                                                  TextOverflow.ellipsis),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 );
                               }).toList(),
                               onChanged: (value) => setState(() {

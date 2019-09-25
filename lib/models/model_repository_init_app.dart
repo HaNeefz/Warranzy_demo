@@ -1,13 +1,20 @@
 import 'dart:convert' as jsonProvider;
 
+import 'dart:convert';
+
 class RepositoryInitalApp {
   bool status;
   List<Country> country;
   List<TimeZone> timeZone;
-  List<ProductCatagory> productCatagory;
+  List<ProductCategory> productCategory;
+  List<GroupCategory> groupCategory;
 
   RepositoryInitalApp(
-      {this.status, this.country, this.timeZone, this.productCatagory});
+      {this.status,
+      this.country,
+      this.timeZone,
+      this.productCategory,
+      this.groupCategory});
 
   RepositoryInitalApp.fromJson(Map<String, dynamic> json) {
     status = json['Status'];
@@ -23,10 +30,16 @@ class RepositoryInitalApp {
         timeZone.add(new TimeZone.fromJson(v));
       });
     }
-    if (json['ProductCatagory'] != null) {
-      productCatagory = new List<ProductCatagory>();
-      json['ProductCatagory'].forEach((v) {
-        productCatagory.add(new ProductCatagory.fromJson(v));
+    if (json['ProductCategory'] != null) {
+      productCategory = new List<ProductCategory>();
+      json['ProductCategory'].forEach((v) {
+        productCategory.add(new ProductCategory.fromJson(v));
+      });
+    }
+    if (json['GroupCategory'] != null) {
+      groupCategory = new List<GroupCategory>();
+      json['GroupCategory'].forEach((v) {
+        groupCategory.add(new GroupCategory.fromJson(v));
       });
     }
   }
@@ -40,9 +53,13 @@ class RepositoryInitalApp {
     if (this.timeZone != null) {
       data['TimeZone'] = this.timeZone.map((v) => v.toJson()).toList();
     }
-    if (this.productCatagory != null) {
-      data['ProductCatagory'] =
-          this.productCatagory.map((v) => v.toJson()).toList();
+    if (this.productCategory != null) {
+      data['ProductCategory'] =
+          this.productCategory.map((v) => v.toJson()).toList();
+    }
+    if (this.groupCategory != null) {
+      data['GroupCategory'] =
+          this.groupCategory.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -130,9 +147,9 @@ class TimeZone {
   }
 }
 
-class ProductCatagory {
+class ProductCategory {
   String catCode;
-  String catName;
+  CatName modelCatName;
   String imageBox;
   String imageProduct;
   String imageDocument;
@@ -143,10 +160,13 @@ class ProductCatagory {
   String imageSellerCard;
   String imageOther;
   String lastUpdate;
+  String groupID;
+  String logo;
+  String keepLogo;
 
-  ProductCatagory(
+  ProductCategory(
       {this.catCode,
-      this.catName,
+      this.modelCatName,
       this.imageBox,
       this.imageProduct,
       this.imageDocument,
@@ -156,11 +176,16 @@ class ProductCatagory {
       this.imageReceipt,
       this.imageSellerCard,
       this.imageOther,
-      this.lastUpdate});
+      this.lastUpdate,
+      this.groupID,
+      this.logo,
+      this.keepLogo});
 
-  ProductCatagory.fromJson(Map<String, dynamic> json) {
+  ProductCategory.fromJson(Map<String, dynamic> json) {
     catCode = json['CatCode'];
-    catName = json['CatName'];
+    modelCatName = json['CatName'] != null
+        ? CatName.fromJson(jsonDecode(json['CatName']))
+        : null;
     imageBox = json['Image_Box'];
     imageProduct = json['Image_Product'];
     imageDocument = json['Image_Document'];
@@ -171,12 +196,14 @@ class ProductCatagory {
     imageSellerCard = json['Image_SellerCard'];
     imageOther = json['Image_Other'];
     lastUpdate = json['LastUpdate'];
+    groupID = json['GroupID'];
+    logo = json['Logo'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['CatCode'] = this.catCode;
-    data['CatName'] = this.catName;
+    data['CatName'] = this.modelCatName;
     data['Image_Box'] = this.imageBox;
     data['Image_Product'] = this.imageProduct;
     data['Image_Document'] = this.imageDocument;
@@ -187,54 +214,65 @@ class ProductCatagory {
     data['Image_SellerCard'] = this.imageSellerCard;
     data['Image_Other'] = this.imageOther;
     data['LastUpdate'] = this.lastUpdate;
+    data['GroupID'] = this.groupID;
+    data['Logo'] = this.logo;
     return data;
   }
+}
 
-  List<ProductCatagory> getListCat() {
-    List<ProductCatagory> listProductCat = [
-      ProductCatagory(
-          catCode: "01",
-          catName: "Elec",
-          imageBox: "Y",
-          imageChassisNo: "Y",
-          imageDocument: "N",
-          imageOther: "Y",
-          imageProduct: "N",
-          imageReceipt: "N",
-          imageSellerCard: "Y",
-          imageSerial: "Y",
-          imageWarranty: "Y"),
-      ProductCatagory(
-          catCode: "02",
-          catName: "TV",
-          imageBox: "Y",
-          imageChassisNo: "Y",
-          imageDocument: "N",
-          imageOther: "N",
-          imageProduct: "Y",
-          imageReceipt: "Y",
-          imageSellerCard: "N",
-          imageSerial: "Y",
-          imageWarranty: "N"),
-      ProductCatagory(
-          catCode: "03",
-          catName: "Car",
-          imageBox: "Y",
-          imageChassisNo: "Y",
-          imageDocument: "Y",
-          imageOther: "N",
-          imageProduct: "Y",
-          imageReceipt: "N",
-          imageSellerCard: "Y",
-          imageSerial: "N",
-          imageWarranty: "Y"),
-    ];
-    return listProductCat;
+class GroupCategory {
+  String groupID;
+  GroupName groupName;
+  String lastUpdate;
+  String logo;
+  String keepLogo;
+  GroupCategory(
+      {this.groupID,
+      this.groupName,
+      this.lastUpdate,
+      this.logo,
+      this.keepLogo});
+
+  GroupCategory.fromJson(Map<String, dynamic> json) {
+    groupID = json['GroupID'];
+    groupName = json['GroupName'] != null
+        ? GroupName.fromJson(jsonDecode(json['GroupName']))
+        : null;
+    lastUpdate = json['LastUpdate'];
+    logo = json['Logo'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['GroupID'] = this.groupID;
+    data['GroupName'] = this.groupName;
+    data['LastUpdate'] = this.lastUpdate;
+    data['Logo'] = this.logo;
+    return data;
+  }
+}
+
+class GroupName {
+  String eN;
+  String tH;
+
+  GroupName({this.eN, this.tH});
+
+  GroupName.fromJson(Map<String, dynamic> json) {
+    eN = json['EN'];
+    tH = json['TH'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['EN'] = this.eN;
+    data['TH'] = this.tH;
+    return data;
   }
 }
 
 class RelatedImage {
-  final ProductCatagory category;
+  final ProductCategory category;
   List<String> _reletedImage = [];
   RelatedImage({this.category});
 

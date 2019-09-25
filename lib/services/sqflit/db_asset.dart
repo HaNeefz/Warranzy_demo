@@ -74,9 +74,7 @@ BlockchainID */
       TradeStatus TEXT,
       SLCName TEXT,
       CustBuyDate TEXT,
-      CatName TEXT,
       ManCode TEXT,
-      BrandName TEXT,
       ProductID TEXT,
       MFGDate TEXT,
       EXPDate TEXT,
@@ -141,7 +139,7 @@ BlockchainID */
     if (res.isNotEmpty) {
       res.forEach((v) {
         String prettyprint = encoder.convert(v);
-        print("Data => " + prettyprint);
+        print("DataOffine => " + prettyprint);
         // var map = {"Status":true,"Data":}
         temp.add(ModelDataAsset.fromJson(v));
       });

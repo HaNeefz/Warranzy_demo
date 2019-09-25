@@ -478,21 +478,12 @@ class MyAssetFormSQLite extends StatefulWidget {
 
 class _MyAssetFormSQLiteState extends State<MyAssetFormSQLite> {
   final Dio dio = Dio();
-  String catName = '';
   final ecsLib = getIt.get<ECSLib>();
   final allTranslations = getIt.get<GlobalTranslations>();
-  getProductCateName() async {
-    var _catName = await DBProviderInitialApp.db.getProductCatName(
-        id: widget.data.pdtCatCode, lang: allTranslations.currentLanguage);
-    setState(() {
-      catName = _catName;
-    });
-  }
 
   @override
   void initState() {
     super.initState();
-    getProductCateName();
   }
 
   @override
@@ -504,17 +495,43 @@ class _MyAssetFormSQLiteState extends State<MyAssetFormSQLite> {
         child: ListTile(
           title: Row(
             children: <Widget>[
-              Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                    border: Border.all(
-                        width: 0.3, color: ThemeColors.COLOR_THEME_APP),
-                    borderRadius: BorderRadius.circular(10)),
-                child: Center(
-                  child: FlutterLogo(),
+              // Container(
+              //   width: 100,
+              //   height: 100,
+              //   decoration: BoxDecoration(
+              //       border: Border.all(
+              //           width: 0.3, color: ThemeColors.COLOR_THEME_APP),
+              //       borderRadius: BorderRadius.circular(10)),
+              //   child: Center(
+              //     child: FlutterLogo(),
+              //   ),
+              // ),
+              if (widget.data.imageMain != null)
+                CachedNetworkImage(
+                  imageUrl: widget.data.imageMain,
+                  imageBuilder: (context, imageProvider) => Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      image: DecorationImage(
+                          image: imageProvider,
+                          fit: BoxFit.cover,
+                          colorFilter:
+                              ColorFilter.mode(Colors.red, BlendMode.dstATop)),
+                    ),
+                  ),
+                  placeholder: (context, url) => CircularProgressIndicator(),
+                  errorWidget: (context, url, error) => Icon(
+                    Icons.error,
+                    size: 100,
+                  ),
+                )
+              else
+                Icon(
+                  Icons.error,
+                  size: 100,
                 ),
-              ),
               Expanded(
                 flex: 2,
                 child: Container(
@@ -545,7 +562,8 @@ class _MyAssetFormSQLiteState extends State<MyAssetFormSQLite> {
                             color: ThemeColors.COLOR_GREY.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(20)),
                         child: TextBuilder.build(
-                            title: widget.data?.modelCatName?.eN ?? catName,
+                            title: widget.data?.modelCatName?.eN ??
+                                "CatName is empty",
                             style: TextStyleCustom.STYLE_CONTENT.copyWith(
                                 fontSize: 14, color: ThemeColors.COLOR_BLACK)),
                       )

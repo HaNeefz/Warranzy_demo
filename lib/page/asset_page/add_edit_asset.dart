@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -91,7 +92,9 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
   List<String> listRelated = [];
   List<String> tempListRelated = [];
   List<String> imageOld = [];
-  Future<List<ProductCatagory>> getProductCategory;
+  Future<List<ProductCategory>> getProductCategory;
+  List<Uint8List> getIconsProductCategory;
+  Future<List<GroupCategory>> getProductGroupCategory;
   bool _showButtonSave = false;
   List<String> _place = [
     "Home",
@@ -106,12 +109,28 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
     "Bed room",
   ];
 
+  String groupID;
+
+  initialCategory(String catCode) async {
+    var getGroupCatID = await DBProviderInitialApp.db
+        .getGroupCategoryByCatCode(catCode: catCode);
+    setState(() {
+      groupID = getGroupCatID;
+    });
+    initialSubCategory(groupID);
+  }
+
+  initialSubCategory(String groupID) async {
+    getProductCategory =
+        DBProviderInitialApp.db.getSubCategoryByGroupID(groupID: groupID);
+  }
+
   @override
   void initState() {
     listTempData = List.of(listImageEachGroup ?? []);
 
-    getProductCategory = DBProviderInitialApp.db.getAllDataProductCategory();
     if (_data != null) {
+      print(_data.pdtCatCode);
       brandActive = _data?.brandCode != null ? "Y" : "N";
       txtAssetName = TextEditingController(text: _data?.title ?? "");
       txtBrandName = TextEditingController(text: "");
@@ -130,7 +149,13 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
       txtLotNo = TextEditingController(text: _data?.lotNo ?? "");
       txtNote = TextEditingController(text: _data?.custRemark ?? "");
       txtSLCName = TextEditingController(text: _data?.slcName ?? "");
+      initialCategory(_data?.pdtCatCode);
+      getProductGroupCategory = DBProviderInitialApp.db.getAllGroupCategory();
     } else {
+      groupID = "A";
+      getProductGroupCategory = DBProviderInitialApp.db.getAllGroupCategory();
+      getProductCategory =
+          DBProviderInitialApp.db.getSubCategoryByGroupID(groupID: groupID);
       brandActive = _data?.brandCode != null ? "Y" : "N";
       txtAssetName = TextEditingController(text: "");
       txtBrandName = TextEditingController(text: "");
@@ -158,6 +183,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
       // getImageToBase64();
     }
     txtPdtCat.addListener(() {
+      /////////////////////////////////////////////////////////////////
       print("ADdListener => ${txtPdtCat.text}");
       if (widget.actionPageForAdd == true) {
         setState(() {
@@ -174,15 +200,12 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
   }
 
   getProductCat([String categoryID]) async {
-    // print("CatID => $categoryID");
     var res = await DBProviderInitialApp.db
         .getDataProductCategoryByID(categoryID ?? _data.pdtCatCode);
     relatedImage = RelatedImage(category: res);
     listRelated = relatedImage.listRelatedImage();
     tempListRelated = List.of(listRelated);
     print("Related => $tempListRelated");
-    // if (listTempData != null && listTempData != []) {
-    // print("listTempData $listTempData");
     for (var tempData in listTempData) {
       print("${listTempData.indexOf(tempData)} => ${tempData.title}");
       for (var tempReleted in listRelated) {
@@ -193,7 +216,6 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
           });
         }
       }
-      // }
     }
     tempListRelated.forEach((v) {
       setState(() {
@@ -256,15 +278,15 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
         saveInformation();
       }
     } else {
-      if (_currentStep + 1 != _myStepForEdit().length)
-        goTo(_currentStep + 1);
-      else {
-        setState(() {
-          complete = true;
-        });
-        print("Completed, check fields.");
-        saveInformation();
-      }
+      // if (_currentStep + 1 != _myStepForEdit().length)
+      //   goTo(_currentStep + 1);
+      // else {
+      //   setState(() {
+      //     complete = true;
+      //   });
+      //   print("Completed, check fields.");
+      //   saveInformation();
+      // }
     }
   }
 
@@ -411,9 +433,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
                   onStepContinue: next,
                   onStepCancel: cancel,
                   onStepTapped: (step) => goTo(step),
-                  steps: actionPageForAdd == true
-                      ? _myStepForAdd()
-                      : _myStepForEdit()),
+                  steps: _myStepForAdd()),
             ),
           ),
         ),
@@ -483,6 +503,13 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
   }
 
   getBrandName() {
+    Firestore.instance
+        .collection('BrandName')
+        .document("411fa764ac3b49c")
+        .get()
+        .then((onValue) {
+      print(onValue.data);
+    });
     Firestore.instance.collection('BrandName').snapshots().listen((onData) {
       for (var temp in onData.documents) {
         listBrandName.add(GetBrandName.fromJson(temp.data));
@@ -859,10 +886,104 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
             formWidget(
               title: "Category",
               necessary: true,
-              child: FutureBuilder<List<ProductCatagory>>(
+              child: FutureBuilder<List<GroupCategory>>(
+                future: getProductGroupCategory,
+                builder: (BuildContext context,
+                    AsyncSnapshot<List<GroupCategory>> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    if (!(snapshot.hasError)) {
+                      return ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: DropdownButtonFormField(
+                            decoration: InputDecoration(
+                                // border: InputBorder.none,
+                                filled: true,
+                                fillColor: Colors.grey[100]),
+                            value: groupID,
+                            items: snapshot.data.map((v) {
+                              return DropdownMenuItem(
+                                value: v.groupID,
+                                child: Container(
+                                  width: 250,
+                                  child: Row(
+                                    children: <Widget>[
+                                      // Image.memory(
+                                      //   base64Decode(v.keepLogo),
+                                      //   width: 30,
+                                      //   height: 30,
+                                      //   fit: BoxFit.contain,
+                                      // ),
+                                      Container(
+                                        child: CachedNetworkImage(
+                                          imageUrl: v.logo,
+                                          imageBuilder:
+                                              (context, imageProvider) =>
+                                                  Container(
+                                            width: 30,
+                                            height: 30,
+                                            decoration: BoxDecoration(
+                                              image: DecorationImage(
+                                                image: imageProvider,
+                                                fit: BoxFit.contain,
+                                              ),
+                                            ),
+                                          ),
+                                          placeholder: (context, url) => Center(
+                                              child:
+                                                  CircularProgressIndicator()),
+                                          errorWidget: (context, url, error) =>
+                                              Icon(Icons.error),
+                                        ),
+                                      ),
+                                      SizedBox(width: 10),
+                                      Container(
+                                        width: 180,
+                                        child: TextBuilder.build(
+                                            title: v.groupName.eN,
+                                            style: TextStyleCustom.STYLE_LABEL
+                                                .copyWith(fontSize: 13),
+                                            maxLine: 1,
+                                            textOverflow:
+                                                TextOverflow.ellipsis),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (value) async {
+                              await DBProviderInitialApp.db
+                                  .getSubCategoryByGroupID(groupID: value)
+                                  .then((onValue) {
+                                setState(() {
+                                  txtPdtCat.text = onValue.first.catCode;
+                                  groupID = value;
+                                  // print("${v.catCode} | ${v.groupID}");
+                                });
+                              });
+                              getProductCategory = DBProviderInitialApp.db
+                                  .getSubCategoryByGroupID(groupID: value);
+                            }),
+                      );
+                    } else {
+                      return TextBuilder.build(title: "Error data");
+                    }
+                  } else if (snapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  } else {
+                    return TextBuilder.build(title: "Something Wrong.");
+                  }
+                },
+              ),
+            ),
+            formWidget(
+              title: "Sub-Category",
+              necessary: true,
+              child: FutureBuilder<List<ProductCategory>>(
                 future: getProductCategory,
                 builder: (BuildContext context,
-                    AsyncSnapshot<List<ProductCatagory>> snapshot) {
+                    AsyncSnapshot<List<ProductCategory>> snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
                     if (!(snapshot.hasError)) {
                       return ClipRRect(
@@ -876,12 +997,47 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
                           items: snapshot.data.map((v) {
                             return DropdownMenuItem(
                               value: v.catCode,
-                              child: TextBuilder.build(
-                                  title: "${v.catName}",
-                                  style: TextStyleCustom.STYLE_LABEL
-                                      .copyWith(fontSize: 14),
-                                  maxLine: 1,
-                                  textOverflow: TextOverflow.ellipsis),
+                              child: Container(
+                                width: 250,
+                                child: Row(
+                                  children: <Widget>[
+                                    // Image.memory(
+                                    //   base64Decode(v.keepLogo),
+                                    //   width: 30,
+                                    //   height: 30,
+                                    //   fit: BoxFit.contain,
+                                    // ),
+                                    CachedNetworkImage(
+                                      imageUrl: v.logo,
+                                      imageBuilder: (context, imageProvider) =>
+                                          Container(
+                                        width: 30,
+                                        height: 30,
+                                        decoration: BoxDecoration(
+                                          image: DecorationImage(
+                                            image: imageProvider,
+                                            fit: BoxFit.contain,
+                                          ),
+                                        ),
+                                      ),
+                                      placeholder: (context, url) => Center(
+                                          child: CircularProgressIndicator()),
+                                      errorWidget: (context, url, error) =>
+                                          Icon(Icons.error),
+                                    ),
+                                    SizedBox(width: 10),
+                                    Container(
+                                      width: 180,
+                                      child: TextBuilder.build(
+                                          title: v.modelCatName.eN,
+                                          style: TextStyleCustom.STYLE_LABEL
+                                              .copyWith(fontSize: 13),
+                                          maxLine: 1,
+                                          textOverflow: TextOverflow.ellipsis),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             );
                           }).toList(),
                           onChanged: (value) => setState(() {
@@ -964,73 +1120,83 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
       ),
       Step(
         title: TextBuilder.build(
-            title: "Warranzy Expire", style: TextStyleCustom.STYLE_LABEL_BOLD),
-        content: formWidget(
-            title: "Warranzy Expire",
-            necessary: true,
-            child: Container(
-              width: MediaQuery.of(context).size.width,
-              height: 50,
-              child: RaisedButton(
-                elevation: 0,
-                color: Colors.grey[100],
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
-                child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: TextBuilder.build(title: dataTime)),
-                onPressed: () {
-                  Picker(
-                      itemExtent: 40,
-                      adapter: DateTimePickerAdapter(customColumnType: [
-                        0,
-                        1,
-                        2
-                      ], months: [
-                        allTranslations.text("jan"),
-                        allTranslations.text("feb"),
-                        allTranslations.text("mar"),
-                        allTranslations.text("apr"),
-                        allTranslations.text("may"),
-                        allTranslations.text("Jun"),
-                        allTranslations.text("jul"),
-                        allTranslations.text("aug"),
-                        allTranslations.text("sep"),
-                        allTranslations.text("oct"),
-                        allTranslations.text("nov"),
-                        allTranslations.text("dec")
-                      ]),
-                      delimiter: [PickerDelimiter(child: Container())],
-                      hideHeader: true,
-                      confirmText: allTranslations.text("confirm"),
-                      cancelText: allTranslations.text("cancel"),
-                      title: new Text("Please Select"),
-                      onConfirm: (Picker picker, List value) {
-                        print(
-                            "Picker value : ${(picker.adapter as DateTimePickerAdapter).value}");
-                        setState(() {
-                          dataTime = (picker.adapter as DateTimePickerAdapter)
-                              .value
-                              .toString()
-                              .split(" ")
-                              .first;
-                          txtWarranzyExpire.text =
-                              (picker.adapter as DateTimePickerAdapter)
-                                  .value
-                                  .toString();
-                        });
-                      }).showDialog(context);
-                },
-              ),
-            )
-            // ButtonDatePickerCustom.buttonDatePicker(context, () {
-            //   print(ButtonDatePickerCustom.showDate);
-            //   setState(() {
-            //     // _showDate = ButtonDatePickerCustom.showDate;
-            //     txtWarranzyExpire.text = ButtonDatePickerCustom.valueDate;
-            //   });
-            // }),
-            ),
+            title: "Warranty Info", style: TextStyleCustom.STYLE_LABEL_BOLD),
+        content: Column(
+          children: <Widget>[
+            TextFieldBuilder.textFormFieldCustom(
+                controller: txtWarranzyNo,
+                borderOutLine: false,
+                validate: false,
+                title: "Warranty No"),
+            formWidget(
+                title: "Warranty Expire",
+                necessary: true,
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: 50,
+                  child: RaisedButton(
+                    elevation: 0,
+                    color: Colors.grey[100],
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                    child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: TextBuilder.build(title: dataTime)),
+                    onPressed: () {
+                      Picker(
+                          itemExtent: 40,
+                          adapter: DateTimePickerAdapter(customColumnType: [
+                            0,
+                            1,
+                            2
+                          ], months: [
+                            allTranslations.text("jan"),
+                            allTranslations.text("feb"),
+                            allTranslations.text("mar"),
+                            allTranslations.text("apr"),
+                            allTranslations.text("may"),
+                            allTranslations.text("Jun"),
+                            allTranslations.text("jul"),
+                            allTranslations.text("aug"),
+                            allTranslations.text("sep"),
+                            allTranslations.text("oct"),
+                            allTranslations.text("nov"),
+                            allTranslations.text("dec")
+                          ]),
+                          delimiter: [PickerDelimiter(child: Container())],
+                          hideHeader: true,
+                          confirmText: allTranslations.text("confirm"),
+                          cancelText: allTranslations.text("cancel"),
+                          title: new Text("Please Select"),
+                          onConfirm: (Picker picker, List value) {
+                            print(
+                                "Picker value : ${(picker.adapter as DateTimePickerAdapter).value}");
+                            setState(() {
+                              dataTime =
+                                  (picker.adapter as DateTimePickerAdapter)
+                                      .value
+                                      .toString()
+                                      .split(" ")
+                                      .first;
+                              txtWarranzyExpire.text =
+                                  (picker.adapter as DateTimePickerAdapter)
+                                      .value
+                                      .toString();
+                            });
+                          }).showDialog(context);
+                    },
+                  ),
+                )
+                // ButtonDatePickerCustom.buttonDatePicker(context, () {
+                //   print(ButtonDatePickerCustom.showDate);
+                //   setState(() {
+                //     // _showDate = ButtonDatePickerCustom.showDate;
+                //     txtWarranzyExpire.text = ButtonDatePickerCustom.valueDate;
+                //   });
+                // }),
+                ),
+          ],
+        ),
         isActive: _currentStep >= 0,
       ),
       Step(
@@ -1129,289 +1295,294 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
     return _step;
   }
 
-  List<Step> _myStepForEdit() {
-    List<Step> _step = [
-      Step(
-        title: TextBuilder.build(
-            title: "Asset Name", style: TextStyleCustom.STYLE_LABEL_BOLD),
-        content: TextFieldBuilder.textFormFieldCustom(
-            controller: txtAssetName,
-            borderOutLine: false,
-            necessary: true,
-            validate: true,
-            title: "Asset Name"),
-        isActive: _currentStep >= 0,
-      ),
-      Step(
-        title: TextBuilder.build(
-            title: "Category", style: TextStyleCustom.STYLE_LABEL_BOLD),
-        content: Column(
-          children: <Widget>[
-            formWidget(
-              title: "Category",
-              necessary: true,
-              child: FutureBuilder<List<ProductCatagory>>(
-                future: getProductCategory,
-                builder: (BuildContext context,
-                    AsyncSnapshot<List<ProductCatagory>> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    if (!(snapshot.hasError)) {
-                      return ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: DropdownButtonFormField(
-                          decoration: InputDecoration(
-                              // border: InputBorder.none,
-                              filled: true,
-                              fillColor: Colors.grey[100]),
-                          value: txtPdtCat.text,
-                          items: snapshot.data.map((v) {
-                            return DropdownMenuItem(
-                              value: v.catCode,
-                              child: TextBuilder.build(
-                                  title: "${v.catName}",
-                                  style: TextStyleCustom.STYLE_LABEL
-                                      .copyWith(fontSize: 15),
-                                  maxLine: 1,
-                                  textOverflow: TextOverflow.ellipsis),
-                            );
-                          }).toList(),
-                          onChanged: (value) => setState(() {
-                            txtPdtCat.text = value;
-                            print(txtPdtCat.text);
-                          }),
-                        ),
-                      );
-                    } else {
-                      return TextBuilder.build(title: "Error data");
-                    }
-                  } else if (snapshot.connectionState ==
-                      ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  } else {
-                    return TextBuilder.build(title: "Something Wrong.");
-                  }
-                },
-              ),
-            ),
-          ],
-        ),
-        isActive: _currentStep >= 0,
-      ),
-      Step(
-        title: TextBuilder.build(
-            title: "Brand Name, Group and Place",
-            style: TextStyleCustom.STYLE_LABEL_BOLD),
-        content: Column(
-          children: <Widget>[
-            formWidget(
-                title: "Brand Name",
-                necessary: true,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Container(
-                      height: 55,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                      ),
-                      child: autoCompleteTextField()),
-                )),
-            formWidget(
-                title: "Group",
-                necessary: true,
-                child: dropdownFormfield(
-                  initalData: txtPdtGroup.text,
-                  items: [
-                    "Car",
-                    "Living Room",
-                    "Meeting Room",
-                    "Bed room",
-                  ],
-                  onChange: (value) {
-                    setState(() {
-                      txtPdtGroup.text = value;
-                    });
-                  },
-                )),
-            formWidget(
-                title: "Place",
-                necessary: true,
-                child: dropdownFormfield(
-                  initalData: txtPdtPlace.text,
-                  items: [
-                    "Home",
-                    "Office",
-                    "School",
-                    "Kitchen",
-                  ],
-                  onChange: (value) {
-                    setState(() {
-                      txtPdtPlace.text = value;
-                    });
-                  },
-                )),
-          ],
-        ),
-        isActive: _currentStep >= 0,
-      ),
-      Step(
-        title: TextBuilder.build(
-            title: "Warranzy Expire", style: TextStyleCustom.STYLE_LABEL_BOLD),
-        content: formWidget(
-            title: "Warranzy Expire",
-            necessary: true,
-            child: Container(
-              width: MediaQuery.of(context).size.width,
-              height: 50,
-              child: RaisedButton(
-                elevation: 0,
-                color: Colors.grey[100],
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
-                child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: TextBuilder.build(title: dataTime)),
-                onPressed: () {
-                  Picker(
-                      itemExtent: 40,
-                      adapter: DateTimePickerAdapter(customColumnType: [
-                        0,
-                        1,
-                        2
-                      ], months: [
-                        allTranslations.text("jan"),
-                        allTranslations.text("feb"),
-                        allTranslations.text("mar"),
-                        allTranslations.text("apr"),
-                        allTranslations.text("may"),
-                        allTranslations.text("Jun"),
-                        allTranslations.text("jul"),
-                        allTranslations.text("aug"),
-                        allTranslations.text("sep"),
-                        allTranslations.text("oct"),
-                        allTranslations.text("nov"),
-                        allTranslations.text("dec")
-                      ]),
-                      delimiter: [PickerDelimiter(child: Container())],
-                      hideHeader: true,
-                      confirmText: allTranslations.text("confirm"),
-                      cancelText: allTranslations.text("cancel"),
-                      title: new Text("Please Select"),
-                      onConfirm: (Picker picker, List value) {
-                        print(
-                            "Picker value : ${(picker.adapter as DateTimePickerAdapter).value}");
-                        setState(() {
-                          dataTime = (picker.adapter as DateTimePickerAdapter)
-                              .value
-                              .toString()
-                              .split(" ")
-                              .first;
-                          txtWarranzyExpire.text =
-                              (picker.adapter as DateTimePickerAdapter)
-                                  .value
-                                  .toString();
-                        });
-                      }).showDialog(context);
-                },
-              ),
-            )
-            // ButtonDatePickerCustom.buttonDatePicker(context, () {
-            //   print(ButtonDatePickerCustom.showDate);
-            //   setState(() {
-            //     // _showDate = ButtonDatePickerCustom.showDate;
-            //     txtWarranzyExpire.text = ButtonDatePickerCustom.valueDate;
-            //   });
-            // }),
-            ),
-        isActive: _currentStep >= 0,
-      ),
-      Step(
-        title: TextBuilder.build(
-            title: "Optional", style: TextStyleCustom.STYLE_LABEL_BOLD),
-        content: formWidget(
-          title: "Optional",
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              // color: Colors.grey[100]
-            ),
-            padding: EdgeInsets.all(5),
-            child: Column(
-              children: <Widget>[
-                TextFieldBuilder.textFormFieldCustom(
-                    controller: txtWarranzyNo,
-                    borderOutLine: false,
-                    validate: false,
-                    title: "Warranty No"),
-                TextFieldBuilder.textFormFieldCustom(
-                    controller: txtSLCName,
-                    borderOutLine: false,
-                    validate: false,
-                    title: "SLCName"),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Expanded(
-                      child: TextFieldBuilder.textFormFieldCustom(
-                          controller: txtSerialNo,
-                          validate: false,
-                          borderOutLine: false,
-                          title: "Serial No"),
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    GestureDetector(
-                        onTap: () async {
-                          print("ScanBarCode or QR");
-                          var dataScan = await MethodLib.scanQR(context);
-                          if (dataScan != null)
-                            setState(() {
-                              txtSerialNo.text = dataScan;
-                            });
-                        },
-                        child: Column(
-                          children: <Widget>[
-                            Image.asset(Assets.ICON_BARCODE,
-                                width: 35, height: 35),
-                            // TextBuilder.build(
-                            //     title: "Scan",
-                            //     style: TextStyleCustom.STYLE_LABEL
-                            //         .copyWith(fontSize: 10))
-                          ],
-                        ))
-                  ],
-                ),
-                TextFieldBuilder.textFormFieldCustom(
-                    controller: txtLotNo,
-                    keyboardType: TextInputType.number,
-                    validate: false,
-                    borderOutLine: false,
-                    title: "Lot No"),
-                TextFieldBuilder.textFormFieldCustom(
-                    controller: txtPrice,
-                    keyboardType:
-                        TextInputType.numberWithOptions(decimal: true),
-                    validate: false,
-                    borderOutLine: false,
-                    title: "Salse price"),
-                TextFieldBuilder.textFormFieldCustom(
-                    controller: txtNote,
-                    validate: false,
-                    maxLine: 5,
-                    borderOutLine: false,
-                    title: "Note"),
-              ],
-              // ExpansionTile(
-              //   title: TextBuilder.build(title: ""),
-              //   children: <Widget>[
+  // List<Step> _myStepForEdit() {
+  //   List<Step> _step = [
+  //     Step(
+  //       title: TextBuilder.build(
+  //           title: "Asset Name", style: TextStyleCustom.STYLE_LABEL_BOLD),
+  //       content: TextFieldBuilder.textFormFieldCustom(
+  //           controller: txtAssetName,
+  //           borderOutLine: false,
+  //           necessary: true,
+  //           validate: true,
+  //           title: "Asset Name"),
+  //       isActive: _currentStep >= 0,
+  //     ),
+  //     Step(
+  //       title: TextBuilder.build(
+  //           title: "Category", style: TextStyleCustom.STYLE_LABEL_BOLD),
+  //       content: Column(
+  //         children: <Widget>[
+  //           formWidget(
+  //             title: "Category",
+  //             necessary: true,
+  //             child: FutureBuilder<List<ProductCategory>>(
+  //               future: getProductCategory,
+  //               builder: (BuildContext context,
+  //                   AsyncSnapshot<List<ProductCategory>> snapshot) {
+  //                 if (snapshot.connectionState == ConnectionState.done) {
+  //                   if (!(snapshot.hasError)) {
+  //                     return ClipRRect(
+  //                       borderRadius: BorderRadius.circular(10),
+  //                       child: DropdownButtonFormField(
+  //                         decoration: InputDecoration(
+  //                             // border: InputBorder.none,
+  //                             filled: true,
+  //                             fillColor: Colors.grey[100]),
+  //                         value: txtPdtCat.text,
+  //                         items: snapshot.data.map((v) {
+  //                           return DropdownMenuItem(
+  //                             value: v.catCode,
+  //                             child: TextBuilder.build(
+  //                                 title: "${v.catName}",
+  //                                 style: TextStyleCustom.STYLE_LABEL
+  //                                     .copyWith(fontSize: 15),
+  //                                 maxLine: 1,
+  //                                 textOverflow: TextOverflow.ellipsis),
+  //                           );
+  //                         }).toList(),
+  //                         onChanged: (value) => setState(() {
+  //                           txtPdtCat.text = value;
+  //                           print(txtPdtCat.text);
+  //                         }),
+  //                       ),
+  //                     );
+  //                   } else {
+  //                     return TextBuilder.build(title: "Error data");
+  //                   }
+  //                 } else if (snapshot.connectionState ==
+  //                     ConnectionState.waiting) {
+  //                   return CircularProgressIndicator();
+  //                 } else {
+  //                   return TextBuilder.build(title: "Something Wrong.");
+  //                 }
+  //               },
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //       isActive: _currentStep >= 0,
+  //     ),
+  //     Step(
+  //       title: TextBuilder.build(
+  //           title: "Brand Name, Group and Place",
+  //           style: TextStyleCustom.STYLE_LABEL_BOLD),
+  //       content: Column(
+  //         children: <Widget>[
+  //           formWidget(
+  //               title: "Brand Name",
+  //               necessary: true,
+  //               child: ClipRRect(
+  //                 borderRadius: BorderRadius.circular(10),
+  //                 child: Container(
+  //                     height: 55,
+  //                     decoration: BoxDecoration(
+  //                       color: Colors.grey[100],
+  //                     ),
+  //                     child: autoCompleteTextField()),
+  //               )),
+  //           formWidget(
+  //               title: "Group",
+  //               necessary: true,
+  //               child: dropdownFormfield(
+  //                 initalData: txtPdtGroup.text,
+  //                 items: [
+  //                   "Car",
+  //                   "Living Room",
+  //                   "Meeting Room",
+  //                   "Bed room",
+  //                 ],
+  //                 onChange: (value) {
+  //                   setState(() {
+  //                     txtPdtGroup.text = value;
+  //                   });
+  //                 },
+  //               )),
+  //           formWidget(
+  //               title: "Place",
+  //               necessary: true,
+  //               child: dropdownFormfield(
+  //                 initalData: txtPdtPlace.text,
+  //                 items: [
+  //                   "Home",
+  //                   "Office",
+  //                   "School",
+  //                   "Kitchen",
+  //                 ],
+  //                 onChange: (value) {
+  //                   setState(() {
+  //                     txtPdtPlace.text = value;
+  //                   });
+  //                 },
+  //               )),
+  //         ],
+  //       ),
+  //       isActive: _currentStep >= 0,
+  //     ),
+  //     Step(
+  //       title: TextBuilder.build(
+  //           title: "Warranzy Expire", style: TextStyleCustom.STYLE_LABEL_BOLD),
+  //       content: Column(
+  //         children: <Widget>[
+  //           TextFieldBuilder.textFormFieldCustom(
+  //               controller: txtWarranzyNo,
+  //               borderOutLine: false,
+  //               validate: false,
+  //               title: "Warranty No"),
+  //           formWidget(
+  //               title: "Warranzy Expire",
+  //               necessary: true,
+  //               child: Container(
+  //                 width: MediaQuery.of(context).size.width,
+  //                 height: 50,
+  //                 child: RaisedButton(
+  //                   elevation: 0,
+  //                   color: Colors.grey[100],
+  //                   shape: RoundedRectangleBorder(
+  //                       borderRadius: BorderRadius.circular(10)),
+  //                   child: Align(
+  //                       alignment: Alignment.centerLeft,
+  //                       child: TextBuilder.build(title: dataTime)),
+  //                   onPressed: () {
+  //                     Picker(
+  //                         itemExtent: 40,
+  //                         adapter: DateTimePickerAdapter(customColumnType: [
+  //                           0,
+  //                           1,
+  //                           2
+  //                         ], months: [
+  //                           allTranslations.text("jan"),
+  //                           allTranslations.text("feb"),
+  //                           allTranslations.text("mar"),
+  //                           allTranslations.text("apr"),
+  //                           allTranslations.text("may"),
+  //                           allTranslations.text("Jun"),
+  //                           allTranslations.text("jul"),
+  //                           allTranslations.text("aug"),
+  //                           allTranslations.text("sep"),
+  //                           allTranslations.text("oct"),
+  //                           allTranslations.text("nov"),
+  //                           allTranslations.text("dec")
+  //                         ]),
+  //                         delimiter: [PickerDelimiter(child: Container())],
+  //                         hideHeader: true,
+  //                         confirmText: allTranslations.text("confirm"),
+  //                         cancelText: allTranslations.text("cancel"),
+  //                         title: new Text("Please Select"),
+  //                         onConfirm: (Picker picker, List value) {
+  //                           print(
+  //                               "Picker value : ${(picker.adapter as DateTimePickerAdapter).value}");
+  //                           setState(() {
+  //                             dataTime =
+  //                                 (picker.adapter as DateTimePickerAdapter)
+  //                                     .value
+  //                                     .toString()
+  //                                     .split(" ")
+  //                                     .first;
+  //                             txtWarranzyExpire.text =
+  //                                 (picker.adapter as DateTimePickerAdapter)
+  //                                     .value
+  //                                     .toString();
+  //                           });
+  //                         }).showDialog(context);
+  //                   },
+  //                 ),
+  //               )
+  //               // ButtonDatePickerCustom.buttonDatePicker(context, () {
+  //               //   print(ButtonDatePickerCustom.showDate);
+  //               //   setState(() {
+  //               //     // _showDate = ButtonDatePickerCustom.showDate;
+  //               //     txtWarranzyExpire.text = ButtonDatePickerCustom.valueDate;
+  //               //   });
+  //               // }),
+  //               ),
+  //         ],
+  //       ),
+  //       isActive: _currentStep >= 0,
+  //     ),
+  //     Step(
+  //       title: TextBuilder.build(
+  //           title: "Optional", style: TextStyleCustom.STYLE_LABEL_BOLD),
+  //       content: formWidget(
+  //         title: "Optional",
+  //         child: Container(
+  //           decoration: BoxDecoration(
+  //             borderRadius: BorderRadius.circular(10),
+  //             // color: Colors.grey[100]
+  //           ),
+  //           padding: EdgeInsets.all(5),
+  //           child: Column(
+  //             children: <Widget>[
+  //               TextFieldBuilder.textFormFieldCustom(
+  //                   controller: txtSLCName,
+  //                   borderOutLine: false,
+  //                   validate: false,
+  //                   title: "SLCName"),
+  //               Row(
+  //                 crossAxisAlignment: CrossAxisAlignment.center,
+  //                 children: <Widget>[
+  //                   Expanded(
+  //                     child: TextFieldBuilder.textFormFieldCustom(
+  //                         controller: txtSerialNo,
+  //                         validate: false,
+  //                         borderOutLine: false,
+  //                         title: "Serial No"),
+  //                   ),
+  //                   SizedBox(
+  //                     width: 5,
+  //                   ),
+  //                   GestureDetector(
+  //                       onTap: () async {
+  //                         print("ScanBarCode or QR");
+  //                         var dataScan = await MethodLib.scanQR(context);
+  //                         if (dataScan != null)
+  //                           setState(() {
+  //                             txtSerialNo.text = dataScan;
+  //                           });
+  //                       },
+  //                       child: Column(
+  //                         children: <Widget>[
+  //                           Image.asset(Assets.ICON_BARCODE,
+  //                               width: 35, height: 35),
+  //                           // TextBuilder.build(
+  //                           //     title: "Scan",
+  //                           //     style: TextStyleCustom.STYLE_LABEL
+  //                           //         .copyWith(fontSize: 10))
+  //                         ],
+  //                       ))
+  //                 ],
+  //               ),
+  //               TextFieldBuilder.textFormFieldCustom(
+  //                   controller: txtLotNo,
+  //                   keyboardType: TextInputType.number,
+  //                   validate: false,
+  //                   borderOutLine: false,
+  //                   title: "Lot No"),
+  //               TextFieldBuilder.textFormFieldCustom(
+  //                   controller: txtPrice,
+  //                   keyboardType:
+  //                       TextInputType.numberWithOptions(decimal: true),
+  //                   validate: false,
+  //                   borderOutLine: false,
+  //                   title: "Salse price"),
+  //               TextFieldBuilder.textFormFieldCustom(
+  //                   controller: txtNote,
+  //                   validate: false,
+  //                   maxLine: 5,
+  //                   borderOutLine: false,
+  //                   title: "Note"),
+  //             ],
+  //             // ExpansionTile(
+  //             //   title: TextBuilder.build(title: ""),
+  //             //   children: <Widget>[
 
-              //   ],
-            ),
-          ),
-        ),
-        isActive: _currentStep >= 0,
-      ),
-    ];
-    return _step;
-  }
+  //             //   ],
+  //           ),
+  //         ),
+  //       ),
+  //       isActive: _currentStep >= 0,
+  //     ),
+  //   ];
+  //   return _step;
+  // }
 }

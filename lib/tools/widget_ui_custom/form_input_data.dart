@@ -78,7 +78,7 @@ class FormWidgetBuilder {
   static Widget formDropDownCategory(
       {@required key,
       @required String title,
-      @required List<ProductCatagory> items,
+      @required List<ProductCategory> items,
       @required validate,
       String hint,
       Function onChange}) {
@@ -105,7 +105,7 @@ class FormWidgetBuilder {
             items: items
                 .map<DropdownMenuItem>((data) => DropdownMenuItem(
                       child: TextBuilder.build(
-                        title: "${data.catCode}. \t\t${data.catName}",
+                        title: "${data.catCode}. \t\t${data.modelCatName}",
                         style:
                             TextStyleCustom.STYLE_LABEL.copyWith(fontSize: 15),
                       ),

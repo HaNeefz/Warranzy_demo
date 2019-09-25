@@ -260,6 +260,7 @@ class ModelDataAsset {
   CatName modelCatName;
   BrandName modelBrandName;
   String pdtGroup;
+  String groupCat;
   String pdtPlace;
   String brandCode;
   String title;
@@ -291,6 +292,7 @@ class ModelDataAsset {
     this.custUserID,
     this.custCountryCode,
     this.pdtCatCode,
+    this.groupCat,
     this.modelCatName,
     this.modelBrandName,
     this.pdtGroup,

@@ -9,6 +9,7 @@ import 'package:warranzy_demo/page/splash_screen/scSplash_screen.dart';
 import 'package:warranzy_demo/services/calls_and_message/calls_and_message.dart';
 import 'package:warranzy_demo/services/method/methode_helper.dart';
 import 'package:warranzy_demo/services/sqflit/db_customers.dart';
+import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
 import 'package:warranzy_demo/tools/assets.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
@@ -214,6 +215,15 @@ class _ProfilePageState extends State<ProfilePage> {
               RaisedButton(
                 child: Text("Test Loading"),
                 onPressed: () => ecsLib.showDialogLoadingLib(context),
+              ),
+              RaisedButton(
+                child: Text("GetCategory"),
+                onPressed: () => DBProviderInitialApp.db.getGroupCategory(),
+              ),
+              RaisedButton(
+                child: Text("GetSubCategoryByGroup"),
+                onPressed: () => DBProviderInitialApp.db
+                    .getSubCategoryByGroupID(groupID: "A"),
               ),
             ])),
             SliverFixedExtentList(

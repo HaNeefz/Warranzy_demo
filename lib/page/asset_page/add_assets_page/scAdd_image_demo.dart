@@ -27,15 +27,15 @@ class _AddImageDemoState extends State<AddImageDemo> {
   final ecsLib = getIt.get<ECSLib>();
   final allTranslations = getIt.get<GlobalTranslations>();
   final Dio dio = Dio();
-  List<ProductCatagory> listCat = [];
-  ProductCatagory productCatagory = ProductCatagory();
+  List<ProductCategory> listCat = [];
+  ProductCategory productCatagory = ProductCategory();
   RelatedImage relatedImage;
   List<String> listRelated = [];
   List<ImageDataEachGroup> listKeepImageData;
 
   getPrudcutCategory() async {
     var catTemp = await DBProviderInitialApp.db.getAllDataProductCategory();
-    ProductCatagory category;
+    ProductCategory category;
     catTemp.forEach((v) {
       if (v.catCode == widget.dataAsset['PdtCatCode']) {
         setState(() {

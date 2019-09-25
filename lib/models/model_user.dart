@@ -257,8 +257,8 @@ class WarranzyUsed {
     data['PdtCatCode'] = this.pdtCatCode;
     // if (data != null) data['CatName'] = this.modelCatName.toJson();
     // if (data != null) data['BrandName'] = this.modelBrandName.toJson();
-    data['CatName'] = this.modelCatName;
-    data['BrandName'] = this.modelBrandName;
+    // data['CatName'] = this.modelCatName;
+    // data['BrandName'] = this.modelBrandName;
     data['PdtGroup'] = this.pdtGroup;
     data['PdtPlace'] = this.pdtPlace;
     data['CustRemark'] = this.custRemark;

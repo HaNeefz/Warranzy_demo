@@ -82,10 +82,28 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
             temp.timeZone.forEach((v) async => await DBProviderInitialApp.db
                 .insertDataInToTableTimeZone(v)
                 .catchError((onError) => print("TimeZone $onError")));
-            temp.productCatagory.forEach((v) async => await DBProviderInitialApp
-                .db
-                .insertDataInToTableProductCategory(v)
-                .catchError((onError) => print("ProductCategory $onError")));
+            temp.productCategory.forEach((v) async {
+              await DBProviderInitialApp.db
+                  .insertDataInToTableProductSubCategory(v)
+                  .catchError(
+                      (onError) => print("ProductSubCategory $onError"));
+              await DBProviderInitialApp.db
+                  .updateIconSubCategory(v)
+                  .catchError((onError) {
+                print("UpdateLogo ProductSubCategory $onError");
+              });
+            });
+            temp.groupCategory.forEach((v) async {
+              await DBProviderInitialApp.db
+                  .insertDataInToTableGroupCategory(v)
+                  .catchError(
+                      (onError) => print("ProductHeaderCategory $onError"));
+              await DBProviderInitialApp.db
+                  .updateIconGroupCategory(v)
+                  .catchError((onError) {
+                print("Update ProductCategory $onError");
+              });
+            });
             // ecsLib.cancelDialogLoadindLib(context);
             ecsLib.pushPageReplacement(
                 context: context, pageWidget: LoginPage());
