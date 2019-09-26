@@ -682,8 +682,8 @@ class _MyAssetOnlineState extends State<MyAssetOnline> {
               CachedNetworkImage(
                 imageUrl: widget.data.imageMain,
                 imageBuilder: (context, imageProvider) => Container(
-                  width: 100,
-                  height: 100,
+                  width: 120,
+                  height: 120,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
                     image: DecorationImage(
@@ -707,7 +707,8 @@ class _MyAssetOnlineState extends State<MyAssetOnline> {
             Expanded(
               flex: 2,
               child: Padding(
-                padding: const EdgeInsets.only(left: 8.0),
+                padding:
+                    const EdgeInsets.only(left: 8.0, top: 10.0, bottom: 10.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -732,6 +733,13 @@ class _MyAssetOnlineState extends State<MyAssetOnline> {
                             .copyWith(fontSize: 12),
                         maxLine: 1,
                         textOverflow: TextOverflow.ellipsis),
+                    TextBuilder.build(
+                        title:
+                            "\nExpire Date : ${widget.data.warrantyExpire.split(" ").first ?? "Empty warrantyExpire"}\nRemaining : ${showDateRemaining(widget.data.warrantyExpire)}",
+                        style: TextStyleCustom.STYLE_CONTENT
+                            .copyWith(fontSize: 12),
+                        textOverflow: TextOverflow.ellipsis,
+                        maxLine: 3),
                     Container(
                       margin: EdgeInsets.fromLTRB(0, 5, 5, 5),
                       padding: EdgeInsets.only(left: 5, right: 5),
@@ -795,5 +803,17 @@ class _MyAssetOnlineState extends State<MyAssetOnline> {
         },
       ),
     );
+  }
+
+  String showDateRemaining(String dateTime) {
+    int date = DateTime.parse(dateTime).difference(DateTime.now()).inDays;
+    int hours = DateTime.parse(dateTime).difference(DateTime.now()).inHours;
+    if (date > 0) {
+      return "$date day.";
+    } else if (date == 0 && hours > 0) {
+      return "$hours hours.";
+    } else {
+      return "Expired";
+    }
   }
 }
