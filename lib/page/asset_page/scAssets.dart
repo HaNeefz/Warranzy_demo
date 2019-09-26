@@ -34,6 +34,7 @@ import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/error_api.dart';
 import 'package:http/http.dart' as http;
 
+import 'add_assets_page/scAdd_image_demo.dart';
 import 'detail_asset_page/scDetailAsset.dart';
 
 class AssetPage extends StatefulWidget {
@@ -480,10 +481,49 @@ class _MyAssetFormSQLiteState extends State<MyAssetFormSQLite> {
   final Dio dio = Dio();
   final ecsLib = getIt.get<ECSLib>();
   final allTranslations = getIt.get<GlobalTranslations>();
+  List<ImageDataEachGroup> imageDataEachGroup = [];
+  String catName = '';
+
+  getProductCateName() async {
+    var _catName = await DBProviderInitialApp.db.getProductCatName(
+        id: widget.data.pdtCatCode, lang: allTranslations.currentLanguage);
+    setState(() {
+      catName = _catName;
+      // print("catName ====================> $catName");
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+    getProductCateName();
+    if (widget.data.createType == "C") {
+      imageDataEachGroup = getImage(widget.data);
+    }
+  }
+
+  List<ImageDataEachGroup> getImage(ModelDataAsset images) {
+    Map<String, dynamic> tempImages;
+    List<ImageDataEachGroup> tempImageDataEachGroup = [];
+    if (images.images != null) {
+      tempImages = jsonDecode(images.images);
+      tempImages.forEach((String k, dynamic v) {
+        var listTemp = v as List;
+        List<String> tempUrl = [];
+        for (var item in listTemp) {
+          tempUrl.add(item);
+          // setState(() {
+          //   listImageUrl.add(item);
+          // });
+        }
+        tempImageDataEachGroup
+            .add(ImageDataEachGroup(title: k, imageUrl: tempUrl));
+      });
+      tempImageDataEachGroup.forEach((v) {
+        print("Title : ${v.title} | url[${v.imageUrl.length}] ${v.imageUrl}");
+      });
+    }
+    return tempImageDataEachGroup;
   }
 
   @override
@@ -562,8 +602,7 @@ class _MyAssetFormSQLiteState extends State<MyAssetFormSQLite> {
                             color: ThemeColors.COLOR_GREY.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(20)),
                         child: TextBuilder.build(
-                            title: widget.data?.modelCatName?.eN ??
-                                "CatName is empty",
+                            title: widget.data?.modelCatName?.eN ?? catName,
                             style: TextStyleCustom.STYLE_CONTENT.copyWith(
                                 fontSize: 14, color: ThemeColors.COLOR_BLACK)),
                       )

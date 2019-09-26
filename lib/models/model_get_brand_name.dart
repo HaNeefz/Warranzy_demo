@@ -2,20 +2,24 @@ import 'dart:convert' as jsonProvider;
 
 class GetBrandName {
   ModelBrandName modelBrandName;
+  String brandName;
   String brandCode;
   String description;
   String manCode;
   String lastUpdate;
   String fileIDLogo;
   String brandActive;
+  String documentID;
 
   GetBrandName(
       {this.modelBrandName,
+      this.brandName,
       this.description,
       this.brandCode,
       this.manCode,
       this.lastUpdate,
       this.fileIDLogo,
+      this.documentID,
       this.brandActive});
 
   GetBrandName.fromJson(Map<String, dynamic> json) {
@@ -26,6 +30,7 @@ class GetBrandName {
     lastUpdate = json['LastUpdate'];
     brandActive = json['BrandActive'];
     fileIDLogo = json['FileID_Logo'];
+    documentID = json["DocumentID"];
   }
 
   Map<String, dynamic> toJson() {
@@ -33,11 +38,13 @@ class GetBrandName {
     if (this.modelBrandName != null) {
       data['BrandName'] = this.modelBrandName;
     }
+    data['BrandName'] = this.brandName;
     data['Description'] = this.description;
     data['ManCode'] = this.manCode;
     data['LastUpdate'] = this.lastUpdate;
     data['FileID_Logo'] = this.fileIDLogo;
     data['BrandActive'] = this.brandActive;
+    data['DocumentID'] = this.documentID;
     return data;
   }
 }

@@ -503,15 +503,10 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
   }
 
   getBrandName() {
-    Firestore.instance
-        .collection('BrandName')
-        .document("411fa764ac3b49c")
-        .get()
-        .then((onValue) {
-      print(onValue.data);
-    });
     Firestore.instance.collection('BrandName').snapshots().listen((onData) {
       for (var temp in onData.documents) {
+        String docID = temp.documentID;
+        temp.data.addAll({"DocumentID": docID});
         listBrandName.add(GetBrandName.fromJson(temp.data));
         listBrandName[onData.documents.indexOf(temp)].brandCode =
             temp.documentID;
@@ -529,8 +524,6 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
             });
           }
         }
-        // print(
-        //     "${listBrandName[onData.documents.indexOf(temp)].brandID} | ${listBrandName[onData.documents.indexOf(temp)].modelBrandName.modelEN.en}");
       }
     });
   }
@@ -939,7 +932,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
                                       Container(
                                         width: 180,
                                         child: TextBuilder.build(
-                                            title: v.groupName.eN,
+                                            title: v.modelGroupName?.eN ?? "",
                                             style: TextStyleCustom.STYLE_LABEL
                                                 .copyWith(fontSize: 13),
                                             maxLine: 1,

@@ -247,7 +247,7 @@ class _FormDataAssetState extends State<FormDataAsset> {
                                           Container(
                                             width: 180,
                                             child: TextBuilder.build(
-                                                title: v.groupName.eN,
+                                                title: v.modelGroupName.eN,
                                                 style: TextStyleCustom
                                                     .STYLE_LABEL
                                                     .copyWith(fontSize: 13),

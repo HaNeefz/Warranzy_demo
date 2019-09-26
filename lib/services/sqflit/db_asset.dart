@@ -1,5 +1,6 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:warranzy_demo/models/model_get_brand_name.dart';
 import 'package:warranzy_demo/models/model_respository_asset.dart';
 import 'dart:convert';
 
@@ -20,6 +21,7 @@ class DBProviderAsset {
   final String tableWarranzyUsed = "WarranzyUsed";
   final String tableWarranzyLog = "WarramzyLog";
   final String tableFilePool = "FilePool";
+  final String tableBrand = "Brand";
 
   Future<Database> get database async {
     if (_database != null) return _database;
@@ -112,6 +114,16 @@ BlockchainID */
       FileData TEXT,
       LastUpdate TEXT
     )""");
+
+    await database.execute("""CREATE TABLE $tableBrand(
+      DocumentID PRIMARY KEY,
+      BrandName TEXT,
+      Description TEXT,
+      ManCode TEXT,
+      LastUpdate TEXT,
+      BrandActive TEXT,
+      FileID_Logo TEXT
+    )""");
   }
 
   //------------------------------------------------------------------------------
@@ -134,13 +146,15 @@ BlockchainID */
     final db = await database;
     var res = await db.rawQuery(
         "SELECT * FROM $tableWarranzyUsed, $tableWarranzyLog WHERE $tableWarranzyUsed.WTokenID = $tableWarranzyLog.WTokenID"); // $tableWarranzyLog, $tableFilePool
+    // var filePool = await db.rawQuery("SE")
     JsonEncoder encoder = JsonEncoder.withIndent(" ");
     List<ModelDataAsset> temp = [];
+    Map<String, dynamic> dataAsset = {};
     if (res.isNotEmpty) {
+      print("--------------------");
       res.forEach((v) {
         String prettyprint = encoder.convert(v);
-        print("DataOffine => " + prettyprint);
-        // var map = {"Status":true,"Data":}
+        print("DataOnline => $prettyprint");
         temp.add(ModelDataAsset.fromJson(v));
       });
 
@@ -151,6 +165,39 @@ BlockchainID */
     } else {
       return [];
     }
+  }
+
+  Future<String> getMainImage() async {
+    final db = await database;
+    String imageMain;
+    var res = await db.rawQuery(
+        "SELECT * FROM $tableWarranzyUsed, $tableWarranzyLog WHERE $tableWarranzyUsed.WTokenID = $tableWarranzyLog.WTokenID");
+    Map<String, dynamic> map = Map<String, dynamic>.from(res.first);
+    int counter = 0;
+    map = jsonDecode(map["FileAttach_ID"]);
+    print(map);
+    map.forEach((k, v) async {
+      if (counter == 0) {
+        // print("$k | $v");
+        List vv = v as List;
+        String vvv = vv.first;
+        // print(vvv);
+        // imageMain = await getImagePool(vvv);
+        counter++;
+      }
+    });
+    print(imageMain);
+    return imageMain;
+  }
+
+  Future<String> getImagePool(String fileID) async {
+    final db = await database;
+    var tempImageValue = await db
+        .rawQuery("SELECT FileID FROM $tableFilePool WHERE FileID = '$fileID'");
+    if (tempImageValue.isNotEmpty) {
+      return tempImageValue.first['FileID'];
+    } else
+      return "";
   }
 
   Future<bool> hasDataAsset() async {
@@ -197,6 +244,16 @@ BlockchainID */
     var res = await db.insert(tableFilePool, data.toJson());
     if (res == 1) {
       print("insert $tableFilePool complete");
+      return true;
+    } else
+      return false;
+  }
+
+  Future<bool> inserDataBrand(GetBrandName data) async {
+    final db = await database;
+    var res = await db.insert(tableBrand, data.toJson());
+    if (res >= 1) {
+      // print("insert $tableBrand complete");
       return true;
     } else
       return false;

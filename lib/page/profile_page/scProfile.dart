@@ -1,13 +1,17 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:warranzy_demo/models/model_respository_asset.dart';
 import 'package:warranzy_demo/models/model_user.dart';
 // import 'package:warranzy_demo/models/model_mas_cust.dart';
 import 'package:warranzy_demo/page/login_first/scLogin.dart';
 import 'package:warranzy_demo/page/splash_screen/scSplash_screen.dart';
 import 'package:warranzy_demo/services/calls_and_message/calls_and_message.dart';
 import 'package:warranzy_demo/services/method/methode_helper.dart';
+import 'package:warranzy_demo/services/sqflit/db_asset.dart';
 import 'package:warranzy_demo/services/sqflit/db_customers.dart';
 import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
 import 'package:warranzy_demo/tools/assets.dart';
@@ -221,9 +225,28 @@ class _ProfilePageState extends State<ProfilePage> {
                 onPressed: () => DBProviderInitialApp.db.getGroupCategory(),
               ),
               RaisedButton(
-                child: Text("GetSubCategoryByGroup"),
-                onPressed: () => DBProviderInitialApp.db
-                    .getSubCategoryByGroupID(groupID: "A"),
+                  child: Text("GetSubCategoryByGroup"),
+                  onPressed: () async {
+                    // DBProviderInitialApp.db
+                    //     .getSubCategoryByGroupID(groupID: "A");
+                    await DBProviderInitialApp.db.getAllSubCategory();
+                  }),
+              RaisedButton(
+                child: Text("GetAsset"),
+                onPressed: () async {
+                  // Map<String, dynamic> tempM = {};
+                  // List<ModelDataAsset> modelData =
+                  //     await DBProviderAsset.db.getAllDataAsset();
+                  // for (var temp in modelData) {
+                  //   Map<String, dynamic> jsonDecoder =
+                  //       jsonDecode(temp.fileAttachID);
+                  //   tempM = await getListImage(jsonDecoder);
+                  //   print(tempM);
+                  //   // print(jsonDecoder);
+                  //   print("---------------");
+                  // }
+                  // await DBProviderAsset.db.getMainImage();
+                },
               ),
             ])),
             SliverFixedExtentList(
@@ -242,6 +265,22 @@ class _ProfilePageState extends State<ProfilePage> {
             )
           ]),
         ));
+  }
+
+  Future<Map<String, dynamic>> getListImage(Map<String, dynamic> map) async {
+    Map<String, dynamic> mapImage = {};
+    map.forEach((k, v) async {
+      mapImage.addAll({"$k": []});
+      List vv = v as List;
+      print("$k | ${vv.length}");
+      List<String> img = [];
+      for (var list in vv) {
+        var tempImagePool = await DBProviderAsset.db.getImagePool(list);
+        img.add(tempImagePool);
+      }
+      mapImage["$k"] = img;
+    });
+    return mapImage.isNotEmpty ? mapImage : {};
   }
 
   Widget buttonContact(

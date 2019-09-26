@@ -150,6 +150,7 @@ class TimeZone {
 class ProductCategory {
   String catCode;
   CatName modelCatName;
+  String catName;
   String imageBox;
   String imageProduct;
   String imageDocument;
@@ -167,6 +168,7 @@ class ProductCategory {
   ProductCategory(
       {this.catCode,
       this.modelCatName,
+      this.catName,
       this.imageBox,
       this.imageProduct,
       this.imageDocument,
@@ -186,6 +188,7 @@ class ProductCategory {
     modelCatName = json['CatName'] != null
         ? CatName.fromJson(jsonDecode(json['CatName']))
         : null;
+    catName = json['CatName'];
     imageBox = json['Image_Box'];
     imageProduct = json['Image_Product'];
     imageDocument = json['Image_Document'];
@@ -203,7 +206,7 @@ class ProductCategory {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['CatCode'] = this.catCode;
-    data['CatName'] = this.modelCatName;
+    data['CatName'] = this.catName;
     data['Image_Box'] = this.imageBox;
     data['Image_Product'] = this.imageProduct;
     data['Image_Document'] = this.imageDocument;
@@ -222,12 +225,14 @@ class ProductCategory {
 
 class GroupCategory {
   String groupID;
-  GroupName groupName;
+  GroupName modelGroupName;
+  String groupName;
   String lastUpdate;
   String logo;
   String keepLogo;
   GroupCategory(
       {this.groupID,
+      this.modelGroupName,
       this.groupName,
       this.lastUpdate,
       this.logo,
@@ -235,9 +240,10 @@ class GroupCategory {
 
   GroupCategory.fromJson(Map<String, dynamic> json) {
     groupID = json['GroupID'];
-    groupName = json['GroupName'] != null
+    modelGroupName = json['GroupName'] != null
         ? GroupName.fromJson(jsonDecode(json['GroupName']))
         : null;
+    groupName = json['GroupName'];
     lastUpdate = json['LastUpdate'];
     logo = json['Logo'];
   }
@@ -245,6 +251,7 @@ class GroupCategory {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['GroupID'] = this.groupID;
+    // if (this.groupName != null) data['GroupName'] = this.groupName;
     data['GroupName'] = this.groupName;
     data['LastUpdate'] = this.lastUpdate;
     data['Logo'] = this.logo;

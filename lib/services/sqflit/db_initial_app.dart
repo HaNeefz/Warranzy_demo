@@ -267,6 +267,20 @@ class DBProviderInitialApp {
     }
   }
 
+  Future<List<ProductCategory>> getAllSubCategory() async {
+    final db = await database;
+    try {
+      var res = await db.rawQuery(
+          "SELECT * FROM $tableProductSubCategory ORDER BY $tableProductSubCategory.CatCode ASC");
+      JsonEncoder encoder = JsonEncoder.withIndent(" ");
+      String prettyprint = encoder.convert(res);
+      print("$tableGroupCategory => " + prettyprint);
+      return res.isNotEmpty ? res : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
   Future<List<ProductCategory>> getSubCategoryByGroupID(
       {String groupID}) async {
     final db = await database;
@@ -332,13 +346,14 @@ class DBProviderInitialApp {
   }
 
   Future<String> getProductCatName({String id, String lang}) async {
+    // print("$id | $lang");
     final db = await database;
     try {
       var response = await db.rawQuery(
           "SELECT CatName FROM $tableProductSubCategory WHERE CatCode = '$id'");
       if (response.isNotEmpty) {
+        // print("==========<$response>===========");
         var catNameDecode = jsonDecode(response.first["CatName"]);
-        // print("CatName : ${catNameDecode[lang.toUpperCase()]}");
         return catNameDecode[lang.toUpperCase()];
       } else {
         print("data is empty");

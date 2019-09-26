@@ -1,12 +1,15 @@
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_picker/Picker.dart';
+import 'package:warranzy_demo/models/model_get_brand_name.dart';
 import 'package:warranzy_demo/models/model_language.dart';
 import 'package:warranzy_demo/models/model_repository_init_app.dart';
 import 'package:warranzy_demo/page/login_first/scLogin.dart';
 import 'package:simple_animations/simple_animations.dart';
 import 'package:warranzy_demo/services/api/base_url.dart';
+import 'package:warranzy_demo/services/sqflit/db_asset.dart';
 import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
 import 'package:warranzy_demo/services/sqflit/db_language.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
@@ -87,24 +90,25 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
                   .insertDataInToTableProductSubCategory(v)
                   .catchError(
                       (onError) => print("ProductSubCategory $onError"));
-              await DBProviderInitialApp.db
-                  .updateIconSubCategory(v)
-                  .catchError((onError) {
-                print("UpdateLogo ProductSubCategory $onError");
-              });
+              // await DBProviderInitialApp.db
+              //     .updateIconSubCategory(v)
+              //     .catchError((onError) {
+              //   print("UpdateLogo ProductSubCategory $onError");
+              // });
             });
             temp.groupCategory.forEach((v) async {
               await DBProviderInitialApp.db
                   .insertDataInToTableGroupCategory(v)
                   .catchError(
                       (onError) => print("ProductHeaderCategory $onError"));
-              await DBProviderInitialApp.db
-                  .updateIconGroupCategory(v)
-                  .catchError((onError) {
-                print("Update ProductCategory $onError");
-              });
+              // await DBProviderInitialApp.db
+              //     .updateIconGroupCategory(v)
+              //     .catchError((onError) {
+              //   print("Update ProductCategory $onError");
+              // });
             });
             // ecsLib.cancelDialogLoadindLib(context);
+            await getBrandName();
             ecsLib.pushPageReplacement(
                 context: context, pageWidget: LoginPage());
           } else
@@ -116,6 +120,29 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
         print(e);
       }
     });
+  }
+
+  Future<bool> getBrandName() async {
+    bool success = false;
+    int length = 0;
+    Firestore.instance
+        .collection('BrandName')
+        .snapshots()
+        .listen((onData) async {
+      for (var temp in onData.documents) {
+        String docID = temp.documentID;
+        temp.data.addAll({"DocumentID": docID});
+        GetBrandName tempBrand = GetBrandName.fromJson(temp.data);
+        await DBProviderAsset.db.inserDataBrand(tempBrand).then((onValue) {
+          if (onValue == true) length++;
+        });
+        if (length == 500) {
+          success = true;
+          print("insertBrand completed");
+        }
+      }
+    });
+    return success;
   }
 
   // TODO: ทำ Log ของ Sqflite
