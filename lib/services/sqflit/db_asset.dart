@@ -83,7 +83,8 @@ BlockchainID */
       SLCCode TEXT,
       SLCBranchNo TEXT,
       SLCCountryCode TEXT,
-      BlockchainID TEXT
+      BlockchainID TEXT,
+      AlertDate TEXT
         )""");
     await database.execute("""create table $tableWarranzyLog (
       WTokenID TEXT,
@@ -142,10 +143,31 @@ BlockchainID */
         .then((v) => print("Delete tableFilePool => $v"));
   }
 
+  Future deleteAssetByWToken(String wTokenID) async {
+    final db = await database;
+    await db
+        .rawDelete(
+            "DELETE FROM $tableWarranzyUsed WHERE WTokenID = '$wTokenID'")
+        .then((onValue) {
+      print("Deleted $tableWarranzyUsed => $onValue at WTokenID = $wTokenID");
+    });
+    await db
+        .rawDelete("DELETE FROM $tableWarranzyLog WHERE WTokenID = '$wTokenID'")
+        .then((onValue) {
+      print("Deleted $tableWarranzyLog => $onValue at WTokenID = $wTokenID");
+    });
+    // await db.delete(tableWarranzyUsed, where: 'WTokenID', whereArgs: [
+    //   '$wTokenID'
+    // ]).then((v) => print("Delete tableWarranzyUsed => $v"));
+    // await db.delete(tableWarranzyLog, where: 'WTokenID', whereArgs: [
+    //   '$wTokenID'
+    // ]).then((v) => print("Delete tableWarranzyLog => $v"));
+  }
+
   Future<List<ModelDataAsset>> getAllDataAsset() async {
     final db = await database;
     var res = await db.rawQuery(
-        "SELECT * FROM $tableWarranzyUsed, $tableWarranzyLog WHERE $tableWarranzyUsed.WTokenID = $tableWarranzyLog.WTokenID"); // $tableWarranzyLog, $tableFilePool
+        "SELECT * FROM $tableWarranzyUsed, $tableWarranzyLog WHERE $tableWarranzyUsed.WTokenID = $tableWarranzyLog.WTokenID ORDER BY $tableWarranzyUsed.LastModiflyDate DESC"); // $tableWarranzyLog, $tableFilePool
     // var filePool = await db.rawQuery("SE")
     JsonEncoder encoder = JsonEncoder.withIndent(" ");
     List<ModelDataAsset> temp = [];
@@ -227,8 +249,6 @@ BlockchainID */
     // }
   }
 
-  /*
-  SqfliteDatabaseException (DatabaseException(Error Domain=FMDatabase Code=1 "table WarranzyUsed has no column named BrandName" UserInfo={NSLocalizedDescription=table WarranzyUsed has no column named BrandName}) sql 'INSERT INTO WarranzyUsed (WTokenID, CustBuyDate, CustUserID, CustCountryCode, PdtCatCode, CatName, BrandName, PdtGroup, PdtPlace, CustRemark, ManCode, BrandCode, ProductID, SerialNo, LotNo, MFGDate, EXPDate, SalesPrice, CreateDate, CreateType, LastModiflyDate, WarrantyNo, WarrantyExpire, SLCCode, SLCBranchNo, SLCCountryCode, BlockchainID, ExWarrantyStatus, TradeStatus, Title, SLCName) VALUES (?, NULL, ?, ?, ?, NULL, NULL, ?, ?, ?, NULL, ?, NULL, ?, ?, NULL, NULL, ?, ?, ?, ?, ?, ?, NULL, NULL, NULL, NULL, NULL, NULL, ?, ?)' args [ca3f5-TH-1082acd47e204bd58004406e1, ca3f58b3a0214aaaa68a, TH, A001, Car, Home, ThunderBolt used connect others devices, 27afd78de7aa42d, 18274782919382891, 12, 131, 2019-09-12 09:05:32+00, C, 2019-09-19 04:25:51+00, , 2019-09-12 12:16:40+00, ThunderBolt, PowerBuy]}) */
   Future<bool> insertDataWarranzyLog(WarranzyLog data) async {
     final db = await database;
     var res = await db.insert(tableWarranzyLog, data.toJson());
@@ -284,6 +304,35 @@ BlockchainID */
         ? res.map((data) => FilePool.fromJson(data)).toList()
         : [];
     return data;
+  }
+
+  Future<String> getBrandName(String brandCode) async {
+    print(brandCode);
+    final db = await database;
+    try {
+      var res = await db.rawQuery(
+          "SELECT BrandName FROM $tableBrand WHERE DocumentID = '$brandCode'");
+      print(res.first['BrandName']);
+      return res.isNotEmpty
+          ? jsonDecode(res.first['BrandName'])['EN']
+          : "BrandName is Empty";
+    } catch (e) {
+      return "Catch Errer $e";
+    }
+  }
+
+  Future<String> getAllBrandName() async {
+    final db = await database;
+    try {
+      var res = await db.rawQuery("SELECT * FROM $tableBrand");
+      // print(res.first['BrandName']);
+      JsonEncoder encoder = JsonEncoder.withIndent(" ");
+      String prettyprint = encoder.convert(res);
+      print("Brand => $prettyprint");
+      return res.isNotEmpty ? res.first['BrandName'] : "BrandName is Empty";
+    } catch (e) {
+      return "Catch Errer $e";
+    }
   }
 
 //-------------------------------------------------------------------------------------

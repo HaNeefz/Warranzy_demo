@@ -25,6 +25,7 @@ class GetBrandName {
   GetBrandName.fromJson(Map<String, dynamic> json) {
     modelBrandName =
         json['BrandName'] != null ? new ModelBrandName.fromJson(json) : null;
+    brandName = json['BrandName'];
     description = json['Description'];
     manCode = json['ManCode'];
     lastUpdate = json['LastUpdate'];
@@ -35,9 +36,9 @@ class GetBrandName {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.modelBrandName != null) {
-      data['BrandName'] = this.modelBrandName;
-    }
+    // if (this.modelBrandName != null) {
+    //   data['BrandName'] = this.modelBrandName;
+    // }
     data['BrandName'] = this.brandName;
     data['Description'] = this.description;
     data['ManCode'] = this.manCode;

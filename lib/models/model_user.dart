@@ -176,39 +176,42 @@ class WarranzyUsed {
   String sLCName;
   CatName modelCatName;
   BrandName modelBrandName;
+  // String alertDate;
 
-  WarranzyUsed(
-      {this.wTokenID,
-      this.custBuyDate,
-      this.custUserID,
-      this.custCountryCode,
-      this.pdtCatCode,
-      this.pdtGroup,
-      this.pdtPlace,
-      this.custRemark,
-      this.manCode,
-      this.brandCode,
-      this.productID,
-      this.serialNo,
-      this.lotNo,
-      this.mFGDate,
-      this.eXPDate,
-      this.salesPrice,
-      this.createDate,
-      this.createType,
-      this.lastModiflyDate,
-      this.warrantyNo,
-      this.warrantyExpire,
-      this.sLCCode,
-      this.sLCBranchNo,
-      this.sLCCountryCode,
-      this.blockchainID,
-      this.exWarrantyStatus,
-      this.tradeStatus,
-      this.title,
-      this.sLCName,
-      this.modelCatName,
-      this.modelBrandName});
+  WarranzyUsed({
+    this.wTokenID,
+    this.custBuyDate,
+    this.custUserID,
+    this.custCountryCode,
+    this.pdtCatCode,
+    this.pdtGroup,
+    this.pdtPlace,
+    this.custRemark,
+    this.manCode,
+    this.brandCode,
+    this.productID,
+    this.serialNo,
+    this.lotNo,
+    this.mFGDate,
+    this.eXPDate,
+    this.salesPrice,
+    this.createDate,
+    this.createType,
+    this.lastModiflyDate,
+    this.warrantyNo,
+    this.warrantyExpire,
+    this.sLCCode,
+    this.sLCBranchNo,
+    this.sLCCountryCode,
+    this.blockchainID,
+    this.exWarrantyStatus,
+    this.tradeStatus,
+    this.title,
+    this.sLCName,
+    this.modelCatName,
+    this.modelBrandName,
+    // this.alertDate
+  });
 
   WarranzyUsed.fromJson(Map<String, dynamic> json) {
     wTokenID = json['WTokenID'];
@@ -246,6 +249,7 @@ class WarranzyUsed {
     tradeStatus = json['TradeStatus'];
     title = json['Title'];
     sLCName = json['SLCName'];
+    // alertDate = json['AlertDate'];
   }
 
   Map<String, dynamic> toJson() {
@@ -283,6 +287,7 @@ class WarranzyUsed {
     data['TradeStatus'] = this.tradeStatus;
     data['Title'] = this.title;
     data['SLCName'] = this.sLCName;
+    // data['AlertDate'] = this.alertDate;
     return data;
   }
 }

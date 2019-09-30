@@ -11,6 +11,7 @@ import 'package:warranzy_demo/page/main_page/scMain_page.dart';
 import 'package:warranzy_demo/services/api/api_service_assets.dart';
 import 'package:warranzy_demo/services/api_provider/api_bloc.dart';
 import 'package:warranzy_demo/services/api_provider/api_response.dart';
+import 'package:warranzy_demo/services/sqflit/db_asset.dart';
 import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
@@ -115,6 +116,8 @@ class _DetailAssetState extends State<DetailAsset> {
   List<ImageDataEachGroup> imageDataEachGroup = [];
   List<String> listImageUrl = [];
   String catName = '';
+  String brandName = '';
+
   getProductCateName() async {
     var _catName = await DBProviderInitialApp.db.getProductCatName(
         id: _data.pdtCatCode, lang: allTranslations.currentLanguage);
@@ -124,12 +127,21 @@ class _DetailAssetState extends State<DetailAsset> {
     });
   }
 
+  getBrandName() async {
+    var _brandName = await DBProviderAsset.db.getBrandName(_data.brandCode);
+    setState(() {
+      brandName = _brandName;
+    });
+  }
+
   void initState() {
     super.initState();
     if (_data.createType == "C") {
       imageDataEachGroup = getImage(_data);
     }
+    print(_data.alertDate);
     getProductCateName();
+    getBrandName();
   }
 
   goToEditPageForEditImage(bool editImage) {
@@ -391,6 +403,8 @@ class _DetailAssetState extends State<DetailAsset> {
                   ecsLib.cancelDialogLoadindLib(context);
                   if (res?.status == true) {
                     print("Data => ${res.data}");
+                    await DBProviderAsset.db
+                        .deleteAssetByWToken(_data.wTokenID);
                     ecsLib.pushPageAndClearAllScene(
                       context: context,
                       pageWidget: MainPage(),
@@ -443,7 +457,7 @@ class _DetailAssetState extends State<DetailAsset> {
             textTitleWithData(title: "Asset Name", data: "${_data.title}"),
             textTitleWithData(
                 title: "Brand Name",
-                data: "${_data.modelBrandName?.eN ?? "BrandName is Empty"}"),
+                data: "${brandName ?? "BrandName is Empty"}"),
             textTitleWithData(
                 title: "Product Category",
                 data: "${_data.modelCatName?.eN ?? catName}"),

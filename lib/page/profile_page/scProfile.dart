@@ -246,6 +246,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   //   print("---------------");
                   // }
                   // await DBProviderAsset.db.getMainImage();
+                  await DBProviderAsset.db.getAllBrandName();
                 },
               ),
             ])),

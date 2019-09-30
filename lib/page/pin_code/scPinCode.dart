@@ -104,7 +104,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
       } else if (response?.status == false) {
         ecsLib
             .showDialogLib(context,
-                content: response.message ?? "PIN Incorrct, Try again.",
+                content: response?.message ?? "PIN Incorrct, Try again.",
                 textOnButton: allTranslations.text("close"),
                 title: "SERVER ERROR")
             .then((res) {

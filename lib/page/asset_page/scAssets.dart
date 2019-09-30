@@ -496,6 +496,7 @@ class _MyAssetFormSQLiteState extends State<MyAssetFormSQLite> {
   @override
   void initState() {
     super.initState();
+    print(widget.data.alertDate);
     getProductCateName();
     if (widget.data.createType == "C") {
       imageDataEachGroup = getImage(widget.data);

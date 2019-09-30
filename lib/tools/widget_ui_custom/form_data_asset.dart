@@ -113,7 +113,7 @@ class _FormDataAssetState extends State<FormDataAsset> {
           TextEditingController(text: ButtonDatePickerCustom.showDate);
       dataTime = txtWarranzyExpire.text;
       txtAlertDate =
-          TextEditingController(text: _data?.alertDateNo.toString() ?? "");
+          TextEditingController(text: _data?.alertDateNo?.toString() ?? "60");
       txtPdtCat = TextEditingController(text: _data?.pdtCatCode ?? "");
       txtPdtGroup = TextEditingController(text: _data?.pdtGroup ?? "");
       txtPdtPlace = TextEditingController(text: _data?.pdtPlace ?? "");
