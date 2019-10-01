@@ -31,6 +31,13 @@ class _ChangeDeviceState extends State<ChangeDevice> {
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
   final Future<SharedPreferences> _pref = SharedPreferences.getInstance();
   final APIServiceUser apiService = APIServiceUser();
+
+  @override
+  void initState() {
+    super.initState();
+    debugPrint("statement");
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
