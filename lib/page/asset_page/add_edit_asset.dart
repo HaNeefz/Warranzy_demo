@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
@@ -627,8 +628,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
       if (response == true) {
         try {
           ecsLib.showDialogLoadingLib(context, content: "Editing Detail Asset");
-          await Repository.updateData(body: postData)
-              .then((resEdit) async {
+          await Repository.updateData(body: postData).then((resEdit) async {
             ecsLib.cancelDialogLoadindLib(context);
             if (resEdit?.status == true) {
               ecsLib.showDialogLoadingLib(context,
@@ -898,48 +898,57 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
                               return DropdownMenuItem(
                                 value: v.groupID,
                                 child: Container(
-                                  width: 250,
+                                  width: 180,
                                   child: Row(
                                     children: <Widget>[
-                                      // Image.memory(
-                                      //   base64Decode(v.keepLogo),
-                                      //   width: 30,
-                                      //   height: 30,
-                                      //   fit: BoxFit.contain,
-                                      // ),
-                                      Container(
-                                        child: CachedNetworkImage(
-                                          imageUrl: v.logo,
-                                          imageBuilder:
-                                              (context, imageProvider) =>
-                                                  Container(
-                                            width: 30,
-                                            height: 30,
-                                            decoration: BoxDecoration(
-                                              image: DecorationImage(
-                                                image: imageProvider,
-                                                fit: BoxFit.contain,
-                                              ),
-                                            ),
-                                          ),
-                                          placeholder: (context, url) => Center(
-                                              child:
-                                                  CircularProgressIndicator()),
-                                          errorWidget: (context, url, error) =>
-                                              Icon(Icons.error),
-                                        ),
+                                      Image.network(
+                                        v.logo,
+                                        width: 30,
+                                        height: 30,
+                                        fit: BoxFit.contain,
                                       ),
+                                      // Container(
+                                      //   child: CachedNetworkImage(
+                                      //     imageUrl: v.logo,
+                                      //     imageBuilder:
+                                      //         (context, imageProvider) =>
+                                      //             Container(
+                                      //       width: 30,
+                                      //       height: 30,
+                                      //       decoration: BoxDecoration(
+                                      //         image: DecorationImage(
+                                      //           image: imageProvider,
+                                      //           fit: BoxFit.contain,
+                                      //         ),
+                                      //       ),
+                                      //     ),
+                                      //     placeholder: (context, url) => Center(
+                                      //         child:
+                                      //             CircularProgressIndicator()),
+                                      //     errorWidget: (context, url, error) =>
+                                      //         Icon(Icons.error),
+                                      //   ),
+                                      // ),
                                       SizedBox(width: 10),
                                       Container(
-                                        width: 180,
-                                        child: TextBuilder.build(
-                                            title: v.modelGroupName?.eN ?? "",
+                                          width: 140,
+                                          child: AutoSizeText(
+                                            v.modelGroupName?.eN ?? "",
+                                            minFontSize: 10,
+                                            stepGranularity: 10,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
                                             style: TextStyleCustom.STYLE_LABEL
                                                 .copyWith(fontSize: 13),
-                                            maxLine: 1,
-                                            textOverflow:
-                                                TextOverflow.ellipsis),
-                                      ),
+                                          )
+                                          // TextBuilder.build(
+                                          //     title: v.modelGroupName?.eN ?? "",
+                                          //     style: TextStyleCustom.STYLE_LABEL
+                                          //         .copyWith(fontSize: 13),
+                                          //     maxLine: 1,
+                                          //     textOverflow:
+                                          //         TextOverflow.ellipsis),
+                                          ),
                                     ],
                                   ),
                                 ),
@@ -992,42 +1001,45 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
                             return DropdownMenuItem(
                               value: v.catCode,
                               child: Container(
-                                width: 250,
+                                width: 180,
                                 child: Row(
                                   children: <Widget>[
-                                    // Image.memory(
-                                    //   base64Decode(v.keepLogo),
-                                    //   width: 30,
-                                    //   height: 30,
-                                    //   fit: BoxFit.contain,
-                                    // ),
-                                    CachedNetworkImage(
-                                      imageUrl: v.logo,
-                                      imageBuilder: (context, imageProvider) =>
-                                          Container(
-                                        width: 30,
-                                        height: 30,
-                                        decoration: BoxDecoration(
-                                          image: DecorationImage(
-                                            image: imageProvider,
-                                            fit: BoxFit.contain,
-                                          ),
-                                        ),
-                                      ),
-                                      placeholder: (context, url) => Center(
-                                          child: CircularProgressIndicator()),
-                                      errorWidget: (context, url, error) =>
-                                          Icon(Icons.error),
+                                    Image.network(
+                                      v.logo,
+                                      width: 30,
+                                      height: 30,
+                                      fit: BoxFit.contain,
                                     ),
+                                    // CachedNetworkImage(
+                                    //   imageUrl: v.logo,
+                                    //   imageBuilder: (context, imageProvider) =>
+                                    //       Container(
+                                    //     width: 30,
+                                    //     height: 30,
+                                    //     decoration: BoxDecoration(
+                                    //       image: DecorationImage(
+                                    //         image: imageProvider,
+                                    //         fit: BoxFit.contain,
+                                    //       ),
+                                    //     ),
+                                    //   ),
+                                    //   placeholder: (context, url) => Center(
+                                    //       child: CircularProgressIndicator()),
+                                    //   errorWidget: (context, url, error) =>
+                                    //       Icon(Icons.error),
+                                    // ),
                                     SizedBox(width: 10),
                                     Container(
-                                      width: 180,
-                                      child: TextBuilder.build(
-                                          title: v.modelCatName.eN,
-                                          style: TextStyleCustom.STYLE_LABEL
-                                              .copyWith(fontSize: 13),
-                                          maxLine: 1,
-                                          textOverflow: TextOverflow.ellipsis),
+                                      width: 140,
+                                      child: AutoSizeText(
+                                        v.modelCatName?.eN ?? "",
+                                        minFontSize: 10,
+                                        stepGranularity: 10,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyleCustom.STYLE_LABEL
+                                            .copyWith(fontSize: 13),
+                                      ),
                                     ),
                                   ],
                                 ),

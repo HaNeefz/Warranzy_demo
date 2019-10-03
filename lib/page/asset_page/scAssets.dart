@@ -167,7 +167,7 @@ class _AssetPageState extends State<AssetPage> {
               return CircularProgressIndicator();
               break;
             case Status.COMPLETED:
-              if (snapshot.data.data.statusSession != null) {
+              if (snapshot.data.data.statusSession == null) {
                 if (snapshot.data.data.data != null)
                   return Column(
                     children: snapshot.data.data.data
@@ -177,9 +177,11 @@ class _AssetPageState extends State<AssetPage> {
                 else {
                   return Text("Data is empty.");
                 }
-              } else
+              } else {
                 ecsLib.pushPageAndClearAllScene(
                     context: context, pageWidget: SplashScreenPage());
+                return Text("${snapshot.data.data.message}");
+              }
               //
               break;
             case Status.ERROR:
