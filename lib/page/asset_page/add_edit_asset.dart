@@ -18,6 +18,7 @@ import 'package:warranzy_demo/page/asset_page/detail_asset_page/scDetailAsset.da
 import 'package:warranzy_demo/page/asset_page/detail_asset_page/scEditDetailAsset.dart';
 import 'package:warranzy_demo/page/main_page/scMain_page.dart';
 import 'package:warranzy_demo/services/api/api_service_assets.dart';
+import 'package:warranzy_demo/services/api/repository.dart';
 import 'package:warranzy_demo/services/method/scan_qr.dart';
 import 'package:warranzy_demo/services/sqflit/db_asset.dart';
 import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
@@ -319,6 +320,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
         } else {
           createType = _data.createType;
         }
+        double price = 0.00;
         var postData = {
           "WTokenID": _data?.wTokenID ?? "",
           "CreateType": createType,
@@ -625,14 +627,14 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
       if (response == true) {
         try {
           ecsLib.showDialogLoadingLib(context, content: "Editing Detail Asset");
-          await APIServiceAssets.updateData(postData: postData)
+          await Repository.updateData(body: postData)
               .then((resEdit) async {
             ecsLib.cancelDialogLoadindLib(context);
             if (resEdit?.status == true) {
               ecsLib.showDialogLoadingLib(context,
                   content: "Upload Detail Asset");
-              await APIServiceAssets.getDetailAseet(wtokenID: _data.wTokenID)
-                  .then((resDetail) {
+              await Repository.getDetailAseet(
+                  body: {"wtokenID": "${_data.wTokenID}"}).then((resDetail) {
                 ecsLib.cancelDialogLoadindLib(context);
                 if (resDetail?.status == true) {
                   ecsLib.cancelDialogLoadindLib(context);
@@ -710,8 +712,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
     ecsLib.printJson(dataPost);
     ecsLib.showDialogLoadingLib(context, content: "Adding assets");
     try {
-      await APIServiceAssets.addAsset(postData: dataPost).then((res) async {
-        print("<--- Response");
+      await Repository.addAsset(body: dataPost).then((res) async {
         _completed = true;
         ecsLib.cancelDialogLoadindLib(context);
         try {
@@ -739,7 +740,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
           }
         });
       }).catchError((e) {
-        print(e);
+        print("$e");
         ecsLib.cancelDialogLoadindLib(context);
       });
     } on DioError catch (error) {

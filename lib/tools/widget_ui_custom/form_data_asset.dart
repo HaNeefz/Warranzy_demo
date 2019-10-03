@@ -10,6 +10,7 @@ import 'package:warranzy_demo/models/model_respository_asset.dart';
 import 'package:warranzy_demo/page/asset_page/add_assets_page/scAdd_image_demo.dart';
 import 'package:warranzy_demo/page/asset_page/detail_asset_page/scDetailAsset.dart';
 import 'package:warranzy_demo/services/api/api_service_assets.dart';
+import 'package:warranzy_demo/services/api/repository.dart';
 import 'package:warranzy_demo/services/method/scan_qr.dart';
 import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
@@ -101,7 +102,6 @@ class _FormDataAssetState extends State<FormDataAsset> {
   @override
   void initState() {
     getProductCategory = DBProviderInitialApp.db.getAllDataProductCategory();
-    print(_data?.salesPrice);
     if (_data != null) {
       brandActive = _data?.brandCode != null ? "Y" : "N";
       txtAssetName = TextEditingController(text: _data?.title ?? "");
@@ -681,7 +681,7 @@ class _FormDataAssetState extends State<FormDataAsset> {
   }
 
   buttonEditInformation() {
-    var postData = {
+    Map<String, dynamic> postData = {
       "WTokenID": _data?.wTokenID ?? "",
       "CreateType": _data?.createType ?? "",
       "PdtCatCode": txtPdtCat.text,
@@ -693,9 +693,8 @@ class _FormDataAssetState extends State<FormDataAsset> {
       "Title": txtAssetName.text,
       "SerialNo": txtSerialNo.text,
       "LotNo": txtLotNo.text,
-      "SalesPrice": txtPrice.text != null && txtPrice.text != ""
-          ? int.parse(txtPrice.text)
-          : 0,
+      "SalesPrice":
+          txtPrice.text != null && txtPrice.text != "" ? txtPrice.text : "0",
       "WarrantyNo": txtWarranzyNo.text,
       "WarrantyExpire": txtWarranzyExpire.text,
       "SLCName": txtSLCName.text,
@@ -709,13 +708,12 @@ class _FormDataAssetState extends State<FormDataAsset> {
   sendApiEdit({postData}) async {
     try {
       ecsLib.showDialogLoadingLib(context, content: "Editing Detail Asset");
-      await APIServiceAssets.updateData(postData: postData)
-          .then((resEdit) async {
+      await Repository.updateData(body: postData).then((resEdit) async {
         ecsLib.cancelDialogLoadindLib(context);
         if (resEdit?.status == true) {
           ecsLib.showDialogLoadingLib(context, content: "Upload Detail Asset");
-          await APIServiceAssets.getDetailAseet(wtokenID: _data.wTokenID)
-              .then((resDetail) {
+          await Repository.getDetailAseet(
+              body: {"WTokenID": "${_data.wTokenID}"}).then((resDetail) {
             ecsLib.cancelDialogLoadindLib(context);
             if (resDetail?.status == true) {
               ecsLib.cancelDialogLoadindLib(context);
@@ -805,7 +803,7 @@ class _FormDataAssetState extends State<FormDataAsset> {
       "BrandActive": brandActive,
       "SerialNo": txtSerialNo.text,
       "LotNo": txtLotNo.text,
-      "SalesPrice": txtPrice.text == "" ? 0 : int.parse(txtPrice.text),
+      "SalesPrice": txtPrice.text == "" ? "0" : txtPrice.text,
       "CustRemark": txtNote.text,
       "SLCName": txtSLCName.text,
       "CreateType":

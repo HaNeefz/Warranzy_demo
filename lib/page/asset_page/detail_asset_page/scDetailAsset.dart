@@ -9,6 +9,7 @@ import 'package:warranzy_demo/page/asset_page/add_assets_page/scAdd_image_demo.d
 import 'package:warranzy_demo/page/asset_page/add_edit_asset.dart';
 import 'package:warranzy_demo/page/main_page/scMain_page.dart';
 import 'package:warranzy_demo/services/api/api_service_assets.dart';
+import 'package:warranzy_demo/services/api/repository.dart';
 import 'package:warranzy_demo/services/api_provider/api_bloc.dart';
 import 'package:warranzy_demo/services/api_provider/api_response.dart';
 import 'package:warranzy_demo/services/sqflit/db_asset.dart';
@@ -398,8 +399,8 @@ class _DetailAssetState extends State<DetailAsset> {
             if (response == true) {
               try {
                 ecsLib.showDialogLoadingLib(context);
-                await APIServiceAssets.deleteAseet(_data.wTokenID)
-                    .then((res) async {
+                await Repository.deleteAseet(
+                    body: {"WTokenID": "${_data.wTokenID}"}).then((res) async {
                   ecsLib.cancelDialogLoadindLib(context);
                   if (res?.status == true) {
                     print("Data => ${res.data}");

@@ -160,7 +160,7 @@ class WarranzyUsed {
   String lotNo;
   String mFGDate;
   String eXPDate;
-  String salesPrice;
+  dynamic salesPrice;
   String createDate;
   String createType;
   String lastModiflyDate;

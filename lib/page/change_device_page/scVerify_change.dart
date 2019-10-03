@@ -9,6 +9,7 @@ import 'package:warranzy_demo/models/model_verify_phone.dart';
 import 'package:warranzy_demo/page/login_first/scLogin.dart';
 import 'package:warranzy_demo/page/pin_code/scPinCode.dart';
 import 'package:warranzy_demo/services/api/api_services_user.dart';
+import 'package:warranzy_demo/services/api/repository.dart';
 import 'package:warranzy_demo/services/sqflit/db_asset.dart';
 import 'package:warranzy_demo/services/sqflit/db_customers.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
@@ -184,8 +185,7 @@ class _VerifyChangeDeviceState extends State<VerifyChangeDevice> {
         print(postData);
         ecsLib.showDialogLoadingLib(context);
 
-        APIServiceUser.apiVerifyChangeDevice(postData: postData)
-            .then((response) async {
+        Repository.apiVerifyChangeDevice(body: postData).then((response) async {
           if (response?.status == true) {
             if (await DBProviderCustomer.db.checkHasCustomer() == true) {
               print("Have information customer, deleting");

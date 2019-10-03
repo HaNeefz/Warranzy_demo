@@ -8,6 +8,7 @@ import 'package:warranzy_demo/models/model_country_birth_year.dart';
 import 'package:warranzy_demo/models/model_cust_temp_data.dart';
 import 'package:warranzy_demo/services/api/api_services_user.dart';
 import 'package:warranzy_demo/services/api/base_url.dart';
+import 'package:warranzy_demo/services/api/repository.dart';
 import 'package:warranzy_demo/services/method/methode_helper.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
@@ -30,7 +31,6 @@ class _ChangeDeviceState extends State<ChangeDevice> {
   final ModelDataCountry modelCountry = ModelDataCountry();
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
   final Future<SharedPreferences> _pref = SharedPreferences.getInstance();
-  final APIServiceUser apiService = APIServiceUser();
 
   @override
   void initState() {
@@ -109,7 +109,7 @@ class _ChangeDeviceState extends State<ChangeDevice> {
         ecsLib.showDialogLoadingLib(
           context,
         );
-        APIServiceUser.apiChangeDevice(postData: dataSendToAPIChangeDevice)
+        Repository.apiChangeDevice(body: dataSendToAPIChangeDevice)
             .then((response) async {
           if (response?.status == true) {
             ecsLib.cancelDialogLoadindLib(context);

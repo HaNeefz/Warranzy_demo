@@ -12,6 +12,7 @@ import 'package:warranzy_demo/page/main_page/scMain_page.dart';
 import 'package:warranzy_demo/services/api/api_services_user.dart';
 import 'package:warranzy_demo/services/api/base_url.dart';
 import 'package:warranzy_demo/services/api/jwt_service.dart';
+import 'package:warranzy_demo/services/api/repository.dart';
 import 'package:warranzy_demo/services/api_provider/api_bloc.dart';
 import 'package:warranzy_demo/services/api_provider/api_bloc_widget.dart';
 import 'package:warranzy_demo/services/api_provider/api_response.dart';
@@ -98,7 +99,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
     };
     print("Data before send Api => $postData");
     ecsLib.showDialogLoadingLib(context);
-    await APIServiceUser.apiVerifyLogin(postData: postData).then((response) {
+    await Repository.apiLogin(body: postData).then((response) {
       if (response?.status == true) {
         gotoMainPage();
       } else if (response?.status == false) {
@@ -118,12 +119,39 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
             .showDialogLib(context,
                 content: response?.message ?? "Catch Error",
                 textOnButton: allTranslations.text("close"),
-                title: "SERVER ERROR")
+                title: "ERROR")
             .then((res) {
           if (res) ecsLib.cancelDialogLoadindLib(context);
         });
       }
     });
+    // ecsLib.showDialogLoadingLib(context);
+    // await APIServiceUser.apiVerifyLogin(postData: postData).then((response) {
+    //   if (response?.status == true) {
+    //     gotoMainPage();
+    //   } else if (response?.status == false) {
+    //     ecsLib
+    //         .showDialogLib(context,
+    //             content: response?.message ?? "PIN Incorrct, Try again.",
+    //             textOnButton: allTranslations.text("close"),
+    //             title: "SERVER ERROR")
+    //         .then((res) {
+    //       if (res) ecsLib.cancelDialogLoadindLib(context);
+    //     });
+    //     setState(() {
+    //       listPinTemp.clear();
+    //     });
+    //   } else {
+    //     ecsLib
+    //         .showDialogLib(context,
+    //             content: response?.message ?? "Catch Error",
+    //             textOnButton: allTranslations.text("close"),
+    //             title: "SERVER ERROR")
+    //         .then((res) {
+    //       if (res) ecsLib.cancelDialogLoadindLib(context);
+    //     });
+    //   }
+    // });
   }
 
   Future _localAuth() async {
@@ -294,7 +322,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
   }
 
   Future sendApiRegister(Map data, String pinCode) async {
-    APIServiceUser.apiRegister(postData: data).then((response) async {
+    Repository.apiRegister(body: data).then((response) async {
       if (response?.status == true) {
         if (await DBProviderCustomer.db.addDataCustomer(response.data) ==
             true) {

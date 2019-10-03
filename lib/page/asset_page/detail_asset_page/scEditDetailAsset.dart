@@ -10,6 +10,7 @@ import 'package:warranzy_demo/models/model_repository_init_app.dart';
 import 'package:warranzy_demo/models/model_respository_asset.dart';
 import 'package:warranzy_demo/page/asset_page/add_assets_page/scAdd_image_demo.dart';
 import 'package:warranzy_demo/services/api/api_service_assets.dart';
+import 'package:warranzy_demo/services/api/repository.dart';
 import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
@@ -458,7 +459,7 @@ class ModifytImageState extends State<ModifyImage> {
             });
           }
           ecsLib.cancelDialogLoadindLib(context);
-          ecsLib.printJson(postData);
+          // ecsLib.printJson(postData);
           sendAPIUpdateImage(postData: postData);
         }
       }
@@ -469,17 +470,22 @@ class ModifytImageState extends State<ModifyImage> {
 
   sendAPIUpdateImage({dynamic postData}) async {
     ecsLib.showDialogLoadingLib(context, content: "Editing Image Asset");
-    await APIServiceAssets.updateImage(postData: postData)
-        .then((response) async {
+    await Repository.updateImage(body: postData).then((response) async {
       ecsLib.cancelDialogLoadindLib(context);
+      print(
+          "upDate Image Success ${response.status} | ${response.message}");
       if (response.status == true) {
         ecsLib.showDialogLoadingLib(context, content: "Updating Image Asset");
-        await APIServiceAssets.getDetailAseet(wtokenID: assetData.wTokenID)
-            .then((responseDetail) {
-          ecsLib.cancelDialogLoadindLib(context);
+        await Repository.getDetailAseet(
+                body: {"WTokenID": "${assetData.wTokenID}"})
+            .then((responseDetail) async {
+          // ecsLib.cancelDialogLoadindLib(context);
+          print("getDetail Success");
           if (responseDetail.status == true) {
-            ecsLib.stepBackScene(context, 2);
-            ecsLib.pushPageReplacement(
+            // ecsLib.stepBackScene(context, 2);
+            Navigator.pop(context);
+            Navigator.pop(context);
+            await ecsLib.pushPageReplacement(
               context: context,
               pageWidget: DetailAsset(
                 dataAsset: responseDetail.data,

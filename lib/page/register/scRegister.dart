@@ -14,6 +14,7 @@ import 'package:warranzy_demo/models/model_cust_temp_data.dart';
 import 'package:warranzy_demo/models/model_verify_phone.dart';
 import 'package:warranzy_demo/page/pin_code/scPinCode.dart';
 import 'package:warranzy_demo/services/api/api_services_user.dart';
+import 'package:warranzy_demo/services/api/repository.dart';
 import 'package:warranzy_demo/services/method/methode_helper.dart';
 import 'package:warranzy_demo/services/providers/notification_state.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
@@ -142,7 +143,7 @@ class _RegisterState extends State<Register> {
         //   ),
         // ); // Skip verify phone number
 
-        APIServiceUser.apiVerifyNumber(postData: data).then((response) async {
+        Repository.apiVerifyNumber(body: data).then((response) async {
           print(response.message);
           if (response?.status == true) {
             ecsLib.cancelDialogLoadindLib(context);

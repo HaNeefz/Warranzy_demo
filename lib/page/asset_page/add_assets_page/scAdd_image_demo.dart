@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:warranzy_demo/models/model_repository_init_app.dart';
 import 'package:warranzy_demo/page/main_page/scMain_page.dart';
 import 'package:warranzy_demo/services/api/api_service_assets.dart';
+import 'package:warranzy_demo/services/api/repository.dart';
 import 'package:warranzy_demo/services/sqflit/db_asset.dart';
 import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
@@ -177,7 +178,7 @@ class _AddImageDemoState extends State<AddImageDemo> {
     ecsLib.printJson(dataPost);
     ecsLib.showDialogLoadingLib(context, content: "Adding assets");
     try {
-      APIServiceAssets.addAsset(postData: dataPost)
+      Repository.addAsset(body: dataPost)
           .timeout(Duration(seconds: 60))
           .then((res) async {
         print("<--- Response");

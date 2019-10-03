@@ -4,6 +4,7 @@ import 'package:warranzy_demo/models/model_cust_temp_data.dart';
 import 'package:warranzy_demo/models/model_verify_phone.dart';
 import 'package:warranzy_demo/page/pin_code/scPinCode.dart';
 import 'package:warranzy_demo/services/api/api_services_user.dart';
+import 'package:warranzy_demo/services/api/repository.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/const.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
@@ -41,8 +42,8 @@ class _ReceiveOTPState extends State<ReceiveOTP> {
 
   @override
   Widget build(BuildContext context) {
-    TextStyle styleText =
-        TextStyleCustom.STYLE_LABEL_BOLD.copyWith(color: ThemeColors.COLOR_BLACK);
+    TextStyle styleText = TextStyleCustom.STYLE_LABEL_BOLD
+        .copyWith(color: ThemeColors.COLOR_BLACK);
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -63,14 +64,14 @@ class _ReceiveOTPState extends State<ReceiveOTP> {
                   text: TextSpan(children: [
                     TextSpan(
                       text: "Please Enter the OTP to Verify your Account\n\n",
-                      style: TextStyleCustom.STYLE_TITLE
-                          .copyWith(fontSize: 22, color: ThemeColors.COLOR_THEME_APP),
+                      style: TextStyleCustom.STYLE_TITLE.copyWith(
+                          fontSize: 22, color: ThemeColors.COLOR_THEME_APP),
                     ),
                     TextSpan(
                         text:
                             "A OTP has been sent to +${modelMasCustomer.countryNumberPhoneCode} ${modelMasCustomer.mobilePhone}",
-                        style: TextStyleCustom.STYLE_LABEL
-                            .copyWith(fontSize: 15, color: ThemeColors.COLOR_GREY)),
+                        style: TextStyleCustom.STYLE_LABEL.copyWith(
+                            fontSize: 15, color: ThemeColors.COLOR_GREY)),
                   ]),
                 ),
               ),
@@ -141,7 +142,7 @@ class _ReceiveOTPState extends State<ReceiveOTP> {
                         context,
                         content: "Resend OTP, Wait a minutes.",
                       );
-                      await APIServiceUser.apiVerifyNumberTryRequest(postData: data)
+                      await Repository.apiVerifyNumberTryRequest(body: data)
                           .then((response) {
                         ecsLib.cancelDialogLoadindLib(context);
                         print(
@@ -184,7 +185,8 @@ class _ReceiveOTPState extends State<ReceiveOTP> {
           hasError = true;
         });
     } else {
-      ecsLib.showDialogLib(context,
+      ecsLib.showDialogLib(
+        context,
         title: "OTP TIME OUT",
         content: "OTP time out!. Please resend OTP.",
         textOnButton: allTranslations.text("close"),
