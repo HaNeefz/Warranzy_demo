@@ -16,6 +16,7 @@ import 'package:warranzy_demo/page/profile_page/scProfile.dart';
 import 'package:warranzy_demo/page/splash_screen/scSplash_screen.dart';
 import 'package:warranzy_demo/services/api/api_service_assets.dart';
 import 'package:warranzy_demo/services/api/jwt_service.dart';
+import 'package:warranzy_demo/services/api/repository.dart';
 import 'package:warranzy_demo/services/api_provider/api_bloc.dart';
 import 'package:warranzy_demo/services/api_provider/api_response.dart';
 import 'package:warranzy_demo/services/method/methode_helper.dart';
@@ -429,14 +430,20 @@ class _AssetPageState extends State<AssetPage> {
               onTap: () async {
                 var res = await MethodLib.scanQR(context);
                 print("Scan QR Code $res");
+                ecsLib.showDialogLoadingLib(context);
+                await Repository.getDataFromQRofAsset(body: {"WTokenID": res})
+                    .then((response) {
+                  ecsLib.cancelDialogLoadindLib(context);
+                  print("response => $response");
+                });
                 if (res.isNotEmpty) Navigator.pop(context);
-                ecsLib.pushPage(
-                  context: context,
-                  pageWidget: FillInformation(
-                    onClickAddAssetPage: PageAction.SCAN_QR_CODE,
-                    hasDataAssetAlready: false,
-                  ),
-                );
+                // ecsLib.pushPage(
+                //   context: context,
+                //   pageWidget: FillInformation(
+                //     onClickAddAssetPage: PageAction.SCAN_QR_CODE,
+                //     hasDataAssetAlready: false,
+                //   ),
+                // );
               },
             ),
             Divider(),

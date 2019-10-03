@@ -23,7 +23,7 @@ class ApiBaseHelper {
       print('No net');
       throw FetchDataException('No Internet connection');
     } catch (e) {
-      throw FetchDataException('No Internet connection');
+      throw FetchDataException('$e');
     }
     print('api get recieved!');
     return responseJson;
@@ -41,7 +41,7 @@ class ApiBaseHelper {
       print('No net');
       throw FetchDataException('No Internet connection');
     } catch (e) {
-      throw FetchDataException('No Internet connection');
+      throw FetchDataException('$e');
     }
     print('api post recieved!.');
     return responseJson;
@@ -64,7 +64,7 @@ class ApiBaseHelper {
       print('No net');
       throw FetchDataException('No Internet connection');
     } catch (e) {
-      throw FetchDataException('No Internet connection');
+      throw FetchDataException('$e');
     }
     print('api post recieved!.');
     return responseJson;

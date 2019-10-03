@@ -4,6 +4,7 @@ import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/const.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
+import 'package:warranzy_demo/tools/widget_ui_custom/button_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/form_data_asset.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 
@@ -48,14 +49,21 @@ class _FillInformationState extends State<FillInformation> {
         // );
         break;
       case PageAction.SCAN_QR_CODE:
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        return ListView(
           children: <Widget>[
             buildInformation(title: "Brand Name", data: "Dyson Electric"),
             buildInformation(
                 title: "Manufacturer Name", data: "Dyson V7 Trigger"),
             buildProductImage(),
             buildDetailProduct(),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              child: ButtonBuilder.buttonCustom(
+                context: context,
+                paddingValue: 10,
+                label: allTranslations.text("continue"),
+              ),
+            )
           ],
         );
         break;

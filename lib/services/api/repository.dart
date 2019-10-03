@@ -139,4 +139,15 @@ class Repository {
       return ResponseImage(message: "$e");
     }
   }
+
+  static Future<dynamic> getDataFromQRofAsset({dynamic body}) async {
+    try {
+      final response = await _helper.postDio("/Asset/getDataFromQR", body);
+
+      return response;
+    } catch (e) {
+      print("$e");
+      return e;
+    }
+  }
 }
