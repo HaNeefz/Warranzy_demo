@@ -402,11 +402,14 @@ class ResponseAssetOnline {
   bool status;
   List<ModelDataAsset> data;
   String message;
+  dynamic statusSession;
 
-  ResponseAssetOnline({this.status, this.data, this.message});
+  ResponseAssetOnline(
+      {this.status, this.data, this.message, this.statusSession});
 
   ResponseAssetOnline.fromJson(Map<String, dynamic> json) {
     status = json['Status'];
+    statusSession = json['Status_Session'];
     message = json['Message'];
     if (json['Data'] != null) {
       data = new List<ModelDataAsset>();

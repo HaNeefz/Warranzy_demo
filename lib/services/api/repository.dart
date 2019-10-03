@@ -80,9 +80,9 @@ class Repository {
   }
 
   //--------------------------------------------Asset------------------------
-  static Future<ResponseAssetOnline> getAllAseet({dynamic body}) async {
+  static Future<ResponseAssetOnline> getAllAseet() async {
     try {
-      final response = await _helper.postDio("/Asset/getMyAsset", body);
+      final response = await _helper.get("/Asset/getMyAsset");
 
       return ResponseAssetOnline.fromJson(response);
     } catch (e) {

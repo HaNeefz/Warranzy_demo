@@ -69,6 +69,11 @@ class _AssetPageState extends State<AssetPage> {
   //     return null;
   //   }
   // }
+  // String jWT = "";
+  // getJWT() async {
+  //   jWT = await JWTService.getTokenJWT();
+  //   setState(() {});
+  // }
 
   @override
   void initState() {
@@ -120,12 +125,6 @@ class _AssetPageState extends State<AssetPage> {
       children: <Widget>[
         buildAssetOffine(),
         buildAssetOnline(),
-
-        // Column(
-        //   children: listAssetData.map((i) {
-        //     return ModelAssetWidget(i);
-        //   }).toList(),
-        // )
       ],
     );
   }
@@ -168,19 +167,27 @@ class _AssetPageState extends State<AssetPage> {
               return CircularProgressIndicator();
               break;
             case Status.COMPLETED:
-              if (snapshot.data.data.data != null)
-                return Column(
-                  children: snapshot.data.data.data
-                      .map((data) => new MyAssetOnline(data: data))
-                      .toList(),
-                );
-              else {
-                return Text("Data is empty.");
-              }
+              if (snapshot.data.data.statusSession != null) {
+                if (snapshot.data.data.data != null)
+                  return Column(
+                    children: snapshot.data.data.data
+                        .map((data) => new MyAssetOnline(data: data))
+                        .toList(),
+                  );
+                else {
+                  return Text("Data is empty.");
+                }
+              } else
+                ecsLib.pushPageAndClearAllScene(
+                    context: context, pageWidget: SplashScreenPage());
               //
               break;
             case Status.ERROR:
-              return Text("${snapshot.data.message}");
+              return Center(
+                  child: Text(
+                "${snapshot.data.message}",
+                textAlign: TextAlign.center,
+              ));
               // Error(
               //   errorMessage: snapshot.data.message,
               //   onRetryPressed: () => getAllAssetBloc.fetchData(),

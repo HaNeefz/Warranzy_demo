@@ -13,6 +13,7 @@ class FetchRepository<T> {
 
   Future<T> getAllAsset(String url) async {
     final response = await _helper.get(url);
+    print("response => $response");
     return ResponseAssetOnline.fromJson(response) as T;
   }
 

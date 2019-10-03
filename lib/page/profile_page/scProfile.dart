@@ -249,6 +249,12 @@ class _ProfilePageState extends State<ProfilePage> {
                   await DBProviderAsset.db.getAllBrandName();
                 },
               ),
+              // RaisedButton(
+              //   child: Text("Clear SQLite"),
+              //   onPressed: () async {
+              //     await DBProviderAsset.db.deleteAllAsset();
+              //   },
+              // ),
             ])),
             SliverFixedExtentList(
               itemExtent: 150.0,

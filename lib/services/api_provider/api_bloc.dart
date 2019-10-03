@@ -27,7 +27,6 @@ class ApiBlocGetAllAsset<T> {
       stmSink.add(ApiResponse<T>.completed(_data));
     } catch (e) {
       stmSink.add(ApiResponse<T>.error(e.toString()));
-      print(e);
     }
   }
 
