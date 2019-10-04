@@ -99,32 +99,34 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
     };
     print("Data before send Api => $postData");
     ecsLib.showDialogLoadingLib(context);
-    await Repository.apiLogin(body: postData).then((response) {
-      if (response?.status == true) {
-        gotoMainPage();
-      } else if (response?.status == false) {
-        ecsLib
-            .showDialogLib(context,
-                content: response?.message ?? "PIN Incorrct, Try again.",
-                textOnButton: allTranslations.text("close"),
-                title: "SERVER ERROR")
-            .then((res) {
-          if (res) ecsLib.cancelDialogLoadindLib(context);
-        });
-        setState(() {
-          listPinTemp.clear();
-        });
-      } else {
-        ecsLib
-            .showDialogLib(context,
-                content: response?.message ?? "Catch Error",
-                textOnButton: allTranslations.text("close"),
-                title: "ERROR")
-            .then((res) {
-          if (res) ecsLib.cancelDialogLoadindLib(context);
-        });
-      }
-    });
+    gotoMainPage();
+    // await Repository.apiLogin(body: postData).then((response) {
+    //   if (response?.status == true) {
+    //     gotoMainPage();
+    //   } else if (response?.status == false) {
+    //     ecsLib
+    //         .showDialogLib(context,
+    //             content: response?.message ?? "PIN Incorrct, Try again.",
+    //             textOnButton: allTranslations.text("close"),
+    //             title: "SERVER ERROR")
+    //         .then((res) {
+    //       if (res) ecsLib.cancelDialogLoadindLib(context);
+    //     });
+    //     setState(() {
+    //       listPinTemp.clear();
+    //     });
+    //   } else {
+    //     ecsLib
+    //         .showDialogLib(context,
+    //             content: response?.message ?? "Catch Error",
+    //             textOnButton: allTranslations.text("close"),
+    //             title: "ERROR")
+    //         .then((res) {
+    //       if (res) ecsLib.cancelDialogLoadindLib(context);
+    //     });
+    //   }
+    // });
+    
     // ecsLib.showDialogLoadingLib(context);
     // await APIServiceUser.apiVerifyLogin(postData: postData).then((response) {
     //   if (response?.status == true) {

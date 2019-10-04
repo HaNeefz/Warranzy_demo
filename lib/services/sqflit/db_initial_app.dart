@@ -248,6 +248,19 @@ class DBProviderInitialApp {
     }
   }
 
+  Future<List<Map<String, dynamic>>> getAllGroupCategoryTypeListMap() async {
+    final db = await database;
+    try {
+      var res = await db.rawQuery(
+          "SELECT * FROM $tableGroupCategory ORDER BY $tableGroupCategory.GroupID ASC"); //query(tableGroupCategory)
+
+      return res.isNotEmpty ? res : [];
+    } catch (e) {
+      print("Error $tableGroupCategory => $e");
+      return [];
+    }
+  }
+
   Future<List<GroupCategory>> getGroupCategoryBySubCat({String groupID}) async {
     final db = await database;
     try {
@@ -275,6 +288,19 @@ class DBProviderInitialApp {
       JsonEncoder encoder = JsonEncoder.withIndent(" ");
       String prettyprint = encoder.convert(res);
       print("$tableGroupCategory => " + prettyprint);
+      return res.isNotEmpty ? res : [];
+    } catch (e) {
+      return [];
+    }
+  }
+  Future<List<Map<String,dynamic>>> getAllSubCategoryTypeListMap() async {
+    final db = await database;
+    try {
+      var res = await db.rawQuery(
+          "SELECT * FROM $tableProductSubCategory ORDER BY $tableProductSubCategory.CatCode ASC");
+      // JsonEncoder encoder = JsonEncoder.withIndent(" ");
+      // String prettyprint = encoder.convert(res);
+      // print("$tableGroupCategory => " + prettyprint);
       return res.isNotEmpty ? res : [];
     } catch (e) {
       return [];

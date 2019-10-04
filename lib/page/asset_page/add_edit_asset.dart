@@ -112,6 +112,62 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
   ];
 
   String groupID;
+  String groupIDTest;
+  List<Map<String, dynamic>> groupCat = [];
+  List<Map<String, dynamic>> subCat = [];
+  List<Map<String, dynamic>> tempgroupCat = [];
+  List<Map<String, dynamic>> tempSubCat = [];
+
+  List<Map<String, dynamic>> getDataCategoryInfo(
+      {List<Map<String, dynamic>> listMap, String searchText}) {
+    List<Map<String, dynamic>> result = [];
+    listMap.forEach((v) {
+      if (v.containsValue(searchText)) {
+        // print(v);
+        result.add(v);
+      }
+    });
+    return result.isNotEmpty ? result : [];
+  }
+
+  initialCategoryTest(String code) async {
+    print("code => $code");
+    groupCat = await DBProviderInitialApp.db.getAllGroupCategoryTypeListMap();
+    subCat = await DBProviderInitialApp.db.getAllSubCategoryTypeListMap();
+    if (code.length > 1) {
+      print("code > 1");
+      var getGroupCatID = getDataCategoryInfo(
+              listMap: subCat,
+              searchText:
+                  code) //getGroupCat by search from subcat.catcode return groupID
+          .first['GroupID'];
+      setState(() {
+        groupIDTest = getGroupCatID;
+        tempgroupCat = initialGroupCategoryTest(groupIDTest);
+        tempSubCat =
+            getDataCategoryInfo(listMap: subCat, searchText: groupIDTest);
+      });
+    } else {
+      print("code < 1");
+      setState(() {
+        groupIDTest = code;
+        tempgroupCat = List.of(groupCat);
+        // print("groupIDTest => $groupIDTest");
+        // print("groupCat => $groupCat length => ${groupCat.length}");
+        tempSubCat =
+            getDataCategoryInfo(listMap: subCat, searchText: groupIDTest);
+        print("value => ${txtPdtCat.text}");
+        print("tempSubCat => ${tempSubCat.length}");
+      });
+    }
+  }
+
+  List<Map<String, dynamic>> initialGroupCategoryTest(String groupID) {
+    //get All GroupCat to declare tempGroup
+    List<Map<String, dynamic>> tempgroup =
+        getDataCategoryInfo(listMap: groupCat, searchText: groupID);
+    return tempgroup.isNotEmpty ? tempgroup : [];
+  }
 
   initialCategory(String catCode) async {
     var getGroupCatID = await DBProviderInitialApp.db
@@ -153,11 +209,13 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
       txtSLCName = TextEditingController(text: _data?.slcName ?? "");
       initialCategory(_data?.pdtCatCode);
       getProductGroupCategory = DBProviderInitialApp.db.getAllGroupCategory();
+      initialCategoryTest(_data?.pdtCatCode);
     } else {
       groupID = "A";
       getProductGroupCategory = DBProviderInitialApp.db.getAllGroupCategory();
       getProductCategory =
           DBProviderInitialApp.db.getSubCategoryByGroupID(groupID: groupID);
+
       brandActive = _data?.brandCode != null ? "Y" : "N";
       txtAssetName = TextEditingController(text: "");
       txtBrandName = TextEditingController(text: "");
@@ -173,6 +231,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
       txtLotNo = TextEditingController(text: "");
       txtNote = TextEditingController(text: "");
       txtSLCName = TextEditingController(text: "");
+      initialCategoryTest("A");
     }
     if (widget.actionPageForAdd == true) {
       titleAppBar = "New Asset";
@@ -554,6 +613,47 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
     );
   }
 
+  Widget showDataIndropdown({String imgUrl, String label}) {
+    return Container(
+      width: 180,
+      child: Row(
+        children: <Widget>[
+          CachedNetworkImage(
+            imageUrl: imgUrl,
+            imageBuilder: (context, imageProvider) => Container(
+              width: 30,
+              height: 30,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: imageProvider,
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+            placeholder: (context, url) => Container(
+              width: 30,
+              height: 30,
+              child: Center(child: CircularProgressIndicator()),
+            ),
+            errorWidget: (context, url, error) => Icon(Icons.error),
+          ),
+          SizedBox(width: 10),
+          Container(
+            width: 140,
+            child: AutoSizeText(
+              label,
+              minFontSize: 10,
+              stepGranularity: 10,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyleCustom.STYLE_LABEL.copyWith(fontSize: 13),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget dropdownFormfield(
       {String initalData,
       List<String> items,
@@ -878,192 +978,63 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
         content: Column(
           children: <Widget>[
             formWidget(
-              title: "Category",
-              necessary: true,
-              child: FutureBuilder<List<GroupCategory>>(
-                future: getProductGroupCategory,
-                builder: (BuildContext context,
-                    AsyncSnapshot<List<GroupCategory>> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    if (!(snapshot.hasError)) {
-                      return ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: DropdownButtonFormField(
-                            decoration: InputDecoration(
-                                // border: InputBorder.none,
-                                filled: true,
-                                fillColor: Colors.grey[100]),
-                            value: groupID,
-                            items: snapshot.data.map((v) {
-                              return DropdownMenuItem(
-                                value: v.groupID,
-                                child: Container(
-                                  width: 180,
-                                  child: Row(
-                                    children: <Widget>[
-                                      Image.network(
-                                        v.logo,
-                                        width: 30,
-                                        height: 30,
-                                        fit: BoxFit.contain,
-                                      ),
-                                      // Container(
-                                      //   child: CachedNetworkImage(
-                                      //     imageUrl: v.logo,
-                                      //     imageBuilder:
-                                      //         (context, imageProvider) =>
-                                      //             Container(
-                                      //       width: 30,
-                                      //       height: 30,
-                                      //       decoration: BoxDecoration(
-                                      //         image: DecorationImage(
-                                      //           image: imageProvider,
-                                      //           fit: BoxFit.contain,
-                                      //         ),
-                                      //       ),
-                                      //     ),
-                                      //     placeholder: (context, url) => Center(
-                                      //         child:
-                                      //             CircularProgressIndicator()),
-                                      //     errorWidget: (context, url, error) =>
-                                      //         Icon(Icons.error),
-                                      //   ),
-                                      // ),
-                                      SizedBox(width: 10),
-                                      Container(
-                                          width: 140,
-                                          child: AutoSizeText(
-                                            v.modelGroupName?.eN ?? "",
-                                            minFontSize: 10,
-                                            stepGranularity: 10,
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyleCustom.STYLE_LABEL
-                                                .copyWith(fontSize: 13),
-                                          )
-                                          // TextBuilder.build(
-                                          //     title: v.modelGroupName?.eN ?? "",
-                                          //     style: TextStyleCustom.STYLE_LABEL
-                                          //         .copyWith(fontSize: 13),
-                                          //     maxLine: 1,
-                                          //     textOverflow:
-                                          //         TextOverflow.ellipsis),
-                                          ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                            onChanged: (value) async {
-                              await DBProviderInitialApp.db
-                                  .getSubCategoryByGroupID(groupID: value)
-                                  .then((onValue) {
-                                setState(() {
-                                  txtPdtCat.text = onValue.first.catCode;
-                                  groupID = value;
-                                  // print("${v.catCode} | ${v.groupID}");
-                                });
-                              });
-                              getProductCategory = DBProviderInitialApp.db
-                                  .getSubCategoryByGroupID(groupID: value);
-                            }),
-                      );
-                    } else {
-                      return TextBuilder.build(title: "Error data");
-                    }
-                  } else if (snapshot.connectionState ==
-                      ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
-                  } else {
-                    return TextBuilder.build(title: "Something Wrong.");
-                  }
-                },
-              ),
-            ),
+                title: "Category",
+                necessary: true,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: DropdownButtonFormField(
+                      decoration: InputDecoration(
+                          // border: InputBorder.none,
+                          filled: true,
+                          fillColor: Colors.grey[100]),
+                      value: groupIDTest,
+                      items: tempgroupCat.map((v) {
+                        return DropdownMenuItem(
+                          value: v['GroupID'],
+                          child: showDataIndropdown(
+                              imgUrl: v['Logo'],
+                              label:
+                                  "${jsonDecode(v['GroupName'])['EN'] ?? ""}"),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        print(value);
+                        setState(() {
+                          groupIDTest = value;
+                          print("valueChange => $value");
+                          tempSubCat = getDataCategoryInfo(
+                              listMap: subCat, searchText: value);
+                          txtPdtCat.text = tempSubCat.first['CatCode'];
+                        });
+                      }),
+                )),
             formWidget(
-              title: "Sub-Category",
-              necessary: true,
-              child: FutureBuilder<List<ProductCategory>>(
-                future: getProductCategory,
-                builder: (BuildContext context,
-                    AsyncSnapshot<List<ProductCategory>> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    if (!(snapshot.hasError)) {
-                      return ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: DropdownButtonFormField(
-                          decoration: InputDecoration(
-                              // border: InputBorder.none,
-                              filled: true,
-                              fillColor: Colors.grey[100]),
-                          value: txtPdtCat.text,
-                          items: snapshot.data.map((v) {
-                            return DropdownMenuItem(
-                              value: v.catCode,
-                              child: Container(
-                                width: 180,
-                                child: Row(
-                                  children: <Widget>[
-                                    Image.network(
-                                      v.logo,
-                                      width: 30,
-                                      height: 30,
-                                      fit: BoxFit.contain,
-                                    ),
-                                    // CachedNetworkImage(
-                                    //   imageUrl: v.logo,
-                                    //   imageBuilder: (context, imageProvider) =>
-                                    //       Container(
-                                    //     width: 30,
-                                    //     height: 30,
-                                    //     decoration: BoxDecoration(
-                                    //       image: DecorationImage(
-                                    //         image: imageProvider,
-                                    //         fit: BoxFit.contain,
-                                    //       ),
-                                    //     ),
-                                    //   ),
-                                    //   placeholder: (context, url) => Center(
-                                    //       child: CircularProgressIndicator()),
-                                    //   errorWidget: (context, url, error) =>
-                                    //       Icon(Icons.error),
-                                    // ),
-                                    SizedBox(width: 10),
-                                    Container(
-                                      width: 140,
-                                      child: AutoSizeText(
-                                        v.modelCatName?.eN ?? "",
-                                        minFontSize: 10,
-                                        stepGranularity: 10,
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyleCustom.STYLE_LABEL
-                                            .copyWith(fontSize: 13),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                          onChanged: (value) => setState(() {
-                            txtPdtCat.text = value;
-                            print(txtPdtCat.text);
-                          }),
-                        ),
-                      );
-                    } else {
-                      return TextBuilder.build(title: "Error data");
-                    }
-                  } else if (snapshot.connectionState ==
-                      ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  } else {
-                    return TextBuilder.build(title: "Something Wrong.");
-                  }
-                },
-              ),
-            ),
+                title: "Sub - Category",
+                necessary: true,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: DropdownButtonFormField(
+                      decoration: InputDecoration(
+                          // border: InputBorder.none,
+                          filled: true,
+                          fillColor: Colors.grey[100]),
+                      value: txtPdtCat.text,
+                      items: tempSubCat.map((v) {
+                        return DropdownMenuItem(
+                          value: v['CatCode'],
+                          child: showDataIndropdown(
+                              imgUrl: v['Logo'],
+                              label:
+                                  "${jsonDecode(v['CatName'])['EN'] ?? "Eieie"}"),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        print(value);
+                        setState(() {
+                          txtPdtCat.text = value;
+                        });
+                      }),
+                )),
           ],
         ),
         isActive: _currentStep >= 0,
@@ -1592,3 +1563,193 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
   //   return _step;
   // }
 }
+
+/*
+// formWidget(
+            //   title: "Category",
+            //   necessary: true,
+            //   child: FutureBuilder<List<GroupCategory>>(
+            //     future: getProductGroupCategory,
+            //     builder: (BuildContext context,
+            //         AsyncSnapshot<List<GroupCategory>> snapshot) {
+            //       if (snapshot.connectionState == ConnectionState.done) {
+            //         if (!(snapshot.hasError)) {
+            //           return ClipRRect(
+            //             borderRadius: BorderRadius.circular(10),
+            //             child: DropdownButtonFormField(
+            //                 decoration: InputDecoration(
+            //                     // border: InputBorder.none,
+            //                     filled: true,
+            //                     fillColor: Colors.grey[100]),
+            //                 value: groupID,
+            //                 items: snapshot.data.map((v) {
+            //                   return DropdownMenuItem(
+            //                     value: v.groupID,
+            //                     child: Container(
+            //                       width: 180,
+            //                       child: Row(
+            //                         children: <Widget>[
+            //                           Image.network(
+            //                             v.logo,
+            //                             width: 30,
+            //                             height: 30,
+            //                             fit: BoxFit.contain,
+            //                           ),
+            //                           // Container(
+            //                           //   child: CachedNetworkImage(
+            //                           //     imageUrl: v.logo,
+            //                           //     imageBuilder:
+            //                           //         (context, imageProvider) =>
+            //                           //             Container(
+            //                           //       width: 30,
+            //                           //       height: 30,
+            //                           //       decoration: BoxDecoration(
+            //                           //         image: DecorationImage(
+            //                           //           image: imageProvider,
+            //                           //           fit: BoxFit.contain,
+            //                           //         ),
+            //                           //       ),
+            //                           //     ),
+            //                           //     placeholder: (context, url) => Center(
+            //                           //         child:
+            //                           //             CircularProgressIndicator()),
+            //                           //     errorWidget: (context, url, error) =>
+            //                           //         Icon(Icons.error),
+            //                           //   ),
+            //                           // ),
+            //                           SizedBox(width: 10),
+            //                           Container(
+            //                               width: 140,
+            //                               child: AutoSizeText(
+            //                                 v.modelGroupName?.eN ?? "",
+            //                                 minFontSize: 10,
+            //                                 stepGranularity: 10,
+            //                                 maxLines: 2,
+            //                                 overflow: TextOverflow.ellipsis,
+            //                                 style: TextStyleCustom.STYLE_LABEL
+            //                                     .copyWith(fontSize: 13),
+            //                               )
+            //                               // TextBuilder.build(
+            //                               //     title: v.modelGroupName?.eN ?? "",
+            //                               //     style: TextStyleCustom.STYLE_LABEL
+            //                               //         .copyWith(fontSize: 13),
+            //                               //     maxLine: 1,
+            //                               //     textOverflow:
+            //                               //         TextOverflow.ellipsis),
+            //                               ),
+            //                         ],
+            //                       ),
+            //                     ),
+            //                   );
+            //                 }).toList(),
+            //                 onChanged: (value) async {
+            //                   await DBProviderInitialApp.db
+            //                       .getSubCategoryByGroupID(groupID: value)
+            //                       .then((onValue) {
+            //                     setState(() {
+            //                       txtPdtCat.text = onValue.first.catCode;
+            //                       groupID = value;
+            //                       // print("${v.catCode} | ${v.groupID}");
+            //                     });
+            //                   });
+            //                   getProductCategory = DBProviderInitialApp.db
+            //                       .getSubCategoryByGroupID(groupID: value);
+            //                 }),
+            //           );
+            //         } else {
+            //           return TextBuilder.build(title: "Error data");
+            //         }
+            //       } else if (snapshot.connectionState ==
+            //           ConnectionState.waiting) {
+            //         return Center(child: CircularProgressIndicator());
+            //       } else {
+            //         return TextBuilder.build(title: "Something Wrong.");
+            //       }
+            //     },
+            //   ),
+            // ),
+            // formWidget(
+            //   title: "Sub-Category",
+            //   necessary: true,
+            //   child: FutureBuilder<List<ProductCategory>>(
+            //     future: getProductCategory,
+            //     builder: (BuildContext context,
+            //         AsyncSnapshot<List<ProductCategory>> snapshot) {
+            //       if (snapshot.connectionState == ConnectionState.done) {
+            //         if (!(snapshot.hasError)) {
+            //           return ClipRRect(
+            //             borderRadius: BorderRadius.circular(10),
+            //             child: DropdownButtonFormField(
+            //               decoration: InputDecoration(
+            //                   // border: InputBorder.none,
+            //                   filled: true,
+            //                   fillColor: Colors.grey[100]),
+            //               value: txtPdtCat.text,
+            //               items: snapshot.data.map((v) {
+            //                 return DropdownMenuItem(
+            //                   value: v.catCode,
+            //                   child: Container(
+            //                     width: 180,
+            //                     child: Row(
+            //                       children: <Widget>[
+            //                         Image.network(
+            //                           v.logo,
+            //                           width: 30,
+            //                           height: 30,
+            //                           fit: BoxFit.contain,
+            //                         ),
+            //                         // CachedNetworkImage(
+            //                         //   imageUrl: v.logo,
+            //                         //   imageBuilder: (context, imageProvider) =>
+            //                         //       Container(
+            //                         //     width: 30,
+            //                         //     height: 30,
+            //                         //     decoration: BoxDecoration(
+            //                         //       image: DecorationImage(
+            //                         //         image: imageProvider,
+            //                         //         fit: BoxFit.contain,
+            //                         //       ),
+            //                         //     ),
+            //                         //   ),
+            //                         //   placeholder: (context, url) => Center(
+            //                         //       child: CircularProgressIndicator()),
+            //                         //   errorWidget: (context, url, error) =>
+            //                         //       Icon(Icons.error),
+            //                         // ),
+            //                         SizedBox(width: 10),
+            //                         Container(
+            //                           width: 140,
+            //                           child: AutoSizeText(
+            //                             v.modelCatName?.eN ?? "",
+            //                             minFontSize: 10,
+            //                             stepGranularity: 10,
+            //                             maxLines: 2,
+            //                             overflow: TextOverflow.ellipsis,
+            //                             style: TextStyleCustom.STYLE_LABEL
+            //                                 .copyWith(fontSize: 13),
+            //                           ),
+            //                         ),
+            //                       ],
+            //                     ),
+            //                   ),
+            //                 );
+            //               }).toList(),
+            //               onChanged: (value) => setState(() {
+            //                 txtPdtCat.text = value;
+            //                 print(txtPdtCat.text);
+            //               }),
+            //             ),
+            //           );
+            //         } else {
+            //           return TextBuilder.build(title: "Error data");
+            //         }
+            //       } else if (snapshot.connectionState ==
+            //           ConnectionState.waiting) {
+            //         return CircularProgressIndicator();
+            //       } else {
+            //         return TextBuilder.build(title: "Something Wrong.");
+            //       }
+            //     },
+            //   ),
+            // ),
+*/
