@@ -126,7 +126,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
     //     });
     //   }
     // });
-    
+
     // ecsLib.showDialogLoadingLib(context);
     // await APIServiceUser.apiVerifyLogin(postData: postData).then((response) {
     //   if (response?.status == true) {
@@ -576,7 +576,8 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
   Widget showUsername() {
     return Container(
       child: TextBuilder.build(
-          title: username, style: TextStyleCustom.STYLE_TITLE),
+          title: username,
+          style: TextStyleCustom.STYLE_TITLE.copyWith(letterSpacing: 2)),
     );
   }
 
