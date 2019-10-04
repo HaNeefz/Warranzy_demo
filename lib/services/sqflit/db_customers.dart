@@ -96,6 +96,19 @@ class DBProviderCustomer {
     }
   }
 
+  Future<bool> getSpecialPass() async {
+    final db = await database;
+    try {
+      var res = await db.query(tableCustomer, columns: [columnSpecialPass]);
+      return res.isNotEmpty
+          ? res.first['SpecialPass'] == "Y" ? true : false
+          : false; // if null then default false cause allow scan something.
+    } catch (e) {
+      print("error gerData $e");
+      return null;
+    }
+  }
+
   Future<String> getIDCustomer() async {
     final db = await database;
     try {

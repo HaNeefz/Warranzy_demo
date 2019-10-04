@@ -253,6 +253,7 @@ class _ProfilePageState extends State<ProfilePage> {
               //   child: Text("Clear SQLite"),
               //   onPressed: () async {
               //     await DBProviderAsset.db.deleteAllAsset();
+              //     // print(await DBProviderCustomer.db.getSpecialPass());
               //   },
               // ),
             ])),

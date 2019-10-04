@@ -170,11 +170,12 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
       );
 
   Future<bool> loginBySettingOfCustomer() async {
-    var dataCust = await DBProviderCustomer.db.getDataCustomer();
-    if (dataCust.specialPass == "Y")
-      return true;
-    else
+    try {
+      return DBProviderCustomer.db.getSpecialPass();
+    } catch (e) {
+      print("$e");
       return false;
+    }
   }
 
   initMethodLogin() async {
@@ -200,6 +201,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
     super.initState();
     getDataCustomer();
     getUsername();
+    initMethodLogin();
   }
 
   bool get pinCorrect => listEquals(listPinTemp, listPinCorrect);
