@@ -31,18 +31,18 @@ class _TradePageState extends State<TradePage> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 4,
+      length: 10,
       initialIndex: _currentPage,
       child: Scaffold(
         appBar: AppBar(
           flexibleSpace: Container(
-          height: 100,
-          decoration: BoxDecoration(
-              gradient: LinearGradient(colors: [
-            ThemeColors.COLOR_THEME_APP,
-            ThemeColors.COLOR_WHITE
-          ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
-        ),
+            height: 100,
+            decoration: BoxDecoration(
+                gradient: LinearGradient(colors: [
+              ThemeColors.COLOR_THEME_APP,
+              ThemeColors.COLOR_WHITE
+            ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
+          ),
           centerTitle: true,
           backgroundColor: ThemeColors.COLOR_WHITE,
           leading: Padding(
@@ -81,8 +81,10 @@ class _TradePageState extends State<TradePage> {
           ],
           title: TextBuilder.build(
               title: "Trade Market",
-              style: TextStyleCustom.STYLE_APPBAR.copyWith(color: ThemeColors.COLOR_BLACK)),
+              style: TextStyleCustom.STYLE_APPBAR
+                  .copyWith(color: ThemeColors.COLOR_BLACK)),
           bottom: TabBar(
+            isScrollable: true,
             indicatorColor: ThemeColors.COLOR_THEME_APP,
             onTap: (i) {
               setState(() {
@@ -105,6 +107,30 @@ class _TradePageState extends State<TradePage> {
                       TextStyleCustom.STYLE_LABEL_BOLD.copyWith(fontSize: 14)),
               TextBuilder.build(
                   title: "Cleaning",
+                  style:
+                      TextStyleCustom.STYLE_LABEL_BOLD.copyWith(fontSize: 14)),
+              TextBuilder.build(
+                  title: "Kitchen",
+                  style:
+                      TextStyleCustom.STYLE_LABEL_BOLD.copyWith(fontSize: 14)),
+              TextBuilder.build(
+                  title: "Others",
+                  style:
+                      TextStyleCustom.STYLE_LABEL_BOLD.copyWith(fontSize: 14)),
+              TextBuilder.build(
+                  title: "Tablet",
+                  style:
+                      TextStyleCustom.STYLE_LABEL_BOLD.copyWith(fontSize: 14)),
+              TextBuilder.build(
+                  title: "Cleaning",
+                  style:
+                      TextStyleCustom.STYLE_LABEL_BOLD.copyWith(fontSize: 14)),
+              TextBuilder.build(
+                  title: "Kitchen",
+                  style:
+                      TextStyleCustom.STYLE_LABEL_BOLD.copyWith(fontSize: 14)),
+              TextBuilder.build(
+                  title: "Others",
                   style:
                       TextStyleCustom.STYLE_LABEL_BOLD.copyWith(fontSize: 14)),
             ],
@@ -149,6 +175,30 @@ class _TradePageState extends State<TradePage> {
                   ),
                 ),
               ),
+              TextBuilder.build(
+                  title: "Electronics",
+                  style:
+                      TextStyleCustom.STYLE_LABEL_BOLD.copyWith(fontSize: 14)),
+              TextBuilder.build(
+                  title: "Tablet",
+                  style:
+                      TextStyleCustom.STYLE_LABEL_BOLD.copyWith(fontSize: 14)),
+              TextBuilder.build(
+                  title: "Cleaning",
+                  style:
+                      TextStyleCustom.STYLE_LABEL_BOLD.copyWith(fontSize: 14)),
+              TextBuilder.build(
+                  title: "Electronics",
+                  style:
+                      TextStyleCustom.STYLE_LABEL_BOLD.copyWith(fontSize: 14)),
+              TextBuilder.build(
+                  title: "Tablet",
+                  style:
+                      TextStyleCustom.STYLE_LABEL_BOLD.copyWith(fontSize: 14)),
+              TextBuilder.build(
+                  title: "Cleaning",
+                  style:
+                      TextStyleCustom.STYLE_LABEL_BOLD.copyWith(fontSize: 14)),
               TextBuilder.build(
                   title: "Electronics",
                   style:
@@ -225,8 +275,8 @@ class ModelTradeWidget extends StatelessWidget {
                       title: title, style: TextStyleCustom.STYLE_LABEL_BOLD),
                   TextBuilder.build(
                       title: subTitle,
-                      style: TextStyleCustom.STYLE_CONTENT
-                          .copyWith(fontSize: 14),
+                      style:
+                          TextStyleCustom.STYLE_CONTENT.copyWith(fontSize: 14),
                       textOverflow: TextOverflow.ellipsis,
                       maxLine: 2),
                   SizedBox(
