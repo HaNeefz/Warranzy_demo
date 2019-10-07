@@ -16,12 +16,21 @@ class _NotificationPageState extends State<NotificationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        flexibleSpace: Container(
+          height: 100,
+          decoration: BoxDecoration(
+              gradient: LinearGradient(colors: [
+            ThemeColors.COLOR_THEME_APP,
+            ThemeColors.COLOR_WHITE
+          ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
+        ),
         centerTitle: true,
         backgroundColor: ThemeColors.COLOR_WHITE,
         elevation: 0.0,
         title: TextBuilder.build(
             title: "Notification",
-            style: TextStyleCustom.STYLE_APPBAR.copyWith(color: ThemeColors.COLOR_BLACK)),
+            style: TextStyleCustom.STYLE_APPBAR
+                .copyWith(color: ThemeColors.COLOR_BLACK)),
       ),
       body: Container(child: ShowMessage()),
     );

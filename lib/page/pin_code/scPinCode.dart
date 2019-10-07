@@ -86,46 +86,45 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
 
   void sendApiLogin() async {
     SharedPreferences pref = await _pref;
-    ModelCustomers dataCust = await DBProviderCustomer.db.getDataCustomer();
-    var dvID = pref?.getString("DeviceID");
-    var pinCIde = dataCust?.pINcode;
-    var custID = dataCust?.custUserID;
+    // ModelCustomers dataCust = await DBProviderCustomer.db.getDataCustomer();
+    // var pinCIde = dataCust?.pINcode;
+    // var custID = dataCust?.custUserID;
     var postData = {
-      "DeviceID": dvID,
-      "PINcode": pref.getString("PinCode"),
-      "CustUserID": pref.getString("UserID"),
+      "DeviceID": pref?.getString("DeviceID"),
+      "PINcode": pref?.getString("PinCode"),
+      "CustUserID": pref?.getString("UserID"),
       "TimeZone": await MethodHelper.timeZone,
       "CountryCode": await MethodHelper.countryCode
     };
     print("Data before send Api => $postData");
     ecsLib.showDialogLoadingLib(context);
-    gotoMainPage();
-    // await Repository.apiLogin(body: postData).then((response) {
-    //   if (response?.status == true) {
-    //     gotoMainPage();
-    //   } else if (response?.status == false) {
-    //     ecsLib
-    //         .showDialogLib(context,
-    //             content: response?.message ?? "PIN Incorrct, Try again.",
-    //             textOnButton: allTranslations.text("close"),
-    //             title: "SERVER ERROR")
-    //         .then((res) {
-    //       if (res) ecsLib.cancelDialogLoadindLib(context);
-    //     });
-    //     setState(() {
-    //       listPinTemp.clear();
-    //     });
-    //   } else {
-    //     ecsLib
-    //         .showDialogLib(context,
-    //             content: response?.message ?? "Catch Error",
-    //             textOnButton: allTranslations.text("close"),
-    //             title: "ERROR")
-    //         .then((res) {
-    //       if (res) ecsLib.cancelDialogLoadindLib(context);
-    //     });
-    //   }
-    // });
+    // gotoMainPage();
+    await Repository.apiLogin(body: postData).then((response) {
+      if (response?.status == true) {
+        gotoMainPage();
+      } else if (response?.status == false) {
+        ecsLib
+            .showDialogLib(context,
+                content: response?.message ?? "PIN Incorrct, Try again.",
+                textOnButton: allTranslations.text("close"),
+                title: "SERVER ERROR")
+            .then((res) {
+          if (res) ecsLib.cancelDialogLoadindLib(context);
+        });
+        setState(() {
+          listPinTemp.clear();
+        });
+      } else {
+        ecsLib
+            .showDialogLib(context,
+                content: response?.message ?? "Catch Error",
+                textOnButton: allTranslations.text("close"),
+                title: "ERROR")
+            .then((res) {
+          if (res) ecsLib.cancelDialogLoadindLib(context);
+        });
+      }
+    });
 
     // ecsLib.showDialogLoadingLib(context);
     // await APIServiceUser.apiVerifyLogin(postData: postData).then((response) {
@@ -699,11 +698,12 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
   }
 
   checkPINCorrect() async {
+    SharedPreferences pref = await _pref;
     if (usedPin == true && listPinTemp.length == 6 && type == PageType.login) {
       var dataCust = await DBProviderCustomer.db.getDataCustomer();
       var pinCode =
           "${listPinTemp[0]}${listPinTemp[1]}${listPinTemp[2]}${listPinTemp[3]}${listPinTemp[4]}${listPinTemp[5]}";
-      if (dataCust?.pINcode == pinCode) {
+      if (pref?.getString("PinCode") == pinCode) {
         //pinCorrect == true
         print("Correct");
         // gotoMainPage();

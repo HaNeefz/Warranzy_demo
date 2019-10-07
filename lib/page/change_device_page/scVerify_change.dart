@@ -195,49 +195,64 @@ class _VerifyChangeDeviceState extends State<VerifyChangeDevice> {
             if (await DBProviderCustomer.db.addDataCustomer(response.data) ==
                 true) {
               if (await updatePINcode() == true) {
-                try {
-                  for (var warranzyUsed in response.dataAssetUsed.warranzyUsed)
-                    await DBProviderAsset.db
-                        .insertDataWarranzyUesd(warranzyUsed)
-                        .catchError(
-                            (onError) => print("warranzyUsed : $onError"));
-                } catch (e) {
-                  print("insertDataWarranzyUesd => $e");
-                }
-                try {
-                  for (var warranzyLog in response.dataAssetUsed.warranzyLog)
-                    await DBProviderAsset.db
-                        .insertDataWarranzyLog(warranzyLog)
-                        .catchError((onError) => print("warranzyLog $onError"));
-                } catch (e) {
-                  print("insertDataWarranzyLog => $e");
-                }
-                response.dataAssetUsed.filePool.forEach((data) async {
+                if (response.dataAssetUsed.warranzyUsed.length > 0) {
+                  //check has Asset
                   try {
-                    await DBProviderAsset.db
-                        .insertDataFilePool(data)
-                        .catchError((onError) => print("filePool $onError"))
-                        .whenComplete(() {
-                      Navigator.pop(context);
-                      ecsLib.pushPageReplacement(
-                        context: context,
-                        pageWidget: PinCodePageUpdate(
-                          type: PageType.login,
-                          usedPin: true,
-                        ),
-                      );
-                      ecsLib.showDialogLib(
-                        context,
-                        title: "COMPLETED INFORMATION",
-                        content:
-                            "Download information completed. You can Sign in now.",
-                        textOnButton: allTranslations.text("ok"),
-                      );
-                    });
+                    for (var warranzyUsed
+                        in response.dataAssetUsed.warranzyUsed)
+                      await DBProviderAsset.db
+                          .insertDataWarranzyUesd(warranzyUsed)
+                          .catchError(
+                              (onError) => print("warranzyUsed : $onError"));
                   } catch (e) {
-                    print("insertDataFilePool => $e");
+                    print("insertDataWarranzyUesd => $e");
                   }
-                });
+                  try {
+                    for (var warranzyLog in response.dataAssetUsed.warranzyLog)
+                      await DBProviderAsset.db
+                          .insertDataWarranzyLog(warranzyLog)
+                          .catchError(
+                              (onError) => print("warranzyLog $onError"));
+                  } catch (e) {
+                    print("insertDataWarranzyLog => $e");
+                  }
+                  response.dataAssetUsed.filePool.forEach((data) async {
+                    try {
+                      await DBProviderAsset.db
+                          .insertDataFilePool(data)
+                          .catchError((onError) => print("filePool $onError"))
+                          .whenComplete(() {
+                        Navigator.pop(context);
+                        ecsLib.pushPageReplacement(
+                          context: context,
+                          pageWidget: PinCodePageUpdate(
+                            type: PageType.login,
+                            usedPin: true,
+                          ),
+                        );
+                        ecsLib.showDialogLib(
+                          context,
+                          title: "COMPLETED INFORMATION",
+                          content:
+                              "Download information completed. You can Sign in now.",
+                          textOnButton: allTranslations.text("ok"),
+                        );
+                      });
+                    } catch (e) {
+                      print("insertDataFilePool => $e");
+                    }
+                  });
+                } else {
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                  ecsLib.pushPageReplacement(
+                    context: context,
+                    pageWidget: PinCodePageUpdate(
+                      type: PageType.login,
+                      usedPin: true,
+                    ),
+                  );
+                }
               } else {
                 ecsLib.showDialogLib(
                   context,

@@ -43,7 +43,7 @@ class _MainPageState extends State<MainPage>
     double _width = 30;
     double _height = 30;
     return Scaffold(
-        body: SafeArea(child: pageTabBar[currentPage]),
+        body: pageTabBar[currentPage],
         bottomNavigationBar: BottomNavigationBar(
           items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(

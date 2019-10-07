@@ -98,16 +98,30 @@ class _AssetPageState extends State<AssetPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView(
-        children: <Widget>[
-          buildHeaderAndProfile(),
-          CarouselWithIndicator(
-            height: 250,
-            items: ["1", "2", "3", "5"],
-          ),
-          buildLabelAndSeeAll(),
-          buildYourAssets(),
-        ],
+      appBar: AppBar(
+        elevation: 0,
+        flexibleSpace: Container(
+          height: 100,
+          decoration: BoxDecoration(
+              gradient: LinearGradient(colors: [
+            ThemeColors.COLOR_THEME_APP,
+            ThemeColors.COLOR_WHITE
+          ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
+        ),
+      ),
+      body: Container(
+        child: ListView(
+          shrinkWrap: true,
+          children: <Widget>[
+            buildHeaderAndProfile(),
+            CarouselWithIndicator(
+              height: 250,
+              items: ["1", "2", "3", "5"],
+            ),
+            buildLabelAndSeeAll(),
+            buildYourAssets(),
+          ],
+        ),
       ),
     );
   }

@@ -24,6 +24,7 @@ class JWTService {
         maxAge: Duration(minutes: 1));
 
     String token = issueJwtHS256(claimSet, _key);
+    // print(token);
     return token;
   }
   // String token = issueJwtHS256(claimSet, hmacKey)

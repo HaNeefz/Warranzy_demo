@@ -21,7 +21,7 @@ class Repository {
   static Future<ModelVerifyNumber> apiVerifyNumber({dynamic body}) async {
     try {
       final response = await _helper.post("/User/CheckVerifyPhone", body);
-
+      
       return ModelVerifyNumber.fromJson(response);
     } catch (e) {
       return ModelVerifyNumber(message: "$e");

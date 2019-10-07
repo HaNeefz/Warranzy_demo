@@ -35,6 +35,14 @@ class _TradePageState extends State<TradePage> {
       initialIndex: _currentPage,
       child: Scaffold(
         appBar: AppBar(
+          flexibleSpace: Container(
+          height: 100,
+          decoration: BoxDecoration(
+              gradient: LinearGradient(colors: [
+            ThemeColors.COLOR_THEME_APP,
+            ThemeColors.COLOR_WHITE
+          ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
+        ),
           centerTitle: true,
           backgroundColor: ThemeColors.COLOR_WHITE,
           leading: Padding(

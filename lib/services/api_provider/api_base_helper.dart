@@ -36,6 +36,7 @@ class ApiBaseHelper {
       final response = await http.post(_baseUrl + url, body: body, headers: {
         "Authorization": await JWTService.getTokenJWT()
       }).timeout(Duration(seconds: 60));
+      print(response.body);
       responseJson = ReturnResponse.response(response);
     } on SocketException {
       print('No net');

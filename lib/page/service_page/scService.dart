@@ -19,10 +19,19 @@ class _ClaimAndServicePageState extends State<ClaimAndServicePage> {
       child: Scaffold(
         appBar: AppBar(
           centerTitle: true,
+          flexibleSpace: Container(
+            height: 100,
+            decoration: BoxDecoration(
+                gradient: LinearGradient(colors: [
+              ThemeColors.COLOR_THEME_APP,
+              ThemeColors.COLOR_WHITE
+            ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
+          ),
           backgroundColor: ThemeColors.COLOR_WHITE,
           title: TextBuilder.build(
               title: "Claim & Service",
-              style: TextStyleCustom.STYLE_APPBAR.copyWith(color: ThemeColors.COLOR_BLACK)),
+              style: TextStyleCustom.STYLE_APPBAR
+                  .copyWith(color: ThemeColors.COLOR_BLACK)),
           bottom: TabBar(
             indicatorColor: ThemeColors.COLOR_THEME_APP,
             labelPadding: EdgeInsets.symmetric(vertical: 10),
