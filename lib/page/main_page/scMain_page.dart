@@ -45,19 +45,27 @@ class _MainPageState extends State<MainPage>
     return Scaffold(
         body: pageTabBar[currentPage],
         bottomNavigationBar: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          // selectedLabelStyle:
           items: <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-                title: TextBuilder.build(title: "Asset", style: textStyle),
-                icon: Image.asset(Assets.ICON_ASSET,
-                    width: _width, height: _height)),
-            BottomNavigationBarItem(
-                title: TextBuilder.build(title: "Service", style: textStyle),
-                icon: Image.asset(Assets.ICON_SERVICE,
-                    width: _width, height: _height)),
-            BottomNavigationBarItem(
-                title: TextBuilder.build(title: "Trade", style: textStyle),
-                icon: Image.asset(Assets.ICON_TRADE,
-                    width: _width, height: _height)),
+            buttomNavigatorItem(
+                iconsPath: Assets.ICON_ASSET,
+                title: "Asset",
+                style: textStyle,
+                width: _width,
+                height: _height),
+            buttomNavigatorItem(
+                iconsPath: Assets.ICON_SERVICE,
+                title: "Service",
+                style: textStyle,
+                width: _width,
+                height: _height),
+            buttomNavigatorItem(
+                iconsPath: Assets.ICON_TRADE,
+                title: "Trade",
+                style: textStyle,
+                width: _width,
+                height: _height),
             BottomNavigationBarItem(
               title: TextBuilder.build(title: "Notification", style: textStyle),
               icon: notiState.emptyMessage
@@ -68,12 +76,29 @@ class _MainPageState extends State<MainPage>
                           title: "${notiState.counterMessage}",
                           style: textStyle.copyWith(
                               color: ThemeColors.COLOR_WHITE)),
-                      child: Icon(Icons.notifications_active,size: 35,),
+                      child: Icon(
+                        Icons.notifications_active,
+                        size: 35,
+                      ),
+                    ),
+              activeIcon: notiState.emptyMessage
+                  ? Image.asset(Assets.ICON_NOTIFICATION,
+                      width: _width,
+                      height: _height,
+                      color: ThemeColors.COLOR_THEME_APP)
+                  : Badge(
+                      badgeContent: TextBuilder.build(
+                          title: "${notiState.counterMessage}",
+                          style: textStyle.copyWith(
+                              color: ThemeColors.COLOR_THEME_APP)),
+                      child: Icon(
+                        Icons.notifications_active,
+                        size: 35,
+                      ),
                     ),
             ),
           ],
           currentIndex: currentPage,
-          type: BottomNavigationBarType.fixed,
           selectedItemColor: ThemeColors.COLOR_THEME_APP,
           unselectedItemColor: ThemeColors.COLOR_BLACK,
           selectedFontSize: 15,
@@ -104,5 +129,22 @@ class _MainPageState extends State<MainPage>
     return notiState.emptyMessage
         ? Icons.notifications
         : Icons.notifications_active;
+  }
+
+  BottomNavigationBarItem buttomNavigatorItem(
+      {String iconsPath,
+      String title,
+      TextStyle style,
+      double width,
+      double height}) {
+    return BottomNavigationBarItem(
+        title: TextBuilder.build(title: title, style: style),
+        icon: Image.asset(iconsPath, width: width, height: height),
+        activeIcon: Image.asset(
+          iconsPath,
+          width: width,
+          height: height,
+          color: ThemeColors.COLOR_THEME_APP,
+        ));
   }
 }
