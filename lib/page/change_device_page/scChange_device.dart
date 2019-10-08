@@ -55,7 +55,8 @@ class _ChangeDeviceState extends State<ChangeDevice> {
                   padding: EdgeInsets.only(bottom: 70),
                   child: TextBuilder.build(
                       title: "Change Device",
-                      style: TextStyleCustom.STYLE_TITLE),
+                      style: TextStyleCustom.STYLE_TITLE
+                          .copyWith(letterSpacing: 1.5)),
                 ),
                 buildCountryCode(),
                 buildFormMobileNumber(),
@@ -109,8 +110,9 @@ class _ChangeDeviceState extends State<ChangeDevice> {
         ecsLib.showDialogLoadingLib(
           context,
         );
-        Repository.apiChangeDevice(body: dataSendToAPIChangeDevice)
+        await Repository.apiChangeDevice(body: dataSendToAPIChangeDevice)
             .then((response) async {
+          print("Message => ${response.message}");
           if (response?.status == true) {
             ecsLib.cancelDialogLoadindLib(context);
             ecsLib.pushPage(

@@ -118,19 +118,21 @@ class _ProfilePageState extends State<ProfilePage> {
                     Align(
                       alignment: Alignment.center,
                       child: Hero(
-                        child: Container(
-                          width: 150,
-                          height: 150,
-                          decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(width: 3)),
-                          child: Center(
-                            child: FlutterLogo(
-                              size: 100,
-                              colors: ThemeColors.COLOR_THEME_APP,
-                            ),
-                          ),
-                        ),
+                        child: Icon(Icons.person_pin,
+                            size: 100, color: Colors.white),
+                        // Container(
+                        //   width: 150,
+                        //   height: 150,
+                        //   decoration: BoxDecoration(
+                        //       shape: BoxShape.circle,
+                        //       border: Border.all(width: 3)),
+                        //   child: Center(
+                        //     child: FlutterLogo(
+                        //       size: 100,
+                        //       colors: ThemeColors.COLOR_THEME_APP,
+                        //     ),
+                        //   ),
+                        // ),
                         tag: "PhotoProfile",
                       ),
                     ),

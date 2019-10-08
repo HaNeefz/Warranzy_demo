@@ -95,11 +95,26 @@ class _AssetPageState extends State<AssetPage> {
     });
   }
 
+  Widget buildUserName() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 10.0, bottom: 15),
+      child: TextBuilder.build(
+          title: "Hello, $username",
+          style: TextStyleCustom.STYLE_TITLE
+              .copyWith(color: ThemeColors.COLOR_GREY, letterSpacing: 1.5),
+          maxLine: 1,
+          textOverflow: TextOverflow.ellipsis),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    var dateTime = DateTime.now();
+    String date = DateFormat('EEEE, d MMMM').format(dateTime);
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
+        automaticallyImplyLeading: false,
         flexibleSpace: Container(
           height: 100,
           decoration: BoxDecoration(
@@ -107,13 +122,41 @@ class _AssetPageState extends State<AssetPage> {
             ThemeColors.COLOR_THEME_APP,
             ThemeColors.COLOR_WHITE
           ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(10, 50, 10, 0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                TextBuilder.build(
+                    title: date, style: TextStyleCustom.STYLE_LABEL_BOLD),
+                GestureDetector(
+                  onTap: () {
+                    ecsLib.pushPage(
+                      context: context,
+                      pageWidget: ProfilePage(
+                        heroTag: "PhotoProfile",
+                      ),
+                    );
+                  },
+                  child: Center(
+                    child: Hero(
+                      child:
+                          Icon(Icons.person_pin, size: 50, color: Colors.black),
+                      tag: "PhotoProfile",
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
       body: Container(
         child: ListView(
           shrinkWrap: true,
           children: <Widget>[
-            buildHeaderAndProfile(),
+            buildUserName(),
+            // buildHeaderAndProfile(),
             CarouselWithIndicator(
               height: 250,
               items: ["1", "2", "3", "5"],
@@ -284,7 +327,8 @@ class _AssetPageState extends State<AssetPage> {
             child: Padding(
           padding: const EdgeInsets.only(left: 10),
           child: TextBuilder.build(
-              title: "Your Asset", style: TextStyleCustom.STYLE_TITLE),
+              title: "Your Asset",
+              style: TextStyleCustom.STYLE_TITLE.copyWith(letterSpacing: 1.5)),
         )),
         Expanded(
             child: Padding(
@@ -412,20 +456,10 @@ class _AssetPageState extends State<AssetPage> {
                   ),
                 );
               },
-              child: Container(
-                width: 50.0,
-                height: 50.0,
-                decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                        width: 3, color: ThemeColors.COLOR_THEME_APP)),
-                child: Center(
-                  child: Hero(
-                    child: FlutterLogo(
-                      colors: ThemeColors.COLOR_THEME_APP,
-                    ),
-                    tag: "PhotoProfile",
-                  ),
+              child: Center(
+                child: Hero(
+                  child: Icon(Icons.person_pin, size: 50),
+                  tag: "PhotoProfile",
                 ),
               ),
             ),

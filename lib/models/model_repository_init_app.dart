@@ -4,6 +4,7 @@ import 'dart:convert';
 
 class RepositoryInitalApp {
   bool status;
+  String message;
   List<Country> country;
   List<TimeZone> timeZone;
   List<ProductCategory> productCategory;
@@ -11,6 +12,7 @@ class RepositoryInitalApp {
 
   RepositoryInitalApp(
       {this.status,
+      this.message,
       this.country,
       this.timeZone,
       this.productCategory,
@@ -18,6 +20,7 @@ class RepositoryInitalApp {
 
   RepositoryInitalApp.fromJson(Map<String, dynamic> json) {
     status = json['Status'];
+    message = json['Message'];
     if (json['Country'] != null) {
       country = new List<Country>();
       json['Country'].forEach((v) {
@@ -47,6 +50,7 @@ class RepositoryInitalApp {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['Status'] = this.status;
+    data['Message'] = this.message;
     if (this.country != null) {
       data['Country'] = this.country.map((v) => v.toJson()).toList();
     }

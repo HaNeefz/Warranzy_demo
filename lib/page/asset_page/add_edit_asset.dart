@@ -613,30 +613,36 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
     );
   }
 
-  Widget showDataIndropdown({String imgUrl, String label}) {
+  Widget showDataIndropdown({String imgPath, String label}) {
     return Container(
       width: 180,
       child: Row(
         children: <Widget>[
-          CachedNetworkImage(
-            imageUrl: imgUrl,
-            imageBuilder: (context, imageProvider) => Container(
-              width: 30,
-              height: 30,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: imageProvider,
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
-            placeholder: (context, url) => Container(
-              width: 30,
-              height: 30,
-              child: Center(child: CircularProgressIndicator()),
-            ),
-            errorWidget: (context, url, error) => Icon(Icons.error),
+          Image.asset(
+            imgPath,
+            width: 30,
+            height: 30,
+            fit: BoxFit.contain,
           ),
+          // CachedNetworkImage(
+          //   imageUrl: imgUrl,
+          //   imageBuilder: (context, imageProvider) => Container(
+          //     width: 30,
+          //     height: 30,
+          //     decoration: BoxDecoration(
+          //       image: DecorationImage(
+          //         image: imageProvider,
+          //         fit: BoxFit.contain,
+          //       ),
+          //     ),
+          //   ),
+          //   placeholder: (context, url) => Container(
+          //     width: 30,
+          //     height: 30,
+          //     child: Center(child: CircularProgressIndicator()),
+          //   ),
+          //   errorWidget: (context, url, error) => Icon(Icons.error),
+          // ),
           SizedBox(width: 10),
           Container(
             width: 140,
@@ -992,7 +998,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
                         return DropdownMenuItem(
                           value: v['GroupID'],
                           child: showDataIndropdown(
-                              imgUrl: v['Logo'],
+                              imgPath: v['Logo'],
                               label:
                                   "${jsonDecode(v['GroupName'])['EN'] ?? ""}"),
                         );
@@ -1023,7 +1029,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
                         return DropdownMenuItem(
                           value: v['CatCode'],
                           child: showDataIndropdown(
-                              imgUrl: v['Logo'],
+                              imgPath: v['Logo'],
                               label:
                                   "${jsonDecode(v['CatName'])['EN'] ?? "Eieie"}"),
                         );

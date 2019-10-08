@@ -74,13 +74,9 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
     pref.setString("PackageType", dataCust.packageType);
     pref.setString("PinCode", dataCust.pINcode);
     pref.setString("SpecialPass", dataCust.specialPass);
-  }
 
-  getUsername() async {
-    await SharedPreferences.getInstance().then((name) {
-      setState(() {
-        username = name.getString("UserName");
-      });
+    setState(() {
+      username = pref.getString("UserName") ?? dataCust.custName;
     });
   }
 
@@ -201,7 +197,6 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
   void initState() {
     super.initState();
     getDataCustomer();
-    getUsername();
     initMethodLogin();
   }
 
@@ -700,7 +695,6 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
   checkPINCorrect() async {
     SharedPreferences pref = await _pref;
     if (usedPin == true && listPinTemp.length == 6 && type == PageType.login) {
-      var dataCust = await DBProviderCustomer.db.getDataCustomer();
       var pinCode =
           "${listPinTemp[0]}${listPinTemp[1]}${listPinTemp[2]}${listPinTemp[3]}${listPinTemp[4]}${listPinTemp[5]}";
       if (pref?.getString("PinCode") == pinCode) {

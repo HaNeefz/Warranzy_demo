@@ -48,6 +48,45 @@ class ApiBaseHelper {
     return responseJson;
   }
 
+  Future<dynamic> postNoJWT(String url, dynamic body) async {
+    print('Api Post, url $url');
+    var responseJson;
+    try {
+      final response = await http
+          .post(
+            _baseUrl + url,
+            body: body,
+          )
+          .timeout(Duration(seconds: 60));
+      print(response.body);
+      responseJson = ReturnResponse.response(response);
+    } on SocketException {
+      print('No net');
+      throw FetchDataException('No Internet connection');
+    } catch (e) {
+      throw FetchDataException('$e');
+    }
+    print('api post recieved!.');
+    return responseJson;
+  }
+
+  Future<dynamic> getDio(String url) async {
+    print('Api Get, url $url');
+    var responseJson;
+    try {
+      final response =
+          await _dio.get(_baseUrl + url).timeout(Duration(seconds: 60));
+      responseJson = ReturnResponse.responseDio(response);
+    } on SocketException {
+      print('No net');
+      throw FetchDataException('No Internet connection');
+    } catch (e) {
+      throw FetchDataException('$e');
+    }
+    print('api get recieved!');
+    return responseJson;
+  }
+
   Future<dynamic> postDio(String url, dynamic body) async {
     print('Api Post, url $url');
     FormData _form = FormData.from(body);

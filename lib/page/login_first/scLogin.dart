@@ -9,6 +9,7 @@ import 'package:warranzy_demo/page/pin_code/scPinCode.dart';
 import 'package:warranzy_demo/services/providers/notification_state.dart';
 import 'package:warranzy_demo/services/sqflit/db_customers.dart';
 import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
+import 'package:warranzy_demo/services/sqflit/db_language.dart';
 import 'package:warranzy_demo/tools/const.dart';
 import '../../page/register/scRegister.dart';
 import '../../tools/config/text_style.dart';
@@ -151,7 +152,9 @@ class _LoginPageState extends State<LoginPage> {
               // RaisedButton(
               //   child: Text("getDataProducCategory"),
               //   onPressed: () async {
-              //     await DBProviderInitialApp.db.getAllDataProductCategory();
+              //     // await DBProviderInitialApp.db.getAllDataProductCategory();
+              //     // await DBProviderInitialApp.db.deleteAllDataIn3Table();
+              //     await DBProviderLanguage.db.deleteAllLanguage();
               //   },
               // ),
             ],

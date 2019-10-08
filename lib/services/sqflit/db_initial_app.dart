@@ -144,11 +144,11 @@ class DBProviderInitialApp {
 
   Future<bool> updateIconGroupCategory(GroupCategory data) async {
     final db = await database;
-    var getContentLogo = await http.get(data.logo);
-    var byte = getContentLogo.bodyBytes;
-    var base64 = base64Encode(byte);
+    // var getContentLogo = await http.get(data.logo);
+    // var byte = getContentLogo.bodyBytes;
+    // var base64 = base64Encode(byte);
     var res = await db.rawUpdate(
-        "UPDATE $tableGroupCategory SET KeepLogo =  '$base64' WHERE GroupID = '${data.groupID}'");
+        "UPDATE $tableGroupCategory SET Logo =  'assets/icons/icons_category/${data.groupID}000.png' WHERE GroupID = '${data.groupID}'");
     if (res == 1) {
       print("UpdateLogo $tableGroupCategory complete");
       return true;
@@ -158,11 +158,16 @@ class DBProviderInitialApp {
 
   Future<bool> updateIconSubCategory(ProductCategory data) async {
     final db = await database;
-    var getContentLogo = await http.get(data.logo);
-    var byte = getContentLogo.bodyBytes;
-    var base64 = base64Encode(byte);
+    // var getContentLogo = await http.get(data.logo);
+    // var byte = getContentLogo.bodyBytes;
+    // var base64 = base64Encode(byte);
+    var path = "";
+    if (data.catCode == "G001")
+      path = "G000";
+    else
+      path = data.catCode;
     var res = await db.rawUpdate(
-        "UPDATE $tableProductSubCategory SET KeepLogo =  '$base64' WHERE CatCode = '${data.catCode}'");
+        "UPDATE $tableProductSubCategory SET Logo =  'assets/icons/icons_category/$path.png' WHERE CatCode = '${data.catCode}'");
     if (res == 1) {
       print("UpdateLogo $tableProductSubCategory complete");
       return true;
@@ -293,7 +298,8 @@ class DBProviderInitialApp {
       return [];
     }
   }
-  Future<List<Map<String,dynamic>>> getAllSubCategoryTypeListMap() async {
+
+  Future<List<Map<String, dynamic>>> getAllSubCategoryTypeListMap() async {
     final db = await database;
     try {
       var res = await db.rawQuery(

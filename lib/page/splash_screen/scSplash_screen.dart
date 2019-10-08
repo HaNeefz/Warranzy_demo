@@ -9,6 +9,7 @@ import 'package:warranzy_demo/models/model_repository_init_app.dart';
 import 'package:warranzy_demo/page/login_first/scLogin.dart';
 import 'package:simple_animations/simple_animations.dart';
 import 'package:warranzy_demo/services/api/base_url.dart';
+import 'package:warranzy_demo/services/api/repository.dart';
 import 'package:warranzy_demo/services/sqflit/db_asset.dart';
 import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
 import 'package:warranzy_demo/services/sqflit/db_language.dart';
@@ -37,20 +38,21 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
           confirmText: allTranslations.text("confirm"),
           // cancelText: allTranslations.text("cancel"),
           title: TextBuilder.build(title: "เลือกภาษา/Select language."),
-          onConfirm: (Picker picker, List value) {
+          onConfirm: (Picker picker, List value) async {
             print("Picker value : ${picker.getSelectedValues()}");
-            sqfliteDB
+            await sqfliteDB
                 .addDataLanguage(
                     ModelLanguage(name: picker.getSelectedValues().first))
                 .then((res) async {
               if (res == true) {
                 print("ADDED ${picker.getSelectedValues()}");
-                // ecsLib.pushPageReplacement(
-                //     context: context, pageWidget: LoginPage());
                 await initialApp();
-                // await checkUpdateApp();
+                var lang = await sqfliteDB.getDataLanguage();
+                await allTranslations.setNewLanguage(lang ?? "th");
+                setState(() {});
               } else
-                print("ADD LANGUAGE FAIL"); //ต้องเเก้ปัญหานี้ด้วย
+                print(
+                    "VALUES ${picker.getSelectedValues()} => ADD LANGUAGE FAIL"); //ต้องเเก้ปัญหานี้ด้วย
             });
           }).showDialog(context);
     } else
@@ -72,9 +74,8 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
     await Future.delayed(Duration(milliseconds: 2000), () async {
       try {
         ecsLib.showDialogLoadingLib(context, content: "Initial App");
-        await dio.get("${BaseUrl.baseUrl}/User/InitialApp").then((res) async {
-          var response = jsonDecode(res.data);
-          var temp = RepositoryInitalApp.fromJson(response);
+        await Repository.initialApplication().then((res) async {
+          var temp = res;
           if (temp.status == true) {
             ecsLib.cancelDialogLoadindLib(context);
             ecsLib.showDialogLoadingLib(context, content: "Setting App");
@@ -90,22 +91,22 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
                   .insertDataInToTableProductSubCategory(v)
                   .catchError(
                       (onError) => print("ProductSubCategory $onError"));
-              // await DBProviderInitialApp.db
-              //     .updateIconSubCategory(v)
-              //     .catchError((onError) {
-              //   print("UpdateLogo ProductSubCategory $onError");
-              // });
+              await DBProviderInitialApp.db
+                  .updateIconSubCategory(v)
+                  .catchError((onError) {
+                print("UpdateLogo ProductSubCategory $onError");
+              });
             });
             temp.groupCategory.forEach((v) async {
               await DBProviderInitialApp.db
                   .insertDataInToTableGroupCategory(v)
                   .catchError(
                       (onError) => print("ProductHeaderCategory $onError"));
-              // await DBProviderInitialApp.db
-              //     .updateIconGroupCategory(v)
-              //     .catchError((onError) {
-              //   print("Update ProductCategory $onError");
-              // });
+              await DBProviderInitialApp.db
+                  .updateIconGroupCategory(v)
+                  .catchError((onError) {
+                print("Update ProductCategory $onError");
+              });
             });
             // ecsLib.cancelDialogLoadindLib(context);
             await getBrandName();

@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:warranzy_demo/models/model_repository_init_app.dart';
 import 'package:warranzy_demo/models/model_respository_asset.dart';
 import 'package:warranzy_demo/models/model_user.dart';
 import 'package:warranzy_demo/models/model_verify_login.dart';
@@ -21,7 +22,7 @@ class Repository {
   static Future<ModelVerifyNumber> apiVerifyNumber({dynamic body}) async {
     try {
       final response = await _helper.post("/User/CheckVerifyPhone", body);
-      
+
       return ModelVerifyNumber.fromJson(response);
     } catch (e) {
       return ModelVerifyNumber(message: "$e");
@@ -51,7 +52,7 @@ class Repository {
 
   static Future<RepositoryUser> apiVerifyChangeDevice({dynamic body}) async {
     try {
-      final response = await _helper.post("/User/VerifyChangeDevice", body);
+      final response = await _helper.postNoJWT("/User/VerifyChangeDevice", body);
 
       return RepositoryUser.fromJson(response);
     } catch (e) {
@@ -61,7 +62,7 @@ class Repository {
 
   static Future<ModelVerifyNumber> apiChangeDevice({dynamic body}) async {
     try {
-      final response = await _helper.post("/User/ChangeDevice", body);
+      final response = await _helper.postNoJWT("/User/ChangeDevice", body);
 
       return ModelVerifyNumber.fromJson(response);
     } catch (e) {
@@ -80,6 +81,15 @@ class Repository {
   }
 
   //--------------------------------------------Asset------------------------
+  static Future<RepositoryInitalApp> initialApplication() async {
+    try {
+      final response = await _helper.getDio("/User/InitialApp");
+      return RepositoryInitalApp.fromJson(response);
+    } catch (e) {
+      return RepositoryInitalApp(message: "$e");
+    }
+  }
+
   static Future<ResponseAssetOnline> getAllAseet() async {
     try {
       final response = await _helper.get("/Asset/getMyAsset");

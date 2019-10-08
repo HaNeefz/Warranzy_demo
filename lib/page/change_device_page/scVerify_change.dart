@@ -223,6 +223,7 @@ class _VerifyChangeDeviceState extends State<VerifyChangeDevice> {
                           .catchError((onError) => print("filePool $onError"))
                           .whenComplete(() {
                         Navigator.pop(context);
+                        Navigator.pop(context);
                         ecsLib.pushPageReplacement(
                           context: context,
                           pageWidget: PinCodePageUpdate(

@@ -38,13 +38,14 @@ class DBProviderLanguage {
   Future<bool> addDataLanguage(ModelLanguage data) async {
     final db = await database;
     var res = await db.insert(tableName, data.toJson());
-    if (res == 1)
+    if (res > 0) {
+      print("Added Language => $res");
       return true;
-    else
+    } else
       return false;
   }
 
-  getDataLanguage() async {
+  Future<String> getDataLanguage() async {
     final db = await database;
     var res = await db.query(tableName);
     List<ModelLanguage> data = res.isNotEmpty
@@ -82,5 +83,13 @@ class DBProviderLanguage {
     final db = await database;
 
     db.delete(tableName, where: 'id = ?', whereArgs: [id]);
+  }
+
+  deleteAllLanguage() async {
+    final db = await database;
+
+    db.delete(tableName).then((deleted) {
+      print("Delete language => $deleted");
+    });
   }
 }

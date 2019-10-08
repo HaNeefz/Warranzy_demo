@@ -176,7 +176,7 @@ class WarranzyUsed {
   String sLCName;
   CatName modelCatName;
   BrandName modelBrandName;
-  // String alertDate;
+  String alertDate;
 
   WarranzyUsed({
     this.wTokenID,
@@ -210,7 +210,7 @@ class WarranzyUsed {
     this.sLCName,
     this.modelCatName,
     this.modelBrandName,
-    // this.alertDate
+    this.alertDate
   });
 
   WarranzyUsed.fromJson(Map<String, dynamic> json) {
@@ -249,7 +249,7 @@ class WarranzyUsed {
     tradeStatus = json['TradeStatus'];
     title = json['Title'];
     sLCName = json['SLCName'];
-    // alertDate = json['AlertDate'];
+    alertDate = json['AlertDate'];
   }
 
   Map<String, dynamic> toJson() {
@@ -287,7 +287,7 @@ class WarranzyUsed {
     data['TradeStatus'] = this.tradeStatus;
     data['Title'] = this.title;
     data['SLCName'] = this.sLCName;
-    // data['AlertDate'] = this.alertDate;
+    data['AlertDate'] = this.alertDate;
     return data;
   }
 }

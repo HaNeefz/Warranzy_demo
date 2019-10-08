@@ -91,7 +91,7 @@ class DBProviderCustomer {
       var res = await db.query(tableCustomer);
       return res.map((data) => ModelCustomers.fromJson(data)).toList().first;
     } catch (e) {
-      print("error gerData $e");
+      print("error getData $e");
       return null;
     }
   }
@@ -104,7 +104,7 @@ class DBProviderCustomer {
           ? res.first['SpecialPass'] == "Y" ? true : false
           : false; // if null then default false cause allow scan something.
     } catch (e) {
-      print("error gerData $e");
+      print("error getData $e");
       return null;
     }
   }
@@ -117,7 +117,7 @@ class DBProviderCustomer {
           res.map((data) => ModelCustomers.fromJson(data)).toList().first;
       return data.custUserID;
     } catch (e) {
-      print("error gerData $e");
+      print("error getData $e");
       return null;
     }
   }

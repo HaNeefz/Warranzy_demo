@@ -77,26 +77,8 @@ class GlobalTranslations {
     // Set the locale
 
     if (language == "") {
-      DBProviderLanguage.db.checkHasLanguage().then((haveLanguage) {
-        if (haveLanguage == true) {
-          language = DBProviderLanguage.db.getDataLanguage();
-          print("Have language, $language");
-        } else {
-          language = "th";
-          print("No language, SetDefault 'th' ");
-        }
-      });
-      // dbLang.getCount().then((counter){
-      //   if(counter == 0){
-      //     language = "th";
-      //   }else{
-      //     dbLang.getAllLanguage().then((getLang){
-      //       print("getLang from DB : " + "${getLang[0]["name"]}");
-      //       language = getLang[0]["name"];
-      //     });
-      //   }
-      // });
-
+      language = "th";
+      print("No language, SetDefault 'th' ");
     }
     _locale = Locale(language, "");
 
