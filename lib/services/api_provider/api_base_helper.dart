@@ -71,7 +71,7 @@ class ApiBaseHelper {
   }
 
   Future<dynamic> getDio(String url) async {
-    print('Api Get, url $url');
+    print('Api GetDio, url $url');
     var responseJson;
     try {
       final response =
@@ -88,7 +88,7 @@ class ApiBaseHelper {
   }
 
   Future<dynamic> postDio(String url, dynamic body) async {
-    print('Api Post, url $url');
+    print('Api PostDio, url $url');
     FormData _form = FormData.from(body);
     var responseJson;
     try {
@@ -99,6 +99,7 @@ class ApiBaseHelper {
             headers: {"Authorization": await JWTService.getTokenJWT()},
             connectTimeout: 60000),
       );
+      print(response.data);
       responseJson = ReturnResponse.responseDio(response);
     } on SocketException {
       print('No net');

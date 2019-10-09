@@ -487,20 +487,32 @@ class _AssetPageState extends State<AssetPage> {
               onTap: () async {
                 var res = await MethodLib.scanQR(context);
                 print("Scan QR Code $res");
-                ecsLib.showDialogLoadingLib(context);
-                await Repository.getDataFromQRofAsset(body: {"WTokenID": res})
-                    .then((response) {
-                  ecsLib.cancelDialogLoadindLib(context);
-                  print("response => $response");
-                });
-                if (res.isNotEmpty) Navigator.pop(context);
-                // ecsLib.pushPage(
-                //   context: context,
-                //   pageWidget: FillInformation(
-                //     onClickAddAssetPage: PageAction.SCAN_QR_CODE,
-                //     hasDataAssetAlready: false,
-                //   ),
-                // );
+
+                if (res.isNotEmpty) {
+                  ecsLib.showDialogLoadingLib(context);
+                  await Repository.getDataFromQRofAsset(body: {"WTokenID": res})
+                      .then((response) async {
+                    ecsLib.cancelDialogLoadindLib(context);
+                    print("response => $response");
+                    await ecsLib
+                        .pushPage(
+                      context: context,
+                      pageWidget: FillInformation(
+                        onClickAddAssetPage: PageAction.SCAN_QR_CODE,
+                        hasDataAssetAlready: false,
+                        dataScan: response,
+                      ),
+                    )
+                        .whenComplete(() {
+                      Navigator.pop(context);
+                    });
+                  });
+                } else {
+                  ecsLib.showDialogLib(context,
+                      content: "Not Found.",
+                      textOnButton: allTranslations.text("close"),
+                      title: "ERROR DATA SCAN");
+                }
               },
             ),
             Divider(),

@@ -251,6 +251,13 @@ class _ProfilePageState extends State<ProfilePage> {
                   await DBProviderAsset.db.getAllBrandName();
                 },
               ),
+              RaisedButton(
+                child: Text("Clear SQLite"),
+                onPressed: () async {
+                  await DBProviderAsset.db.deleteAllAsset();
+                  // print(await DBProviderCustomer.db.getSpecialPass());
+                },
+              ),
               // RaisedButton(
               //   child: Text("Clear SQLite"),
               //   onPressed: () async {

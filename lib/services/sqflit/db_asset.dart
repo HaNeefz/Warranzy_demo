@@ -252,7 +252,7 @@ BlockchainID */
   Future<bool> insertDataWarranzyLog(WarranzyLog data) async {
     final db = await database;
     var res = await db.insert(tableWarranzyLog, data.toJson());
-    if (res == 1) {
+    if (res > 1) {
       print("insert $tableWarranzyLog complete");
       return true;
     } else
@@ -262,7 +262,7 @@ BlockchainID */
   Future<bool> insertDataFilePool(FilePool data) async {
     final db = await database;
     var res = await db.insert(tableFilePool, data.toJson());
-    if (res == 1) {
+    if (res > 0) {
       print("insert $tableFilePool complete");
       return true;
     } else

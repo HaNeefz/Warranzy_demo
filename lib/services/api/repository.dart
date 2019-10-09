@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:warranzy_demo/models/model_repository_asset_scan.dart';
 import 'package:warranzy_demo/models/model_repository_init_app.dart';
 import 'package:warranzy_demo/models/model_respository_asset.dart';
 import 'package:warranzy_demo/models/model_user.dart';
@@ -52,7 +53,8 @@ class Repository {
 
   static Future<RepositoryUser> apiVerifyChangeDevice({dynamic body}) async {
     try {
-      final response = await _helper.postNoJWT("/User/VerifyChangeDevice", body);
+      final response =
+          await _helper.postNoJWT("/User/VerifyChangeDevice", body);
 
       return RepositoryUser.fromJson(response);
     } catch (e) {
@@ -103,7 +105,7 @@ class Repository {
   static Future<RepositoryOfAsset> addAsset({dynamic body}) async {
     try {
       final response = await _helper.postDio("/Asset/AddAsset", body);
-
+    
       return RepositoryOfAsset.fromJson(response);
     } catch (e) {
       return RepositoryOfAsset(message: "$e");
@@ -150,14 +152,15 @@ class Repository {
     }
   }
 
-  static Future<dynamic> getDataFromQRofAsset({dynamic body}) async {
+  static Future<RepositoryAssetScan> getDataFromQRofAsset(
+      {dynamic body}) async {
     try {
       final response = await _helper.postDio("/Asset/getDataFromQR", body);
 
-      return response;
+      return RepositoryAssetScan.fromJson(response);
     } catch (e) {
       print("$e");
-      return e;
+      return RepositoryAssetScan(message :e);
     }
   }
 }

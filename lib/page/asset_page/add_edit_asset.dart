@@ -143,7 +143,8 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
           .first['GroupID'];
       setState(() {
         groupIDTest = getGroupCatID;
-        tempgroupCat = initialGroupCategoryTest(groupIDTest);
+        tempgroupCat = List.of(groupCat);
+        print("tempgroupCat => $tempgroupCat");
         tempSubCat =
             getDataCategoryInfo(listMap: subCat, searchText: groupIDTest);
       });
@@ -188,10 +189,9 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
     listTempData = List.of(listImageEachGroup ?? []);
 
     if (_data != null) {
-      print(_data.pdtCatCode);
       brandActive = _data?.brandCode != null ? "Y" : "N";
       txtAssetName = TextEditingController(text: _data?.title ?? "");
-      txtBrandName = TextEditingController(text: "");
+      txtBrandName = TextEditingController(text: _data?.brandCode ?? "");
       txtBrandCode = TextEditingController(text: _data?.brandCode ?? "");
       txtWarranzyNo = TextEditingController(text: _data?.warrantyNo ?? "");
       txtWarranzyExpire =
@@ -199,22 +199,25 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
       dataTime = txtWarranzyExpire.text;
       txtAlertDate =
           TextEditingController(text: _data?.alertDateNo.toString() ?? "");
+      if (_data?.groupCat != null) groupIDTest = _data?.groupCat;
       txtPdtCat = TextEditingController(text: _data?.pdtCatCode ?? "");
-      txtPdtGroup = TextEditingController(text: _data?.pdtGroup ?? "");
-      txtPdtPlace = TextEditingController(text: _data?.pdtPlace ?? "");
+      txtPdtGroup =
+          TextEditingController(text: _data?.pdtGroup ?? _group.first);
+      txtPdtPlace =
+          TextEditingController(text: _data?.pdtPlace ?? _place.first);
       txtPrice = TextEditingController(text: _data?.salesPrice ?? "");
       txtSerialNo = TextEditingController(text: _data?.serialNo ?? "");
       txtLotNo = TextEditingController(text: _data?.lotNo ?? "");
       txtNote = TextEditingController(text: _data?.custRemark ?? "");
       txtSLCName = TextEditingController(text: _data?.slcName ?? "");
-      initialCategory(_data?.pdtCatCode);
-      getProductGroupCategory = DBProviderInitialApp.db.getAllGroupCategory();
+      // initialCategory(_data?.pdtCatCode);
+      // getProductGroupCategory = DBProviderInitialApp.db.getAllGroupCategory();
       initialCategoryTest(_data?.pdtCatCode);
     } else {
-      groupID = "A";
-      getProductGroupCategory = DBProviderInitialApp.db.getAllGroupCategory();
-      getProductCategory =
-          DBProviderInitialApp.db.getSubCategoryByGroupID(groupID: groupID);
+      // groupID = "A";
+      // getProductGroupCategory = DBProviderInitialApp.db.getAllGroupCategory();
+      // getProductCategory =
+      //     DBProviderInitialApp.db.getSubCategoryByGroupID(groupID: groupID);
 
       brandActive = _data?.brandCode != null ? "Y" : "N";
       txtAssetName = TextEditingController(text: "");
@@ -378,9 +381,9 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
           else
             createType = "T";
         } else {
-          createType = _data.createType;
+          createType =
+              widget.pageType == PageType.MANUAL ? "C" : _data.createType;
         }
-        double price = 0.00;
         var postData = {
           "WTokenID": _data?.wTokenID ?? "",
           "CreateType": createType,
@@ -417,9 +420,10 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
             if (response == "F") {
               print(response);
               await submitForAddAsset(
-                  postData: postData,
-                  whenCompleted: () => ecsLib.pushPageAndClearAllScene(
-                      context: context, pageWidget: MainPage()));
+                postData: postData,
+                whenCompleted: () => ecsLib.pushPageAndClearAllScene(
+                    context: context, pageWidget: MainPage())
+              );
             } else if (response == "S") {
               print(response);
               await submitForAddAsset(
@@ -476,10 +480,13 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
         title: TextBuilder.build(
             title: titleAppBar, style: TextStyleCustom.STYLE_APPBAR),
         actions: <Widget>[
-          FlatButton(
-            child: null,
-            onPressed: () {},
-          )
+          RaisedButton(
+            child: Text("Clear SQLite"),
+            onPressed: () async {
+              await DBProviderAsset.db.deleteAllAsset();
+              // print(await DBProviderCustomer.db.getSpecialPass());
+            },
+          ),
         ],
       ),
       body: Container(
@@ -822,27 +829,25 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
         _completed = true;
         ecsLib.cancelDialogLoadindLib(context);
         try {
-          await DBProviderAsset.db
-              .insertDataWarranzyUesd(res.warranzyUsed)
-              .catchError((onError) => print("warranzyUsed : $onError"));
+          await DBProviderAsset.db.insertDataWarranzyUesd(res.warranzyUsed);
+          // .catchError((onError) => print("warranzyUsed : $onError"));
         } catch (e) {
           print("insertDataWarranzyUesd => $e");
         }
         try {
-          await DBProviderAsset.db
-              .insertDataWarranzyLog(res.warranzyLog)
-              .catchError((onError) => print("warranzyLog $onError"));
+          await DBProviderAsset.db.insertDataWarranzyLog(res.warranzyLog);
+          // .catchError((onError) => print("warranzyLog $onError"));
         } catch (e) {
           print("insertDataWarranzyLog => $e");
         }
         res.filePool.forEach((data) async {
           try {
-            await DBProviderAsset.db
-                .insertDataFilePool(data)
-                .catchError((onError) => print("filePool $onError"))
-                .whenComplete(whenCompleted);
+          await DBProviderAsset.db
+              .insertDataFilePool(data)
+              .catchError((onError) => print("filePool $onError"))
+              .whenComplete(whenCompleted);
           } catch (e) {
-            print("insertDataFilePool => $e");
+          print("insertDataFilePool => $e");
           }
         });
       }).catchError((e) {

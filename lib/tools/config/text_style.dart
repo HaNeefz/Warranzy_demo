@@ -17,7 +17,7 @@ class TextStyleCustom {
       color: ThemeColors.COLOR_BLACK,
       height: 1.2,
       fontSize: 30.0,
-      // letterSpacing: 1,
+      letterSpacing: 1,
       fontFamily: fontFamily,
       fontWeight: FontWeight.w900);
 
