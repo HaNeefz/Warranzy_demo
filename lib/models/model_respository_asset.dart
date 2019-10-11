@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
 
+import 'model_repository_asset_scan.dart';
 import 'model_user.dart';
 
 class RepositoryOfAsset {
@@ -230,15 +231,19 @@ class RepositoryOfAsset {
 class ResponseDetailOfAsset {
   bool status;
   ModelDataAsset data;
+  ModelDataScan dataScan;
   String message;
 
-  ResponseDetailOfAsset({this.status, this.data, this.message});
+  ResponseDetailOfAsset({this.status, this.data, this.message, this.dataScan});
 
   ResponseDetailOfAsset.fromJson(Map<String, dynamic> json) {
     status = json['Status'];
     message = json['Message'];
     data =
         json['Data'] != null ? new ModelDataAsset.fromJson(json['Data']) : null;
+    dataScan = json['Product'] != null
+        ? new ModelDataScan.fromJson(json['Product'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -248,6 +253,7 @@ class ResponseDetailOfAsset {
     if (this.data != null) {
       data['Data'] = this.data.toJson();
     }
+    if (this.dataScan != null) data['Product'] = this.dataScan.toJson();
     return data;
   }
 }
@@ -287,40 +293,39 @@ class ModelDataAsset {
   String slcName;
   int alertDateNo;
 
-  ModelDataAsset({
-    this.wTokenID,
-    this.custUserID,
-    this.custCountryCode,
-    this.pdtCatCode,
-    this.groupCat,
-    this.modelCatName,
-    this.modelBrandName,
-    this.pdtGroup,
-    this.pdtPlace,
-    this.brandCode,
-    this.title,
-    this.serialNo,
-    this.lotNo,
-    this.salesPrice,
-    this.warrantyNo,
-    this.warrantyExpire,
-    this.custRemark,
-    this.createType,
-    this.createDate,
-    this.lastModiflyDate,
-    this.exWarrantyStatus,
-    this.tradeStatus,
-    this.logDate,
-    this.logType,
-    this.partyCode,
-    this.partyCountryCode,
-    this.warranzyEndDate,
-    this.fileAttachID,
-    this.images,
-    this.slcName,
-    this.alertDate,
-    this.alertDateNo,
-  });
+  ModelDataAsset(
+      {this.wTokenID,
+      this.custUserID,
+      this.custCountryCode,
+      this.pdtCatCode,
+      this.groupCat,
+      this.modelCatName,
+      this.modelBrandName,
+      this.pdtGroup,
+      this.pdtPlace,
+      this.brandCode,
+      this.title,
+      this.serialNo,
+      this.lotNo,
+      this.salesPrice,
+      this.warrantyNo,
+      this.warrantyExpire,
+      this.custRemark,
+      this.createType,
+      this.createDate,
+      this.lastModiflyDate,
+      this.exWarrantyStatus,
+      this.tradeStatus,
+      this.logDate,
+      this.logType,
+      this.partyCode,
+      this.partyCountryCode,
+      this.warranzyEndDate,
+      this.fileAttachID,
+      this.images,
+      this.slcName,
+      this.alertDate,
+      this.alertDateNo});
 
   ModelDataAsset.fromJson(Map<String, dynamic> json) {
     wTokenID = json['WTokenID'];
@@ -392,8 +397,8 @@ class ModelDataAsset {
     data['FileAttach_ID'] = this.fileAttachID;
     data['Images'] = this.images;
     data['SLCName'] = this.slcName;
-    data['AlertDate'] = alertDate;
-    data['AlertDateNo'] = alertDateNo;
+    data['AlertDate'] = this.alertDate;
+    data['AlertDateNo'] = this.alertDateNo;
     return data;
   }
 }

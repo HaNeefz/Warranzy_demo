@@ -4,11 +4,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_animations/simple_animations.dart';
+import 'package:warranzy_demo/models/model_repository_asset_scan.dart';
 import 'package:warranzy_demo/models/model_respository_asset.dart';
 import 'package:warranzy_demo/page/asset_page/add_assets_page/scAdd_image_demo.dart';
 import 'package:warranzy_demo/page/asset_page/add_edit_asset.dart';
 import 'package:warranzy_demo/page/main_page/scMain_page.dart';
-import 'package:warranzy_demo/services/api/api_service_assets.dart';
 import 'package:warranzy_demo/services/api/repository.dart';
 import 'package:warranzy_demo/services/api_provider/api_bloc.dart';
 import 'package:warranzy_demo/services/api_provider/api_response.dart';
@@ -70,6 +70,7 @@ class _LoadingDetailAssetState extends State<LoadingDetailAsset> {
                       opacity: animation,
                       child: DetailAsset(
                         dataAsset: snapshot.data.data.data,
+                        dataScan: snapshot.data.data.dataScan,
                         showDetailOnline: true,
                       ),
                     );
@@ -97,13 +98,15 @@ class DetailAsset extends StatefulWidget {
   final bool editAble;
   final bool showDetailOnline;
   final ModelDataAsset dataAsset;
+  final ModelDataScan dataScan;
 
   const DetailAsset(
       {Key key,
       this.heroTag,
       this.editAble = true,
       this.dataAsset,
-      this.showDetailOnline})
+      this.showDetailOnline,
+      this.dataScan})
       : super(key: key);
 
   @override
@@ -137,9 +140,8 @@ class _DetailAssetState extends State<DetailAsset> {
 
   void initState() {
     super.initState();
-    if (_data.createType == "C") {
-      imageDataEachGroup = getImage(_data);
-    }
+    imageDataEachGroup = getImage(_data);
+
     print(_data.alertDate);
     getProductCateName();
     getBrandName();
@@ -197,7 +199,7 @@ class _DetailAssetState extends State<DetailAsset> {
                 onPressed: () => Navigator.pop(context)),
             actions: <Widget>[
               widget.editAble == true
-                  ? widget.showDetailOnline == true
+                  ? widget.showDetailOnline == true && _data.createType == "C"
                       ? containerButton(Icons.mode_edit,
                           onPressed: () => goToEditPageForEditImage(true))
                       : Container()
@@ -207,43 +209,11 @@ class _DetailAssetState extends State<DetailAsset> {
                 autoPlay: false,
                 height: 400,
                 viewportFraction: 1.0,
-                items: listImageUrl != null && listImageUrl.length > 0
-                    ? Iterable.generate(
-                        listImageUrl.length,
-                        (i) => GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).push(
-                                TransparentMaterialPageRoute(
-                                    fullscreenDialog: true,
-                                    builder: (BuildContext context) =>
-                                        PhotoViewPage(
-                                          image: listImageUrl,
-                                          heroTag: "image$i",
-                                          currentIndex: i,
-                                        )));
-                          },
-                          child: CachedNetworkImage(
-                            imageUrl: listImageUrl[i],
-                            imageBuilder: (context, imageProvider) => Container(
-                              width: 150,
-                              height: 150,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(40),
-                                image: DecorationImage(
-                                    image: imageProvider,
-                                    fit: BoxFit.cover,
-                                    colorFilter: ColorFilter.mode(
-                                        Colors.red, BlendMode.dstATop)),
-                              ),
-                            ),
-                            placeholder: (context, url) =>
-                                Center(child: CircularProgressIndicator()),
-                            errorWidget: (context, url, error) =>
-                                Icon(Icons.error),
-                          ),
-                        ),
-                      ).toList()
-                    : Iterable.generate(4, (i) => testImage()).toList()),
+                items: widget.dataScan == null
+                    ? listImageUrl != null && listImageUrl.length > 0
+                        ? showProductImage(listImageUrl)
+                        : Iterable.generate(4, (i) => testImage()).toList()
+                    : showProductImage(widget.dataScan.fileImageID)),
           ),
           SliverList(
             delegate: SliverChildListDelegate([
@@ -267,6 +237,7 @@ class _DetailAssetState extends State<DetailAsset> {
   }
 
   Widget checkTypeAsset(String typeAsset) {
+    // print("TypeAsset -> $typeAsset");
     Widget child = Container();
     switch (typeAsset) {
       case "C":
@@ -293,7 +264,16 @@ class _DetailAssetState extends State<DetailAsset> {
             buildHeader(context),
             buildAssetInformation(),
             buildProductPhotoByCustomer(),
-            buildLastAssetInformation()
+            buildLastAssetInformation(),
+            if (widget.showDetailOnline == true)
+              Column(
+                children: <Widget>[
+                  buildButtonDuplicate(context),
+                  SizedBox(height: 10),
+                  buildButtonDelete(context),
+                  SizedBox(height: 10),
+                ],
+              )
           ],
         );
         break;
@@ -431,13 +411,16 @@ class _DetailAssetState extends State<DetailAsset> {
         label: "Duplicate",
         onPressed: () async {
           print("Duplicate");
+          _data.wTokenID = "";
+          _data.createType = "C";
           ecsLib.pushPage(
             context: context,
             pageWidget: FormDataAssetTest(
                 modelDataAsset: _data,
                 categoryID: null,
                 actionPageForAdd: true,
-                pageType: PageType.MANUAL,
+                pageType:
+                    _data.createType == "C" ? PageType.MANUAL : PageType.SCANQR,
                 listImageDataEachGroup: []),
           );
         });
@@ -446,47 +429,61 @@ class _DetailAssetState extends State<DetailAsset> {
   Widget buildLastAssetInformation() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
-      child: RichText(
-        text: TextSpan(
-          children: [
-            // textTitleWithData(
-            //     title: "Shop for sales", data: "_assetsData.shopForSales"),
-            // textTitleWithData(
-            //     title: "Shop Branch", data: "_assetsData.brandName"),
-            // textTitleWithData(
-            //     title: "Shop Country", data: "_assetsData.shopCountry"),
-            textTitleWithData(title: "Asset Name", data: "${_data.title}"),
-            textTitleWithData(
-                title: "Brand Name",
-                data: "${brandName ?? "BrandName is Empty"}"),
-            textTitleWithData(
-                title: "Product Category",
-                data: "${_data.modelCatName?.eN ?? catName}"),
-            textTitleWithData(
-                title: "Product Group", data: "${_data.pdtGroup}"),
-            textTitleWithData(
-                title: "Product Place", data: "${_data.pdtPlace}"),
-            textTitleWithData(title: "SLCName", data: "${_data.slcName}"),
-            textTitleWithData(
-                title: "Product Price", data: "${_data.salesPrice}"),
-            textTitleWithData(
-                title: "Warranty No", data: "${_data.warrantyNo}"),
-            textTitleWithData(
-                title: "Warranty Expire Date",
-                data: _data.warrantyExpire.split(" ").first),
-            textTitleWithData(
-                title: "AlerDate",
-                data: _data.alertDate != null
-                    ? _data.alertDate.split(" ").first
-                    : "-"),
-            textTitleWithData(
-                title: "Alert Date No.", data: "${_data.alertDateNo}"),
-            textTitleWithData(title: "Serial No.", data: "${_data.serialNo}"),
-            textTitleWithData(title: "Lot No.", data: "${_data.lotNo}"),
-            textTitleWithData(
-                title: "Note (Optional)", data: "${_data.custRemark}"),
-          ],
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          if (_data.createType == "T" && widget.showDetailOnline == true)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                TextBuilder.build(
+                    title: "Warranty used", style: TextStyleCustom.STYLE_TITLE),
+                IconButton(
+                  icon: Icon(Icons.edit),
+                  onPressed: () {
+                    goToEditPageForEditImage(false);
+                  },
+                )
+              ],
+            ),
+          RichText(
+            text: TextSpan(
+              children: [
+                textTitleWithData(title: "Asset Name", data: "${_data.title}"),
+                textTitleWithData(
+                    title: "Brand Name",
+                    data: "${brandName ?? "BrandName is Empty"}"),
+                textTitleWithData(
+                    title: "Product Category",
+                    data: "${_data.modelCatName?.eN ?? catName}"),
+                textTitleWithData(
+                    title: "Product Group", data: "${_data.pdtGroup}"),
+                textTitleWithData(
+                    title: "Product Place", data: "${_data.pdtPlace}"),
+                textTitleWithData(title: "SLCName", data: "${_data.slcName}"),
+                textTitleWithData(
+                    title: "Product Price", data: "${_data.salesPrice}"),
+                textTitleWithData(
+                    title: "Warranty No", data: "${_data.warrantyNo}"),
+                textTitleWithData(
+                    title: "Warranty Expire Date",
+                    data: _data.warrantyExpire.split(" ").first),
+                textTitleWithData(
+                    title: "AlerDate",
+                    data: _data.alertDate != null
+                        ? _data.alertDate.split(" ").first
+                        : "-"),
+                textTitleWithData(
+                    title: "Alert Date No.", data: "${_data.alertDateNo}"),
+                textTitleWithData(
+                    title: "Serial No.", data: "${_data.serialNo}"),
+                textTitleWithData(title: "Lot No.", data: "${_data.lotNo}"),
+                textTitleWithData(
+                    title: "Note (Optional)", data: "${_data.custRemark}"),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -496,31 +493,37 @@ class _DetailAssetState extends State<DetailAsset> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          RichText(
-            text: TextSpan(children: [
-              TextSpan(
-                  text: "Purchase Information\n\n",
-                  style: TextStyleCustom.STYLE_TITLE),
-              TextSpan(
-                  text: "Product Photo(By Customer)",
-                  style: TextStyleCustom.STYLE_CONTENT),
-            ]),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              RichText(
+                text: TextSpan(children: [
+                  TextSpan(
+                      text: "Purchase Information\n",
+                      style: TextStyleCustom.STYLE_TITLE
+                          .copyWith(letterSpacing: 1.5)),
+                  TextSpan(
+                      text: "Product Photo(By Customer)",
+                      style: TextStyleCustom.STYLE_CONTENT),
+                ]),
+              ),
+              if (widget.showDetailOnline == true)
+                IconButton(
+                    icon: Icon(Icons.edit),
+                    onPressed: () {
+                      goToEditPageForEditImage(true);
+                    }),
+            ],
           ),
           Container(
             height: 300,
-            child: ListView.builder(
-              itemCount: 4,
+            child: ListView(
+              shrinkWrap: true,
               scrollDirection: Axis.horizontal,
-              itemExtent: 300,
-              itemBuilder: (BuildContext context, int index) {
-                return Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: ThemeColors.COLOR_THEME_APP,
-                  ),
-                  margin: EdgeInsets.fromLTRB(0, 15, 10, 10),
-                );
-              },
+              children: showProductImage(listImageUrl,
+                  width: 250,
+                  height: 250,
+                  padding: EdgeInsets.only(right: 5, top: 10)),
             ),
           )
         ],
@@ -570,54 +573,30 @@ class _DetailAssetState extends State<DetailAsset> {
   }
 
   RichText buildAssetInformation() {
+    var _manName = "-";
+    var _detail = "-";
+    if (widget.dataScan?.manName != null &&
+        widget.dataScan?.description != null) {
+      _manName = jsonDecode(widget.dataScan?.manName)["EN"];
+      _detail = jsonDecode(widget.dataScan?.description)["EN"];
+    }
     return RichText(
       text: TextSpan(
         style: TextStyleCustom.STYLE_CONTENT,
         children: [
-          // MenuFacturerName
-          TextSpan(
-              text:
-                  _data.custRemark ?? "_assetsData?.note ??" + "\n\n"), // Note
-          TextSpan(
-              text:
-                  "Product Price : ${_data.salesPrice ?? "_assetsData?.productPrice ??"}" +
-                      "\n"), // Product Price
-          TextSpan(
-              text: "Warranty Date : " +
-                  "${_data.warrantyExpire + '\n' ?? "_assetsData?.warrantyExpireDate ??\n\n"}"), // Warranty Date
-
           textTitleWithData(
-              title: "Brand Name",
-              data: _data.brandCode ??
-                  "_assetsData?.brandName ??" ""), // Brand Name
+              title: "Menufacturer ID", data: widget.dataScan?.manCode ?? "-"),
+          textTitleWithData(title: "Menufacturer Name", data: _manName ?? "-"),
           textTitleWithData(
-              title: "Menufacturer Name",
-              data: "_assetsData?.manuFacturerName ??" ""), // MenuFacturerName
+              title: "Warranty Date",
+              data: "${_data.warrantyExpire ?? "warrantyExpireDate"}"),
           textTitleWithData(
-              title: "Menufacturer ID",
-              data: "_assetsData?.manuFacturerID ??" ""),
-          // MenuFacturerID
+              title: "Brand Name", data: brandName ?? "BrandName is Empty"),
           textTitleWithData(
-              title: "Serial No.",
-              data: _data.serialNo ?? "_assetsData?.serialNo ??" ""),
-          // Serial No
+              title: "MFG Date", data: widget.dataScan?.mFGDate ?? "-"),
           textTitleWithData(
-              title: "Lot No.",
-              data: _data.lotNo ?? "_assetsData?.lotNo ??" ""),
-          // Lot No
-          // textTitleWithData(
-          //     title: "MFG Date", data: "_assetsData?.mfgDate ??" ""),
-          // // MFG Date
-          textTitleWithData(
-              title: "Expire Date",
-              data: _data.warrantyExpire ??
-                  "_assetsData?.expireDate ??" "" + "\n"),
-          // Expire Date
-          textTitleWithData(
-              title: "Product Detail",
-              data: "\n" + "${_data.custRemark}" ??
-                  "_assetsData?.productDetail ??"), //_data.custRemark
-          // Product Detail
+              title: "Warranty Date", data: "${_data.warrantyExpire ?? "-"}"),
+          textTitleWithData(title: "Product Detail", data: "${_detail ?? "-"}"),
         ],
       ),
     );
@@ -681,6 +660,46 @@ class _DetailAssetState extends State<DetailAsset> {
       });
     }
     return tempImageDataEachGroup;
+  }
+
+  List showProductImage(List<dynamic> imgPath,
+      {double width = 150, double height = 150, EdgeInsetsGeometry padding}) {
+    if (imgPath != null && imgPath != [])
+      return Iterable.generate(
+        imgPath.length,
+        (i) => GestureDetector(
+          onTap: () {
+            Navigator.of(context).push(TransparentMaterialPageRoute(
+                fullscreenDialog: true,
+                builder: (BuildContext context) => PhotoViewPage(
+                      image: imgPath,
+                      heroTag: "image$i",
+                      currentIndex: i,
+                    )));
+          },
+          child: CachedNetworkImage(
+            imageUrl: imgPath[i],
+            imageBuilder: (context, imageProvider) => Container(
+              width: width,
+              height: height,
+              margin: padding,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(40),
+                image: DecorationImage(
+                    image: imageProvider,
+                    fit: BoxFit.cover,
+                    colorFilter:
+                        ColorFilter.mode(Colors.red, BlendMode.dstATop)),
+              ),
+            ),
+            placeholder: (context, url) =>
+                Center(child: CircularProgressIndicator()),
+            errorWidget: (context, url, error) => Icon(Icons.error),
+          ),
+        ),
+      ).toList();
+    else
+      return Iterable.generate(4, (i) => testImage()).toList();
   }
 }
 

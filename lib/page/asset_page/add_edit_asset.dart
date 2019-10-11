@@ -97,7 +97,6 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
   Future<List<ProductCategory>> getProductCategory;
   List<Uint8List> getIconsProductCategory;
   Future<List<GroupCategory>> getProductGroupCategory;
-  bool _showButtonSave = false;
   List<String> _place = [
     "Home",
     "Office",
@@ -111,10 +110,32 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
     "Bed room",
   ];
 
+  Map<String, dynamic> groupCatMap = {
+    "GroupID": "",
+    "GroupName": "",
+    "Logo": ""
+  };
+
+  setGroupCatMap(Map<String, dynamic> map) {
+    groupCatMap['GroupID'] = map['GroupID'];
+    groupCatMap['GroupName'] = map['GroupName'];
+    groupCatMap['Logo'] = map['Logo'];
+  }
+
+  Map<String, dynamic> subCatMap = {"CatCode": "", "CatName": "", "Logo": ""};
+
+  setSubCatMap(Map<String, dynamic> map) {
+    subCatMap['CatCode'] = map['CatCode'];
+    subCatMap['CatName'] = map['CatName'];
+    subCatMap['Logo'] = map['Logo'];
+  }
+
   String groupID;
   String groupIDTest;
-  List<Map<String, dynamic>> groupCat = [];
-  List<Map<String, dynamic>> subCat = [];
+  String groupCatName;
+  String subCatName;
+  List<Map<String, dynamic>> groupCatAll = [];
+  List<Map<String, dynamic>> subCatAll = [];
   List<Map<String, dynamic>> tempgroupCat = [];
   List<Map<String, dynamic>> tempSubCat = [];
 
@@ -132,33 +153,38 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
 
   initialCategoryTest(String code) async {
     print("code => $code");
-    groupCat = await DBProviderInitialApp.db.getAllGroupCategoryTypeListMap();
-    subCat = await DBProviderInitialApp.db.getAllSubCategoryTypeListMap();
+    groupCatAll =
+        await DBProviderInitialApp.db.getAllGroupCategoryTypeListMap();
+    subCatAll = await DBProviderInitialApp.db.getAllSubCategoryTypeListMap();
     if (code.length > 1) {
       print("code > 1");
-      var getGroupCatID = getDataCategoryInfo(
-              listMap: subCat,
-              searchText:
-                  code) //getGroupCat by search from subcat.catcode return groupID
-          .first['GroupID'];
+      var _tempSubCat =
+          getDataCategoryInfo(listMap: subCatAll, searchText: code);
       setState(() {
-        groupIDTest = getGroupCatID;
-        tempgroupCat = List.of(groupCat);
-        print("tempgroupCat => $tempgroupCat");
-        tempSubCat =
-            getDataCategoryInfo(listMap: subCat, searchText: groupIDTest);
+        tempgroupCat = List.of(groupCatAll);
+        var _tempGroupCat = getDataCategoryInfo(
+            listMap: groupCatAll, searchText: _tempSubCat.first['GroupID']);
+        setGroupCatMap(_tempGroupCat.first);
+        tempSubCat = getDataCategoryInfo(
+            listMap: subCatAll, searchText: _tempSubCat.first['GroupID']);
+        setSubCatMap(_tempSubCat.first);
       });
     } else {
       print("code < 1");
       setState(() {
         groupIDTest = code;
-        tempgroupCat = List.of(groupCat);
-        // print("groupIDTest => $groupIDTest");
-        // print("groupCat => $groupCat length => ${groupCat.length}");
-        tempSubCat =
-            getDataCategoryInfo(listMap: subCat, searchText: groupIDTest);
-        print("value => ${txtPdtCat.text}");
-        print("tempSubCat => ${tempSubCat.length}");
+        tempgroupCat = List.of(groupCatAll);
+        var _tempGroupCat =
+            getDataCategoryInfo(listMap: groupCatAll, searchText: groupIDTest)
+                .first;
+        setGroupCatMap(_tempGroupCat);
+        print("groupCatMap => $groupCatMap");
+        var _tempSubCat =
+            getDataCategoryInfo(listMap: subCatAll, searchText: groupIDTest);
+        tempSubCat = _tempSubCat;
+        setSubCatMap(_tempSubCat.first);
+        txtPdtCat.text = _tempSubCat.first['CatCode'];
+        print("subCatMap => $subCatMap");
       });
     }
   }
@@ -166,22 +192,8 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
   List<Map<String, dynamic>> initialGroupCategoryTest(String groupID) {
     //get All GroupCat to declare tempGroup
     List<Map<String, dynamic>> tempgroup =
-        getDataCategoryInfo(listMap: groupCat, searchText: groupID);
+        getDataCategoryInfo(listMap: groupCatAll, searchText: groupID);
     return tempgroup.isNotEmpty ? tempgroup : [];
-  }
-
-  initialCategory(String catCode) async {
-    var getGroupCatID = await DBProviderInitialApp.db
-        .getGroupCategoryByCatCode(catCode: catCode);
-    setState(() {
-      groupID = getGroupCatID;
-    });
-    initialSubCategory(groupID);
-  }
-
-  initialSubCategory(String groupID) async {
-    getProductCategory =
-        DBProviderInitialApp.db.getSubCategoryByGroupID(groupID: groupID);
   }
 
   @override
@@ -210,15 +222,8 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
       txtLotNo = TextEditingController(text: _data?.lotNo ?? "");
       txtNote = TextEditingController(text: _data?.custRemark ?? "");
       txtSLCName = TextEditingController(text: _data?.slcName ?? "");
-      // initialCategory(_data?.pdtCatCode);
-      // getProductGroupCategory = DBProviderInitialApp.db.getAllGroupCategory();
       initialCategoryTest(_data?.pdtCatCode);
     } else {
-      // groupID = "A";
-      // getProductGroupCategory = DBProviderInitialApp.db.getAllGroupCategory();
-      // getProductCategory =
-      //     DBProviderInitialApp.db.getSubCategoryByGroupID(groupID: groupID);
-
       brandActive = _data?.brandCode != null ? "Y" : "N";
       txtAssetName = TextEditingController(text: "");
       txtBrandName = TextEditingController(text: "");
@@ -260,8 +265,31 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
     Future.delayed(Duration(milliseconds: 1500), () {
       getBrandName();
     });
+
     super.initState();
   }
+
+  // getBrandName() async {
+  //   List<GetBrandName> tempAllBrand =
+  //       await DBProviderAsset.db.getAllBrandName();
+  //   setState(() => listBrandName = List.of(tempAllBrand));
+  //   // listBrandName = List.of(tempAllBrand);
+  //   print("tempAllBrand => ${tempAllBrand.length}");
+  //   print("listBrandName => ${listBrandName.length}");
+  //   tempAllBrand.forEach((v) {
+  //     setState(() => listBrandID.add(v.documentID));
+  //   });
+  //   print("listBrandID ${listBrandID.length}");
+  //   await getBrandNameEN();
+  // }
+
+  // getBrandNameEN() async {
+  //   var _brandName = await DBProviderAsset.db.getBrandName(_data.brandCode);
+  //   setState(() {
+  //     print("brandName => $_brandName");
+  //     txtBrandName.text = _brandName;
+  //   });
+  // }
 
   getProductCat([String categoryID]) async {
     var res = await DBProviderInitialApp.db
@@ -420,10 +448,9 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
             if (response == "F") {
               print(response);
               await submitForAddAsset(
-                postData: postData,
-                whenCompleted: () => ecsLib.pushPageAndClearAllScene(
-                    context: context, pageWidget: MainPage())
-              );
+                  postData: postData,
+                  whenCompleted: () => ecsLib.pushPageAndClearAllScene(
+                      context: context, pageWidget: MainPage()));
             } else if (response == "S") {
               print(response);
               await submitForAddAsset(
@@ -480,13 +507,13 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
         title: TextBuilder.build(
             title: titleAppBar, style: TextStyleCustom.STYLE_APPBAR),
         actions: <Widget>[
-          RaisedButton(
-            child: Text("Clear SQLite"),
-            onPressed: () async {
-              await DBProviderAsset.db.deleteAllAsset();
-              // print(await DBProviderCustomer.db.getSpecialPass());
-            },
-          ),
+          // RaisedButton(
+          //   child: Text("Clear SQLite"),
+          //   onPressed: () async {
+          //     await DBProviderAsset.db.deleteAllAsset();
+          //     // print(await DBProviderCustomer.db.getSpecialPass());
+          //   },
+          // ),
         ],
       ),
       body: Container(
@@ -631,25 +658,6 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
             height: 30,
             fit: BoxFit.contain,
           ),
-          // CachedNetworkImage(
-          //   imageUrl: imgUrl,
-          //   imageBuilder: (context, imageProvider) => Container(
-          //     width: 30,
-          //     height: 30,
-          //     decoration: BoxDecoration(
-          //       image: DecorationImage(
-          //         image: imageProvider,
-          //         fit: BoxFit.contain,
-          //       ),
-          //     ),
-          //   ),
-          //   placeholder: (context, url) => Container(
-          //     width: 30,
-          //     height: 30,
-          //     child: Center(child: CircularProgressIndicator()),
-          //   ),
-          //   errorWidget: (context, url, error) => Icon(Icons.error),
-          // ),
           SizedBox(width: 10),
           Container(
             width: 140,
@@ -755,6 +763,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
                     context: context,
                     pageWidget: DetailAsset(
                       dataAsset: resDetail.data,
+                      dataScan: resDetail.dataScan,
                       showDetailOnline: true,
                     ),
                   );
@@ -828,28 +837,40 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
       await Repository.addAsset(body: dataPost).then((res) async {
         _completed = true;
         ecsLib.cancelDialogLoadindLib(context);
-        try {
-          await DBProviderAsset.db.insertDataWarranzyUesd(res.warranzyUsed);
-          // .catchError((onError) => print("warranzyUsed : $onError"));
-        } catch (e) {
-          print("insertDataWarranzyUesd => $e");
-        }
-        try {
-          await DBProviderAsset.db.insertDataWarranzyLog(res.warranzyLog);
-          // .catchError((onError) => print("warranzyLog $onError"));
-        } catch (e) {
-          print("insertDataWarranzyLog => $e");
-        }
-        res.filePool.forEach((data) async {
+        if (res.status == true) {
           try {
-          await DBProviderAsset.db
-              .insertDataFilePool(data)
-              .catchError((onError) => print("filePool $onError"))
-              .whenComplete(whenCompleted);
+            await DBProviderAsset.db.insertDataWarranzyUesd(res.warranzyUsed);
+            // .catchError((onError) => print("warranzyUsed : $onError"));
           } catch (e) {
-          print("insertDataFilePool => $e");
+            print("insertDataWarranzyUesd => $e");
           }
-        });
+          try {
+            await DBProviderAsset.db.insertDataWarranzyLog(res.warranzyLog);
+            // .catchError((onError) => print("warranzyLog $onError"));
+          } catch (e) {
+            print("insertDataWarranzyLog => $e");
+          }
+          res.filePool.forEach((data) async {
+            try {
+              await DBProviderAsset.db
+                  .insertDataFilePool(data)
+                  .catchError((onError) => print("filePool $onError"))
+                  .whenComplete(whenCompleted);
+            } catch (e) {
+              print("insertDataFilePool => $e");
+            }
+          });
+        } else if (res.status == false) {
+          ecsLib.showDialogLib(context,
+              title: "FAIL ADD ASSET",
+              content: res.message ?? "Somthing wrong !. status fail",
+              textOnButton: allTranslations.text("close"));
+        } else {
+          ecsLib.showDialogLib(context,
+              title: "FAIL ADD ASSET",
+              content: res.message ?? "Somthing wrong !.",
+              textOnButton: allTranslations.text("close"));
+        }
       }).catchError((e) {
         print("$e");
         ecsLib.cancelDialogLoadindLib(context);
@@ -912,6 +933,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
           ],
         ),
       );
+
   Map<String, dynamic> postDataForAdd() {
     Map<String, dynamic> mapData = {
       "WarrantyNo": txtWarranzyNo.text,
@@ -970,6 +992,91 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
     );
   }
 
+  showAlertDropDownCustoms(
+      {Map<String, dynamic> showContent,
+      String titleInDropdown,
+      List<Map<String, dynamic>> dataOfDropdown,
+      Function(Map<String, dynamic> data) onSelected}) {
+    return RaisedButton(
+        elevation: 0,
+        color: Colors.grey[100],
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        child: Align(
+            alignment: Alignment.centerLeft,
+            child: showDataIndropdown(
+                imgPath: showContent['Logo'],
+                label: jsonDecode(
+                    showContent['CatName'] ?? showContent['GroupName'])["EN"])),
+        onPressed: () async {
+          Map<String, dynamic> dataGroup = await showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                  contentPadding: EdgeInsets.fromLTRB(5.0, 20.0, 5.0, 20.0),
+                  content: Container(
+                    width: 250,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.only(left: 10.0),
+                          child: TextBuilder.build(
+                              title: titleInDropdown,
+                              style: TextStyleCustom.STYLE_LABEL_BOLD),
+                        ),
+                        Divider(),
+                        Container(
+                          height: 300,
+                          child: ListView(
+                            shrinkWrap: true,
+                            children: dataOfDropdown.map((v) {
+                              return Container(
+                                height: 45,
+                                child: ListTile(
+                                    leading: Image.asset("${v['Logo']}",
+                                        width: 30,
+                                        height: 30,
+                                        fit: BoxFit.contain),
+                                    title: Container(
+                                      width: 140,
+                                      child: AutoSizeText(
+                                        jsonDecode(v['CatName'] ??
+                                            v['GroupName'])["EN"],
+                                        minFontSize: 10,
+                                        stepGranularity: 10,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyleCustom.STYLE_LABEL
+                                            .copyWith(fontSize: 13),
+                                      ),
+                                    ),
+                                    onTap: () {
+                                      Navigator.pop(context, v);
+                                    }),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              });
+          if (dataGroup != null) {
+            onSelected(dataGroup);
+            // setState(() {
+            //   setSubCatMap(dataGroup);
+            //   txtPdtCat.text = dataGroup['CatCode'];
+            //   print("dataGroup => $dataGroup");
+            //   print("txtPdtCat.text => ${txtPdtCat.text}");
+            // });
+          }
+        });
+  }
+
   List<Step> _myStepForAdd() {
     List<Step> _step = [
       Step(
@@ -988,63 +1095,108 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
             title: "Category", style: TextStyleCustom.STYLE_LABEL_BOLD),
         content: Column(
           children: <Widget>[
+            // formWidget(
+            //     title: "Category",
+            //     necessary: true,
+            //     child: ClipRRect(
+            //       borderRadius: BorderRadius.circular(10),
+            //       child: DropdownButtonFormField(
+            //           decoration: InputDecoration(
+            //               // border: InputBorder.none,
+            //               filled: true,
+            //               fillColor: Colors.grey[100]),
+            //           value: groupIDTest,
+            //           items: tempgroupCat.map((v) {
+            //             return DropdownMenuItem(
+            //               value: v['GroupID'],
+            //               child: showDataIndropdown(
+            //                   imgPath: v['Logo'],
+            //                   label:
+            //                       "${jsonDecode(v['GroupName'])['EN'] ?? ""}"),
+            //             );
+            //           }).toList(),
+            //           onChanged: (value) {
+            //             print(value);
+            //             setState(() {
+            //               groupIDTest = value;
+            //               print("valueChange => $value");
+            //               tempSubCat = getDataCategoryInfo(
+            //                   listMap: subCat, searchText: value);
+            //               txtPdtCat.text = tempSubCat.first['CatCode'];
+            //             });
+            //           }),
+            //     )),
+            // formWidget(
+            //     title: "Sub - Category",
+            //     necessary: true,
+            //     child: ClipRRect(
+            //       borderRadius: BorderRadius.circular(10),
+            //       child: DropdownButtonFormField(
+            //           decoration: InputDecoration(
+            //               // border: InputBorder.none,
+            //               filled: true,
+            //               fillColor: Colors.grey[100]),
+            //           value: txtPdtCat.text,
+            //           items: tempSubCat.map((v) {
+            //             return DropdownMenuItem(
+            //               value: v['CatCode'],
+            //               child: showDataIndropdown(
+            //                   imgPath: v['Logo'],
+            //                   label:
+            //                       "${jsonDecode(v['CatName'])['EN'] ?? "Eieie"}"),
+            //             );
+            //           }).toList(),
+            //           onChanged: (value) {
+            //             print(value);
+            //             setState(() {
+            //               txtPdtCat.text = value;
+            //             });
+            //           }),
+            //     )),
             formWidget(
-                title: "Category",
+                title: "Category Test",
                 necessary: true,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
-                  child: DropdownButtonFormField(
-                      decoration: InputDecoration(
-                          // border: InputBorder.none,
-                          filled: true,
-                          fillColor: Colors.grey[100]),
-                      value: groupIDTest,
-                      items: tempgroupCat.map((v) {
-                        return DropdownMenuItem(
-                          value: v['GroupID'],
-                          child: showDataIndropdown(
-                              imgPath: v['Logo'],
-                              label:
-                                  "${jsonDecode(v['GroupName'])['EN'] ?? ""}"),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        print(value);
-                        setState(() {
-                          groupIDTest = value;
-                          print("valueChange => $value");
-                          tempSubCat = getDataCategoryInfo(
-                              listMap: subCat, searchText: value);
-                          txtPdtCat.text = tempSubCat.first['CatCode'];
-                        });
-                      }),
+                  child: Container(
+                    height: 50,
+                    child: showAlertDropDownCustoms(
+                        showContent: groupCatMap,
+                        titleInDropdown: "Category",
+                        dataOfDropdown: tempgroupCat,
+                        onSelected: (data) {
+                          setState(() {
+                            print(data);
+                            setGroupCatMap(data);
+                            tempSubCat = getDataCategoryInfo(
+                                listMap: subCatAll,
+                                searchText: data['GroupID']);
+                            setSubCatMap(tempSubCat.first);
+                            txtPdtCat.text = tempSubCat.first['CatCode'];
+                          });
+                        }),
+                  ),
                 )),
             formWidget(
-                title: "Sub - Category",
+                title: "Sub - Category Test",
                 necessary: true,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
-                  child: DropdownButtonFormField(
-                      decoration: InputDecoration(
-                          // border: InputBorder.none,
-                          filled: true,
-                          fillColor: Colors.grey[100]),
-                      value: txtPdtCat.text,
-                      items: tempSubCat.map((v) {
-                        return DropdownMenuItem(
-                          value: v['CatCode'],
-                          child: showDataIndropdown(
-                              imgPath: v['Logo'],
-                              label:
-                                  "${jsonDecode(v['CatName'])['EN'] ?? "Eieie"}"),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        print(value);
-                        setState(() {
-                          txtPdtCat.text = value;
-                        });
-                      }),
+                  child: Container(
+                    height: 50,
+                    child: showAlertDropDownCustoms(
+                        showContent: subCatMap,
+                        titleInDropdown: "Sub-Category",
+                        dataOfDropdown: tempSubCat,
+                        onSelected: (data) {
+                          setState(() {
+                            setSubCatMap(data);
+                            txtPdtCat.text = data['CatCode'];
+                            print("dataGroup => $data");
+                            print("txtPdtCat.text => ${txtPdtCat.text}");
+                          });
+                        }),
+                  ),
                 )),
           ],
         ),

@@ -321,17 +321,19 @@ BlockchainID */
     }
   }
 
-  Future<String> getAllBrandName() async {
+  Future<List<GetBrandName>> getAllBrandName() async {
     final db = await database;
     try {
       var res = await db.rawQuery("SELECT * FROM $tableBrand");
-      // print(res.first['BrandName']);
-      JsonEncoder encoder = JsonEncoder.withIndent(" ");
-      String prettyprint = encoder.convert(res);
-      print("Brand => $prettyprint");
-      return res.isNotEmpty ? res.first['BrandName'] : "BrandName is Empty";
+      // JsonEncoder encoder = JsonEncoder.withIndent(" ");
+      // String prettyprint = encoder.convert(res);
+      // print("Brand => $prettyprint");
+      return res.isNotEmpty
+          ? res.map((f) => GetBrandName.fromJson(f)).toList()
+          : "BrandName is Empty";
     } catch (e) {
-      return "Catch Errer $e";
+      print("Catch getAllBrandName $e");
+      return [];
     }
   }
 

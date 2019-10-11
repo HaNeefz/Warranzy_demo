@@ -9,13 +9,11 @@ import 'package:path_provider/path_provider.dart';
 import 'package:warranzy_demo/models/model_repository_init_app.dart';
 import 'package:warranzy_demo/models/model_respository_asset.dart';
 import 'package:warranzy_demo/page/asset_page/add_assets_page/scAdd_image_demo.dart';
-import 'package:warranzy_demo/services/api/api_service_assets.dart';
 import 'package:warranzy_demo/services/api/repository.dart';
 import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/form_data_asset.dart';
-import 'package:warranzy_demo/tools/widget_ui_custom/image_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/image_list_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 
@@ -274,7 +272,7 @@ class ModifytImageState extends State<ModifyImage> {
         ),
         actions: <Widget>[
           FlatButton(
-              child: TextBuilder.build(title: allTranslations.text("submit")),
+              child: TextBuilder.build(title: "Edit"),
               onPressed: submitUpdateImage)
         ],
       ),
@@ -472,8 +470,7 @@ class ModifytImageState extends State<ModifyImage> {
     ecsLib.showDialogLoadingLib(context, content: "Editing Image Asset");
     await Repository.updateImage(body: postData).then((response) async {
       ecsLib.cancelDialogLoadindLib(context);
-      print(
-          "upDate Image Success ${response.status} | ${response.message}");
+      print("upDate Image Success ${response.status} | ${response.message}");
       if (response.status == true) {
         ecsLib.showDialogLoadingLib(context, content: "Updating Image Asset");
         await Repository.getDetailAseet(
@@ -483,15 +480,16 @@ class ModifytImageState extends State<ModifyImage> {
           print("getDetail Success");
           if (responseDetail.status == true) {
             // ecsLib.stepBackScene(context, 2);
+            ecsLib.cancelDialogLoadindLib(context);
             Navigator.pop(context);
             Navigator.pop(context);
             await ecsLib.pushPageReplacement(
-              context: context,
-              pageWidget: DetailAsset(
-                dataAsset: responseDetail.data,
-                showDetailOnline: true,
-              ),
-            );
+                context: context,
+                pageWidget: DetailAsset(
+                  dataAsset: responseDetail.data,
+                  dataScan: responseDetail.dataScan,
+                  showDetailOnline: true,
+                ));
           } else if (responseDetail.status == false) {
             alert("${responseDetail.message}");
           } else {

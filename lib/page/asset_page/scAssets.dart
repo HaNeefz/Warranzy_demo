@@ -493,19 +493,29 @@ class _AssetPageState extends State<AssetPage> {
                   await Repository.getDataFromQRofAsset(body: {"WTokenID": res})
                       .then((response) async {
                     ecsLib.cancelDialogLoadindLib(context);
-                    print("response => $response");
-                    await ecsLib
-                        .pushPage(
-                      context: context,
-                      pageWidget: FillInformation(
-                        onClickAddAssetPage: PageAction.SCAN_QR_CODE,
-                        hasDataAssetAlready: false,
-                        dataScan: response,
-                      ),
-                    )
-                        .whenComplete(() {
-                      Navigator.pop(context);
-                    });
+                    if (response.status == true) {
+                      await ecsLib
+                          .pushPage(
+                        context: context,
+                        pageWidget: FillInformation(
+                          onClickAddAssetPage: PageAction.SCAN_QR_CODE,
+                          hasDataAssetAlready: false,
+                          dataScan: response,
+                        ),
+                      )
+                          .whenComplete(() {
+                        Navigator.pop(context);
+                      });
+                    } else if (response.status == false) {
+                      await ecsLib
+                          .showDialogLib(
+                            context,
+                            title: "WARRANZY",
+                            content: response.message ?? "",
+                            textOnButton: allTranslations.text("close"),
+                          )
+                          .whenComplete(() => Navigator.pop(context));
+                    }
                   });
                 } else {
                   ecsLib.showDialogLib(context,
@@ -695,6 +705,7 @@ class _MyAssetFormSQLiteState extends State<MyAssetFormSQLite> {
               pageWidget: DetailAsset(
                 dataAsset: widget.data,
                 showDetailOnline: false,
+                dataScan: null,
               ),
             );
           },

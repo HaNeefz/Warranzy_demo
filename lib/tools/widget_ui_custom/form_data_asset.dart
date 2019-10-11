@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -81,10 +84,122 @@ class _FormDataAssetState extends State<FormDataAsset> {
     "Meeting Room",
     "Bed room",
   ];
+  Map<String, dynamic> groupCatMap = {
+    "GroupID": "",
+    "GroupName": "",
+    "Logo": ""
+  };
+
+  setGroupCatMap(Map<String, dynamic> map) {
+    groupCatMap['GroupID'] = map['GroupID'];
+    groupCatMap['GroupName'] = map['GroupName'];
+    groupCatMap['Logo'] = map['Logo'];
+  }
+
+  Map<String, dynamic> subCatMap = {"CatCode": "", "CatName": "", "Logo": ""};
+
+  setSubCatMap(Map<String, dynamic> map) {
+    subCatMap['CatCode'] = map['CatCode'];
+    subCatMap['CatName'] = map['CatName'];
+    subCatMap['Logo'] = map['Logo'];
+  }
 
   String groupID;
   Future<List<ProductCategory>> getProductCategory;
   Future<List<GroupCategory>> getProductGroupCategory;
+
+  String groupIDTest;
+  List<Map<String, dynamic>> groupCatAll = [];
+  List<Map<String, dynamic>> subCatAll = [];
+  List<Map<String, dynamic>> tempgroupCat = [];
+  List<Map<String, dynamic>> tempSubCat = [];
+
+  List<Map<String, dynamic>> getDataCategoryInfo(
+      {List<Map<String, dynamic>> listMap, String searchText}) {
+    List<Map<String, dynamic>> result = [];
+    listMap.forEach((v) {
+      if (v.containsValue(searchText)) {
+        // print(v);
+        result.add(v);
+      }
+    });
+    return result.isNotEmpty ? result : [];
+  }
+
+  initialCategoryTest(String code) async {
+    print("code => $code");
+    groupCatAll =
+        await DBProviderInitialApp.db.getAllGroupCategoryTypeListMap();
+    subCatAll = await DBProviderInitialApp.db.getAllSubCategoryTypeListMap();
+    if (code.length > 1) {
+      print("code > 1");
+      // var getGroupCatID = getDataCategoryInfo(
+      //         listMap: subCat,
+      //         searchText:
+      //             code) //getGroupCat by search from subcat.catcode return groupID
+      //     .first['GroupID'];
+      // setState(() {
+      //   groupIDTest = getGroupCatID;
+      //   tempgroupCat = List.of(groupCat);
+      //   print("tempgroupCat => $tempgroupCat");
+      //   tempSubCat =
+      //       getDataCategoryInfo(listMap: subCat, searchText: groupIDTest);
+      // });
+
+      var _tempSubCat =
+          getDataCategoryInfo(listMap: subCatAll, searchText: code);
+      setState(() {
+        tempgroupCat = List.of(groupCatAll);
+        var _tempGroupCat = getDataCategoryInfo(
+            listMap: groupCatAll, searchText: _tempSubCat.first['GroupID']);
+        setGroupCatMap(_tempGroupCat.first);
+        tempSubCat = getDataCategoryInfo(
+            listMap: subCatAll, searchText: _tempSubCat.first['GroupID']);
+        setSubCatMap(_tempSubCat.first);
+      });
+      // var _tempSubCat =
+      //     getDataCategoryInfo(listMap: subCatAll, searchText: code);
+      // print("tempSubCat => $_tempSubCat");
+      // setSubCatMap(_tempSubCat.first);
+      // tempSubCat = List.of(_tempSubCat);
+      // print("SubCarMap => $subCatMap");
+      // var tempGroupCat = getDataCategoryInfo(
+      //     listMap: groupCatAll, searchText: tempSubCat.first['GroupID']);
+      // print("tempGroupCat => $tempGroupCat");
+      // setGroupCatMap(tempGroupCat.first);
+      // print("GroupCarMap => $groupCatMap");
+      // tempgroupCat = List.of(groupCatAll);
+
+    } else {
+      print("code < 1");
+      //   setState(() {
+      //     groupIDTest = code;
+      //     tempgroupCat = List.of(groupCat);
+      //     // print("groupIDTest => $groupIDTest");
+      //     // print("groupCat => $groupCat length => ${groupCat.length}");
+      //     tempSubCat =
+      //         getDataCategoryInfo(listMap: subCat, searchText: groupIDTest);
+      //     print("value => ${txtPdtCat.text}");
+      //     print("tempSubCat => ${tempSubCat.length}");
+      //   });
+      setState(() {
+        groupIDTest = code;
+        tempgroupCat = List.of(groupCatAll);
+        var _tempGroupCat =
+            getDataCategoryInfo(listMap: groupCatAll, searchText: groupIDTest)
+                .first;
+        setGroupCatMap(_tempGroupCat);
+        print("groupCatMap => $groupCatMap");
+        var _tempSubCat =
+            getDataCategoryInfo(listMap: subCatAll, searchText: groupIDTest);
+        tempSubCat = _tempSubCat;
+        setSubCatMap(_tempSubCat.first);
+        txtPdtCat.text = _tempSubCat.first['CatCode'];
+        print("subCatMap => $subCatMap");
+      });
+    }
+  }
+
   initialCategory(String catCode) async {
     var getGroupCatID = await DBProviderInitialApp.db
         .getGroupCategoryByCatCode(catCode: catCode);
@@ -122,13 +237,9 @@ class _FormDataAssetState extends State<FormDataAsset> {
       txtLotNo = TextEditingController(text: _data?.lotNo ?? "");
       txtNote = TextEditingController(text: _data?.custRemark ?? "");
       txtSLCName = TextEditingController(text: _data?.slcName ?? "");
-      initialCategory(_data?.pdtCatCode);
-      getProductGroupCategory = DBProviderInitialApp.db.getAllGroupCategory();
+      initialCategoryTest(_data?.pdtCatCode);
     } else {
-      groupID = "A";
-      getProductGroupCategory = DBProviderInitialApp.db.getAllGroupCategory();
-      getProductCategory =
-          DBProviderInitialApp.db.getSubCategoryByGroupID(groupID: groupID);
+      initialCategoryTest("A");
       brandActive = _data?.brandCode != null ? "Y" : "N";
       txtAssetName = TextEditingController(text: "");
       txtBrandName = TextEditingController(text: "");
@@ -191,185 +302,50 @@ class _FormDataAssetState extends State<FormDataAsset> {
                     validate: true,
                     title: "Asset Name"),
                 formWidget(
-                  title: "Category",
-                  necessary: true,
-                  child: FutureBuilder<List<GroupCategory>>(
-                    future: getProductGroupCategory,
-                    builder: (BuildContext context,
-                        AsyncSnapshot<List<GroupCategory>> snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done) {
-                        if (!(snapshot.hasError)) {
-                          return ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: DropdownButtonFormField(
-                                decoration: InputDecoration(
-                                    // border: InputBorder.none,
-                                    filled: true,
-                                    fillColor: Colors.grey[100]),
-                                value: groupID,
-                                items: snapshot.data.map((v) {
-                                  return DropdownMenuItem(
-                                    value: v.groupID,
-                                    child: Container(
-                                      width: 250,
-                                      child: Row(
-                                        children: <Widget>[
-                                          // Image.memory(
-                                          //   base64Decode(v.keepLogo),
-                                          //   width: 30,
-                                          //   height: 30,
-                                          //   fit: BoxFit.contain,
-                                          // ),
-                                          Container(
-                                            child: CachedNetworkImage(
-                                              imageUrl: v.logo,
-                                              imageBuilder:
-                                                  (context, imageProvider) =>
-                                                      Container(
-                                                width: 30,
-                                                height: 30,
-                                                decoration: BoxDecoration(
-                                                  image: DecorationImage(
-                                                    image: imageProvider,
-                                                    fit: BoxFit.contain,
-                                                  ),
-                                                ),
-                                              ),
-                                              placeholder: (context, url) => Center(
-                                                  child:
-                                                      CircularProgressIndicator()),
-                                              errorWidget:
-                                                  (context, url, error) =>
-                                                      Icon(Icons.error),
-                                            ),
-                                          ),
-                                          SizedBox(width: 10),
-                                          Container(
-                                            width: 180,
-                                            child: TextBuilder.build(
-                                                title: v.modelGroupName.eN,
-                                                style: TextStyleCustom
-                                                    .STYLE_LABEL
-                                                    .copyWith(fontSize: 13),
-                                                maxLine: 1,
-                                                textOverflow:
-                                                    TextOverflow.ellipsis),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                }).toList(),
-                                onChanged: (value) async {
-                                  await DBProviderInitialApp.db
-                                      .getSubCategoryByGroupID(groupID: value)
-                                      .then((onValue) {
-                                    setState(() {
-                                      txtPdtCat.text = onValue.first.catCode;
-                                      groupID = value;
-                                      // print("${v.catCode} | ${v.groupID}");
-                                    });
-                                  });
-                                  getProductCategory = DBProviderInitialApp.db
-                                      .getSubCategoryByGroupID(groupID: value);
-                                }),
-                          );
-                        } else {
-                          return TextBuilder.build(title: "Error data");
-                        }
-                      } else if (snapshot.connectionState ==
-                          ConnectionState.waiting) {
-                        return CircularProgressIndicator();
-                      } else {
-                        return TextBuilder.build(title: "Something Wrong.");
-                      }
-                    },
-                  ),
-                ),
+                    title: "Category Test",
+                    necessary: true,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Container(
+                        height: 50,
+                        child: showAlertDropDownCustoms(
+                            showContent: groupCatMap,
+                            titleInDropdown: "Category",
+                            dataOfDropdown: tempgroupCat,
+                            onSelected: (data) {
+                              setState(() {
+                                print(data);
+                                setGroupCatMap(data);
+                                tempSubCat = getDataCategoryInfo(
+                                    listMap: subCatAll,
+                                    searchText: data['GroupID']);
+                                setSubCatMap(tempSubCat.first);
+                                txtPdtCat.text = tempSubCat.first['CatCode'];
+                              });
+                            }),
+                      ),
+                    )),
                 formWidget(
-                  title: "Sub-Category",
-                  necessary: true,
-                  child: FutureBuilder<List<ProductCategory>>(
-                    future: getProductCategory,
-                    builder: (BuildContext context,
-                        AsyncSnapshot<List<ProductCategory>> snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done) {
-                        if (!(snapshot.hasError)) {
-                          return ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: DropdownButtonFormField(
-                              decoration: InputDecoration(
-                                  // border: InputBorder.none,
-                                  filled: true,
-                                  fillColor: Colors.grey[100]),
-                              value: txtPdtCat.text,
-                              items: snapshot.data.map((v) {
-                                return DropdownMenuItem(
-                                  value: v.catCode,
-                                  child: Container(
-                                    width: 250,
-                                    child: Row(
-                                      children: <Widget>[
-                                        // Image.memory(
-                                        //   base64Decode(v.keepLogo),
-                                        //   width: 30,
-                                        //   height: 30,
-                                        //   fit: BoxFit.contain,
-                                        // ),
-                                        CachedNetworkImage(
-                                          imageUrl: v.logo,
-                                          imageBuilder:
-                                              (context, imageProvider) =>
-                                                  Container(
-                                            width: 30,
-                                            height: 30,
-                                            decoration: BoxDecoration(
-                                              image: DecorationImage(
-                                                image: imageProvider,
-                                                fit: BoxFit.contain,
-                                              ),
-                                            ),
-                                          ),
-                                          placeholder: (context, url) => Center(
-                                              child:
-                                                  CircularProgressIndicator()),
-                                          errorWidget: (context, url, error) =>
-                                              Icon(Icons.error),
-                                        ),
-                                        SizedBox(width: 10),
-                                        Container(
-                                          width: 180,
-                                          child: TextBuilder.build(
-                                              title: v.modelCatName.eN,
-                                              style: TextStyleCustom.STYLE_LABEL
-                                                  .copyWith(fontSize: 13),
-                                              maxLine: 1,
-                                              textOverflow:
-                                                  TextOverflow.ellipsis),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                              onChanged: (value) => setState(() {
-                                txtPdtCat.text = value;
-                                print(txtPdtCat.text);
-                              }),
-                            ),
-                          );
-                        } else {
-                          return TextBuilder.build(title: "Error data");
-                        }
-                      } else if (snapshot.connectionState ==
-                          ConnectionState.waiting) {
-                        return CircularProgressIndicator();
-                      } else {
-                        return TextBuilder.build(title: "Something Wrong.");
-                      }
-                    },
-                  ),
-                ),
+                    title: "Sub - Category Test",
+                    necessary: true,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Container(
+                        height: 50,
+                        child: showAlertDropDownCustoms(
+                            showContent: subCatMap,
+                            titleInDropdown: "Sub-Category",
+                            dataOfDropdown: tempSubCat,
+                            onSelected: (data) {
+                              setState(() {
+                                setSubCatMap(data);
+                                txtPdtCat.text = data['CatCode'];
+                                print("dataGroup => $data");
+                                print("txtPdtCat.text => ${txtPdtCat.text}");
+                              });
+                            }),
+                      ),
+                    )),
                 formWidget(
                     title: "Group",
                     necessary: true,
@@ -594,6 +570,138 @@ class _FormDataAssetState extends State<FormDataAsset> {
     );
   }
 
+  showAlertDropDownCustoms(
+      {Map<String, dynamic> showContent,
+      String titleInDropdown,
+      List<Map<String, dynamic>> dataOfDropdown,
+      Function(Map<String, dynamic> data) onSelected}) {
+    return RaisedButton(
+        elevation: 0,
+        color: Colors.grey[100],
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        child: Align(
+            alignment: Alignment.centerLeft,
+            child: showDataIndropdown(
+                imgPath: showContent['Logo'],
+                label: jsonDecode(
+                    showContent['CatName'] ?? showContent['GroupName'])["EN"])),
+        onPressed: () async {
+          Map<String, dynamic> dataGroup = await showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                  contentPadding: EdgeInsets.fromLTRB(5.0, 20.0, 5.0, 20.0),
+                  content: Container(
+                    width: 250,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.only(left: 10.0),
+                          child: TextBuilder.build(
+                              title: titleInDropdown,
+                              style: TextStyleCustom.STYLE_LABEL_BOLD),
+                        ),
+                        Divider(),
+                        Container(
+                          height: 300,
+                          child: ListView(
+                            shrinkWrap: true,
+                            children: dataOfDropdown.map((v) {
+                              return Container(
+                                height: 45,
+                                child: ListTile(
+                                    leading: Image.asset("${v['Logo']}",
+                                        width: 30,
+                                        height: 30,
+                                        fit: BoxFit.contain),
+                                    title: Container(
+                                      width: 140,
+                                      child: AutoSizeText(
+                                        jsonDecode(v['CatName'] ??
+                                            v['GroupName'])["EN"],
+                                        minFontSize: 10,
+                                        stepGranularity: 10,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyleCustom.STYLE_LABEL
+                                            .copyWith(fontSize: 13),
+                                      ),
+                                    ),
+                                    onTap: () {
+                                      Navigator.pop(context, v);
+                                    }),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              });
+          if (dataGroup != null) {
+            onSelected(dataGroup);
+            // setState(() {
+            //   setSubCatMap(dataGroup);
+            //   txtPdtCat.text = dataGroup['CatCode'];
+            //   print("dataGroup => $dataGroup");
+            //   print("txtPdtCat.text => ${txtPdtCat.text}");
+            // });
+          }
+        });
+  }
+
+  Widget showDataIndropdown({String imgPath, String label}) {
+    return Container(
+      width: 180,
+      child: Row(
+        children: <Widget>[
+          Image.asset(
+            imgPath,
+            width: 30,
+            height: 30,
+            fit: BoxFit.contain,
+          ),
+          // CachedNetworkImage(
+          //   imageUrl: imgUrl,
+          //   imageBuilder: (context, imageProvider) => Container(
+          //     width: 30,
+          //     height: 30,
+          //     decoration: BoxDecoration(
+          //       image: DecorationImage(
+          //         image: imageProvider,
+          //         fit: BoxFit.contain,
+          //       ),
+          //     ),
+          //   ),
+          //   placeholder: (context, url) => Container(
+          //     width: 30,
+          //     height: 30,
+          //     child: Center(child: CircularProgressIndicator()),
+          //   ),
+          //   errorWidget: (context, url, error) => Icon(Icons.error),
+          // ),
+          SizedBox(width: 10),
+          Container(
+            width: 140,
+            child: AutoSizeText(
+              label,
+              minFontSize: 10,
+              stepGranularity: 10,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyleCustom.STYLE_LABEL.copyWith(fontSize: 13),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   getBrandName() {
     Firestore.instance.collection('BrandName').snapshots().listen((onData) {
       for (var temp in onData.documents) {
@@ -693,8 +801,9 @@ class _FormDataAssetState extends State<FormDataAsset> {
       "Title": txtAssetName.text,
       "SerialNo": txtSerialNo.text,
       "LotNo": txtLotNo.text,
-      "SalesPrice":
-          txtPrice.text != null && txtPrice.text != "" ? txtPrice.text : "0",
+      "SalesPrice": txtPrice.text != null && txtPrice.text != ""
+          ? double.parse(txtPrice.text)
+          : 0.0,
       "WarrantyNo": txtWarranzyNo.text,
       "WarrantyExpire": txtWarranzyExpire.text,
       "SLCName": txtSLCName.text,
@@ -721,6 +830,7 @@ class _FormDataAssetState extends State<FormDataAsset> {
                 context: context,
                 pageWidget: DetailAsset(
                   dataAsset: resDetail.data,
+                  dataScan: resDetail.dataScan,
                   showDetailOnline: true,
                 ),
               );

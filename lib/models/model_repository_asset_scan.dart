@@ -1,6 +1,6 @@
 class RepositoryAssetScan {
   bool status;
-  Data data;
+  ModelDataScan data;
   String message;
 
   RepositoryAssetScan({this.status, this.data, this.message});
@@ -8,7 +8,8 @@ class RepositoryAssetScan {
   RepositoryAssetScan.fromJson(Map<String, dynamic> json) {
     status = json['Status'];
     message = json['Message'];
-    data = json['Data'] != null ? new Data.fromJson(json['Data']) : null;
+    data =
+        json['Data'] != null ? new ModelDataScan.fromJson(json['Data']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -22,7 +23,7 @@ class RepositoryAssetScan {
   }
 }
 
-class Data {
+class ModelDataScan {
   String wTokenID;
   String manCode;
   String brandCode;
@@ -44,7 +45,7 @@ class Data {
   List<String> fileImageID;
   String warrantyNo;
 
-  Data(
+  ModelDataScan(
       {this.wTokenID,
       this.manCode,
       this.brandCode,
@@ -66,7 +67,7 @@ class Data {
       this.fileImageID,
       this.warrantyNo});
 
-  Data.fromJson(Map<String, dynamic> json) {
+  ModelDataScan.fromJson(Map<String, dynamic> json) {
     wTokenID = json['WTokenID'];
     manCode = json['ManCode'];
     brandCode = json['BrandCode'];
