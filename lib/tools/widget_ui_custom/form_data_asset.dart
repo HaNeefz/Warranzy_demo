@@ -24,6 +24,7 @@ import '../const.dart';
 import '../theme_color.dart';
 import 'button_builder.dart';
 import 'button_date_picker.dart';
+import 'category_ui.dart';
 import 'text_builder.dart';
 import 'text_field_builder.dart';
 
@@ -90,10 +91,15 @@ class _FormDataAssetState extends State<FormDataAsset> {
     "Logo": ""
   };
 
+  String labelCategory = "";
+  String labelSubCategory = "";
+
   setGroupCatMap(Map<String, dynamic> map) {
     groupCatMap['GroupID'] = map['GroupID'];
     groupCatMap['GroupName'] = map['GroupName'];
     groupCatMap['Logo'] = map['Logo'];
+    labelCategory = jsonDecode(groupCatMap['GroupName'])["EN"];
+    print("groupCatMap => $labelCategory");
   }
 
   Map<String, dynamic> subCatMap = {"CatCode": "", "CatName": "", "Logo": ""};
@@ -102,6 +108,8 @@ class _FormDataAssetState extends State<FormDataAsset> {
     subCatMap['CatCode'] = map['CatCode'];
     subCatMap['CatName'] = map['CatName'];
     subCatMap['Logo'] = map['Logo'];
+    labelSubCategory = jsonDecode(subCatMap['CatName'])["EN"];
+    print("subCatMap => $labelSubCategory");
   }
 
   String groupID;
@@ -302,50 +310,128 @@ class _FormDataAssetState extends State<FormDataAsset> {
                     validate: true,
                     title: "Asset Name"),
                 formWidget(
-                    title: "Category Test",
+                    title: "Category",
                     necessary: true,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: Container(
                         height: 50,
-                        child: showAlertDropDownCustoms(
-                            showContent: groupCatMap,
-                            titleInDropdown: "Category",
-                            dataOfDropdown: tempgroupCat,
-                            onSelected: (data) {
-                              setState(() {
-                                print(data);
-                                setGroupCatMap(data);
-                                tempSubCat = getDataCategoryInfo(
-                                    listMap: subCatAll,
-                                    searchText: data['GroupID']);
-                                setSubCatMap(tempSubCat.first);
-                                txtPdtCat.text = tempSubCat.first['CatCode'];
-                              });
+                        child: RaisedButton(
+                            elevation: 0,
+                            color: Colors.grey[100],
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10)),
+                            child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: showDataIndropdown(
+                                  imgPath: groupCatMap['Logo'],
+                                  label: labelCategory,
+                                )),
+                            onPressed: () async {
+                              Map<String, dynamic> dataReturn =
+                                  await ecsLib.pushPage(
+                                      context: context,
+                                      pageWidget: CategoryUI(
+                                        title: "Category",
+                                        category: tempgroupCat,
+                                        selected: groupCatMap,
+                                      ));
+                              if (dataReturn != null) {
+                                setState(() {
+                                  print(dataReturn);
+                                  setGroupCatMap(dataReturn);
+                                  tempSubCat = getDataCategoryInfo(
+                                      listMap: subCatAll,
+                                      searchText: dataReturn['GroupID']);
+                                  setSubCatMap(tempSubCat.first);
+                                  txtPdtCat.text = tempSubCat.first['CatCode'];
+                                });
+                              }
                             }),
                       ),
                     )),
                 formWidget(
-                    title: "Sub - Category Test",
+                    title: "Sub - Category",
                     necessary: true,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: Container(
                         height: 50,
-                        child: showAlertDropDownCustoms(
-                            showContent: subCatMap,
-                            titleInDropdown: "Sub-Category",
-                            dataOfDropdown: tempSubCat,
-                            onSelected: (data) {
-                              setState(() {
-                                setSubCatMap(data);
-                                txtPdtCat.text = data['CatCode'];
-                                print("dataGroup => $data");
-                                print("txtPdtCat.text => ${txtPdtCat.text}");
-                              });
+                        child: RaisedButton(
+                            elevation: 0,
+                            color: Colors.grey[100],
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10)),
+                            child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: showDataIndropdown(
+                                    imgPath: subCatMap['Logo'],
+                                    label: labelSubCategory)),
+                            onPressed: () async {
+                              Map<String, dynamic> dataReturn =
+                                  await ecsLib.pushPage(
+                                      context: context,
+                                      pageWidget: CategoryUI(
+                                        title: "Sub - Category",
+                                        category: tempSubCat,
+                                        selected: subCatMap,
+                                      ));
+                              if (dataReturn != null) {
+                                setState(() {
+                                  setSubCatMap(dataReturn);
+                                  txtPdtCat.text = dataReturn['CatCode'];
+                                  print("dataGroup => $dataReturn");
+                                  print("txtPdtCat.text => ${txtPdtCat.text}");
+                                });
+                              }
                             }),
                       ),
                     )),
+                // formWidget(
+                //     title: "Category Test",
+                //     necessary: true,
+                //     child: ClipRRect(
+                //       borderRadius: BorderRadius.circular(10),
+                //       child: Container(
+                //         height: 50,
+                //         child: showAlertDropDownCustoms(
+                //             showContent: groupCatMap,
+                //             titleInDropdown: "Category",
+                //             dataOfDropdown: tempgroupCat,
+                //             onSelected: (data) {
+                //               setState(() {
+                //                 print(data);
+                //                 setGroupCatMap(data);
+                //                 tempSubCat = getDataCategoryInfo(
+                //                     listMap: subCatAll,
+                //                     searchText: data['GroupID']);
+                //                 setSubCatMap(tempSubCat.first);
+                //                 txtPdtCat.text = tempSubCat.first['CatCode'];
+                //               });
+                //             }),
+                //       ),
+                //     )),
+                // formWidget(
+                //     title: "Sub - Category Test",
+                //     necessary: true,
+                //     child: ClipRRect(
+                //       borderRadius: BorderRadius.circular(10),
+                //       child: Container(
+                //         height: 50,
+                //         child: showAlertDropDownCustoms(
+                //             showContent: subCatMap,
+                //             titleInDropdown: "Sub-Category",
+                //             dataOfDropdown: tempSubCat,
+                //             onSelected: (data) {
+                //               setState(() {
+                //                 setSubCatMap(data);
+                //                 txtPdtCat.text = data['CatCode'];
+                //                 print("dataGroup => $data");
+                //                 print("txtPdtCat.text => ${txtPdtCat.text}");
+                //               });
+                //             }),
+                //       ),
+                //     )),
                 formWidget(
                     title: "Group",
                     necessary: true,
