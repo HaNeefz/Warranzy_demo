@@ -1,5 +1,5 @@
 class ModelLanguage {
-  String id;
+  dynamic id;
   String name;
 
   ModelLanguage({this.id, this.name});

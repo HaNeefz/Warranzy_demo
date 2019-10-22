@@ -179,6 +179,7 @@ class DBProviderInitialApp {
     final db = await database;
     try {
       var res = await db.query(tableCountry);
+      // print(res);
       JsonEncoder encoder = JsonEncoder.withIndent(" ");
       res.forEach((v) {
         String prettyprint = encoder.convert(v);

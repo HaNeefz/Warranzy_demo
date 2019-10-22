@@ -7,6 +7,7 @@ import 'package:dio/dio.dart';
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_picker/flutter_picker.dart';
 import 'package:keyboard_avoider/keyboard_avoider.dart';
@@ -29,6 +30,7 @@ import 'package:warranzy_demo/tools/const.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/button_builder.dart';
+import 'package:warranzy_demo/tools/widget_ui_custom/category_ui.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_field_builder.dart';
 
@@ -109,6 +111,9 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
     "Meeting Room",
     "Bed room",
   ];
+  String labelCategory = "";
+  String labelSubCategory = "";
+  String pathLogo = "";
 
   Map<String, dynamic> groupCatMap = {
     "GroupID": "",
@@ -117,17 +122,28 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
   };
 
   setGroupCatMap(Map<String, dynamic> map) {
-    groupCatMap['GroupID'] = map['GroupID'];
-    groupCatMap['GroupName'] = map['GroupName'];
-    groupCatMap['Logo'] = map['Logo'];
+    setState(() {
+      groupCatMap['GroupID'] = map['GroupID'];
+      groupCatMap['GroupName'] = map['GroupName'];
+      groupCatMap['Logo'] = map['Logo'];
+
+      labelCategory = jsonDecode(groupCatMap['GroupName'])["EN"];
+      print("groupCatMap => $labelCategory");
+      pathLogo = groupCatMap['Logo'];
+    });
   }
 
   Map<String, dynamic> subCatMap = {"CatCode": "", "CatName": "", "Logo": ""};
 
   setSubCatMap(Map<String, dynamic> map) {
-    subCatMap['CatCode'] = map['CatCode'];
-    subCatMap['CatName'] = map['CatName'];
-    subCatMap['Logo'] = map['Logo'];
+    setState(() {
+      subCatMap['CatCode'] = map['CatCode'];
+      subCatMap['CatName'] = map['CatName'];
+      subCatMap['Logo'] = map['Logo'];
+      labelSubCategory = jsonDecode(subCatMap['CatName'])["EN"];
+      print("subCatMap => $labelSubCategory");
+      pathLogo = subCatMap['Logo'];
+    });
   }
 
   String groupID;
@@ -160,32 +176,31 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
       print("code > 1");
       var _tempSubCat =
           getDataCategoryInfo(listMap: subCatAll, searchText: code);
-      setState(() {
-        tempgroupCat = List.of(groupCatAll);
-        var _tempGroupCat = getDataCategoryInfo(
-            listMap: groupCatAll, searchText: _tempSubCat.first['GroupID']);
-        setGroupCatMap(_tempGroupCat.first);
-        tempSubCat = getDataCategoryInfo(
-            listMap: subCatAll, searchText: _tempSubCat.first['GroupID']);
-        setSubCatMap(_tempSubCat.first);
-      });
+
+      tempgroupCat = List.of(groupCatAll);
+      var _tempGroupCat = getDataCategoryInfo(
+          listMap: groupCatAll, searchText: _tempSubCat.first['GroupID']);
+      setGroupCatMap(_tempGroupCat.first);
+      tempSubCat = getDataCategoryInfo(
+          listMap: subCatAll, searchText: _tempSubCat.first['GroupID']);
+      setSubCatMap(_tempSubCat.first);
     } else {
       print("code < 1");
-      setState(() {
-        groupIDTest = code;
-        tempgroupCat = List.of(groupCatAll);
-        var _tempGroupCat =
-            getDataCategoryInfo(listMap: groupCatAll, searchText: groupIDTest)
-                .first;
-        setGroupCatMap(_tempGroupCat);
-        print("groupCatMap => $groupCatMap");
-        var _tempSubCat =
-            getDataCategoryInfo(listMap: subCatAll, searchText: groupIDTest);
-        tempSubCat = _tempSubCat;
-        setSubCatMap(_tempSubCat.first);
-        txtPdtCat.text = _tempSubCat.first['CatCode'];
-        print("subCatMap => $subCatMap");
-      });
+
+      groupIDTest = code;
+      tempgroupCat = List.of(groupCatAll);
+      var _tempGroupCat =
+          getDataCategoryInfo(listMap: groupCatAll, searchText: groupIDTest)
+              .first;
+      setGroupCatMap(_tempGroupCat);
+      // print("groupCatMap => $groupCatMap");
+      var _tempSubCat =
+          getDataCategoryInfo(listMap: subCatAll, searchText: groupIDTest);
+      tempSubCat = _tempSubCat;
+      setSubCatMap(_tempSubCat.first);
+      txtPdtCat.text = _tempSubCat.first['CatCode'];
+      // print("subCatMap => $subCatMap");
+
     }
   }
 
@@ -198,48 +213,53 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
 
   @override
   void initState() {
+    // if (SchedulerBinding.instance.schedulerPhase ==
+    //     SchedulerPhase.persistentCallbacks) {}
     listTempData = List.of(listImageEachGroup ?? []);
-
     if (_data != null) {
-      brandActive = _data?.brandCode != null ? "Y" : "N";
-      txtAssetName = TextEditingController(text: _data?.title ?? "");
-      txtBrandName = TextEditingController(text: _data?.brandCode ?? "");
-      txtBrandCode = TextEditingController(text: _data?.brandCode ?? "");
-      txtWarranzyNo = TextEditingController(text: _data?.warrantyNo ?? "");
-      txtWarranzyExpire =
-          TextEditingController(text: _data?.warrantyExpire ?? "");
-      dataTime = txtWarranzyExpire.text;
-      txtAlertDate =
-          TextEditingController(text: _data?.alertDateNo.toString() ?? "");
-      if (_data?.groupCat != null) groupIDTest = _data?.groupCat;
-      txtPdtCat = TextEditingController(text: _data?.pdtCatCode ?? "");
-      txtPdtGroup =
-          TextEditingController(text: _data?.pdtGroup ?? _group.first);
-      txtPdtPlace =
-          TextEditingController(text: _data?.pdtPlace ?? _place.first);
-      txtPrice = TextEditingController(text: _data?.salesPrice ?? "");
-      txtSerialNo = TextEditingController(text: _data?.serialNo ?? "");
-      txtLotNo = TextEditingController(text: _data?.lotNo ?? "");
-      txtNote = TextEditingController(text: _data?.custRemark ?? "");
-      txtSLCName = TextEditingController(text: _data?.slcName ?? "");
-      initialCategoryTest(_data?.pdtCatCode);
+      setState(() {
+        brandActive = _data?.brandCode != null ? "Y" : "N";
+        txtAssetName = TextEditingController(text: _data?.title ?? "");
+        txtBrandName = TextEditingController(text: _data?.brandCode ?? "");
+        txtBrandCode = TextEditingController(text: _data?.brandCode ?? "");
+        txtWarranzyNo = TextEditingController(text: _data?.warrantyNo ?? "");
+        txtWarranzyExpire =
+            TextEditingController(text: _data?.warrantyExpire ?? "");
+        dataTime = txtWarranzyExpire.text;
+        txtAlertDate =
+            TextEditingController(text: _data?.alertDateNo.toString() ?? "");
+        if (_data?.groupCat != null) groupIDTest = _data?.groupCat;
+        txtPdtCat = TextEditingController(text: _data?.pdtCatCode ?? "");
+        txtPdtGroup =
+            TextEditingController(text: _data?.pdtGroup ?? _group.first);
+        txtPdtPlace =
+            TextEditingController(text: _data?.pdtPlace ?? _place.first);
+        txtPrice = TextEditingController(text: _data?.salesPrice ?? "");
+        txtSerialNo = TextEditingController(text: _data?.serialNo ?? "");
+        txtLotNo = TextEditingController(text: _data?.lotNo ?? "");
+        txtNote = TextEditingController(text: _data?.custRemark ?? "");
+        txtSLCName = TextEditingController(text: _data?.slcName ?? "");
+        initialCategoryTest(_data?.pdtCatCode);
+      });
     } else {
-      brandActive = _data?.brandCode != null ? "Y" : "N";
-      txtAssetName = TextEditingController(text: "");
-      txtBrandName = TextEditingController(text: "");
-      txtBrandCode = TextEditingController(text: "");
-      txtWarranzyNo = TextEditingController(text: "");
-      txtWarranzyExpire = TextEditingController(text: "");
-      txtAlertDate = TextEditingController(text: "60");
-      txtPdtCat = TextEditingController(text: "A001");
-      txtPdtGroup = TextEditingController(text: _group.elementAt(0));
-      txtPdtPlace = TextEditingController(text: _place.elementAt(0));
-      txtPrice = TextEditingController(text: "");
-      txtSerialNo = TextEditingController(text: "");
-      txtLotNo = TextEditingController(text: "");
-      txtNote = TextEditingController(text: "");
-      txtSLCName = TextEditingController(text: "");
-      initialCategoryTest("A");
+      setState(() {
+        brandActive = _data?.brandCode != null ? "Y" : "N";
+        txtAssetName = TextEditingController(text: "");
+        txtBrandName = TextEditingController(text: "");
+        txtBrandCode = TextEditingController(text: "");
+        txtWarranzyNo = TextEditingController(text: "");
+        txtWarranzyExpire = TextEditingController(text: "");
+        txtAlertDate = TextEditingController(text: "60");
+        txtPdtCat = TextEditingController(text: "A001");
+        txtPdtGroup = TextEditingController(text: _group.elementAt(0));
+        txtPdtPlace = TextEditingController(text: _place.elementAt(0));
+        txtPrice = TextEditingController(text: "");
+        txtSerialNo = TextEditingController(text: "");
+        txtLotNo = TextEditingController(text: "");
+        txtNote = TextEditingController(text: "");
+        txtSLCName = TextEditingController(text: "");
+        initialCategoryTest("A");
+      });
     }
     if (widget.actionPageForAdd == true) {
       titleAppBar = "New Asset";
@@ -302,22 +322,22 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
       print("${listTempData.indexOf(tempData)} => ${tempData.title}");
       for (var tempReleted in listRelated) {
         if (tempReleted == tempData.title) {
-          setState(() {
-            tempListRelated.removeAt(tempListRelated.indexOf(tempReleted));
-            print("rm => $tempListRelated");
-          });
+          // setState(() {
+          tempListRelated.removeAt(tempListRelated.indexOf(tempReleted));
+          print("rm => $tempListRelated");
+          // });
         }
       }
     }
     tempListRelated.forEach((v) {
-      setState(() {
-        listTempData.add(ImageDataEachGroup(
-            title: v,
-            imageUrl: [],
-            imageBase64: [],
-            imagesList: [],
-            imageUint8List: []));
-      });
+      // setState(() {
+      listTempData.add(ImageDataEachGroup(
+          title: v,
+          imageUrl: [],
+          imageBase64: [],
+          imagesList: [],
+          imageUint8List: []));
+      // });
     });
     print("compact => $listRelated");
   }
@@ -652,17 +672,19 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
       width: 180,
       child: Row(
         children: <Widget>[
-          Image.asset(
-            imgPath,
-            width: 30,
-            height: 30,
-            fit: BoxFit.contain,
-          ),
+          imgPath.length > 0
+              ? Image.asset(
+                  imgPath,
+                  width: 30,
+                  height: 30,
+                  fit: BoxFit.contain,
+                )
+              : Icon(Icons.error, color: Colors.red),
           SizedBox(width: 10),
           Container(
             width: 140,
             child: AutoSizeText(
-              label,
+              label ?? "empty",
               minFontSize: 10,
               stepGranularity: 10,
               maxLines: 2,
@@ -1118,10 +1140,16 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
             //           onChanged: (value) {
             //             print(value);
             //             setState(() {
-            //               groupIDTest = value;
-            //               print("valueChange => $value");
+            //               // groupIDTest = value;
+            //               // print("valueChange => $value");
+            //               // tempSubCat = getDataCategoryInfo(
+            //               //     listMap: subCatAll, searchText: value);
+            //               // txtPdtCat.text = tempSubCat.first['CatCode'];
+            //               print(value);
+            //               setGroupCatMap(value);
             //               tempSubCat = getDataCategoryInfo(
-            //                   listMap: subCat, searchText: value);
+            //                   listMap: subCatAll, searchText: value['GroupID']);
+            //               setSubCatMap(tempSubCat.first);
             //               txtPdtCat.text = tempSubCat.first['CatCode'];
             //             });
             //           }),
@@ -1149,52 +1177,137 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
             //           onChanged: (value) {
             //             print(value);
             //             setState(() {
-            //               txtPdtCat.text = value;
+            //               setGroupCatMap(value);
+            //               tempSubCat = getDataCategoryInfo(
+            //                   listMap: subCatAll, searchText: value['GroupID']);
+            //               setSubCatMap(tempSubCat.first);
+            //               txtPdtCat.text = tempSubCat.first['CatCode'];
             //             });
+            //             // txtPdtCat.text = value;
             //           }),
             //     )),
+            //----------------
+            // formWidget(
+            //     title: "Category",
+            //     necessary: true,
+            //     child: ClipRRect(
+            //       borderRadius: BorderRadius.circular(10),
+            //       child: Container(
+            //         height: 50,
+            //         child: showAlertDropDownCustoms(
+            //             showContent: groupCatMap,
+            //             titleInDropdown: "Category",
+            //             dataOfDropdown: tempgroupCat,
+            //             onSelected: (data) {
+            //               setState(() {
+            //                 print(data);
+            //                 setGroupCatMap(data);
+            //                 tempSubCat = getDataCategoryInfo(
+            //                     listMap: subCatAll,
+            //                     searchText: data['GroupID']);
+            //                 setSubCatMap(tempSubCat.first);
+            //                 txtPdtCat.text = tempSubCat.first['CatCode'];
+            //               });
+            //             }),
+            //       ),
+            //     )),
+            // formWidget(
+            //     title: "Sub - Category",
+            //     necessary: true,
+            //     child: ClipRRect(
+            //       borderRadius: BorderRadius.circular(10),
+            //       child: Container(
+            //         height: 50,
+            //         child: showAlertDropDownCustoms(
+            //             showContent: subCatMap,
+            //             titleInDropdown: "Sub-Category",
+            //             dataOfDropdown: tempSubCat,
+            //             onSelected: (data) {
+            //               setState(() {
+            //                 setSubCatMap(data);
+            //                 txtPdtCat.text = data['CatCode'];
+            //                 print("dataGroup => $data");
+            //                 print("txtPdtCat.text => ${txtPdtCat.text}");
+            //               });
+            //             }),
+            //       ),
+            //     )),
+            //----------------
             formWidget(
-                title: "Category Test",
+                title: "Category",
                 necessary: true,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
                   child: Container(
                     height: 50,
-                    child: showAlertDropDownCustoms(
-                        showContent: groupCatMap,
-                        titleInDropdown: "Category",
-                        dataOfDropdown: tempgroupCat,
-                        onSelected: (data) {
-                          setState(() {
-                            print(data);
-                            setGroupCatMap(data);
-                            tempSubCat = getDataCategoryInfo(
-                                listMap: subCatAll,
-                                searchText: data['GroupID']);
-                            setSubCatMap(tempSubCat.first);
-                            txtPdtCat.text = tempSubCat.first['CatCode'];
-                          });
+                    child: RaisedButton(
+                        elevation: 0,
+                        color: Colors.grey[100],
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                        child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: showDataIndropdown(
+                              imgPath: groupCatMap['Logo'],
+                              label: labelCategory,
+                            )),
+                        onPressed: () async {
+                          Map<String, dynamic> dataReturn =
+                              await ecsLib.pushPage(
+                                  context: context,
+                                  pageWidget: CategoryUI(
+                                    title: "Category",
+                                    category: tempgroupCat,
+                                    selected: groupCatMap,
+                                  ));
+                          if (dataReturn != null) {
+                            setState(() {
+                              print(dataReturn);
+                              setGroupCatMap(dataReturn);
+                              tempSubCat = getDataCategoryInfo(
+                                  listMap: subCatAll,
+                                  searchText: dataReturn['GroupID']);
+                              setSubCatMap(tempSubCat.first);
+                              txtPdtCat.text = tempSubCat.first['CatCode'];
+                            });
+                          }
                         }),
                   ),
                 )),
             formWidget(
-                title: "Sub - Category Test",
+                title: "Sub - Category",
                 necessary: true,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
                   child: Container(
                     height: 50,
-                    child: showAlertDropDownCustoms(
-                        showContent: subCatMap,
-                        titleInDropdown: "Sub-Category",
-                        dataOfDropdown: tempSubCat,
-                        onSelected: (data) {
-                          setState(() {
-                            setSubCatMap(data);
-                            txtPdtCat.text = data['CatCode'];
-                            print("dataGroup => $data");
-                            print("txtPdtCat.text => ${txtPdtCat.text}");
-                          });
+                    child: RaisedButton(
+                        elevation: 0,
+                        color: Colors.grey[100],
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                        child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: showDataIndropdown(
+                                imgPath: subCatMap['Logo'],
+                                label: labelSubCategory)),
+                        onPressed: () async {
+                          Map<String, dynamic> dataReturn =
+                              await ecsLib.pushPage(
+                                  context: context,
+                                  pageWidget: CategoryUI(
+                                    title: "Sub - Category",
+                                    category: tempSubCat,
+                                    selected: subCatMap,
+                                  ));
+                          if (dataReturn != null) {
+                            setState(() {
+                              setSubCatMap(dataReturn);
+                              txtPdtCat.text = dataReturn['CatCode'];
+                              print("dataGroup => $dataReturn");
+                              print("txtPdtCat.text => ${txtPdtCat.text}");
+                            });
+                          }
                         }),
                   ),
                 )),

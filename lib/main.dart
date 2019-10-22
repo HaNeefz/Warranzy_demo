@@ -28,9 +28,10 @@ setupApp() {
 void main() {
   Provider.debugCheckInvalidValueType = null;
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-    statusBarColor: Colors.black,
-    // statusBarBrightness: Brightness.light,
-  ));
+      statusBarColor: Colors.black,
+      statusBarBrightness: Brightness.dark,
+      systemNavigationBarColor: Colors.white,
+      systemNavigationBarIconBrightness: Brightness.dark));
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]).then((_) async {
@@ -65,38 +66,20 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     _initLangeuage("en");
     initialConfig();
-    notiState.initNotification();
+    initNoti();
+    // notiState.initialFirebaseMessage();
     allTranslations.onLocaleChangedCallback = _onLocaleChanged;
+  }
+
+  initNoti() {
+    setState(() {
+      notiState.initNotification();
+    });
   }
 
   initialConfig() async {
     await GlobalConfiguration().loadFromAsset("app_settings");
   }
-
-  // initnoti() async {
-  //   var settings = {
-  //     OSiOSSettings.autoPrompt: true,
-  //     OSiOSSettings.promptBeforeOpeningPushUrl: true
-  //   };
-  //   await OneSignal.shared.init("138414dc-cb53-43e0-bc67-49fc9b7a99f4");
-  //   await OneSignal.shared
-  //       .init("138414dc-cb53-43e0-bc67-49fc9b7a99f4", iOSSettings: settings);
-  //   OneSignal.shared
-  //       .setInFocusDisplayType(OSNotificationDisplayType.notification);
-  //   OneSignal.shared
-  //       .setNotificationReceivedHandler((OSNotification notification) {
-  //     // will be called whenever a notification is received
-  //   });
-  //   OneSignal.shared
-  //       .setNotificationOpenedHandler((OSNotificationOpenedResult result) {
-  //     // will be called whenever a notification is opened/button pressed.
-  //   });
-  //   OneSignal.shared.getPermissionSubscriptionState().then((status) {
-  //     SharedPreferences.getInstance().then((prefs) {
-  //       prefs.setString("playerID", status.subscriptionStatus.userId);
-  //     });
-  //   });
-  // }
 
   _onLocaleChanged() async {
     // do anything you need to do if the language changes

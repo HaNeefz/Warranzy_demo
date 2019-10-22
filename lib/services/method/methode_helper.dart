@@ -35,7 +35,7 @@ class MethodHelper {
     String countryCode =
         await DBProviderInitialApp.db.getCountryCodeByTimeZone(await timeZone);
 
-    return countryCode ?? "";
+    return countryCode ?? "countryCode is null";
   }
 
   static Future<String> _repositoryTimeZone() async {

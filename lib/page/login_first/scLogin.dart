@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:warranzy_demo/page/asset_page/add_assets_page/scAdd_image_demo.dart';
 import 'package:warranzy_demo/page/change_device_page/scChange_device.dart';
 import 'package:warranzy_demo/page/pin_code/scPinCode.dart';
+import 'package:warranzy_demo/services/method/methode_helper.dart';
 import 'package:warranzy_demo/services/providers/notification_state.dart';
 import 'package:warranzy_demo/services/sqflit/db_customers.dart';
 import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
@@ -140,7 +141,11 @@ class _LoginPageState extends State<LoginPage> {
               // RaisedButton(
               //   child: Text("getDataCountry"),
               //   onPressed: () async {
-              //     await DBProviderInitialApp.db.getAllDataCountry();
+              //     print(await MethodHelper.timeZone);
+              //     print(await MethodHelper.countryCode);
+              //     // print(await DBProviderInitialApp.db
+              //     //     .getCountryCodeByTimeZone(await MethodHelper.timeZone));
+              //     // print(await DBProviderInitialApp.db.getAllDataCountry());
               //   },
               // ),
               // RaisedButton(
