@@ -176,7 +176,7 @@ BlockchainID */
       print("--------------------");
       res.forEach((v) {
         String prettyprint = encoder.convert(v);
-        print("DataAsset => $prettyprint");
+        // print("DataAsset => $prettyprint");
         temp.add(ModelDataAsset.fromJson(v));
       });
 
@@ -189,37 +189,14 @@ BlockchainID */
     }
   }
 
-  Future<String> getMainImage() async {
+  Future<Map<String, dynamic>> getImagePool(String fileID) async {
     final db = await database;
-    String imageMain;
-    var res = await db.rawQuery(
-        "SELECT * FROM $tableWarranzyUsed, $tableWarranzyLog WHERE $tableWarranzyUsed.WTokenID = $tableWarranzyLog.WTokenID");
-    Map<String, dynamic> map = Map<String, dynamic>.from(res.first);
-    int counter = 0;
-    map = jsonDecode(map["FileAttach_ID"]);
-    print(map);
-    map.forEach((k, v) async {
-      if (counter == 0) {
-        // print("$k | $v");
-        List vv = v as List;
-        String vvv = vv.first;
-        // print(vvv);
-        // imageMain = await getImagePool(vvv);
-        counter++;
-      }
-    });
-    print(imageMain);
-    return imageMain;
-  }
-
-  Future<String> getImagePool(String fileID) async {
-    final db = await database;
-    var tempImageValue = await db
-        .rawQuery("SELECT FileID FROM $tableFilePool WHERE FileID = '$fileID'");
+    var tempImageValue = await db.rawQuery(
+        "SELECT FileDescription,FileData FROM $tableFilePool WHERE FileID = '$fileID'");
     if (tempImageValue.isNotEmpty) {
-      return tempImageValue.first['FileID'];
+      return tempImageValue.first;
     } else
-      return "";
+      return null;
   }
 
   Future<bool> hasDataAsset() async {
@@ -300,6 +277,11 @@ BlockchainID */
   Future<List<FilePool>> getAllDataFilePool() async {
     final db = await database;
     var res = await db.query(tableFilePool);
+    JsonEncoder encoder = JsonEncoder.withIndent(" ");
+    res.forEach((v) {
+      String prettyprint = encoder.convert(v);
+      print("DataAsset => $prettyprint");
+    });
     List<FilePool> data = res.isNotEmpty
         ? res.map((data) => FilePool.fromJson(data)).toList()
         : [];
@@ -334,6 +316,21 @@ BlockchainID */
     } catch (e) {
       print("Catch getAllBrandName $e");
       return [];
+    }
+  }
+
+  Future<bool> updateBrandName(GetBrandName brand) async {
+    final db = await database;
+    try {
+      var res = await db.update("$tableBrand", brand.toJson());
+      if (res >= 1) {
+        print("Updated brand.");
+        return true;
+      } else
+        return false;
+    } catch (e) {
+      print("Catch getAllBrandName $e");
+      return false;
     }
   }
 

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -151,20 +152,25 @@ class _AssetPageState extends State<AssetPage> {
           ),
         ),
       ),
-      body: Container(
-        child: ListView(
-          shrinkWrap: true,
-          children: <Widget>[
-            buildUserName(),
-            // buildHeaderAndProfile(),
-            CarouselWithIndicator(
-              height: 250,
-              items: ["1", "2", "3", "5"],
-            ),
-            buildLabelAndSeeAll(),
-            buildYourAssets(),
-          ],
+      body: WillPopScope(
+        child: Container(
+          child: ListView(
+            shrinkWrap: true,
+            children: <Widget>[
+              buildUserName(),
+              // buildHeaderAndProfile(),
+              CarouselWithIndicator(
+                height: 250,
+                items: ["1", "2", "3", "5"],
+              ),
+              buildLabelAndSeeAll(),
+              buildYourAssets(),
+            ],
+          ),
         ),
+        onWillPop: () async {
+          return false;
+        },
       ),
     );
   }
@@ -180,7 +186,8 @@ class _AssetPageState extends State<AssetPage> {
 
     return Column(
       children: <Widget>[
-        buildAssetOffine(),
+        // buildAssetOffine(),
+        MyAssetOffline(),
         buildAssetOnline(),
       ],
     );
@@ -551,6 +558,329 @@ class _AssetPageState extends State<AssetPage> {
   }
 }
 
+class MyAssetOffline extends StatefulWidget {
+  @override
+  _MyAssetOfflineState createState() => _MyAssetOfflineState();
+}
+
+class _MyAssetOfflineState extends State<MyAssetOffline> {
+  final ecsLib = getIt.get<ECSLib>();
+  final allTranslations = getIt.get<GlobalTranslations>();
+  Future<List<ModelDataAsset>> getModelData;
+  List<ImageDataEachGroup> imageDataEachGroup = [];
+  Uint8List imageMain;
+  List<Map<String, dynamic>> dataImage = [];
+  List<Map<String, dynamic>> titleAndFileData = [];
+  Future<List<ModelDataAsset>> getModelDataAsset() async {
+    print("begin getAllAsset");
+    List<ModelDataAsset> tempAllAsset =
+        await DBProviderAsset.db.getAllDataAsset();
+    // print("tempAllAsset => ${tempAllAsset.length}");
+    tempAllAsset.forEach((v) async {
+      Map<String, dynamic> map = jsonDecode(v.fileAttachID);
+      Iterable tempMapValues = map.values.toList().first;
+      List tempImageID = [];
+      tempMapValues.forEach((v) {
+        tempImageID.add(v.toString());
+      });
+
+      tempImageID.forEach((pathID) async {
+        Map<String, dynamic> tempMapDataImage =
+            await DBProviderAsset.db.getImagePool(pathID.toString());
+        dataImage.add(tempMapDataImage);
+        // titleAndFileData.add({"title": tempMapDataImage['FileDescription']});
+        // titleAndFileData.add({"img": tempMapDataImage['FileData']});
+        // print(dataImage.first['FileData']);
+
+        imageDataEachGroup.add(
+          ImageDataEachGroup(
+            title: jsonDecode(
+                titleAndFileData[tempImageID.indexOf(pathID)]["title"])["EN"],
+            imageBase64: titleAndFileData[tempImageID.indexOf(pathID)]['img'],
+          ),
+        );
+        print("imageDataEachGroup => ${imageDataEachGroup.first.title}");
+        print("imageDataEachGroup => ${imageDataEachGroup.first.imageBase64}");
+      });
+      getProductCateName(v.pdtCatCode);
+      imageDataEachGroup.add(ImageDataEachGroup(
+        imageBase64: dataImage.first['FileData'],
+      ));
+    });
+    // print({
+    //   "imageDataEachGroup.first.imageBase64 => ${imageDataEachGroup.first.imageBase64}"
+    // });
+    print("end getAsset");
+    return tempAllAsset;
+  }
+
+  List<String> listCatName = [];
+  String catName = 'catName is null';
+
+  getProductCateName(String catCode) async {
+    var _catName = await DBProviderInitialApp.db
+        .getProductCatName(id: catCode, lang: allTranslations.currentLanguage);
+    setState(() => listCatName.add(_catName));
+
+    return _catName;
+  }
+
+  List<ImageDataEachGroup> getImage(ModelDataAsset images) {
+    Map<String, dynamic> tempImages;
+    List<ImageDataEachGroup> tempImageDataEachGroup = [];
+    if (images.images != null) {
+      tempImages = jsonDecode(images.images);
+      tempImages.forEach((String k, dynamic v) {
+        var listTemp = v as List;
+        List<String> tempUrl = [];
+        for (var item in listTemp) {
+          tempUrl.add(item);
+          // setState(() {
+          //   listImageUrl.add(item);
+          // });
+        }
+        tempImageDataEachGroup
+            .add(ImageDataEachGroup(title: k, imageUrl: tempUrl));
+      });
+      setState(() => imageDataEachGroup = List.of(tempImageDataEachGroup));
+
+      print("imageDataEachGroup => ${imageDataEachGroup.length}");
+      // tempImageDataEachGroup.forEach((v) {
+      //   print("Title : ${v.title} | url[${v.imageUrl.length}] ${v.imageUrl}");
+      // });
+    }
+    return tempImageDataEachGroup;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getModelData = getModelDataAsset();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<ModelDataAsset>>(
+      future: getModelData,
+      builder:
+          (BuildContext context, AsyncSnapshot<List<ModelDataAsset>> snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          if (!(snapshot.hasError)) {
+            if (snapshot.data.isNotEmpty) {
+              return Padding(
+                padding: const EdgeInsets.fromLTRB(10, 15, 10, 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Column(
+                        children: snapshot.data.length > 0
+                            ? snapshot.data
+                                .map((data) => Card(
+                                      elevation: 5.0,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(20)),
+                                      child: Container(
+                                        child: ListTile(
+                                          title: Row(
+                                            children: <Widget>[
+                                              if (data.imageMain != null)
+                                                CachedNetworkImage(
+                                                  imageUrl: data.imageMain,
+                                                  imageBuilder: (context,
+                                                          imageProvider) =>
+                                                      Container(
+                                                    width: 100,
+                                                    height: 100,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20),
+                                                      image: DecorationImage(
+                                                          image: imageProvider,
+                                                          fit: BoxFit.cover,
+                                                          colorFilter:
+                                                              ColorFilter.mode(
+                                                                  Colors.red,
+                                                                  BlendMode
+                                                                      .dstATop)),
+                                                    ),
+                                                  ),
+                                                  placeholder: (context, url) =>
+                                                      CircularProgressIndicator(),
+                                                  errorWidget:
+                                                      (context, url, error) =>
+                                                          Icon(
+                                                    Icons.error,
+                                                    size: 100,
+                                                  ),
+                                                )
+                                              else
+                                                imageDataEachGroup.length > 0
+                                                    ?
+                                                    // Image.memory(
+                                                    //         imageMain,
+                                                    //         width: 100,
+                                                    //         height: 100,
+                                                    //         fit: BoxFit.cover,
+                                                    //       )
+                                                    CachedNetworkImage(
+                                                        imageUrl:
+                                                            imageDataEachGroup
+                                                                .first
+                                                                .imageUrl
+                                                                .first,
+                                                        imageBuilder: (context,
+                                                                imageProvider) =>
+                                                            Container(
+                                                          width: 100,
+                                                          height: 100,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        20),
+                                                            image: DecorationImage(
+                                                                image:
+                                                                    imageProvider,
+                                                                fit: BoxFit
+                                                                    .cover,
+                                                                colorFilter:
+                                                                    ColorFilter.mode(
+                                                                        Colors
+                                                                            .red,
+                                                                        BlendMode
+                                                                            .dstATop)),
+                                                          ),
+                                                        ),
+                                                      )
+                                                    : Icon(
+                                                        Icons.error,
+                                                        size: 100,
+                                                      ),
+                                              Expanded(
+                                                flex: 2,
+                                                child: Container(
+                                                  padding: EdgeInsets.symmetric(
+                                                      vertical: 10,
+                                                      horizontal: 10),
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: <Widget>[
+                                                      TextBuilder.build(
+                                                          title: data.title ??
+                                                              "Empty title",
+                                                          style: TextStyleCustom
+                                                              .STYLE_LABEL_BOLD),
+                                                      TextBuilder.build(
+                                                          title: data
+                                                                  .custRemark ??
+                                                              "Empty Remark",
+                                                          style: TextStyleCustom
+                                                              .STYLE_CONTENT,
+                                                          textOverflow:
+                                                              TextOverflow
+                                                                  .ellipsis,
+                                                          maxLine: 2),
+                                                      TextBuilder.build(
+                                                          title:
+                                                              "\nExpire Date : ${data.warrantyExpire.split(" ").first ?? "Empty warrantyExpire"}\nRemaining : ${showDateRemaining(data.warrantyExpire)}",
+                                                          style: TextStyleCustom
+                                                              .STYLE_CONTENT
+                                                              .copyWith(
+                                                                  fontSize: 12),
+                                                          textOverflow:
+                                                              TextOverflow
+                                                                  .ellipsis,
+                                                          maxLine: 3),
+                                                      Container(
+                                                        margin:
+                                                            EdgeInsets.fromLTRB(
+                                                                0, 5, 5, 5),
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                                horizontal: 5,
+                                                                vertical: 5),
+                                                        decoration: BoxDecoration(
+                                                            color: ThemeColors
+                                                                .COLOR_GREY
+                                                                .withOpacity(
+                                                                    0.2),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        20)),
+                                                        child: TextBuilder.build(
+                                                            title: listCatName[
+                                                                snapshot.data
+                                                                    .indexOf(
+                                                                        data)],
+                                                            style: TextStyleCustom
+                                                                .STYLE_CONTENT
+                                                                .copyWith(
+                                                                    fontSize:
+                                                                        14,
+                                                                    color: ThemeColors
+                                                                        .COLOR_BLACK)),
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          onTap: () async {
+                                            ecsLib.pushPage(
+                                              context: context,
+                                              pageWidget: DetailAsset(
+                                                dataAsset: data,
+                                                showDetailOnline: false,
+                                                dataScan: null,
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ))
+                                .toList()
+                            : Text("Data length == 0")),
+                  ],
+                ),
+              );
+            } else {
+              return Center(
+                child: TextBuilder.build(title: "Data offline is empty"),
+              );
+            }
+          } else {
+            return Text("Error");
+          }
+        } else if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        } else {
+          return Text("Something wrong.!!");
+        }
+      },
+    );
+  }
+
+  String showDateRemaining(String dateTime) {
+    int date = DateTime.parse(dateTime).difference(DateTime.now()).inDays;
+    int hours = DateTime.parse(dateTime).difference(DateTime.now()).inHours;
+    if (date > 0) {
+      return "$date day.";
+    } else if (date == 0 && hours > 0) {
+      return "$hours hours.";
+    } else {
+      return "Expired";
+    }
+  }
+}
+
 class MyAssetFormSQLite extends StatefulWidget {
   // final RepositoryOfAssetFromSqflite data;
   final ModelDataAsset data;
@@ -584,9 +914,15 @@ class _MyAssetFormSQLiteState extends State<MyAssetFormSQLite> {
     super.initState();
     print(widget.data.alertDate);
     getProductCateName();
-    if (widget.data.createType == "C") {
-      imageDataEachGroup = getImage(widget.data);
-    }
+    // if (widget.data.createType == "C") {
+    print("widget.data.fileAttachID => ${widget.data.fileAttachID}");
+    getImage(widget.data);
+    // imageDataEachGroup = List.of(getImage(widget.data));
+    imageDataEachGroup.forEach((v) {
+      print("getImage---------------------------->");
+      print(v.imageUrl);
+    });
+    // }
   }
 
   List<ImageDataEachGroup> getImage(ModelDataAsset images) {
@@ -606,9 +942,10 @@ class _MyAssetFormSQLiteState extends State<MyAssetFormSQLite> {
         tempImageDataEachGroup
             .add(ImageDataEachGroup(title: k, imageUrl: tempUrl));
       });
-      tempImageDataEachGroup.forEach((v) {
-        print("Title : ${v.title} | url[${v.imageUrl.length}] ${v.imageUrl}");
-      });
+      imageDataEachGroup = List.of(tempImageDataEachGroup);
+      // tempImageDataEachGroup.forEach((v) {
+      //   print("Title : ${v.title} | url[${v.imageUrl.length}] ${v.imageUrl}");
+      // });
     }
     return tempImageDataEachGroup;
   }
@@ -655,10 +992,26 @@ class _MyAssetFormSQLiteState extends State<MyAssetFormSQLite> {
                   ),
                 )
               else
-                Icon(
-                  Icons.error,
-                  size: 100,
-                ),
+                imageDataEachGroup.length > 0
+                    ? CachedNetworkImage(
+                        imageUrl: imageDataEachGroup.first.imageUrl.first,
+                        imageBuilder: (context, imageProvider) => Container(
+                          width: 100,
+                          height: 100,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            image: DecorationImage(
+                                image: imageProvider,
+                                fit: BoxFit.cover,
+                                colorFilter: ColorFilter.mode(
+                                    Colors.red, BlendMode.dstATop)),
+                          ),
+                        ),
+                      )
+                    : Icon(
+                        Icons.edit,
+                        size: 100,
+                      ),
               Expanded(
                 flex: 2,
                 child: Container(

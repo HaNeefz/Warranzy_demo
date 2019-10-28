@@ -31,7 +31,13 @@ class GetBrandName {
     lastUpdate = json['LastUpdate'];
     brandActive = json['BrandActive'];
     fileIDLogo = json['FileID_Logo'];
-    documentID = json["DocumentID"];
+    if (json["BrandCode"] == null && json['DocumentID'] != null) {
+      documentID = json["DocumentID"];
+    } else if (json['BrandCode'] != null && json['DocumentID'] == null) {
+      documentID = json["BrandCode"];
+    } else {
+      documentID = json["DocumentID"];
+    }
   }
 
   Map<String, dynamic> toJson() {

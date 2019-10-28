@@ -2,6 +2,11 @@ import 'dart:io';
 
 import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
+// import 'package:gallery_saver/gallery_saver.dart';
+import 'package:image_picker/image_picker.dart';
+// import 'package:image_picker_saver/image_picker_saver.dart' as imageSaver;
+// import 'package:gallery_saver/gallery_saver.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:warranzy_demo/page/asset_page/add_assets_page/scAdd_image_demo.dart';
 import 'package:warranzy_demo/page/change_device_page/scChange_device.dart';
@@ -31,6 +36,7 @@ class _LoginPageState extends State<LoginPage> {
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
   NotificationState noti = NotificationState();
   bool hasAccount = false;
+  File _image;
   @override
   void initState() {
     super.initState();
@@ -129,6 +135,44 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(
                 height: 20.0,
               ),
+
+              // RaisedButton(
+              //   child: Text("Gallery_Saver Test"),
+              //   onPressed: () async {
+              //     print("Click");
+
+              //     await ImagePicker.pickImage(source: ImageSource.camera)
+              //         .then((File image) async {
+              //       if (image != null) {
+              //         Directory dir = await getApplicationDocumentsDirectory();
+              //         var imageName = image.path.split("/").last;
+              //         var newImage = await image.copy("${dir.path}/$imageName");
+              //         print("newImage => ${newImage.path}");
+              //         print(image);
+              //         _image = newImage;
+              //       } else
+              //         print("Image is null");
+              //     });
+
+                  // setState(() => _image = newImage);
+                  // var filePath = await imageSaver.ImagePickerSaver.saveFile(
+                  //     fileData: newImage.readAsBytesSync());
+                  // print("Saved path $filePath");
+
+                  // var filePath = await imageSaver.ImagePickerSaver.saveFile(
+                  //     fileData: r.readAsBytesSync());
+                  // print("filePath => $filePath");
+                  // setState(() => _image = r);
+              //   },
+              // ),
+              // RaisedButton(
+              //   child: Text("RemoveImage Test"),
+              //   onPressed: () {
+              //     setState(() {});
+              //   },
+              // ),
+              // _image != null ? Image.file(_image) : Container(),
+
               // RaisedButton(
               //   child: Text("AddImageDemoPage Test"),
               //   onPressed: () {

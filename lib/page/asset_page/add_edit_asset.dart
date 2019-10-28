@@ -872,6 +872,13 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
           } catch (e) {
             print("insertDataWarranzyLog => $e");
           }
+          try {
+            await DBProviderAsset.db
+                .inserDataBrand(res.brand)
+                .catchError((onError) => print("Insert Name brand $onError"));
+          } catch (e) {
+            print("Insert Name brand $e");
+          }
           res.filePool.forEach((data) async {
             try {
               await DBProviderAsset.db

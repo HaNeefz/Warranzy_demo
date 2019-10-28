@@ -126,6 +126,10 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
   Future<bool> getBrandName() async {
     bool success = false;
     int length = 0;
+    int amountOfBrand = 0;
+    amountOfBrand =
+        await Firestore.instance.collection("BrandName").snapshots().length;
+    print("AllBrand amount is $amountOfBrand");
     Firestore.instance
         .collection('BrandName')
         .snapshots()
@@ -137,7 +141,7 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
         await DBProviderAsset.db.inserDataBrand(tempBrand).then((onValue) {
           if (onValue == true) length++;
         });
-        if (length == 500) {
+        if (length == amountOfBrand) {
           success = true;
           print("insertBrand completed");
         }

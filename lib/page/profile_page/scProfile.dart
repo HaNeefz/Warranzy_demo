@@ -258,6 +258,13 @@ class _ProfilePageState extends State<ProfilePage> {
                   // print(await DBProviderCustomer.db.getSpecialPass());
                 },
               ),
+              RaisedButton(
+                child: Text("getImagePool"),
+                onPressed: () async {
+                  await DBProviderAsset.db.getAllDataFilePool();
+                  // print(await DBProviderCustomer.db.getSpecialPass());
+                },
+              ),
               // RaisedButton(
               //   child: Text("Clear SQLite"),
               //   onPressed: () async {
@@ -284,21 +291,21 @@ class _ProfilePageState extends State<ProfilePage> {
         ));
   }
 
-  Future<Map<String, dynamic>> getListImage(Map<String, dynamic> map) async {
-    Map<String, dynamic> mapImage = {};
-    map.forEach((k, v) async {
-      mapImage.addAll({"$k": []});
-      List vv = v as List;
-      print("$k | ${vv.length}");
-      List<String> img = [];
-      for (var list in vv) {
-        var tempImagePool = await DBProviderAsset.db.getImagePool(list);
-        img.add(tempImagePool);
-      }
-      mapImage["$k"] = img;
-    });
-    return mapImage.isNotEmpty ? mapImage : {};
-  }
+  // Future<Map<String, dynamic>> getListImage(Map<String, dynamic> map) async {
+  //   Map<String, dynamic> mapImage = {};
+  //   map.forEach((k, v) async {
+  //     mapImage.addAll({"$k": []});
+  //     List vv = v as List;
+  //     print("$k | ${vv.length}");
+  //     List<String> img = [];
+  //     for (var list in vv) {
+  //       var tempImagePool = await DBProviderAsset.db.getImagePool(list);
+  //       img.add(tempImagePool);
+  //     }
+  //     mapImage["$k"] = img;
+  //   });
+  //   return mapImage.isNotEmpty ? mapImage : {};
+  // }
 
   Widget buttonContact(
       [IconData icons, String title, Color colors, Function onPressed]) {

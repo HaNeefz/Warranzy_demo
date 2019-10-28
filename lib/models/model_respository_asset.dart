@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:warranzy_demo/models/model_get_brand_name.dart';
 import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
 
 import 'model_repository_asset_scan.dart';
@@ -11,13 +12,15 @@ class RepositoryOfAsset {
   WarranzyLog warranzyLog;
   List<FilePool> filePool;
   String message;
+  GetBrandName brand;
 
   RepositoryOfAsset(
       {this.status,
       this.warranzyUsed,
       this.warranzyLog,
       this.filePool,
-      this.message});
+      this.message,
+      this.brand});
 
   RepositoryOfAsset.fromJson(Map<String, dynamic> json) {
     status = json['Status'];
@@ -34,6 +37,9 @@ class RepositoryOfAsset {
         filePool.add(new FilePool.fromJson(v));
       });
     }
+    brand = json['BrandName'] != null
+        ? GetBrandName.fromJson(json['BrandName'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {

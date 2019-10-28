@@ -50,7 +50,8 @@ dependencies:
   global_configuration: ^1.2.0
   progress_indicators: ^0.1.4
   keyboard_avoider: ^0.1.2
-  firebase_messaging: ^5.1.6
+  # firebase_messaging: ^5.1.6
+  # gallery_saver: ^1.0.6
 
 dev_dependencies:
   flutter_test:
