@@ -31,6 +31,7 @@ void main() {
       statusBarColor: Colors.black,
       statusBarBrightness: Brightness.dark,
       systemNavigationBarColor: Colors.white,
+      statusBarIconBrightness: Brightness.dark,
       systemNavigationBarIconBrightness: Brightness.dark));
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,

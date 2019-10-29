@@ -11,6 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:warranzy_demo/models/model_asset_data.dart';
 import 'package:warranzy_demo/models/model_respository_asset.dart';
+import 'package:warranzy_demo/models/model_user.dart';
 import 'package:warranzy_demo/models/model_verify_login.dart';
 import 'package:warranzy_demo/page/asset_page/add_assets_page/scFillInformation.dart';
 import 'package:warranzy_demo/page/profile_page/scProfile.dart';
@@ -53,7 +54,6 @@ class _AssetPageState extends State<AssetPage> {
   String username = "Username";
 
   List<ModelAssetsData> listAssetData;
-  JWTService jwtService;
   ApiBlocGetAllAsset<ResponseAssetOnline> getAllAssetBloc;
 
   Future<List<ModelDataAsset>> getModelDataAsset() async {
@@ -61,28 +61,13 @@ class _AssetPageState extends State<AssetPage> {
     return await DBProviderAsset.db.getAllDataAsset();
   }
 
-  // Future<ResponseAssetOnline> getUrlAssetOnline() async {
-  //   // ResponseAssetOnline response;
-  //   try {
-  //     return await APIServiceAssets.getAllAseet();
-  //   } catch (e) {
-  //     print(e);
-  //     return null;
-  //   }
-  // }
-  // String jWT = "";
-  // getJWT() async {
-  //   jWT = await JWTService.getTokenJWT();
-  //   setState(() {});
-  // }
-
   @override
   void initState() {
     super.initState();
-    var url = "/Asset/getMyAsset";
-    getAllAssetBloc = ApiBlocGetAllAsset<ResponseAssetOnline>(
-      url: url,
-    );
+    // var url = "/Asset/getMyAsset";
+    // getAllAssetBloc = ApiBlocGetAllAsset<ResponseAssetOnline>(
+    //   url: url,
+    // );
     getUsername();
     getModelData = getModelDataAsset();
     // getAssetOnline = getUrlAssetOnline();
@@ -188,7 +173,7 @@ class _AssetPageState extends State<AssetPage> {
       children: <Widget>[
         // buildAssetOffine(),
         MyAssetOffline(),
-        buildAssetOnline(),
+        // buildAssetOnline(),
       ],
     );
   }
@@ -571,47 +556,70 @@ class _MyAssetOfflineState extends State<MyAssetOffline> {
   Uint8List imageMain;
   List<Map<String, dynamic>> dataImage = [];
   List<Map<String, dynamic>> titleAndFileData = [];
+  bool hasData = false;
+
   Future<List<ModelDataAsset>> getModelDataAsset() async {
     print("begin getAllAsset");
     List<ModelDataAsset> tempAllAsset =
         await DBProviderAsset.db.getAllDataAsset();
-    // print("tempAllAsset => ${tempAllAsset.length}");
+    await getImageEachAsset(tempAllAsset);
     tempAllAsset.forEach((v) async {
-      Map<String, dynamic> map = jsonDecode(v.fileAttachID);
-      Iterable tempMapValues = map.values.toList().first;
-      List tempImageID = [];
-      tempMapValues.forEach((v) {
-        tempImageID.add(v.toString());
-      });
-
-      tempImageID.forEach((pathID) async {
-        Map<String, dynamic> tempMapDataImage =
-            await DBProviderAsset.db.getImagePool(pathID.toString());
-        dataImage.add(tempMapDataImage);
-        // titleAndFileData.add({"title": tempMapDataImage['FileDescription']});
-        // titleAndFileData.add({"img": tempMapDataImage['FileData']});
-        // print(dataImage.first['FileData']);
-
-        imageDataEachGroup.add(
-          ImageDataEachGroup(
-            title: jsonDecode(
-                titleAndFileData[tempImageID.indexOf(pathID)]["title"])["EN"],
-            imageBase64: titleAndFileData[tempImageID.indexOf(pathID)]['img'],
-          ),
-        );
-        print("imageDataEachGroup => ${imageDataEachGroup.first.title}");
-        print("imageDataEachGroup => ${imageDataEachGroup.first.imageBase64}");
-      });
-      getProductCateName(v.pdtCatCode);
-      imageDataEachGroup.add(ImageDataEachGroup(
-        imageBase64: dataImage.first['FileData'],
-      ));
+      await getProductCateName(v.pdtCatCode);
     });
-    // print({
-    //   "imageDataEachGroup.first.imageBase64 => ${imageDataEachGroup.first.imageBase64}"
-    // });
+
     print("end getAsset");
-    return tempAllAsset;
+    if (tempAllAsset.isNotEmpty) {
+      setState(() => hasData = true);
+      return tempAllAsset;
+    } else {
+      return [];
+    }
+  }
+
+  Future getImageEachAsset(List<ModelDataAsset> listAsset) async {
+    // print("listAsset => $listAsset");
+    listAsset.forEach((data) async {
+      //each of asset, outside
+      // print("data => ${data.fileAttachID}");
+      Map<String, dynamic> mapTempImage = {};
+      Map<String, dynamic> map =
+          jsonDecode(data.fileAttachID); //get fileID type Json
+      String imageName = '';
+      List<String> imageKey = [];
+      map.forEach((k, v) async {
+        print("$k , $v");
+        imageName = k;
+        mapTempImage.addAll({"$imageName": {}});
+        List list = v as List;
+        list.forEach((f) async {
+          // imageKey.add(f);
+          await getImageFilePool(imageKey: f, imageName: imageName).then((v) {
+            print("v $v");
+          });
+        });
+      });
+
+      print("-------------------------------------End");
+      // getImage(mapTempImage);
+    });
+  }
+
+  Future<List<String>> getImageFilePool(
+      {List<String> imageKey, String imageName}) async {
+    List<String> imageData = [];
+    List<FilePool> image;
+    imageKey.forEach((key) async {
+      image = await DBProviderAsset.db.getImagePoolReturn(key);
+      if (image.length > 0) {
+        // print("first.fileData => ${image.first.fileData}");
+        print("Eiei");
+        imageData.add(image.first.fileData);
+        return imageData;
+      } else {
+        return imageData = [];
+      }
+    });
+    return imageData;
   }
 
   List<String> listCatName = [];
@@ -620,41 +628,63 @@ class _MyAssetOfflineState extends State<MyAssetOffline> {
   getProductCateName(String catCode) async {
     var _catName = await DBProviderInitialApp.db
         .getProductCatName(id: catCode, lang: allTranslations.currentLanguage);
-    setState(() => listCatName.add(_catName));
-
+    // setState(() => listCatName.add(_catName));
+    listCatName.add(_catName);
+    imageDataEachGroup.forEach((v) {
+      print("title ${v.title}");
+      print("imageBase64 ${v.imageBase64.length}");
+    });
     return _catName;
   }
 
-  List<ImageDataEachGroup> getImage(ModelDataAsset images) {
-    Map<String, dynamic> tempImages;
+  List<ImageDataEachGroup> getImage(Map<String, dynamic> images) {
+    // Map<String, dynamic> tempImages;
     List<ImageDataEachGroup> tempImageDataEachGroup = [];
-    if (images.images != null) {
-      tempImages = jsonDecode(images.images);
-      tempImages.forEach((String k, dynamic v) {
-        var listTemp = v as List;
-        List<String> tempUrl = [];
-        for (var item in listTemp) {
-          tempUrl.add(item);
-          // setState(() {
-          //   listImageUrl.add(item);
-          // });
-        }
-        tempImageDataEachGroup
-            .add(ImageDataEachGroup(title: k, imageUrl: tempUrl));
+    if (images != null) {
+      images.forEach((String k, dynamic v) {
+        print("Key $k | Value $v");
+        //   var listTemp = v as List;
+        //   List<String> tempBase64 = [];
+        //   for (var item in listTemp) {
+        //     tempBase64.add(item);
+        //   }
+        //   tempImageDataEachGroup
+        //       .add(ImageDataEachGroup(title: k, imageBase64: tempBase64));
       });
-      setState(() => imageDataEachGroup = List.of(tempImageDataEachGroup));
+      // setState(() => imageDataEachGroup = List.of(tempImageDataEachGroup));
 
-      print("imageDataEachGroup => ${imageDataEachGroup.length}");
-      // tempImageDataEachGroup.forEach((v) {
-      //   print("Title : ${v.title} | url[${v.imageUrl.length}] ${v.imageUrl}");
-      // });
+      // print("imageDataEachGroup => ${imageDataEachGroup.length}");
     }
     return tempImageDataEachGroup;
   }
+  // List<ImageDataEachGroup> getImage(ModelDataAsset images) {
+  //   Map<String, dynamic> tempImages;
+  //   List<ImageDataEachGroup> tempImageDataEachGroup = [];
+  //   if (images.images != null) {
+  //     tempImages = jsonDecode(images.images);
+  //     tempImages.forEach((String k, dynamic v) {
+  //       var listTemp = v as List;
+  //       List<String> tempUrl = [];
+  //       for (var item in listTemp) {
+  //         tempUrl.add(item);
+  //         // setState(() {
+  //         //   listImageUrl.add(item);
+  //         // });
+  //       }
+  //       tempImageDataEachGroup
+  //           .add(ImageDataEachGroup(title: k, imageUrl: tempUrl));
+  //     });
+  //     setState(() => imageDataEachGroup = List.of(tempImageDataEachGroup));
+
+  //     print("imageDataEachGroup => ${imageDataEachGroup.length}");
+  //   }
+  //   return tempImageDataEachGroup;
+  // }
 
   @override
   void initState() {
     super.initState();
+    imageDataEachGroup = List<ImageDataEachGroup>();
     getModelData = getModelDataAsset();
   }
 
@@ -665,200 +695,133 @@ class _MyAssetOfflineState extends State<MyAssetOffline> {
       builder:
           (BuildContext context, AsyncSnapshot<List<ModelDataAsset>> snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          if (!(snapshot.hasError)) {
-            if (snapshot.data.isNotEmpty) {
-              return Padding(
-                padding: const EdgeInsets.fromLTRB(10, 15, 10, 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Column(
-                        children: snapshot.data.length > 0
-                            ? snapshot.data
-                                .map((data) => Card(
-                                      elevation: 5.0,
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(20)),
-                                      child: Container(
-                                        child: ListTile(
-                                          title: Row(
-                                            children: <Widget>[
-                                              if (data.imageMain != null)
-                                                CachedNetworkImage(
-                                                  imageUrl: data.imageMain,
-                                                  imageBuilder: (context,
-                                                          imageProvider) =>
-                                                      Container(
-                                                    width: 100,
-                                                    height: 100,
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              20),
-                                                      image: DecorationImage(
-                                                          image: imageProvider,
-                                                          fit: BoxFit.cover,
-                                                          colorFilter:
-                                                              ColorFilter.mode(
-                                                                  Colors.red,
-                                                                  BlendMode
-                                                                      .dstATop)),
-                                                    ),
-                                                  ),
-                                                  placeholder: (context, url) =>
-                                                      CircularProgressIndicator(),
-                                                  errorWidget:
-                                                      (context, url, error) =>
-                                                          Icon(
-                                                    Icons.error,
-                                                    size: 100,
-                                                  ),
-                                                )
-                                              else
-                                                imageDataEachGroup.length > 0
-                                                    ?
-                                                    // Image.memory(
-                                                    //         imageMain,
-                                                    //         width: 100,
-                                                    //         height: 100,
-                                                    //         fit: BoxFit.cover,
-                                                    //       )
-                                                    CachedNetworkImage(
-                                                        imageUrl:
-                                                            imageDataEachGroup
-                                                                .first
-                                                                .imageUrl
-                                                                .first,
-                                                        imageBuilder: (context,
-                                                                imageProvider) =>
-                                                            Container(
-                                                          width: 100,
-                                                          height: 100,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        20),
-                                                            image: DecorationImage(
-                                                                image:
-                                                                    imageProvider,
-                                                                fit: BoxFit
-                                                                    .cover,
-                                                                colorFilter:
-                                                                    ColorFilter.mode(
-                                                                        Colors
-                                                                            .red,
-                                                                        BlendMode
-                                                                            .dstATop)),
-                                                          ),
-                                                        ),
-                                                      )
-                                                    : Icon(
-                                                        Icons.error,
-                                                        size: 100,
-                                                      ),
-                                              Expanded(
-                                                flex: 2,
-                                                child: Container(
-                                                  padding: EdgeInsets.symmetric(
-                                                      vertical: 10,
-                                                      horizontal: 10),
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: <Widget>[
-                                                      TextBuilder.build(
-                                                          title: data.title ??
-                                                              "Empty title",
-                                                          style: TextStyleCustom
-                                                              .STYLE_LABEL_BOLD),
-                                                      TextBuilder.build(
-                                                          title: data
-                                                                  .custRemark ??
-                                                              "Empty Remark",
-                                                          style: TextStyleCustom
-                                                              .STYLE_CONTENT,
-                                                          textOverflow:
-                                                              TextOverflow
-                                                                  .ellipsis,
-                                                          maxLine: 2),
-                                                      TextBuilder.build(
-                                                          title:
-                                                              "\nExpire Date : ${data.warrantyExpire.split(" ").first ?? "Empty warrantyExpire"}\nRemaining : ${showDateRemaining(data.warrantyExpire)}",
-                                                          style: TextStyleCustom
-                                                              .STYLE_CONTENT
-                                                              .copyWith(
-                                                                  fontSize: 12),
-                                                          textOverflow:
-                                                              TextOverflow
-                                                                  .ellipsis,
-                                                          maxLine: 3),
-                                                      Container(
-                                                        margin:
-                                                            EdgeInsets.fromLTRB(
-                                                                0, 5, 5, 5),
-                                                        padding: EdgeInsets
-                                                            .symmetric(
-                                                                horizontal: 5,
-                                                                vertical: 5),
-                                                        decoration: BoxDecoration(
-                                                            color: ThemeColors
-                                                                .COLOR_GREY
-                                                                .withOpacity(
-                                                                    0.2),
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        20)),
-                                                        child: TextBuilder.build(
-                                                            title: listCatName[
-                                                                snapshot.data
-                                                                    .indexOf(
-                                                                        data)],
-                                                            style: TextStyleCustom
-                                                                .STYLE_CONTENT
-                                                                .copyWith(
-                                                                    fontSize:
-                                                                        14,
-                                                                    color: ThemeColors
-                                                                        .COLOR_BLACK)),
-                                                      )
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          onTap: () async {
-                                            ecsLib.pushPage(
-                                              context: context,
-                                              pageWidget: DetailAsset(
-                                                dataAsset: data,
-                                                showDetailOnline: false,
-                                                dataScan: null,
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                    ))
-                                .toList()
-                            : Text("Data length == 0")),
-                  ],
-                ),
-              );
-            } else {
-              return Center(
-                child: TextBuilder.build(title: "Data offline is empty"),
-              );
-            }
-          } else {
-            return Text("Error");
-          }
+          if (snapshot.data.isNotEmpty) {
+            print("Amount asset => ${snapshot.data.length}");
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(10, 15, 10, 10),
+              child: Column(
+                  children: snapshot.data.map((data) {
+                print("Asset No. ${snapshot.data.indexOf(data)}");
+                return Card(
+                  elevation: 5.0,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)),
+                  child: Container(
+                    child: ListTile(
+                      title: Row(
+                        children: <Widget>[
+                          if (data.imageMain != null)
+                            CachedNetworkImage(
+                              imageUrl: data.imageMain,
+                              imageBuilder: (context, imageProvider) =>
+                                  Container(
+                                width: 100,
+                                height: 100,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20),
+                                  image: DecorationImage(
+                                      image: imageProvider,
+                                      fit: BoxFit.cover,
+                                      colorFilter: ColorFilter.mode(
+                                          Colors.red, BlendMode.dstATop)),
+                                ),
+                              ),
+                              placeholder: (context, url) =>
+                                  CircularProgressIndicator(),
+                              errorWidget: (context, url, error) => Icon(
+                                Icons.error,
+                                size: 100,
+                              ),
+                            )
+                          else
+                            imageDataEachGroup != null &&
+                                    imageDataEachGroup.length > 0
+                                ? ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.memory(
+                                      base64Decode(imageDataEachGroup[
+                                              (snapshot.data.indexOf(data))]
+                                          .imageBase64
+                                          .first),
+                                      width: 130,
+                                      height: 130,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  )
+                                : Icon(
+                                    Icons.error,
+                                    size: 100,
+                                  ),
+                          Expanded(
+                            flex: 2,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 10),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  TextBuilder.build(
+                                      title: data.title ?? "Empty title",
+                                      style: TextStyleCustom.STYLE_LABEL_BOLD),
+                                  TextBuilder.build(
+                                      title: data.custRemark ?? "Empty Remark",
+                                      style: TextStyleCustom.STYLE_CONTENT,
+                                      textOverflow: TextOverflow.ellipsis,
+                                      maxLine: 2),
+                                  TextBuilder.build(
+                                      title:
+                                          "\nExpire Date : ${data.warrantyExpire.split(" ").first ?? "Empty warrantyExpire"}\nRemaining : ${showDateRemaining(data.warrantyExpire)}",
+                                      style: TextStyleCustom.STYLE_CONTENT
+                                          .copyWith(fontSize: 12),
+                                      textOverflow: TextOverflow.ellipsis,
+                                      maxLine: 3),
+                                  Container(
+                                    margin: EdgeInsets.fromLTRB(0, 5, 5, 5),
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 5, vertical: 5),
+                                    decoration: BoxDecoration(
+                                        color: ThemeColors.COLOR_GREY
+                                            .withOpacity(0.2),
+                                        borderRadius:
+                                            BorderRadius.circular(20)),
+                                    child: TextBuilder.build(
+                                        title: listCatName[
+                                            snapshot.data.indexOf(data)],
+                                        style: TextStyleCustom.STYLE_CONTENT
+                                            .copyWith(
+                                                fontSize: 14,
+                                                color:
+                                                    ThemeColors.COLOR_BLACK)),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      onTap: () async {
+                        ecsLib.pushPage(
+                          context: context,
+                          pageWidget: DetailAsset(
+                            dataAsset: data,
+                            showDetailOnline: false,
+                            dataScan: null,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                );
+              }).toList()),
+            );
+          } else if (snapshot.data.isEmpty) {
+            return Center(
+              child: TextBuilder.build(title: "Data offline is empty"),
+            );
+          } else
+            return Center(
+              child: TextBuilder.build(title: "Error"),
+            );
         } else if (snapshot.connectionState == ConnectionState.waiting) {
           return CircularProgressIndicator();
         } else {

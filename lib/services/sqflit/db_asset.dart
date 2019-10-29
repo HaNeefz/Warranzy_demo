@@ -199,6 +199,19 @@ BlockchainID */
       return null;
   }
 
+  Future<List<FilePool>> getImagePoolReturn(String fileID) async {
+    final db = await database;
+    List<FilePool> filePool = [];
+    var tempImageValue = await db
+        .rawQuery("SELECT * FROM $tableFilePool WHERE FileID = '$fileID'");
+
+    if (tempImageValue.isNotEmpty) {
+      tempImageValue.forEach((v) => filePool.add(FilePool.fromJson(v)));
+      return filePool;
+    } else
+      return [];
+  }
+
   Future<bool> hasDataAsset() async {
     final db = await database;
     var res = await db.rawQuery(

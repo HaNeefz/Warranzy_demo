@@ -341,7 +341,7 @@ class _TakePhotosState extends State<TakePhotos> {
 }
 
 class ImageDataEachGroup {
-  final String title;
+  String title;
   List<File> imagesList;
   List<String> imageBase64;
   List<String> imageUrl;

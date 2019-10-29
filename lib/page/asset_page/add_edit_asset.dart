@@ -15,6 +15,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:warranzy_demo/models/model_get_brand_name.dart';
 import 'package:warranzy_demo/models/model_repository_init_app.dart';
 import 'package:warranzy_demo/models/model_respository_asset.dart';
+import 'package:warranzy_demo/models/model_user.dart';
 import 'package:warranzy_demo/page/asset_page/add_assets_page/scAdd_image_demo.dart';
 import 'package:warranzy_demo/page/asset_page/detail_asset_page/scDetailAsset.dart';
 import 'package:warranzy_demo/page/asset_page/detail_asset_page/scEditDetailAsset.dart';
@@ -812,6 +813,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
     bool _completed = false;
     var dataPost = {"Data": postData, "Images": {}};
     print("Submit");
+    // var tempImageData = {};
     ecsLib.showDialogLoadingLib(context, content: "Image compressing");
     try {
       for (int i = 0; i < listTempData.length; i++) {
@@ -834,14 +836,17 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
         }
       }
       var imageData = {};
+
       try {
         for (var modelImage in listTempData) {
           imageData.addAll({"${modelImage.title}": {}});
+          // tempImageData.addAll({"${modelImage.title}": {}});
           for (var imageBase64Data in modelImage.imageBase64) {
             imageData["${modelImage.title}"].addAll({
               "${modelImage.imageBase64.indexOf(imageBase64Data)}":
                   imageBase64Data
             });
+            // tempImageData.addAll({"${modelImage.title}": imageBase64Data});
           }
         }
         dataPost.addAll({"Images": imageData});
@@ -854,6 +859,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
     ecsLib.cancelDialogLoadindLib(context);
 
     ecsLib.printJson(dataPost);
+    // ecsLib.printJson(tempImageData);
     ecsLib.showDialogLoadingLib(context, content: "Adding assets");
     try {
       await Repository.addAsset(body: dataPost).then((res) async {
@@ -861,23 +867,27 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
         ecsLib.cancelDialogLoadindLib(context);
         if (res.status == true) {
           try {
-            await DBProviderAsset.db.insertDataWarranzyUesd(res.warranzyUsed);
-            // .catchError((onError) => print("warranzyUsed : $onError"));
+            await DBProviderAsset.db
+                .insertDataWarranzyUesd(res.warranzyUsed)
+                .catchError((onError) => print("warranzyUsed : $onError"));
           } catch (e) {
             print("insertDataWarranzyUesd => $e");
           }
           try {
-            await DBProviderAsset.db.insertDataWarranzyLog(res.warranzyLog);
-            // .catchError((onError) => print("warranzyLog $onError"));
+            await DBProviderAsset.db
+                .insertDataWarranzyLog(res.warranzyLog)
+                .catchError((onError) => print("warranzyLog $onError"));
           } catch (e) {
             print("insertDataWarranzyLog => $e");
           }
-          try {
-            await DBProviderAsset.db
-                .inserDataBrand(res.brand)
-                .catchError((onError) => print("Insert Name brand $onError"));
-          } catch (e) {
-            print("Insert Name brand $e");
+          if (txtBrandCode.text == null || txtBrandCode.text == "") {
+            try {
+              await DBProviderAsset.db
+                  .inserDataBrand(res.brand)
+                  .catchError((onError) => print("Insert Name brand $onError"));
+            } catch (e) {
+              print("Insert Name brand $e");
+            }
           }
           res.filePool.forEach((data) async {
             try {
