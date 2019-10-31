@@ -171,8 +171,8 @@ class _AssetPageState extends State<AssetPage> {
 
     return Column(
       children: <Widget>[
-        // buildAssetOffine(),
-        MyAssetOffline(),
+        buildAssetOffine(),
+        // MyAssetOffline(),
         // buildAssetOnline(),
       ],
     );
@@ -860,58 +860,112 @@ class _MyAssetFormSQLiteState extends State<MyAssetFormSQLite> {
   final Dio dio = Dio();
   final ecsLib = getIt.get<ECSLib>();
   final allTranslations = getIt.get<GlobalTranslations>();
+  List<Map<String, List<String>>> keyImage = [];
   List<ImageDataEachGroup> imageDataEachGroup = [];
+  List<String> imageData = [];
+  List<String> tempImageData = [];
   String catName = '';
 
   getProductCateName() async {
     var _catName = await DBProviderInitialApp.db.getProductCatName(
         id: widget.data.pdtCatCode, lang: allTranslations.currentLanguage);
-    setState(() {
-      catName = _catName;
-      // print("catName ====================> $catName");
-    });
+    // setState(() {
+    catName = _catName;
+    // print("catName ====================> $catName");
+    // });
   }
 
   @override
   void initState() {
     super.initState();
-    print(widget.data.alertDate);
+    // print(widget.data.alertDate);
     getProductCateName();
+    separateImage(widget.data);
+    // getImage();
     // if (widget.data.createType == "C") {
-    print("widget.data.fileAttachID => ${widget.data.fileAttachID}");
-    getImage(widget.data);
     // imageDataEachGroup = List.of(getImage(widget.data));
-    imageDataEachGroup.forEach((v) {
-      print("getImage---------------------------->");
-      print(v.imageUrl);
-    });
+    // imageDataEachGroup.forEach((v) {
+    //   print("getImage---------------------------->");
+    //   print(v.imageUrl);
+    // });
     // }
   }
 
-  List<ImageDataEachGroup> getImage(ModelDataAsset images) {
+  separateImage(ModelDataAsset images) async {
     Map<String, dynamic> tempImages;
     List<ImageDataEachGroup> tempImageDataEachGroup = [];
-    if (images.images != null) {
-      tempImages = jsonDecode(images.images);
+    // List<Map<String, List<String>>> keyImage = [];
+    List<String> tempKey = [];
+    String imageName = '';
+    if (images.fileAttachID != null) {
+      print("======== WTOKENID => ${images.wTokenID} ========");
+      tempImages = jsonDecode(images.fileAttachID);
+      print("images.fileAttachID => ${images.fileAttachID}");
+
       tempImages.forEach((String k, dynamic v) {
-        var listTemp = v as List;
-        List<String> tempUrl = [];
-        for (var item in listTemp) {
-          tempUrl.add(item);
-          // setState(() {
-          //   listImageUrl.add(item);
-          // });
+        imageName = k;
+        List listTempKey = v as List;
+        print("New Value length : ${listTempKey.length}");
+        print("======== Name : $k");
+        int index = 1;
+        int listTempKeyLength = listTempKey.length;
+        for (var key in listTempKey) {
+          if (listTempKeyLength >= index) {
+            print("Value index No. $index");
+            print("========= KEY : $key");
+            tempKey.add(key);
+          } else {
+            // print("index $index");
+            print("length limit");
+          }
+          index++;
         }
-        tempImageDataEachGroup
-            .add(ImageDataEachGroup(title: k, imageUrl: tempUrl));
+        keyImage.add({"$k": tempKey});
+        tempKey = [];
       });
-      imageDataEachGroup = List.of(tempImageDataEachGroup);
-      // tempImageDataEachGroup.forEach((v) {
-      //   print("Title : ${v.title} | url[${v.imageUrl.length}] ${v.imageUrl}");
+      print("keyImage => $keyImage");
+      imageName = keyImage.first.keys.toList().first;
+      print("getImage by ${keyImage.first[imageName].first}");
+      await DBProviderAsset.db
+          .getImagePoolReturn(keyImage.first[imageName].first)
+          .then((dataImage) {
+        if (dataImage != null) {
+          imageData.add(dataImage.first.fileData);
+        } else {
+          print("getImagePool is Null");
+        }
+      });
+      tempImageDataEachGroup
+          .add(ImageDataEachGroup(title: imageName, imageBase64: imageData));
+      setState(() => imageDataEachGroup = List.of(tempImageDataEachGroup));
+      print("added ${imageDataEachGroup.length}");
       // });
+      print("keyImage After Added => $keyImage ");
     }
+    print("--------");
     return tempImageDataEachGroup;
   }
+  // List<ImageDataEachGroup> getImage(ModelDataAsset images) {
+  //   Map<String, dynamic> tempImages;
+  //   List<ImageDataEachGroup> tempImageDataEachGroup = [];
+  //   if (images.images != null) {
+  //     tempImages = jsonDecode(images.images);
+  //     tempImages.forEach((String k, dynamic v) {
+  //       var listTemp = v as List;
+  //       List<String> tempUrl = [];
+  //       for (var item in listTemp) {
+  //         tempUrl.add(item);
+  //         // setState(() {
+  //         //   listImageUrl.add(item);
+  //         // });
+  //       }
+  //       tempImageDataEachGroup
+  //           .add(ImageDataEachGroup(title: k, imageUrl: tempUrl));
+  //     });
+  //     imageDataEachGroup = List.of(tempImageDataEachGroup);
+  //   }
+  //   return tempImageDataEachGroup;
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -922,17 +976,6 @@ class _MyAssetFormSQLiteState extends State<MyAssetFormSQLite> {
         child: ListTile(
           title: Row(
             children: <Widget>[
-              // Container(
-              //   width: 100,
-              //   height: 100,
-              //   decoration: BoxDecoration(
-              //       border: Border.all(
-              //           width: 0.3, color: ThemeColors.COLOR_THEME_APP),
-              //       borderRadius: BorderRadius.circular(10)),
-              //   child: Center(
-              //     child: FlutterLogo(),
-              //   ),
-              // ),
               if (widget.data.imageMain != null)
                 CachedNetworkImage(
                   imageUrl: widget.data.imageMain,
@@ -956,24 +999,19 @@ class _MyAssetFormSQLiteState extends State<MyAssetFormSQLite> {
                 )
               else
                 imageDataEachGroup.length > 0
-                    ? CachedNetworkImage(
-                        imageUrl: imageDataEachGroup.first.imageUrl.first,
-                        imageBuilder: (context, imageProvider) => Container(
-                          width: 100,
-                          height: 100,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            image: DecorationImage(
-                                image: imageProvider,
-                                fit: BoxFit.cover,
-                                colorFilter: ColorFilter.mode(
-                                    Colors.red, BlendMode.dstATop)),
-                          ),
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.memory(
+                          base64Decode(
+                              imageDataEachGroup.first.imageBase64.first),
+                          width: 120,
+                          height: 120,
+                          fit: BoxFit.cover,
                         ),
                       )
                     : Icon(
-                        Icons.edit,
-                        size: 100,
+                        Icons.error,
+                        size: 150,
                       ),
               Expanded(
                 flex: 2,
@@ -1020,8 +1058,9 @@ class _MyAssetFormSQLiteState extends State<MyAssetFormSQLite> {
               context: context,
               pageWidget: DetailAsset(
                 dataAsset: widget.data,
-                showDetailOnline: false,
+                showDetailOnline: true,
                 dataScan: null,
+                listImage: keyImage,
               ),
             );
           },

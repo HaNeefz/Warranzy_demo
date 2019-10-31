@@ -143,25 +143,40 @@ BlockchainID */
         .then((v) => print("Delete tableFilePool => $v"));
   }
 
-  Future deleteAssetByWToken(String wTokenID) async {
+  Future deleteAssetByWToken({String wTokenID, List<String> imageKey}) async {
     final db = await database;
     await db
         .rawDelete(
             "DELETE FROM $tableWarranzyUsed WHERE WTokenID = '$wTokenID'")
         .then((onValue) {
       print("Deleted $tableWarranzyUsed => $onValue at WTokenID = $wTokenID");
-    });
+    }).catchError(
+            (onError) => print("Error delete $tableWarranzyUsed : $onError"));
     await db
         .rawDelete("DELETE FROM $tableWarranzyLog WHERE WTokenID = '$wTokenID'")
         .then((onValue) {
       print("Deleted $tableWarranzyLog => $onValue at WTokenID = $wTokenID");
-    });
+    }).catchError(
+            (onError) => print("Error delete $tableWarranzyLog : $onError"));
+
+    imageKey.map((key) async {
+      await deleteImagePoolByKey(key);
+    }).toList();
     // await db.delete(tableWarranzyUsed, where: 'WTokenID', whereArgs: [
     //   '$wTokenID'
     // ]).then((v) => print("Delete tableWarranzyUsed => $v"));
     // await db.delete(tableWarranzyLog, where: 'WTokenID', whereArgs: [
     //   '$wTokenID'
     // ]).then((v) => print("Delete tableWarranzyLog => $v"));
+  }
+
+  Future deleteImagePoolByKey(String key) async {
+    final db = await database;
+    await db
+        .rawDelete("DELETE FROM $tableFilePool WHERE FileID = '$key'")
+        .then((i) {
+      print("Deleted key $key : return $i");
+    }).catchError((onError) => print("Error delete $tableFilePool : $onError"));
   }
 
   Future<List<ModelDataAsset>> getAllDataAsset() async {

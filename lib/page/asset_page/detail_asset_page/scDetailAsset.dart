@@ -99,6 +99,7 @@ class DetailAsset extends StatefulWidget {
   final bool showDetailOnline;
   final ModelDataAsset dataAsset;
   final ModelDataScan dataScan;
+  final List<Map<String, List<String>>> listImage;
 
   const DetailAsset(
       {Key key,
@@ -106,7 +107,8 @@ class DetailAsset extends StatefulWidget {
       this.editAble = true,
       this.dataAsset,
       this.showDetailOnline,
-      this.dataScan})
+      this.dataScan,
+      this.listImage})
       : super(key: key);
 
   @override
@@ -119,16 +121,17 @@ class _DetailAssetState extends State<DetailAsset> {
   ModelDataAsset get _data => widget.dataAsset;
   List<ImageDataEachGroup> imageDataEachGroup = [];
   List<String> listImageUrl = [];
+  List<String> imageData = [];
+  List<String> imageKey = [];
   String catName = '';
   String brandName = '';
 
   getProductCateName() async {
     var _catName = await DBProviderInitialApp.db.getProductCatName(
         id: _data.pdtCatCode, lang: allTranslations.currentLanguage);
-    setState(() {
-      catName = _catName;
-      print("catName ====================> $catName");
-    });
+
+    catName = _catName;
+    print("catName ====================> $catName");
   }
 
   getBrandName() async {
@@ -138,13 +141,34 @@ class _DetailAssetState extends State<DetailAsset> {
     });
   }
 
+  getImage() async {
+    print(widget.listImage);
+    widget.listImage.map((map) {
+      print("key : ${map.values.toList().first}");
+      map.values.toList().first.forEach((v) async {
+        imageKey.add(v);
+        print("imageKey: $imageKey");
+        await DBProviderAsset.db.getImagePoolReturn(v).then((filePool) {
+          imageData.add(filePool.first.fileData);
+        });
+      });
+    }).toList();
+  }
+
   void initState() {
     super.initState();
-    imageDataEachGroup = getImage(_data);
-
-    print(_data.alertDate);
+    getImage();
+    getImageUrl(widget.dataAsset);
     getProductCateName();
     getBrandName();
+    // widget.listImage.forEach((v) {
+    //   v.values.toList().forEach((vv) {
+    //     vv.forEach((vvv) {
+    //       imageKey.add(vvv);
+    //     });
+    //   });
+    // });
+    // print("imageKey : $imageKey");
   }
 
   goToEditPageForEditImage(bool editImage) {
@@ -212,7 +236,9 @@ class _DetailAssetState extends State<DetailAsset> {
                 items: widget.dataScan == null
                     ? listImageUrl != null && listImageUrl.length > 0
                         ? showProductImage(listImageUrl)
-                        : Iterable.generate(4, (i) => testImage()).toList()
+                        : imageData != null && imageData.length > 0
+                            ? showProductImage(imageData, isImageBase64: true)
+                            : Iterable.generate(4, (i) => testImage()).toList()
                     : showProductImage(widget.dataScan.fileImageID)),
           ),
           SliverList(
@@ -384,8 +410,9 @@ class _DetailAssetState extends State<DetailAsset> {
                   ecsLib.cancelDialogLoadindLib(context);
                   if (res?.status == true) {
                     print("Data => ${res.data}");
-                    await DBProviderAsset.db
-                        .deleteAssetByWToken(_data.wTokenID);
+                    await DBProviderAsset.db.deleteAssetByWToken(
+                        wTokenID: _data.wTokenID, imageKey: imageKey);
+                    // await DBProviderAsset.db.
                     ecsLib.pushPageAndClearAllScene(
                       context: context,
                       pageWidget: MainPage(),
@@ -638,7 +665,7 @@ class _DetailAssetState extends State<DetailAsset> {
     );
   }
 
-  List<ImageDataEachGroup> getImage(ModelDataAsset images) {
+  List<ImageDataEachGroup> getImageUrl(ModelDataAsset images) {
     Map<String, dynamic> tempImages;
     List<ImageDataEachGroup> tempImageDataEachGroup = [];
     if (images.images != null) {
@@ -648,9 +675,9 @@ class _DetailAssetState extends State<DetailAsset> {
         List<String> tempUrl = [];
         for (var item in listTemp) {
           tempUrl.add(item);
-          setState(() {
-            listImageUrl.add(item);
-          });
+          // setState(() {
+          listImageUrl.add(item);
+          // });
         }
         tempImageDataEachGroup
             .add(ImageDataEachGroup(title: k, imageUrl: tempUrl));
@@ -663,7 +690,10 @@ class _DetailAssetState extends State<DetailAsset> {
   }
 
   List showProductImage(List<dynamic> imgPath,
-      {double width = 150, double height = 150, EdgeInsetsGeometry padding}) {
+      {double width = 150,
+      double height = 150,
+      EdgeInsetsGeometry padding,
+      bool isImageBase64 = false}) {
     if (imgPath != null && imgPath != [])
       return Iterable.generate(
         imgPath.length,
@@ -675,27 +705,35 @@ class _DetailAssetState extends State<DetailAsset> {
                       image: imgPath,
                       heroTag: "image$i",
                       currentIndex: i,
+                      isImageBase64: true,
                     )));
           },
-          child: CachedNetworkImage(
-            imageUrl: imgPath[i],
-            imageBuilder: (context, imageProvider) => Container(
-              width: width,
-              height: height,
-              margin: padding,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(40),
-                image: DecorationImage(
-                    image: imageProvider,
-                    fit: BoxFit.cover,
-                    colorFilter:
-                        ColorFilter.mode(Colors.red, BlendMode.dstATop)),
-              ),
-            ),
-            placeholder: (context, url) =>
-                Center(child: CircularProgressIndicator()),
-            errorWidget: (context, url, error) => Icon(Icons.error),
-          ),
+          child: isImageBase64 == false
+              ? CachedNetworkImage(
+                  imageUrl: imgPath[i],
+                  imageBuilder: (context, imageProvider) => Container(
+                    width: width,
+                    height: height,
+                    margin: padding,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(40),
+                      image: DecorationImage(
+                          image: imageProvider,
+                          fit: BoxFit.cover,
+                          colorFilter:
+                              ColorFilter.mode(Colors.red, BlendMode.dstATop)),
+                    ),
+                  ),
+                  placeholder: (context, url) =>
+                      Center(child: CircularProgressIndicator()),
+                  errorWidget: (context, url, error) => Icon(Icons.error),
+                )
+              : Image.memory(
+                  base64Decode(imgPath[i]),
+                  width: width,
+                  height: height,
+                  fit: BoxFit.cover,
+                ),
         ),
       ).toList();
     else

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -146,12 +147,14 @@ Positioned numberImage(int index) {
 class PhotoViewPage extends StatefulWidget {
   final List image;
   final String heroTag;
+  final bool isImageBase64;
   int currentIndex;
   PhotoViewPage({
     Key key,
     this.image,
     this.heroTag,
     this.currentIndex,
+    this.isImageBase64 = false,
   }) : super(key: key);
   @override
   _PhotoViewPageState createState() => _PhotoViewPageState();
@@ -248,7 +251,7 @@ class _PhotoViewPageState extends State<PhotoViewPage> {
                   //   );
                   // },
                 )
-              : widget.image is List<String>
+              : widget.image is List<String> && widget.isImageBase64 == false
                   ? ExtendedImage.network(
                       widget.image[index],
                       width: MediaQuery.of(context).size.width,
@@ -279,7 +282,7 @@ class _PhotoViewPageState extends State<PhotoViewPage> {
                       // },
                     )
                   : ExtendedImage.memory(
-                      widget.image[index],
+                      base64Decode(widget.image[index]),
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.height,
                       enableSlideOutPage: true,
