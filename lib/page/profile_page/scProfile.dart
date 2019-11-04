@@ -237,16 +237,17 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: Text("GetAsset"),
                 onPressed: () async {
                   // Map<String, dynamic> tempM = {};
-                  // List<ModelDataAsset> modelData =
-                  //     await DBProviderAsset.db.getAllDataAsset();
-                  // for (var temp in modelData) {
-                  //   Map<String, dynamic> jsonDecoder =
-                  //       jsonDecode(temp.fileAttachID);
-                  //   tempM = await getListImage(jsonDecoder);
-                  //   print(tempM);
-                  //   // print(jsonDecoder);
-                  //   print("---------------");
-                  // }
+                  List<ModelDataAsset> modelData =
+                      await DBProviderAsset.db.getAllDataAsset();
+                  for (var temp in modelData) {
+                    print(temp.fileAttachID);
+                    //   Map<String, dynamic> jsonDecoder =
+                    //       jsonDecode(temp.fileAttachID);
+                    //   tempM = await getListImage(jsonDecoder);
+                    //   print(tempM);
+                    //   // print(jsonDecoder);
+                    //   print("---------------");
+                  }
                   // await DBProviderAsset.db.getMainImage();
                   await DBProviderAsset.db.getAllBrandName();
                 },

@@ -80,6 +80,7 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
             ecsLib.cancelDialogLoadindLib(context);
             ecsLib.showDialogLoadingLib(context, content: "Setting App");
             await DBProviderInitialApp.db.deleteAllDataIn3Table();
+            await getBrandName();
             temp.country.forEach((v) async => await DBProviderInitialApp.db
                 .insertDataInToTableCountry(v)
                 .catchError((onError) => print("Country $onError")));
@@ -109,7 +110,7 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
               });
             });
             // ecsLib.cancelDialogLoadindLib(context);
-            await getBrandName();
+
             ecsLib.pushPageReplacement(
                 context: context, pageWidget: LoginPage());
           } else
@@ -124,16 +125,16 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
   }
 
   Future<bool> getBrandName() async {
+    print("get in");
     bool success = false;
     int length = 0;
     int amountOfBrand = 0;
-    amountOfBrand =
-        await Firestore.instance.collection("BrandName").snapshots().length;
-    print("AllBrand amount is $amountOfBrand");
     Firestore.instance
         .collection('BrandName')
         .snapshots()
         .listen((onData) async {
+      print("listen OK");
+      amountOfBrand = onData.documents.length;
       for (var temp in onData.documents) {
         String docID = temp.documentID;
         temp.data.addAll({"DocumentID": docID});

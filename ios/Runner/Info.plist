@@ -45,10 +45,10 @@
 	<string>This app needs access to location when open.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Microphone permission is required for recording.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>PhotoLibrary permission is required for get Picture.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>PhotoLibrary permission is required for add Picture.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>PhotoLibrary permission is required for get Picture.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>

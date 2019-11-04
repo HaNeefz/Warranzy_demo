@@ -75,6 +75,7 @@ flutter:
     - assets/logo/
     - assets/cfg/
     - assets/icons/icons_category/
+    - assets/icons/avatars/
 
   fonts:
     - family: Supermarket

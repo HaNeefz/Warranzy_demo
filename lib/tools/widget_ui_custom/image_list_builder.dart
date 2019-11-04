@@ -15,6 +15,7 @@ class ImageListBuilder {
       {@required BuildContext context,
       @required List imageData,
       bool editAble = false,
+      bool isImageBase64 = false,
       double cornerRadius = 20.0,
       int crossAxisCount = 3,
       String heroTag = "",
@@ -46,6 +47,7 @@ class ImageListBuilder {
                           image: imageData,
                           heroTag: "${heroTag}image$index",
                           currentIndex: index,
+                          isImageBase64: isImageBase64,
                         )));
               },
               child: Stack(

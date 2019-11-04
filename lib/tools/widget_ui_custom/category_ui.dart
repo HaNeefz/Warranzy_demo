@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
@@ -20,6 +21,27 @@ class CategoryUI extends StatefulWidget {
 class _CategoryUIState extends State<CategoryUI> {
   final ecsLib = getIt.get<ECSLib>();
   final allTranslations = getIt.get<GlobalTranslations>();
+  final Future<SharedPreferences> _pref = SharedPreferences.getInstance();
+
+  checkTempPreference() async {
+    final pref = await _pref;
+    // pref.
+  }
+
+  List<String> imagePath = [];
+  @override
+  void initState() {
+    super.initState();
+    widget.category.forEach((v) {
+      // imagePath = List.of(v.values.toList().first);
+      // print("v : $v");
+      // v.values.toList().first.forEach((v){
+
+      // });
+      print(v['Logo']);
+      setState(() => imagePath.add(v['Logo']));
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,8 +62,13 @@ class _CategoryUIState extends State<CategoryUI> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   ListTile(
-                    leading: Image.asset("${v['Logo']}",
-                        width: 30, height: 30, fit: BoxFit.contain),
+                    leading: ImageView.show(
+                        path: imagePath[widget.category.indexOf(v)]),
+                    //  new ImageViewer(
+                    //   imagePath: v['Logo'],
+                    // ),
+                    // Image.asset("${v['Logo']}",
+                    //     width: 30, height: 30, fit: BoxFit.contain),
                     title: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
@@ -77,5 +104,40 @@ class _CategoryUIState extends State<CategoryUI> {
             }).toList()),
       ),
     );
+  }
+}
+
+class ImageView {
+  static Widget show({String path}) {
+    return path != null
+        ? Image.asset(
+            path,
+            fit: BoxFit.contain,
+            width: 30,
+            height: 30,
+          )
+        : Icon(Icons.error);
+  }
+}
+
+class ImageViewer extends StatelessWidget {
+  final imagePath;
+  const ImageViewer({
+    Key key,
+    this.imagePath,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return imagePath != null
+        ? Container(
+            width: 30,
+            height: 30,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                  image: AssetImage(imagePath), fit: BoxFit.contain),
+            ),
+          )
+        : Icon(Icons.error);
   }
 }

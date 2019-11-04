@@ -127,6 +127,8 @@ class _DetailAssetState extends State<DetailAsset> {
   String brandName = '';
 
   getProductCateName() async {
+    print(
+        "carID : ${_data.pdtCatCode} | lang: ${allTranslations.currentLanguage}");
     var _catName = await DBProviderInitialApp.db.getProductCatName(
         id: _data.pdtCatCode, lang: allTranslations.currentLanguage);
 
@@ -142,43 +144,65 @@ class _DetailAssetState extends State<DetailAsset> {
   }
 
   getImage() async {
-    print(widget.listImage);
+    //keep all tempKey
+    List<String> _key = [];
+    print("widget.listImage => ${widget.listImage}");
+    //loop for get data type list<Map<..,..>>
     widget.listImage.map((map) {
-      print("key : ${map.values.toList().first}");
-      map.values.toList().first.forEach((v) async {
-        imageKey.add(v);
-        print("imageKey: $imageKey");
-        await DBProviderAsset.db.getImagePoolReturn(v).then((filePool) {
-          imageData.add(filePool.first.fileData);
+      // loop get data type Map for output to key,value . To continue to use.
+      map.forEach((k, v) {
+        // print("k : $k | v : $v");
+        //add data image each group
+        imageDataEachGroup.add(ImageDataEachGroup(title: k, imageBase64: v));
+        // loop cause v (as Value) isList for getAllKey
+        v.forEach((v) {
+          //add imageKey
+          _key.add(v);
         });
       });
+      print("_key => $_key");
+
+      //loop all key in loop of Type each Image ex. "Image_Product"
+      _key.forEach((key) async {
+        // keep All KEY_IMAGE for delete each image.
+        imageKey.add(key);
+        //getAllImage by keyImage
+        await DBProviderAsset.db.getImagePoolReturn(key).then((filePool) {
+          //addImage for show in widget
+          setState(() => imageData.add(filePool.first.fileData));
+        });
+      });
+      //clear tempKey cause duplicate in loop
+      _key = [];
     }).toList();
+    print("imageKey => $imageKey");
+    // imageDataEachGroup.forEach((v) {
+    //   print("title : ${v.title} | base64 : ${v.imageBase64}");
+    // });
   }
 
   void initState() {
     super.initState();
     getImage();
-    getImageUrl(widget.dataAsset);
+    // getImageUrl(widget.dataAsset);
     getProductCateName();
     getBrandName();
-    // widget.listImage.forEach((v) {
-    //   v.values.toList().forEach((vv) {
-    //     vv.forEach((vvv) {
-    //       imageKey.add(vvv);
-    //     });
-    //   });
-    // });
-    // print("imageKey : $imageKey");
   }
 
   goToEditPageForEditImage(bool editImage) {
     // if (editImage == true)
+    Map<String, List<String>> _tempFileAttach = {};
+    widget.listImage.forEach((v) {
+      _tempFileAttach.addAll(v);
+    });
+    // print("<DetailAsset> fileAttach => $_tempFileAttach");
     ecsLib.pushPage(
       context: context,
       pageWidget: EditDetailAsset(
         editingImage: editImage,
         modelDataAsset: _data,
         imageDataEachGroup: imageDataEachGroup,
+        fileAttach: _tempFileAttach,
       ),
     );
   }
@@ -196,9 +220,9 @@ class _DetailAssetState extends State<DetailAsset> {
         color: Colors.transparent,
         boxShadow: [
           BoxShadow(
-            color: Colors.teal,
-            spreadRadius: 2,
-            blurRadius: 30,
+            color: Colors.black.withOpacity(0.3),
+            spreadRadius: 15,
+            blurRadius: 1,
           ),
         ],
       ),
@@ -233,13 +257,12 @@ class _DetailAssetState extends State<DetailAsset> {
                 autoPlay: false,
                 height: 400,
                 viewportFraction: 1.0,
-                items: widget.dataScan == null
-                    ? listImageUrl != null && listImageUrl.length > 0
-                        ? showProductImage(listImageUrl)
-                        : imageData != null && imageData.length > 0
-                            ? showProductImage(imageData, isImageBase64: true)
-                            : Iterable.generate(4, (i) => testImage()).toList()
-                    : showProductImage(widget.dataScan.fileImageID)),
+                items: widget.dataScan == null &&
+                        widget.dataAsset.createType == "C"
+                    ? imageData != null && imageData.length > 0
+                        ? showProductImage(imageData, isImageBase64: true)
+                        : Iterable.generate(4, (i) => testImage()).toList()
+                    : showProductImage(widget?.dataScan?.fileImageID ?? null)),
           ),
           SliverList(
             delegate: SliverChildListDelegate([
@@ -448,7 +471,7 @@ class _DetailAssetState extends State<DetailAsset> {
                 actionPageForAdd: true,
                 pageType:
                     _data.createType == "C" ? PageType.MANUAL : PageType.SCANQR,
-                listImageDataEachGroup: []),
+                listImageDataEachGroup: imageDataEachGroup),
           );
         });
   }
@@ -544,13 +567,15 @@ class _DetailAssetState extends State<DetailAsset> {
           ),
           Container(
             height: 300,
+            padding: EdgeInsets.only(top: 10),
             child: ListView(
               shrinkWrap: true,
               scrollDirection: Axis.horizontal,
-              children: showProductImage(listImageUrl,
+              children: showProductImage(imageData,
+                  isImageBase64: true,
                   width: 250,
                   height: 250,
-                  padding: EdgeInsets.only(right: 5, top: 10)),
+                  padding: EdgeInsets.only(right: 5, top: 5)),
             ),
           )
         ],
@@ -694,49 +719,57 @@ class _DetailAssetState extends State<DetailAsset> {
       double height = 150,
       EdgeInsetsGeometry padding,
       bool isImageBase64 = false}) {
-    if (imgPath != null && imgPath != [])
+    // print("imgPath : $imgPath");
+    if (imgPath.isNotEmpty && imgPath.length > 0 && imgPath != null) {
       return Iterable.generate(
         imgPath.length,
         (i) => GestureDetector(
-          onTap: () {
-            Navigator.of(context).push(TransparentMaterialPageRoute(
-                fullscreenDialog: true,
-                builder: (BuildContext context) => PhotoViewPage(
-                      image: imgPath,
-                      heroTag: "image$i",
-                      currentIndex: i,
-                      isImageBase64: true,
-                    )));
-          },
-          child: isImageBase64 == false
-              ? CachedNetworkImage(
-                  imageUrl: imgPath[i],
-                  imageBuilder: (context, imageProvider) => Container(
+            onTap: () {
+              Navigator.of(context).push(TransparentMaterialPageRoute(
+                  fullscreenDialog: true,
+                  builder: (BuildContext context) => PhotoViewPage(
+                        image: imgPath,
+                        heroTag: "image$i",
+                        currentIndex: i,
+                        isImageBase64: true,
+                      )));
+            },
+            child: isImageBase64 == false
+                ? CachedNetworkImage(
+                    imageUrl: imgPath[i],
+                    imageBuilder: (context, imageProvider) => Container(
+                      width: width,
+                      height: height,
+                      margin: padding,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(40),
+                        image: DecorationImage(
+                            image: imageProvider,
+                            fit: BoxFit.cover,
+                            colorFilter: ColorFilter.mode(
+                                Colors.red, BlendMode.dstATop)),
+                      ),
+                    ),
+                    placeholder: (context, url) =>
+                        Center(child: CircularProgressIndicator()),
+                    errorWidget: (context, url, error) => Icon(Icons.error),
+                  )
+                : Container(
                     width: width,
                     height: height,
                     margin: padding,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(40),
-                      image: DecorationImage(
-                          image: imageProvider,
-                          fit: BoxFit.cover,
-                          colorFilter:
-                              ColorFilter.mode(Colors.red, BlendMode.dstATop)),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(15),
+                      child: Image.memory(
+                        base64Decode(imgPath[i]),
+                        width: width,
+                        height: height,
+                        fit: BoxFit.cover,
+                      ),
                     ),
-                  ),
-                  placeholder: (context, url) =>
-                      Center(child: CircularProgressIndicator()),
-                  errorWidget: (context, url, error) => Icon(Icons.error),
-                )
-              : Image.memory(
-                  base64Decode(imgPath[i]),
-                  width: width,
-                  height: height,
-                  fit: BoxFit.cover,
-                ),
-        ),
+                  )),
       ).toList();
-    else
+    } else
       return Iterable.generate(4, (i) => testImage()).toList();
   }
 }

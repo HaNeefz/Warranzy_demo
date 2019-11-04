@@ -386,8 +386,10 @@ class DBProviderInitialApp {
           "SELECT CatName FROM $tableProductSubCategory WHERE CatCode = '$id'");
       if (response.isNotEmpty) {
         // print("==========<$response>===========");
+        // print("responseCat => ${jsonDecode(response.first["CatName"])}");
         var catNameDecode = jsonDecode(response.first["CatName"]);
-        return catNameDecode[lang.toUpperCase()];
+        // print("lang : ${lang.substring(0, 2).toUpperCase()}");
+        return catNameDecode["EN"]; //lang.substring(0, 2).toUpperCase()
       } else {
         print("data is empty");
         return "CatName is empty";

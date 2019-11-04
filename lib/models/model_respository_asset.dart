@@ -298,6 +298,7 @@ class ModelDataAsset {
   String alertDate;
   String slcName;
   int alertDateNo;
+  String geoLocation;
 
   ModelDataAsset(
       {this.wTokenID,
@@ -331,7 +332,8 @@ class ModelDataAsset {
       this.images,
       this.slcName,
       this.alertDate,
-      this.alertDateNo});
+      this.alertDateNo,
+      this.geoLocation});
 
   ModelDataAsset.fromJson(Map<String, dynamic> json) {
     wTokenID = json['WTokenID'];
@@ -370,6 +372,7 @@ class ModelDataAsset {
     slcName = json['SLCName'];
     alertDate = json['AlertDate'];
     alertDateNo = json['AlertDateNo'];
+    geoLocation = json['Geolocation'];
   }
 
   Map<String, dynamic> toJson() {
@@ -405,6 +408,7 @@ class ModelDataAsset {
     data['SLCName'] = this.slcName;
     data['AlertDate'] = this.alertDate;
     data['AlertDateNo'] = this.alertDateNo;
+    data['Geolocation'] = this.geoLocation;
     return data;
   }
 }

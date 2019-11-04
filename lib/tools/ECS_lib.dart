@@ -14,6 +14,7 @@ import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 import 'assets.dart';
 import 'widget_ui_custom/button_builder.dart';
+import 'package:http/http.dart' as http;
 
 class ECSLib {
   final allTranslations = GlobalTranslations();
@@ -82,6 +83,18 @@ class ECSLib {
       print(prettyprint);
     } else {
       print("Empty data or Data not match format.");
+    }
+  }
+
+  Future<String> parseUrlToBase64({String url}) async {
+    try {
+      print("loading");
+      var response = await http.get(url);
+      var temp = response.bodyBytes;
+      return base64Encode(temp);
+    } catch (e) {
+      print(e);
+      return null;
     }
   }
 

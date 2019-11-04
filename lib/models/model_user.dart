@@ -178,40 +178,39 @@ class WarranzyUsed {
   BrandName modelBrandName;
   String alertDate;
 
-  WarranzyUsed({
-    this.wTokenID,
-    this.custBuyDate,
-    this.custUserID,
-    this.custCountryCode,
-    this.pdtCatCode,
-    this.pdtGroup,
-    this.pdtPlace,
-    this.custRemark,
-    this.manCode,
-    this.brandCode,
-    this.productID,
-    this.serialNo,
-    this.lotNo,
-    this.mFGDate,
-    this.eXPDate,
-    this.salesPrice,
-    this.createDate,
-    this.createType,
-    this.lastModiflyDate,
-    this.warrantyNo,
-    this.warrantyExpire,
-    this.sLCCode,
-    this.sLCBranchNo,
-    this.sLCCountryCode,
-    this.blockchainID,
-    this.exWarrantyStatus,
-    this.tradeStatus,
-    this.title,
-    this.sLCName,
-    this.modelCatName,
-    this.modelBrandName,
-    this.alertDate
-  });
+  WarranzyUsed(
+      {this.wTokenID,
+      this.custBuyDate,
+      this.custUserID,
+      this.custCountryCode,
+      this.pdtCatCode,
+      this.pdtGroup,
+      this.pdtPlace,
+      this.custRemark,
+      this.manCode,
+      this.brandCode,
+      this.productID,
+      this.serialNo,
+      this.lotNo,
+      this.mFGDate,
+      this.eXPDate,
+      this.salesPrice,
+      this.createDate,
+      this.createType,
+      this.lastModiflyDate,
+      this.warrantyNo,
+      this.warrantyExpire,
+      this.sLCCode,
+      this.sLCBranchNo,
+      this.sLCCountryCode,
+      this.blockchainID,
+      this.exWarrantyStatus,
+      this.tradeStatus,
+      this.title,
+      this.sLCName,
+      this.modelCatName,
+      this.modelBrandName,
+      this.alertDate});
 
   WarranzyUsed.fromJson(Map<String, dynamic> json) {
     wTokenID = json['WTokenID'];
@@ -305,6 +304,7 @@ class WarranzyLog {
   String warranzyPrice;
   String fileAttachID;
   String blockchainID;
+  String geoLocation;
 
   WarranzyLog(
       {this.wTokenID,
@@ -318,7 +318,8 @@ class WarranzyLog {
       this.warranzyEndDate,
       this.warranzyPrice,
       this.fileAttachID,
-      this.blockchainID});
+      this.blockchainID,
+      this.geoLocation});
 
   WarranzyLog.fromJson(Map<String, dynamic> json) {
     wTokenID = json['WTokenID'];
@@ -333,6 +334,7 @@ class WarranzyLog {
     warranzyPrice = json['WarranzyPrice'];
     fileAttachID = json['FileAttach_ID'];
     blockchainID = json['BlockchainID'];
+    geoLocation = json['Geolocation'];
   }
 
   Map<String, dynamic> toJson() {
@@ -349,6 +351,7 @@ class WarranzyLog {
     data['WarranzyPrice'] = this.warranzyPrice;
     data['FileAttach_ID'] = this.fileAttachID;
     data['BlockchainID'] = this.blockchainID;
+    data["Geolocation"] = this.geoLocation;
     return data;
   }
 }

@@ -205,7 +205,7 @@ class _VerifyChangeDeviceState extends State<VerifyChangeDevice> {
                           .catchError(
                               (onError) => print("warranzyUsed : $onError"));
                   } catch (e) {
-                    print("insertDataWarranzyUesd => $e");
+                    print("Catch insertDataWarranzyUesd => $e");
                   }
                   try {
                     for (var warranzyLog in response.dataAssetUsed.warranzyLog)
@@ -214,35 +214,41 @@ class _VerifyChangeDeviceState extends State<VerifyChangeDevice> {
                           .catchError(
                               (onError) => print("warranzyLog $onError"));
                   } catch (e) {
-                    print("insertDataWarranzyLog => $e");
+                    print("Catch insertDataWarranzyLog => $e");
                   }
                   response.dataAssetUsed.filePool.forEach((data) async {
                     try {
+                      data.fileData = await ecsLib.parseUrlToBase64(
+                          url: "${data.fileData}");
                       await DBProviderAsset.db
                           .insertDataFilePool(data)
-                          .catchError((onError) => print("filePool $onError"))
-                          .whenComplete(() {
-                        Navigator.pop(context);
-                        Navigator.pop(context);
-                        ecsLib.pushPageReplacement(
-                          context: context,
-                          pageWidget: PinCodePageUpdate(
-                            type: PageType.login,
-                            usedPin: true,
-                          ),
-                        );
-                        ecsLib.showDialogLib(
-                          context,
-                          title: "COMPLETED INFORMATION",
-                          content:
-                              "Download information completed. You can Sign in now.",
-                          textOnButton: allTranslations.text("ok"),
-                        );
-                      });
+                          .catchError((onError) =>
+                              print("Catch insertDataFilePool $onError"));
+
+                      // await DBProviderAsset.db
+                      //     .updateFileDataOfImagePoolToBase64(filePool: data)
+                      //     .catchError((onError) => print(
+                      //         "Catch updateFileDataOfImagePoolToBase64 : $onError"));
                     } catch (e) {
-                      print("insertDataFilePool => $e");
+                      print("catch insertDataFilePool => $e");
                     }
                   });
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                  ecsLib.pushPageReplacement(
+                    context: context,
+                    pageWidget: PinCodePageUpdate(
+                      type: PageType.login,
+                      usedPin: true,
+                    ),
+                  );
+                  ecsLib.showDialogLib(
+                    context,
+                    title: "COMPLETED INFORMATION",
+                    content:
+                        "Download information completed. You can Sign in now.",
+                    textOnButton: allTranslations.text("ok"),
+                  );
                 } else {
                   Navigator.pop(context);
                   Navigator.pop(context);

@@ -85,6 +85,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
   TextEditingController txtNote;
   TextEditingController txtSLCName;
 
+  String geoLocation = '';
   String brandActive = "N";
   var valueBrandName = "DysonElectric";
   List<GetBrandName> listBrandName = [];
@@ -216,6 +217,11 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
   void initState() {
     // if (SchedulerBinding.instance.schedulerPhase ==
     //     SchedulerPhase.persistentCallbacks) {}
+    listImageEachGroup.forEach((v) {
+      print("title : ${v.title}");
+      print("imageBase64 : ${v.imageBase64}");
+      print("-----------");
+    });
     listTempData = List.of(listImageEachGroup ?? []);
     if (_data != null) {
       setState(() {
@@ -341,6 +347,23 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
       // });
     });
     print("compact => $listRelated");
+    listTempData.forEach((data) {
+      int index = listTempData.indexOf(data);
+      print(
+          "index : $index , data is ${listImageEachGroup[index].imageBase64}");
+      if (data.title == listImageEachGroup[index].title) {
+        print("tile == title");
+        data.imageBase64 = listImageEachGroup[index].imageBase64;
+        print("title ${data.title}");
+        print("imageBase64 ${data.imageBase64}");
+        print("----------------");
+      } else {
+        print("title notEquar");
+        print("title ${data.title}");
+        print("imageBase64 ${data.imageBase64}");
+        print("=========");
+      }
+    });
   }
 
   Future<List<Uint8List>> getImageToUint8List() async {
@@ -453,6 +476,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
           "SLCName": txtSLCName.text,
           "AlertDate": txtAlertDate.text,
           "CustRemark": txtNote.text,
+          "Geolocation": geoLocation
         };
         // ecsLib.printJson(postData);
 
@@ -559,6 +583,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
   }
 
   Widget buildDetialEachGroup(ImageDataEachGroup data, {bool edit = false}) {
+    // print("buildDetialEachGroup edit : $edit");
     return Column(
       children: <Widget>[
         ListTile(
@@ -569,49 +594,60 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
+                //"${edit == false ? data.imagesList.length : data.imageUrl.length + data.imagesList.length}\t\titems"
                 Text(
-                    "${edit == false ? data.imagesList.length : data.imageUrl.length + data.imagesList.length}\t\titems"),
+                    "${edit == false ? data.imageBase64.length : data.imageUrl.length + data.imagesList.length}\t\titems"),
                 Icon(edit == true ? Icons.edit : Icons.add_circle),
               ],
             ),
           ),
           onTap: () async {
-            if (edit == true) {
-              List images = await ecsLib.pushPage(
+            ImageDataEachGroup images = await ecsLib.pushPage(
                 context: context,
-                pageWidget: ModifyImage(
-                  image: data,
-                  assetData: _data,
-                ),
-              );
-              if (images != null && images.isNotEmpty) {
-                // List<Uint8List> temp = images[0] as List<Uint8List>;
-                setState(() {
-                  data.imageUint8List = images[0] as List<Uint8List>;
-                  data.imagesList = images[1] as List<File>;
-                });
-              }
-            } else {
-              List<File> images = await ecsLib.pushPage(
-                  context: context,
-                  pageWidget: TakePhotos(
-                    title: data.title,
-                    images: data.imagesList,
-                  ));
-              print("comeback");
+                pageWidget: TakePhotos(
+                  title: data.title,
+                  images: data.imagesList,
+                  imageEachGroup: data,
+                ));
 
-              if (images != null) {
-                print("return Images = ${images.length}");
-                setState(() {
-                  data.imagesList = images;
-                });
-                data.imageBase64.clear();
-                for (var fileImage in images) {
-                  data.imageBase64.add("${fileImage.path}");
-                }
-                print(data.imagesList.length);
-              }
-            }
+            // if (edit == true) {
+            //   print(edit);
+            // List images = await ecsLib.pushPage(
+            //   context: context,
+            //   pageWidget: ModifyImage(
+            //     image: data,
+            //     assetData: _data,
+            //   ),
+            // );
+            // if (images != null && images.isNotEmpty) {
+            //   // List<Uint8List> temp = images[0] as List<Uint8List>;
+            //   setState(() {
+            //     data.imageUint8List = images[0] as List<Uint8List>;
+            //     data.imagesList = images[1] as List<File>;
+            //   });
+            // }
+            // } else {
+            //   print(edit);
+            // List<File> images = await ecsLib.pushPage(
+            //     context: context,
+            //     pageWidget: TakePhotos(
+            //       title: data.title,
+            //       images: data.imagesList,
+            //     ));
+            // print("comeback");
+            // if (images != null) {
+            //   print("return Images = ${images.length}");
+
+            // setState(() {
+            //   data.imagesList = images;
+            // });
+            // data.imageBase64.clear();
+            // for (var fileImage in images) {
+            //   data.imageBase64.add("${fileImage.path}");
+            // }
+            // print(data.imagesList.length);
+            // }
+            // }
           },
         ),
         Divider()
@@ -756,6 +792,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
       "SLCName": txtSLCName.text,
       "AlertDate": txtAlertDate.text,
       "CustRemark": txtNote.text,
+      "Geolocation": geoLocation
     };
     ecsLib.printJson(postData);
     sendApiEdit(postData: postData);
@@ -990,7 +1027,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
       "SalesPrice": txtPrice.text == "" ? 0.00 : double.parse(txtPrice.text),
       "CustRemark": txtNote.text,
       "SLCName": txtSLCName.text,
-      "CreateType": widget.pageType == PageType.MANUAL ? "C" : "T"
+      "CreateType": widget.pageType == PageType.MANUAL ? "C" : "T",
     };
     return mapData;
   }

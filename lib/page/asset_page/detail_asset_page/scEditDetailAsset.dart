@@ -10,6 +10,7 @@ import 'package:warranzy_demo/models/model_repository_init_app.dart';
 import 'package:warranzy_demo/models/model_respository_asset.dart';
 import 'package:warranzy_demo/page/asset_page/add_assets_page/scAdd_image_demo.dart';
 import 'package:warranzy_demo/services/api/repository.dart';
+import 'package:warranzy_demo/services/sqflit/db_asset.dart';
 import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
@@ -23,12 +24,14 @@ class EditDetailAsset extends StatefulWidget {
   final bool editingImage;
   final ModelDataAsset modelDataAsset;
   final List<ImageDataEachGroup> imageDataEachGroup;
+  final Map<String, List<String>> fileAttach;
 
   const EditDetailAsset(
       {Key key,
       this.editingImage,
       this.modelDataAsset,
-      this.imageDataEachGroup})
+      this.imageDataEachGroup,
+      this.fileAttach})
       : super(key: key);
   @override
   _EditDetailAssetState createState() => _EditDetailAssetState();
@@ -39,6 +42,12 @@ class _EditDetailAssetState extends State<EditDetailAsset> {
   ModelDataAsset get _data => widget.modelDataAsset;
   List<ImageDataEachGroup> get imageDataEachGroup => widget.imageDataEachGroup;
   @override
+  @override
+  void initState() {
+    super.initState();
+    print("<EditDetailAsset> fileAttach => ${widget.fileAttach}");
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomPadding: false,
@@ -62,6 +71,7 @@ class _EditDetailAssetState extends State<EditDetailAsset> {
         return EditImages(
           modelDataAsset: _data,
           imageEachGroup: imageDataEachGroup,
+          fileAttach: widget.fileAttach,
         );
         break;
       case false:
@@ -81,12 +91,14 @@ class EditImages extends StatefulWidget {
   final bool editImageForAdd;
   final List<ImageDataEachGroup> imageEachGroup;
   final String categoryID;
+  final Map<String, List<String>> fileAttach;
   const EditImages(
       {Key key,
       this.modelDataAsset,
       this.imageEachGroup,
       this.editImageForAdd = true,
-      this.categoryID})
+      this.categoryID,
+      this.fileAttach})
       : super(key: key);
   @override
   _EditImagesState createState() => _EditImagesState();
@@ -113,13 +125,13 @@ class _EditImagesState extends State<EditImages> {
     relatedImage = RelatedImage(category: res);
     listRelated = relatedImage.listRelatedImage();
     tempListRelated = List.of(listRelated);
-    print("Related => $tempListRelated");
+    // print("Related => $tempListRelated");
     for (var tempData in listTempData) {
-      print("${listTempData.indexOf(tempData)} => ${tempData.title}");
+      // print("${listTempData.indexOf(tempData)} => ${tempData.title}");
       for (var tempReleted in listRelated) {
         if (tempReleted == tempData.title) {
           tempListRelated.removeAt(tempListRelated.indexOf(tempReleted));
-          print("rm => $tempListRelated");
+          // print("rm => $tempListRelated");
         }
       }
     }
@@ -136,6 +148,7 @@ class _EditImagesState extends State<EditImages> {
   void initState() {
     super.initState();
     listTempData = List.of(imageEachGroup ?? []);
+
     if (editImageForAdd == false) {
       getProductCat();
       getImageToBase64();
@@ -185,7 +198,7 @@ class _EditImagesState extends State<EditImages> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Text("${v.imageUrl.length}\t\titems"),
+                Text("${v.imageBase64.length}\t\titems"),
                 Icon(Icons.edit),
               ],
             ),
@@ -197,6 +210,7 @@ class _EditImagesState extends State<EditImages> {
               pageWidget: ModifyImage(
                 image: v,
                 assetData: _data,
+                fileAttach: widget.fileAttach,
               ),
             )
                 .then((_) {
@@ -213,7 +227,9 @@ class _EditImagesState extends State<EditImages> {
 class ModifyImage extends StatefulWidget {
   final ImageDataEachGroup image;
   final ModelDataAsset assetData;
-  ModifyImage({Key key, this.image, this.assetData}) : super(key: key);
+  final Map<String, List<String>> fileAttach;
+  ModifyImage({Key key, this.image, this.assetData, this.fileAttach})
+      : super(key: key);
 
   ModifytImageState createState() => ModifytImageState();
 }
@@ -229,30 +245,43 @@ class ModifytImageState extends State<ModifyImage> {
 
   void initState() {
     super.initState();
-
-    print(imageDataEachGroup.title);
-    print(imageDataEachGroup.imageUrl);
+    print("fileAttach intiState() : ${widget.fileAttach}");
+    print("title initState() : ${imageDataEachGroup.title}");
+    print("listBase64 initState() : ${imageDataEachGroup.imageBase64}");
     tempImageLoading = getImageToBase64();
   }
 
   Future<List<Uint8List>> getImageToBase64() async {
     List<Uint8List> listImage = [];
-    for (int i = 0; i < imageDataEachGroup.imageUrl.length; i++) {
-      try {
-        print("loading");
-        var response = await http.get(imageDataEachGroup.imageUrl[i]);
-        listImage.add(response.bodyBytes);
-        imageOld = listImage;
-      } catch (e) {
-        print(e);
-        return null;
+    // for (int i = 0; i < imageDataEachGroup.imageUrl.length; i++) {
+    //   try {
+    //     print("loading");
+    //     var response = await http.get(imageDataEachGroup.imageUrl[i]);
+    //     listImage.add(response.bodyBytes);
+    //     imageOld = listImage;
+    //   } catch (e) {
+    //     print(e);
+    //     return [];
+    //   }
+    // }
+    imageDataEachGroup?.imageBase64?.forEach((v) async {
+      final image = await DBProviderAsset.db.getImagePoolReturn(v);
+      if (image != null && image.length > 0) {
+        listImage.add(base64Decode(image.first.fileData));
+        setState(() => imageOld = listImage);
+      } else {
+        print("getImageFromDB return null");
       }
-    }
+    });
 
     return listImage;
   }
 
-  alert(String content) {}
+  alert({String title, String content}) => ecsLib.showDialogLib(context,
+      content: content,
+      textOnButton: allTranslations.text("close"),
+      title: "ERROR STATUS");
+
   List returnImage = [];
   @override
   Widget build(BuildContext context) {
@@ -315,6 +344,7 @@ class ModifytImageState extends State<ModifyImage> {
                                     ImageListBuilder.build(
                                         context: context,
                                         imageData: data,
+                                        isImageBase64: true,
                                         heroTag: "imageOld",
                                         editAble: true,
                                         onClicked: (index) {
@@ -347,6 +377,7 @@ class ModifytImageState extends State<ModifyImage> {
                               ImageListBuilder.build(
                                   context: context,
                                   imageData: imageNew,
+                                  isImageBase64: true,
                                   heroTag: "imageNew",
                                   editAble: true,
                                   onClicked: (index) {
@@ -407,6 +438,7 @@ class ModifytImageState extends State<ModifyImage> {
 
   submitUpdateImage() async {
     if (imageOld.isNotEmpty || imageNew.isNotEmpty) {
+      print("this if imageOld.isNotEmpty || imageNew.isNotEmpty");
       ecsLib.showDialogLoadingLib(context, content: "compressing photo");
       Map<String, dynamic> postData = {
         "WTokenID": "${assetData.wTokenID}",
@@ -446,6 +478,7 @@ class ModifytImageState extends State<ModifyImage> {
           }
         });
       else {
+        print("this else imageOld.isNotEmpty || imageNew.isNotEmpty");
         imageOld.forEach((v) {
           imageTobase64.add(base64.encode(v));
         });
@@ -457,12 +490,12 @@ class ModifytImageState extends State<ModifyImage> {
             });
           }
           ecsLib.cancelDialogLoadindLib(context);
-          // ecsLib.printJson(postData);
+          ecsLib.printJson(postData);
           sendAPIUpdateImage(postData: postData);
         }
       }
     } else {
-      alert("Image is empty. Please add Image.");
+      alert(content: "Image is empty. Please add Image.");
     }
   }
 
@@ -473,33 +506,91 @@ class ModifytImageState extends State<ModifyImage> {
       print("upDate Image Success ${response.status} | ${response.message}");
       if (response.status == true) {
         ecsLib.showDialogLoadingLib(context, content: "Updating Image Asset");
-        await Repository.getDetailAseet(
-                body: {"WTokenID": "${assetData.wTokenID}"})
-            .then((responseDetail) async {
-          // ecsLib.cancelDialogLoadindLib(context);
-          print("getDetail Success");
-          if (responseDetail.status == true) {
-            // ecsLib.stepBackScene(context, 2);
-            ecsLib.cancelDialogLoadindLib(context);
-            Navigator.pop(context);
-            Navigator.pop(context);
-            await ecsLib.pushPageReplacement(
-                context: context,
-                pageWidget: DetailAsset(
-                  dataAsset: responseDetail.data,
-                  dataScan: responseDetail.dataScan,
-                  showDetailOnline: true,
-                ));
-          } else if (responseDetail.status == false) {
-            alert("${responseDetail.message}");
+        Map<String, List<String>> fileAttach = {};
+        String decriptionImage;
+        List<String> keyImage = [];
+        response.filePool.forEach((v) {
+          decriptionImage = "${jsonDecode(v.fileDescription)['EN']}";
+          keyImage.add(v.fileID);
+        });
+        fileAttach.addAll({decriptionImage: keyImage});
+        print("OldFileAttach => ${widget.fileAttach}");
+        print("fileAttach => $fileAttach");
+        widget.fileAttach.addAll(fileAttach);
+        print("ManageFileAttach : ${widget.fileAttach}");
+        await DBProviderAsset.db
+            .updateWarranzyLog(
+                wTokenID: assetData.wTokenID,
+                fileAttach: jsonEncode(widget.fileAttach))
+            .then((completed) async {
+          if (completed != null) {
+            print("Update tableLog completed");
+            response.filePool.forEach((dataFilePool) async {
+              await DBProviderAsset.db.updateImagePoolForEditImageAsset(
+                  oldFileID: imageDataEachGroup.imageBase64,
+                  filePool: dataFilePool);
+            });
+            print("ALL UPDATE COMPLETED");
+            if (widget.assetData.createType == "C") {
+              Navigator.pop(context);
+              Navigator.pop(context);
+              Navigator.pop(context);
+              ecsLib.pushPageReplacement(
+                  context: context,
+                  pageWidget: DetailAsset(
+                    dataAsset: widget.assetData,
+                    dataScan: null,
+                    showDetailOnline: true,
+                    listImage: [widget.fileAttach],
+                  ));
+            } else {
+              try {
+                ecsLib.showDialogLoadingLib(context);
+                await Repository.getDetailAseet(
+                        body: {"WTokenID": widget.assetData.wTokenID})
+                    .then((res) async {
+                  ecsLib.cancelDialogLoadindLib(context);
+                  if (res?.status == true) {
+                    Navigator.pop(context);
+                    Navigator.pop(context);
+                    Navigator.pop(context);
+                    ecsLib.pushPageReplacement(
+                      context: context,
+                      pageWidget: DetailAsset(
+                        dataAsset: res.data,
+                        showDetailOnline: true,
+                        dataScan: res.dataScan,
+                        listImage: [widget.fileAttach],
+                      ),
+                    );
+                  } else if (res.status == false) {
+                    alert(
+                        content:
+                            "status false : " + res?.message ?? "status false");
+                  } else {
+                    alert(content: res?.message ?? "Something wrong");
+                    await ecsLib.pushPageReplacement(
+                        context: context,
+                        pageWidget: DetailAsset(
+                          dataAsset: widget.assetData,
+                          showDetailOnline: true,
+                          dataScan: null,
+                          listImage: [widget.fileAttach],
+                        ));
+                  }
+                });
+              } catch (e) {
+                alert(title: "CATCH ERROR", content: "catch : $e");
+              }
+            }
           } else {
-            alert("${responseDetail.message}");
+            print("Update tableLog incompleted");
           }
         });
       } else if (response.status == false) {
-        alert("${response.message}");
+        alert(content: "${response.message}");
       } else {
-        alert("${response.message}");
+        alert(content: "${response.message}");
       }
     });
   }

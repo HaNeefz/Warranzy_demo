@@ -99,6 +99,7 @@ BlockchainID */
       WarranzyBeginDate TEXT,
       WarranzyPrice TEXT,
       BlockchainID TEXT,
+      Geolocation TEXT,
       PRIMARY KEY("WTokenID","LogDate")
     )""");
     /*
@@ -162,12 +163,6 @@ BlockchainID */
     imageKey.map((key) async {
       await deleteImagePoolByKey(key);
     }).toList();
-    // await db.delete(tableWarranzyUsed, where: 'WTokenID', whereArgs: [
-    //   '$wTokenID'
-    // ]).then((v) => print("Delete tableWarranzyUsed => $v"));
-    // await db.delete(tableWarranzyLog, where: 'WTokenID', whereArgs: [
-    //   '$wTokenID'
-    // ]).then((v) => print("Delete tableWarranzyLog => $v"));
   }
 
   Future deleteImagePoolByKey(String key) async {
@@ -179,6 +174,61 @@ BlockchainID */
     }).catchError((onError) => print("Error delete $tableFilePool : $onError"));
   }
 
+  Future<int> updateWarranzyLog({String wTokenID, String fileAttach}) async {
+    final db = await database;
+    try {
+      return await db.rawUpdate(
+          "UPDATE $tableWarranzyLog SET FileAttach_ID = '$fileAttach' WHERE WTokenID = '$wTokenID'");
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<int> updateImagePoolForEditImageAsset(
+      {List<String> oldFileID, FilePool filePool}) async {
+    final db = await database;
+    try {
+      if (oldFileID.length > 0 && oldFileID != null) {
+        oldFileID.forEach((fileID) async {
+          int deleteOldImage = await db
+              .delete(tableFilePool, where: "FileID = ?", whereArgs: [fileID]);
+          print("deletedOldImage : $deleteOldImage");
+        });
+      }
+      int completed = await db.insert(tableFilePool, filePool.toJson());
+      print(
+          "update imagePool : $completed <Realy! this method is insert newImage>");
+      return completed >= 0 ? completed : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<int> updateImagePool({FilePool filePool}) async {
+    final db = await database;
+    try {
+      int completed = await db.update(tableFilePool, filePool.toJson(),
+          where: "FileID = ?", whereArgs: [filePool.fileID]);
+      print("update imagePool : $completed");
+      return completed >= 0 ? completed : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<int> updateFileDataOfImagePoolToBase64({FilePool filePool}) async {
+    final db = await database;
+    try {
+      int completed = await db.update(
+          tableFilePool, {"FileData": filePool.fileData},
+          where: "FileID = ?", whereArgs: [filePool.fileID]);
+      print("update imagePool to base64 : $completed");
+      return completed >= 0 ? completed : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
   Future<List<ModelDataAsset>> getAllDataAsset() async {
     final db = await database;
     var res = await db.rawQuery(
@@ -186,17 +236,13 @@ BlockchainID */
     // var filePool = await db.rawQuery("SE")
     JsonEncoder encoder = JsonEncoder.withIndent(" ");
     List<ModelDataAsset> temp = [];
-    Map<String, dynamic> dataAsset = {};
     if (res.isNotEmpty) {
       print("--------------------");
       res.forEach((v) {
         String prettyprint = encoder.convert(v);
-        // print("DataAsset => $prettyprint");
+        print("DataAssetSQLite => $prettyprint");
         temp.add(ModelDataAsset.fromJson(v));
       });
-
-      // print("added[0] ${encoder.convert(temp[0].toJson())}");
-      // print("added[1] ${encoder.convert(temp[1].toJson())}");
 
       return temp;
     } else {
@@ -219,12 +265,13 @@ BlockchainID */
     List<FilePool> filePool = [];
     var tempImageValue = await db
         .rawQuery("SELECT * FROM $tableFilePool WHERE FileID = '$fileID'");
-
     if (tempImageValue.isNotEmpty) {
+      print("key : $fileID");
       tempImageValue.forEach((v) => filePool.add(FilePool.fromJson(v)));
       return filePool;
     } else
-      return [];
+      print("getImage is Empty at key : $fileID");
+    return [];
   }
 
   Future<bool> hasDataAsset() async {

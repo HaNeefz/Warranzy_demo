@@ -239,7 +239,9 @@ class _AddImageDemoState extends State<AddImageDemo> {
 class TakePhotos extends StatefulWidget {
   final String title;
   final List<File> images;
-  TakePhotos({Key key, this.title, this.images}) : super(key: key);
+  final ImageDataEachGroup imageEachGroup;
+  TakePhotos({Key key, this.title, this.images, this.imageEachGroup})
+      : super(key: key);
 
   _TakePhotosState createState() => _TakePhotosState();
 }
@@ -248,9 +250,23 @@ class _TakePhotosState extends State<TakePhotos> {
   final ecsLib = getIt.get<ECSLib>();
   final allTranslations = getIt.get<GlobalTranslations>();
   List<File> images;
+  List<String> listImagekey = [];
+
+  getImageFromSQLite(List<String> listKey) async {
+    listKey.forEach((key) async {
+      await DBProviderAsset.db.getImagePoolReturn(key).then((data) {
+        setState(() => listImagekey.add(data.first.fileData));
+        print("listImagekey : $listImagekey");
+      });
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    if (widget.imageEachGroup.imageBase64.length > 0) {
+      getImageFromSQLite(widget.imageEachGroup.imageBase64);
+    }
     images = widget.images;
   }
 
@@ -346,6 +362,7 @@ class ImageDataEachGroup {
   List<String> imageBase64;
   List<String> imageUrl;
   List<Uint8List> imageUint8List;
+  // List<String> temp
 
   ImageDataEachGroup(
       {this.title,
