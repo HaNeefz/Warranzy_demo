@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:extended_image/extended_image.dart';
@@ -64,8 +65,13 @@ class ImageListBuilder {
                               ? _ecsLib.modelImageFile(
                                   file: imageData[index],
                                 )
-                              : _ecsLib.modelImageUint8List(
-                                  file: imageData[index], fit: BoxFit.cover),
+                              : imageData is List<Uint8List>
+                                  ? _ecsLib.modelImageUint8List(
+                                      file: imageData[index],
+                                      fit: BoxFit.contain)
+                                  : _ecsLib.modelImageUint8List(
+                                      file: base64Decode(imageData[index]),
+                                      fit: BoxFit.cover),
                         )),
                   ),
                   // removeImageTest(index, onClicked),

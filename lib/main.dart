@@ -107,7 +107,7 @@ class _MyHomePageState extends State<MyHomePage> {
           brightness: Brightness.light,
           // primaryColor: Colors.white,
           scaffoldBackgroundColor: Colors.white,
-          appBarTheme: AppBarTheme(),
+          appBarTheme: AppBarTheme(brightness: Brightness.light),
           iconTheme: IconThemeData(color: ThemeColors.COLOR_THEME_APP)
           // fontFamily: "Ekkamai"
           ), //Supermarket

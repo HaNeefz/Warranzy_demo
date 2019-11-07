@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:warranzy_demo/models/model_image_data_each_group.dart';
 import 'package:warranzy_demo/models/model_repository_init_app.dart';
 import 'package:warranzy_demo/page/main_page/scMain_page.dart';
 import 'package:warranzy_demo/services/api/api_service_assets.dart';
@@ -13,6 +14,7 @@ import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/image_list_builder.dart';
+import 'package:warranzy_demo/tools/widget_ui_custom/take_a_photo.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 
 class AddImageDemo extends StatefulWidget {
@@ -234,142 +236,6 @@ class _AddImageDemoState extends State<AddImageDemo> {
       ecsLib.cancelDialogLoadindLib(context);
     }
   }
-}
-
-class TakePhotos extends StatefulWidget {
-  final String title;
-  final List<File> images;
-  final ImageDataEachGroup imageEachGroup;
-  TakePhotos({Key key, this.title, this.images, this.imageEachGroup})
-      : super(key: key);
-
-  _TakePhotosState createState() => _TakePhotosState();
-}
-
-class _TakePhotosState extends State<TakePhotos> {
-  final ecsLib = getIt.get<ECSLib>();
-  final allTranslations = getIt.get<GlobalTranslations>();
-  List<File> images;
-  List<String> listImagekey = [];
-
-  getImageFromSQLite(List<String> listKey) async {
-    listKey.forEach((key) async {
-      await DBProviderAsset.db.getImagePoolReturn(key).then((data) {
-        setState(() => listImagekey.add(data.first.fileData));
-        print("listImagekey : $listImagekey");
-      });
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    if (widget.imageEachGroup.imageBase64.length > 0) {
-      getImageFromSQLite(widget.imageEachGroup.imageBase64);
-    }
-    images = widget.images;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text(
-            widget.title ?? 'Take a Photos',
-            style: TextStyleCustom.STYLE_APPBAR,
-          ),
-          leading: IconButton(
-              icon: Icon(Icons.arrow_back_ios),
-              onPressed: () {
-                Navigator.pop(context, images);
-              }),
-        ),
-        body: WillPopScope(
-          onWillPop: () async {
-            return false;
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Center(
-              child: images.length > 0
-                  ? Column(
-                      children: <Widget>[
-                        if (images.isNotEmpty && images.length > 0)
-                          ImageListBuilder.build(
-                              context: context,
-                              imageData: images,
-                              crossAxisCount: 2,
-                              heroTag: "imageOld",
-                              editAble: true,
-                              onClicked: (index) {
-                                print("ImageOld indexOf($index)");
-                                if (images.length > 0)
-                                  setState(() {
-                                    images.removeAt(index);
-                                  });
-                              }),
-                      ],
-                    )
-                  : TextBuilder.build(
-                      title: "Empty photos, Please take a photos."),
-            ),
-          ),
-        ),
-        floatingActionButton: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: <Widget>[
-            FloatingActionButton(
-              heroTag: "TakePhoto",
-              child: Icon(Icons.add_a_photo, size: 35),
-              onPressed: () async {
-                var image = await ecsLib.getImage();
-                print(image);
-                if (image != null) {
-                  setState(() {
-                    images.add(image);
-                  });
-                }
-              },
-            ),
-            SizedBox(
-              height: 5,
-            ),
-            FloatingActionButton(
-              backgroundColor: Colors.red[200],
-              heroTag: "Gallery",
-              child: Icon(
-                Icons.add_photo_alternate,
-                size: 35,
-              ),
-              onPressed: () async {
-                var image = await ecsLib.getImageFromGallery();
-                print(image);
-                if (image != null) {
-                  setState(() {
-                    images.add(image);
-                  });
-                }
-              },
-            ),
-          ],
-        ));
-  }
-}
-
-class ImageDataEachGroup {
-  String title;
-  List<File> imagesList;
-  List<String> imageBase64;
-  List<String> imageUrl;
-  List<Uint8List> imageUint8List;
-  // List<String> temp
-
-  ImageDataEachGroup(
-      {this.title,
-      this.imagesList = const [],
-      this.imageBase64 = const [],
-      this.imageUint8List = const [],
-      this.imageUrl = const []});
 }
 
 class Name<T> {

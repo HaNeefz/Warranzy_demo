@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_animations/simple_animations.dart';
+import 'package:warranzy_demo/models/model_image_data_each_group.dart';
 import 'package:warranzy_demo/models/model_repository_asset_scan.dart';
 import 'package:warranzy_demo/models/model_respository_asset.dart';
 import 'package:warranzy_demo/page/asset_page/add_assets_page/scAdd_image_demo.dart';

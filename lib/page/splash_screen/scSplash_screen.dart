@@ -39,15 +39,20 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
           // cancelText: allTranslations.text("cancel"),
           title: TextBuilder.build(title: "เลือกภาษา/Select language."),
           onConfirm: (Picker picker, List value) async {
+            // print("Picker picker : ${picker.adapter.picker.}");
             print("Picker value : ${picker.getSelectedValues()}");
+            String lang = "";
+            if (picker.getSelectedValues().first == "English") {
+              lang = "en";
+            } else
+              lang = "th";
             await sqfliteDB
-                .addDataLanguage(
-                    ModelLanguage(name: picker.getSelectedValues().first))
+                .addDataLanguage(ModelLanguage(name: lang))
                 .then((res) async {
               if (res == true) {
                 print("ADDED ${picker.getSelectedValues()}");
                 await initialApp();
-                var lang = await sqfliteDB.getDataLanguage();
+                // var lang = await sqfliteDB.getDataLanguage();
                 await allTranslations.setNewLanguage(lang ?? "th");
                 setState(() {});
               } else

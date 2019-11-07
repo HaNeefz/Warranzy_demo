@@ -33,11 +33,6 @@ class _CategoryUIState extends State<CategoryUI> {
   void initState() {
     super.initState();
     widget.category.forEach((v) {
-      // imagePath = List.of(v.values.toList().first);
-      // print("v : $v");
-      // v.values.toList().first.forEach((v){
-
-      // });
       print(v['Logo']);
       setState(() => imagePath.add(v['Logo']));
     });
@@ -53,55 +48,51 @@ class _CategoryUIState extends State<CategoryUI> {
       ),
       body: Container(
         padding: EdgeInsets.all(5),
-        child: ListView(
-            shrinkWrap: true,
-            children: widget.category.map((v) {
-              // print(widget.selected['Logo']);
-              // print(widget.selected['Logo'] == v["Logo"]);
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  ListTile(
-                    leading: ImageView.show(
-                        path: imagePath[widget.category.indexOf(v)]),
-                    //  new ImageViewer(
-                    //   imagePath: v['Logo'],
-                    // ),
-                    // Image.asset("${v['Logo']}",
-                    //     width: 30, height: 30, fit: BoxFit.contain),
-                    title: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Expanded(
-                          flex: 2,
-                          child: AutoSizeText(
-                            jsonDecode(v['CatName'] ?? v['GroupName'])["EN"],
-                            minFontSize: 10,
-                            stepGranularity: 10,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyleCustom.STYLE_LABEL
-                                .copyWith(fontSize: 13),
-                          ),
+        child: SingleChildScrollView(
+          child: Column(
+              children: widget.category.map((v) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                ListTile(
+                  leading: ImageView.show(
+                      path: imagePath[widget.category.indexOf(v)]),
+                  // Image.asset("${v['Logo']}",
+                  //     width: 30, height: 30, fit: BoxFit.contain),
+                  title: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Expanded(
+                        flex: 2,
+                        child: AutoSizeText(
+                          jsonDecode(v['CatName'] ?? v['GroupName'])["EN"],
+                          minFontSize: 10,
+                          stepGranularity: 10,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyleCustom.STYLE_LABEL
+                              .copyWith(fontSize: 13),
                         ),
-                        Expanded(
-                          child: Align(
-                            alignment: Alignment.centerRight,
-                            child: widget.selected['Logo'] == v['Logo']
-                                ? Icon(Icons.check, color: Colors.green)
-                                : Container(),
-                          ),
-                        )
-                      ],
-                    ),
-                    onTap: () {
-                      Navigator.pop(context, v);
-                    },
+                      ),
+                      Expanded(
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: widget.selected['Logo'] == v['Logo']
+                              ? Icon(Icons.check, color: Colors.green)
+                              : Container(),
+                        ),
+                      )
+                    ],
                   ),
-                  Divider()
-                ],
-              );
-            }).toList()),
+                  onTap: () {
+                    Navigator.pop(context, v);
+                  },
+                ),
+                Divider()
+              ],
+            );
+          }).toList()),
+        ),
       ),
     );
   }

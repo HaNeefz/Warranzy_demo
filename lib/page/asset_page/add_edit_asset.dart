@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
@@ -13,10 +14,10 @@ import 'package:flutter_picker/flutter_picker.dart';
 import 'package:keyboard_avoider/keyboard_avoider.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:warranzy_demo/models/model_get_brand_name.dart';
+import 'package:warranzy_demo/models/model_image_data_each_group.dart';
 import 'package:warranzy_demo/models/model_repository_init_app.dart';
 import 'package:warranzy_demo/models/model_respository_asset.dart';
 import 'package:warranzy_demo/models/model_user.dart';
-import 'package:warranzy_demo/page/asset_page/add_assets_page/scAdd_image_demo.dart';
 import 'package:warranzy_demo/page/asset_page/detail_asset_page/scDetailAsset.dart';
 import 'package:warranzy_demo/page/asset_page/detail_asset_page/scEditDetailAsset.dart';
 import 'package:warranzy_demo/page/main_page/scMain_page.dart';
@@ -32,6 +33,7 @@ import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/button_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/category_ui.dart';
+import 'package:warranzy_demo/tools/widget_ui_custom/take_a_photo.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_field_builder.dart';
 
@@ -101,6 +103,9 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
   Future<List<ProductCategory>> getProductCategory;
   List<Uint8List> getIconsProductCategory;
   Future<List<GroupCategory>> getProductGroupCategory;
+
+  List<ImageDataEachGroup> _listTempData = [];
+
   List<String> _place = [
     "Home",
     "Office",
@@ -219,6 +224,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
     //     SchedulerPhase.persistentCallbacks) {}
     listImageEachGroup.forEach((v) {
       print("title : ${v.title}");
+      print("imageList : ${v.imagesList}");
       print("imageBase64 : ${v.imageBase64}");
       print("-----------");
     });
@@ -279,11 +285,11 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
       // getImageToBase64();
     }
     txtPdtCat.addListener(() {
-      /////////////////////////////////////////////////////////////////
       print("ADdListener => ${txtPdtCat.text}");
       if (widget.actionPageForAdd == true) {
         setState(() {
           listTempData.clear();
+          _listTempData.clear();
           listImageEachGroup.clear();
           getProductCat(txtPdtCat.text);
         });
@@ -337,33 +343,23 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
       }
     }
     tempListRelated.forEach((v) {
-      // setState(() {
       listTempData.add(ImageDataEachGroup(
           title: v,
           imageUrl: [],
           imageBase64: [],
           imagesList: [],
-          imageUint8List: []));
-      // });
+          imageUint8List: [],
+          tempBase64: []));
+
+      _listTempData.add(ImageDataEachGroup(
+          title: v,
+          imageUrl: [],
+          imageBase64: [],
+          imagesList: [],
+          imageUint8List: [],
+          tempBase64: []));
     });
     print("compact => $listRelated");
-    listTempData.forEach((data) {
-      int index = listTempData.indexOf(data);
-      print(
-          "index : $index , data is ${listImageEachGroup[index].imageBase64}");
-      if (data.title == listImageEachGroup[index].title) {
-        print("tile == title");
-        data.imageBase64 = listImageEachGroup[index].imageBase64;
-        print("title ${data.title}");
-        print("imageBase64 ${data.imageBase64}");
-        print("----------------");
-      } else {
-        print("title notEquar");
-        print("title ${data.title}");
-        print("imageBase64 ${data.imageBase64}");
-        print("=========");
-      }
-    });
   }
 
   Future<List<Uint8List>> getImageToUint8List() async {
@@ -492,22 +488,36 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
               .then((response) async {
             if (response == "F") {
               print(response);
-              await submitForAddAsset(
-                  postData: postData,
-                  whenCompleted: () => ecsLib.pushPageAndClearAllScene(
-                      context: context, pageWidget: MainPage()));
+              // await changeAllImageToBase64();
+              // setState(() {});
+              await setFormatDataBeforSendApi(
+                postData,
+              ).then((body) async {
+                ecsLib.printJson(body);
+                await sendApiAddAsset(
+                    body: body,
+                    whenCompleted: () => ecsLib.pushPageAndClearAllScene(
+                        context: context, pageWidget: MainPage()));
+              });
             } else if (response == "S") {
               print(response);
-              await submitForAddAsset(
-                  postData: postData,
-                  whenCompleted: () async {
-                    await ecsLib.showDialogLib(
-                      context,
-                      title: "Warranzy",
-                      content: "Added asset and Duplicated data.",
-                      textOnButton: allTranslations.text("ok"),
-                    );
-                  });
+              // await changeAllImageToBase64();
+              // setState(() {});
+              await setFormatDataBeforSendApi(
+                postData,
+              ).then((body) async {
+                ecsLib.printJson(body);
+                // await sendApiAddAsset(
+                //     body: body,
+                //     whenCompleted: () async {
+                //       await ecsLib.showDialogLib(
+                //         context,
+                //         title: "Warranzy",
+                //         content: "Added asset and Duplicated data.",
+                //         textOnButton: allTranslations.text("ok"),
+                //       );
+                //     });
+              });
             } else {
               print(response);
             }
@@ -515,6 +525,90 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
         } else
           sendApiEdit(postData: postData);
       }
+    }
+  }
+
+  Future<Map<String, dynamic>> setFormatDataBeforSendApi(
+      Map<String, dynamic> postData) async {
+    var imageData = {};
+    var dataPost = {"Data": postData, "Images": {}};
+    for (var modelImage in listTempData) {
+      // print("title : ${modelImage.title}");
+      // print("iamgeList : ${modelImage.imagesList}");
+      // print("imageBase64 : ${modelImage.imageBase64}");
+      // print("tempBase64 : ${modelImage.tempBase64}");
+      // String tempBase64;
+      imageData.addAll({"${modelImage.title}": {}});
+      for (var imageBase64Data in modelImage.tempBase64) {
+        imageData["${modelImage.title}"].addAll({
+          "${modelImage.tempBase64.indexOf(imageBase64Data)}": imageBase64Data
+        });
+      }
+    }
+    dataPost.addAll({"Images": imageData});
+    return dataPost;
+  }
+
+  Future sendApiAddAsset({body, Function whenCompleted}) async {
+    ecsLib.showDialogLoadingLib(context, content: "Adding assets");
+    try {
+      await Repository.addAsset(body: body).then((res) async {
+        ecsLib.cancelDialogLoadindLib(context);
+        if (res.status == true) {
+          try {
+            await DBProviderAsset.db
+                .insertDataWarranzyUesd(res.warranzyUsed)
+                .catchError((onError) => print("warranzyUsed : $onError"));
+          } catch (e) {
+            print("insertDataWarranzyUesd => $e");
+          }
+          try {
+            await DBProviderAsset.db
+                .insertDataWarranzyLog(res.warranzyLog)
+                .catchError((onError) => print("warranzyLog $onError"));
+          } catch (e) {
+            print("insertDataWarranzyLog => $e");
+          }
+          if (txtBrandCode.text == null || txtBrandCode.text == "") {
+            try {
+              await DBProviderAsset.db
+                  .inserDataBrand(res.brand)
+                  .catchError((onError) => print("Insert Name brand $onError"));
+            } catch (e) {
+              print("Insert Name brand $e");
+            }
+          }
+          res.filePool.forEach((data) async {
+            try {
+              await DBProviderAsset.db
+                  .insertDataFilePool(data)
+                  .catchError((onError) => print("filePool $onError"))
+                  .whenComplete(whenCompleted);
+            } catch (e) {
+              print("insertDataFilePool => $e");
+            }
+          });
+        } else if (res.status == false) {
+          ecsLib.showDialogLib(context,
+              title: "FAIL ADD ASSET",
+              content: res.message ?? "Somthing wrong !. status fail",
+              textOnButton: allTranslations.text("close"));
+        } else {
+          ecsLib.showDialogLib(context,
+              title: "FAIL ADD ASSET",
+              content: res.message ?? "Somthing wrong !.",
+              textOnButton: allTranslations.text("close"));
+        }
+      }).catchError((e) {
+        print("$e");
+        ecsLib.cancelDialogLoadindLib(context);
+      });
+    } on DioError catch (error) {
+      print("DIO ERROR => ${error.error}\nMsg => ${error.message}");
+      ecsLib.cancelDialogLoadindLib(context);
+    } catch (e) {
+      print("Catch $e");
+      ecsLib.cancelDialogLoadindLib(context);
     }
   }
 
@@ -596,7 +690,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
               children: <Widget>[
                 //"${edit == false ? data.imagesList.length : data.imageUrl.length + data.imagesList.length}\t\titems"
                 Text(
-                    "${edit == false ? data.imageBase64.length : data.imageUrl.length + data.imagesList.length}\t\titems"),
+                    "${edit == false ? data.tempBase64.length == 0 ? data.imageBase64.length : data.tempBase64.length : "Something"}\t\titems"),
                 Icon(edit == true ? Icons.edit : Icons.add_circle),
               ],
             ),
@@ -606,9 +700,18 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
                 context: context,
                 pageWidget: TakePhotos(
                   title: data.title,
-                  images: data.imagesList,
                   imageEachGroup: data,
                 ));
+
+            if (images != null) {
+              setState(() {
+                data = images;
+              });
+              print("title : ${data.title}");
+              print("imageListFile : ${data.imagesList}");
+              print("imageBase64 : ${data.imageBase64}");
+              print("tempBase64 : ${data.tempBase64}");
+            }
 
             // if (edit == true) {
             //   print(edit);
@@ -846,118 +949,112 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
     });
   }
 
-  Future<bool> submitForAddAsset({postData, Function whenCompleted}) async {
+  Future<bool> changeAllImageToBase64() async {
     bool _completed = false;
-    var dataPost = {"Data": postData, "Images": {}};
     print("Submit");
-    // var tempImageData = {};
     ecsLib.showDialogLoadingLib(context, content: "Image compressing");
     try {
-      for (int i = 0; i < listTempData.length; i++) {
-        var tempModelImage = listTempData[i];
-        for (int j = 0; j < tempModelImage.imagesList.length; j++) {
-          var listImages = tempModelImage.imagesList[j];
-          var tempDir = await getTemporaryDirectory();
-          var _newSize = await ecsLib.compressFile(
-            file: listImages,
-            targetPath: tempDir.path + "/${listImages.path.split("/").last}",
-            minWidth: 600,
-            minHeight: 480,
-            quality: 80,
-          );
-          listImages = _newSize;
-          tempModelImage.imageBase64[j] =
-              base64Encode(listImages.readAsBytesSync());
-
-          print("------ ${tempModelImage.title} No. $i => Image No. $j");
-        }
-      }
-      var imageData = {};
-
-      try {
-        for (var modelImage in listTempData) {
-          imageData.addAll({"${modelImage.title}": {}});
-          // tempImageData.addAll({"${modelImage.title}": {}});
-          for (var imageBase64Data in modelImage.imageBase64) {
-            imageData["${modelImage.title}"].addAll({
-              "${modelImage.imageBase64.indexOf(imageBase64Data)}":
-                  imageBase64Data
+      listTempData.forEach((imageEachGroup) async {
+        if (imageEachGroup.imageBase64.length > 0) {
+          imageEachGroup?.imageBase64?.forEach((imageKey) async {
+            await ImageDataEachGroup.changeImageKeyToBase64(imageKey).then((v) {
+              _listTempData[listTempData.indexOf(imageEachGroup)]
+                  .tempBase64
+                  .add(v);
+              // print(
+              //     "title: ${_listTempData[listTempData.indexOf(imageEachGroup)].title}");
+              // print(
+              //     "imageEachGroup.tempBase64: ${_listTempData[listTempData.indexOf(imageEachGroup)].tempBase64.length}");
             });
-            // tempImageData.addAll({"${modelImage.title}": imageBase64Data});
-          }
+          });
         }
-        dataPost.addAll({"Images": imageData});
-      } catch (e) {
-        print(e);
-      }
+        if (imageEachGroup.imagesList.length > 0) {
+          print("imageEachGroup.imagesList.length > 0");
+          imageEachGroup?.imagesList?.forEach((imageFile) async {
+            print("imageFile : $imageFile");
+            await ImageDataEachGroup.changeImageFileToBase64(imageFile)
+                .then((v) {
+              _listTempData[listTempData.indexOf(imageEachGroup)]
+                  .tempBase64
+                  .add(v);
+              // print(
+              //     "title: ${_listTempData[listTempData.indexOf(imageEachGroup)].title}");
+              // print(
+              //     "imageEachGroup.tempBase64: ${_listTempData[listTempData.indexOf(imageEachGroup)].tempBase64.length}");
+            });
+          });
+        }
+      });
+
+      // _listTempData.forEach((v) {
+      //   print("title : ${v.title}");
+      //   print("listImage : ${v.imagesList}");
+      //   print("base64 : ${v.tempBase64}");
+      // });
+      // listTempData.forEach((imageData) async {
+      //   print("ff.title : ${imageData.title}");
+      //   print("ff.tempBase64 : ${imageData.tempBase64}");
+      // });
+
+      // var imageData = {};
+      // for (int i = 0; i < listTempData?.length ?? 0; i++) {
+      //   // if (listTempData[i].imagesList.length > 0) {
+      //   var tempModelImage = listTempData[i];
+      //   for (int j = 0; j < tempModelImage.imagesList.length; j++) {
+      //     var listImages = tempModelImage.imagesList[j];
+      //     var tempDir = await getTemporaryDirectory();
+      //     var _newSize = await ecsLib.compressFile(
+      //       file: listImages,
+      //       targetPath: tempDir.path + "/${listImages.path.split("/").last}",
+      //       minWidth: 600,
+      //       minHeight: 480,
+      //       quality: 80,
+      //     );
+      //     listImages = _newSize;
+      //     tempModelImage.tempBase64[j] =
+      //         base64Encode(listImages.readAsBytesSync());
+
+      //     print("------ ${tempModelImage.title} No. $i => Image No. $j");
+      //   }
+      // if (listTempData[i].imageBase64.length > 0) {
+      //   print("listTempData[i].imageBase64: ${listTempData[i].imageBase64}");
+      //   listTempData[i].imageBase64.forEach((key) async {
+      //     await DBProviderAsset.db
+      //         .getImagePoolReturn(key)
+      //         .then((imageBase64) {
+      //       keepDataBase64.add(imageBase64.first.fileData);
+      //       print("listTempData[i].tempBase64 ${listTempData[i].tempBase64}");
+      //     });
+      //   });
+      //   listTempData[i].tempBase64 = keepDataBase64;
+      //   keepDataBase64 = [];
+      //   print("listTempData: ${listTempData[i].tempBase64.length}");
+      //   imageData.addAll(
+      //       {listTempData[i].title: listTempData[i].tempBase64.asMap()});
+      // }
+      //   }
+      // try {
+      //   for (var modelImage in listTempData) {
+      //     imageData.addAll({"${modelImage.title}": {}});
+      //     // tempImageData.addAll({"${modelImage.title}": {}});
+      //     for (var imageBase64Data in modelImage.tempBase64) {
+      //       imageData["${modelImage.title}"].addAll({
+      //         "${modelImage.tempBase64.indexOf(imageBase64Data)}":
+      //             imageBase64Data
+      //       });
+      //       // tempImageData.addAll({"${modelImage.title}": imageBase64Data});
+      //     }
+      //   }
+      //   dataPost.addAll({"Images": imageData});
+      // } catch (e) {
+      //   print(e);
+      // }
+      // }
     } catch (e) {
-      print(e);
+      print("Catch outerSide $e");
     }
     ecsLib.cancelDialogLoadindLib(context);
-
-    ecsLib.printJson(dataPost);
-    // ecsLib.printJson(tempImageData);
-    ecsLib.showDialogLoadingLib(context, content: "Adding assets");
-    try {
-      await Repository.addAsset(body: dataPost).then((res) async {
-        _completed = true;
-        ecsLib.cancelDialogLoadindLib(context);
-        if (res.status == true) {
-          try {
-            await DBProviderAsset.db
-                .insertDataWarranzyUesd(res.warranzyUsed)
-                .catchError((onError) => print("warranzyUsed : $onError"));
-          } catch (e) {
-            print("insertDataWarranzyUesd => $e");
-          }
-          try {
-            await DBProviderAsset.db
-                .insertDataWarranzyLog(res.warranzyLog)
-                .catchError((onError) => print("warranzyLog $onError"));
-          } catch (e) {
-            print("insertDataWarranzyLog => $e");
-          }
-          if (txtBrandCode.text == null || txtBrandCode.text == "") {
-            try {
-              await DBProviderAsset.db
-                  .inserDataBrand(res.brand)
-                  .catchError((onError) => print("Insert Name brand $onError"));
-            } catch (e) {
-              print("Insert Name brand $e");
-            }
-          }
-          res.filePool.forEach((data) async {
-            try {
-              await DBProviderAsset.db
-                  .insertDataFilePool(data)
-                  .catchError((onError) => print("filePool $onError"))
-                  .whenComplete(whenCompleted);
-            } catch (e) {
-              print("insertDataFilePool => $e");
-            }
-          });
-        } else if (res.status == false) {
-          ecsLib.showDialogLib(context,
-              title: "FAIL ADD ASSET",
-              content: res.message ?? "Somthing wrong !. status fail",
-              textOnButton: allTranslations.text("close"));
-        } else {
-          ecsLib.showDialogLib(context,
-              title: "FAIL ADD ASSET",
-              content: res.message ?? "Somthing wrong !.",
-              textOnButton: allTranslations.text("close"));
-        }
-      }).catchError((e) {
-        print("$e");
-        ecsLib.cancelDialogLoadindLib(context);
-      });
-    } on DioError catch (error) {
-      print("DIO ERROR => ${error.error}\nMsg => ${error.message}");
-      ecsLib.cancelDialogLoadindLib(context);
-    } catch (e) {
-      print("Catch $e");
-      ecsLib.cancelDialogLoadindLib(context);
-    }
+    // ecsLib.printJson(dataPost);
     return _completed;
   }
 
@@ -1056,12 +1153,12 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
                     title: "Warranzy");
               } else {
                 print(postDataForAdd());
-                ecsLib.pushPage(
-                  context: context,
-                  pageWidget: AddImageDemo(
-                    dataAsset: postDataForAdd(),
-                  ),
-                );
+                // ecsLib.pushPage(
+                //   context: context,
+                //   pageWidget: AddImageDemo(
+                //     dataAsset: postDataForAdd(),
+                //   ),
+                // );
               }
             }
           }),

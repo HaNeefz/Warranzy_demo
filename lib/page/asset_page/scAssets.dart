@@ -11,6 +11,7 @@ import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:warranzy_demo/models/model_asset_data.dart';
+import 'package:warranzy_demo/models/model_image_data_each_group.dart';
 import 'package:warranzy_demo/models/model_repository_asset_scan.dart';
 import 'package:warranzy_demo/models/model_respository_asset.dart';
 import 'package:warranzy_demo/models/model_user.dart';
