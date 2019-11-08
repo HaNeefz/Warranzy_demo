@@ -1016,9 +1016,10 @@ class _MyAssetFormSQLiteState extends State<MyAssetFormSQLite> {
                     children: <Widget>[
                       TextBuilder.build(
                           title: widget.data.title ?? "Empty title",
-                          style: TextStyleCustom.STYLE_LABEL_BOLD),
+                          style: TextStyleCustom.STYLE_LABEL_BOLD
+                              .copyWith(fontSize: 20)),
                       TextBuilder.build(
-                          title: widget.data.custRemark ?? "Empty Remark",
+                          title: widget.data.custRemark ?? "",
                           style: TextStyleCustom.STYLE_CONTENT,
                           textOverflow: TextOverflow.ellipsis,
                           maxLine: 2),

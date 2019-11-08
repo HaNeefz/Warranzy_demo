@@ -226,6 +226,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
       print("title : ${v.title}");
       print("imageList : ${v.imagesList}");
       print("imageBase64 : ${v.imageBase64}");
+      print("tempBase64 : ${v.tempBase64.length}");
       print("-----------");
     });
     listTempData = List.of(listImageEachGroup ?? []);
@@ -477,55 +478,68 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
         // ecsLib.printJson(postData);
 
         if (actionPageForAdd == true) {
-          await ecsLib
-              .showDialogTripleAction(
-            context,
-            content: "Are you sure you want to add asset ?",
-            labelFisrt: "Save",
-            labelSecond: "Save and Duplicate",
-            labelThird: allTranslations.text("cancel"),
-          )
-              .then((response) async {
-            if (response == "F") {
-              print(response);
-              // await changeAllImageToBase64();
-              // setState(() {});
-              await setFormatDataBeforSendApi(
-                postData,
-              ).then((body) async {
-                ecsLib.printJson(body);
-                await sendApiAddAsset(
-                    body: body,
-                    whenCompleted: () => ecsLib.pushPageAndClearAllScene(
-                        context: context, pageWidget: MainPage()));
-              });
-            } else if (response == "S") {
-              print(response);
-              // await changeAllImageToBase64();
-              // setState(() {});
-              await setFormatDataBeforSendApi(
-                postData,
-              ).then((body) async {
-                ecsLib.printJson(body);
-                // await sendApiAddAsset(
-                //     body: body,
-                //     whenCompleted: () async {
-                //       await ecsLib.showDialogLib(
-                //         context,
-                //         title: "Warranzy",
-                //         content: "Added asset and Duplicated data.",
-                //         textOnButton: allTranslations.text("ok"),
-                //       );
-                //     });
-              });
-            } else {
-              print(response);
-            }
-          });
+          if (checkImageisEmpty() == true) {
+            await ecsLib.showDialogLib(context,
+                title: "IMAGE IS EMPTY",
+                content: "Please add some image.",
+                textOnButton: allTranslations.text("close"));
+          } else {
+            await ecsLib
+                .showDialogTripleAction(
+              context,
+              content: "Are you sure you want to add asset ?",
+              labelFisrt: "Save",
+              labelSecond: "Save and Duplicate",
+              labelThird: allTranslations.text("cancel"),
+            )
+                .then((response) async {
+              if (response == "F") {
+                print(response);
+                await setFormatDataBeforSendApi(
+                  postData,
+                ).then((body) async {
+                  ecsLib.printJson(body);
+                  await sendApiAddAsset(
+                      body: body,
+                      whenCompleted: () => ecsLib.pushPageAndClearAllScene(
+                          context: context, pageWidget: MainPage()));
+                });
+              } else if (response == "S") {
+                print(response);
+                await setFormatDataBeforSendApi(
+                  postData,
+                ).then((body) async {
+                  ecsLib.printJson(body);
+                  await sendApiAddAsset(
+                      body: body,
+                      whenCompleted: () async {
+                        await ecsLib.showDialogLib(
+                          context,
+                          title: "Warranzy",
+                          content: "Added asset and Duplicated data.",
+                          textOnButton: allTranslations.text("ok"),
+                        );
+                      });
+                });
+              } else {
+                print(response);
+              }
+            });
+          }
         } else
           sendApiEdit(postData: postData);
       }
     }
+  }
+
+  bool checkImageisEmpty() {
+    bool isEmpty = true;
+    listTempData.forEach((v) {
+      if (v.tempBase64.length > 0) {
+        isEmpty = false;
+      }
+    });
+    return isEmpty;
   }
 
   Future<Map<String, dynamic>> setFormatDataBeforSendApi(
@@ -710,47 +724,8 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
               print("title : ${data.title}");
               print("imageListFile : ${data.imagesList}");
               print("imageBase64 : ${data.imageBase64}");
-              print("tempBase64 : ${data.tempBase64}");
+              print("tempBase64 : ${data.tempBase64.length}");
             }
-
-            // if (edit == true) {
-            //   print(edit);
-            // List images = await ecsLib.pushPage(
-            //   context: context,
-            //   pageWidget: ModifyImage(
-            //     image: data,
-            //     assetData: _data,
-            //   ),
-            // );
-            // if (images != null && images.isNotEmpty) {
-            //   // List<Uint8List> temp = images[0] as List<Uint8List>;
-            //   setState(() {
-            //     data.imageUint8List = images[0] as List<Uint8List>;
-            //     data.imagesList = images[1] as List<File>;
-            //   });
-            // }
-            // } else {
-            //   print(edit);
-            // List<File> images = await ecsLib.pushPage(
-            //     context: context,
-            //     pageWidget: TakePhotos(
-            //       title: data.title,
-            //       images: data.imagesList,
-            //     ));
-            // print("comeback");
-            // if (images != null) {
-            //   print("return Images = ${images.length}");
-
-            // setState(() {
-            //   data.imagesList = images;
-            // });
-            // data.imageBase64.clear();
-            // for (var fileImage in images) {
-            //   data.imageBase64.add("${fileImage.path}");
-            // }
-            // print(data.imagesList.length);
-            // }
-            // }
           },
         ),
         Divider()
@@ -854,7 +829,6 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
         decoration: InputDecoration(
           filled: true,
           fillColor: Colors.grey[100],
-          // border: InputBorder.none,
         ),
         value: initalData, //items.elementAt(0)
         items: items.isNotEmpty
@@ -947,115 +921,6 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
         }
       }
     });
-  }
-
-  Future<bool> changeAllImageToBase64() async {
-    bool _completed = false;
-    print("Submit");
-    ecsLib.showDialogLoadingLib(context, content: "Image compressing");
-    try {
-      listTempData.forEach((imageEachGroup) async {
-        if (imageEachGroup.imageBase64.length > 0) {
-          imageEachGroup?.imageBase64?.forEach((imageKey) async {
-            await ImageDataEachGroup.changeImageKeyToBase64(imageKey).then((v) {
-              _listTempData[listTempData.indexOf(imageEachGroup)]
-                  .tempBase64
-                  .add(v);
-              // print(
-              //     "title: ${_listTempData[listTempData.indexOf(imageEachGroup)].title}");
-              // print(
-              //     "imageEachGroup.tempBase64: ${_listTempData[listTempData.indexOf(imageEachGroup)].tempBase64.length}");
-            });
-          });
-        }
-        if (imageEachGroup.imagesList.length > 0) {
-          print("imageEachGroup.imagesList.length > 0");
-          imageEachGroup?.imagesList?.forEach((imageFile) async {
-            print("imageFile : $imageFile");
-            await ImageDataEachGroup.changeImageFileToBase64(imageFile)
-                .then((v) {
-              _listTempData[listTempData.indexOf(imageEachGroup)]
-                  .tempBase64
-                  .add(v);
-              // print(
-              //     "title: ${_listTempData[listTempData.indexOf(imageEachGroup)].title}");
-              // print(
-              //     "imageEachGroup.tempBase64: ${_listTempData[listTempData.indexOf(imageEachGroup)].tempBase64.length}");
-            });
-          });
-        }
-      });
-
-      // _listTempData.forEach((v) {
-      //   print("title : ${v.title}");
-      //   print("listImage : ${v.imagesList}");
-      //   print("base64 : ${v.tempBase64}");
-      // });
-      // listTempData.forEach((imageData) async {
-      //   print("ff.title : ${imageData.title}");
-      //   print("ff.tempBase64 : ${imageData.tempBase64}");
-      // });
-
-      // var imageData = {};
-      // for (int i = 0; i < listTempData?.length ?? 0; i++) {
-      //   // if (listTempData[i].imagesList.length > 0) {
-      //   var tempModelImage = listTempData[i];
-      //   for (int j = 0; j < tempModelImage.imagesList.length; j++) {
-      //     var listImages = tempModelImage.imagesList[j];
-      //     var tempDir = await getTemporaryDirectory();
-      //     var _newSize = await ecsLib.compressFile(
-      //       file: listImages,
-      //       targetPath: tempDir.path + "/${listImages.path.split("/").last}",
-      //       minWidth: 600,
-      //       minHeight: 480,
-      //       quality: 80,
-      //     );
-      //     listImages = _newSize;
-      //     tempModelImage.tempBase64[j] =
-      //         base64Encode(listImages.readAsBytesSync());
-
-      //     print("------ ${tempModelImage.title} No. $i => Image No. $j");
-      //   }
-      // if (listTempData[i].imageBase64.length > 0) {
-      //   print("listTempData[i].imageBase64: ${listTempData[i].imageBase64}");
-      //   listTempData[i].imageBase64.forEach((key) async {
-      //     await DBProviderAsset.db
-      //         .getImagePoolReturn(key)
-      //         .then((imageBase64) {
-      //       keepDataBase64.add(imageBase64.first.fileData);
-      //       print("listTempData[i].tempBase64 ${listTempData[i].tempBase64}");
-      //     });
-      //   });
-      //   listTempData[i].tempBase64 = keepDataBase64;
-      //   keepDataBase64 = [];
-      //   print("listTempData: ${listTempData[i].tempBase64.length}");
-      //   imageData.addAll(
-      //       {listTempData[i].title: listTempData[i].tempBase64.asMap()});
-      // }
-      //   }
-      // try {
-      //   for (var modelImage in listTempData) {
-      //     imageData.addAll({"${modelImage.title}": {}});
-      //     // tempImageData.addAll({"${modelImage.title}": {}});
-      //     for (var imageBase64Data in modelImage.tempBase64) {
-      //       imageData["${modelImage.title}"].addAll({
-      //         "${modelImage.tempBase64.indexOf(imageBase64Data)}":
-      //             imageBase64Data
-      //       });
-      //       // tempImageData.addAll({"${modelImage.title}": imageBase64Data});
-      //     }
-      //   }
-      //   dataPost.addAll({"Images": imageData});
-      // } catch (e) {
-      //   print(e);
-      // }
-      // }
-    } catch (e) {
-      print("Catch outerSide $e");
-    }
-    ecsLib.cancelDialogLoadindLib(context);
-    // ecsLib.printJson(dataPost);
-    return _completed;
   }
 
   AutoCompleteTextField<GetBrandName> autoCompleteTextField() {

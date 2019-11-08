@@ -139,7 +139,11 @@ class _EditImagesState extends State<EditImages> {
     tempListRelated.forEach((v) {
       setState(() {
         listTempData.add(ImageDataEachGroup(
-            title: v, imageUrl: [], imageBase64: [], imagesList: []));
+            title: v,
+            imageUrl: [],
+            imageBase64: [],
+            imagesList: [],
+            tempBase64: []));
       });
     });
     print("compact => $listRelated");
@@ -149,7 +153,7 @@ class _EditImagesState extends State<EditImages> {
   void initState() {
     super.initState();
     listTempData = List.of(imageEachGroup ?? []);
-
+    print("--------editImageForAdd $editImageForAdd");
     if (editImageForAdd == false) {
       getProductCat();
       getImageToBase64();
@@ -243,13 +247,17 @@ class ModifytImageState extends State<ModifyImage> {
   Future<List<Uint8List>> tempImageLoading;
   List<File> imageNew = [];
   List<Uint8List> imageOld = [];
+  List<String> allImage = [];
 
   void initState() {
     super.initState();
+    print("WTokenID : ${assetData.wTokenID}");
     print("fileAttach intiState() : ${widget.fileAttach}");
     print("title initState() : ${imageDataEachGroup.title}");
     print("listBase64 initState() : ${imageDataEachGroup.imageBase64}");
-    tempImageLoading = getImageToBase64();
+    print("tempBase64 initState() : ${imageDataEachGroup.tempBase64.length}");
+    allImage = List.of(imageDataEachGroup.tempBase64);
+    // tempImageLoading = getImageToBase64();
   }
 
   Future<List<Uint8List>> getImageToBase64() async {
@@ -324,73 +332,20 @@ class ModifytImageState extends State<ModifyImage> {
                       style: TextStyleCustom.STYLE_TITLE),
                   SizedBox(height: 5),
                   SizedBox(height: 5),
-                  FutureBuilder<List<Uint8List>>(
-                    future: tempImageLoading,
-                    builder: (BuildContext context,
-                        AsyncSnapshot<List<Uint8List>> snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done) {
-                        if (snapshot.hasError) {
-                          return Text("Error");
-                        } else {
-                          var data = snapshot.data;
-                          return Container(
-                              child: Column(
-                            children: <Widget>[
-                              if (data.isNotEmpty && data.length > 0)
-                                Column(
-                                  children: <Widget>[
-                                    Center(
-                                        child: TextBuilder.build(
-                                            title: "Old Image")),
-                                    ImageListBuilder.build(
-                                        context: context,
-                                        imageData: data,
-                                        isImageBase64: true,
-                                        heroTag: "imageOld",
-                                        editAble: true,
-                                        onClicked: (index) {
-                                          print("ImageOld indexOf($index)");
-                                          if (data.length > 1)
-                                            setState(() {
-                                              imageOld.removeAt(index);
-                                            });
-                                        }),
-                                  ],
-                                )
-                            ],
-                          ));
-                        }
-                      } else if (snapshot.connectionState ==
-                          ConnectionState.waiting) {
-                        return Center(child: CircularProgressIndicator());
-                      } else {
-                        return Text("Something wrong...!");
-                      }
-                    },
-                  ),
-                  SizedBox(height: 20),
-                  imageNew.length > 0
-                      ? Column(
-                          children: <Widget>[
-                            TextBuilder.build(title: "New Image"),
-                            SizedBox(height: 10),
-                            if (imageNew.isNotEmpty && imageNew.length > 0)
-                              ImageListBuilder.build(
-                                  context: context,
-                                  imageData: imageNew,
-                                  isImageBase64: true,
-                                  heroTag: "imageNew",
-                                  editAble: true,
-                                  onClicked: (index) {
-                                    print("imageNew indexOf($index)");
-                                    if (imageNew.length > 0)
-                                      setState(() {
-                                        imageNew.removeAt(index);
-                                      });
-                                  })
-                          ],
-                        )
-                      : Container()
+                  ImageListBuilder.build(
+                      context: context,
+                      imageData: allImage,
+                      isImageBase64: true,
+                      crossAxisCount: 2,
+                      heroTag: "imageOld",
+                      editAble: true,
+                      onClicked: (index) {
+                        print("ImageOld indexOf($index)");
+                        if (allImage.length > 0)
+                          setState(() {
+                            allImage.removeAt(index);
+                          });
+                      }),
                 ],
               ),
             ],
@@ -409,6 +364,7 @@ class ModifytImageState extends State<ModifyImage> {
                 if (resPhoto != null)
                   setState(() {
                     imageNew.add(resPhoto);
+                    allImage.add(base64Encode(resPhoto.readAsBytesSync()));
                   });
               } catch (e) {
                 print(e);
@@ -426,6 +382,7 @@ class ModifytImageState extends State<ModifyImage> {
                 if (resPhoto != null)
                   setState(() {
                     imageNew.add(resPhoto);
+                    allImage.add(base64Encode(resPhoto.readAsBytesSync()));
                   });
               } catch (e) {
                 print(e);

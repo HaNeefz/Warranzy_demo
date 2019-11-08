@@ -121,6 +121,7 @@ class _DetailAssetState extends State<DetailAsset> {
   final allTranslations = getIt.get<GlobalTranslations>();
   ModelDataAsset get _data => widget.dataAsset;
   List<ImageDataEachGroup> imageDataEachGroup = [];
+  List<ImageDataEachGroup> imageGroup = [];
   List<String> listImageUrl = [];
   List<String> imageData = [];
   List<String> imageKey = [];
@@ -128,8 +129,8 @@ class _DetailAssetState extends State<DetailAsset> {
   String brandName = '';
 
   getProductCateName() async {
-    print(
-        "carID : ${_data.pdtCatCode} | lang: ${allTranslations.currentLanguage}");
+    // print(
+    //     "carID : ${_data.pdtCatCode} | lang: ${allTranslations.currentLanguage}");
     var _catName = await DBProviderInitialApp.db.getProductCatName(
         id: _data.pdtCatCode, lang: allTranslations.currentLanguage);
 
@@ -147,7 +148,7 @@ class _DetailAssetState extends State<DetailAsset> {
   getImage() async {
     //keep all tempKey
     List<String> _key = [];
-    print("widget.listImage => ${widget.listImage}");
+    // print("widget.listImage => ${widget.listImage}");
     //loop for get data type list<Map<..,..>>
     widget.listImage.map((map) {
       // loop get data type Map for output to key,value . To continue to use.
@@ -161,7 +162,7 @@ class _DetailAssetState extends State<DetailAsset> {
           _key.add(v);
         });
       });
-      print("_key => $_key");
+      // print("_key => $_key");
 
       //loop all key in loop of Type each Image ex. "Image_Product"
       _key.forEach((key) async {
@@ -170,7 +171,7 @@ class _DetailAssetState extends State<DetailAsset> {
         //getAllImage by keyImage
         await DBProviderAsset.db.getImagePoolReturn(key).then((filePool) {
           //addImage for show in widget
-          setState(() => imageData.add(filePool.first.fileData));
+          imageData.add(filePool.first.fileData);
         });
       });
       //clear tempKey cause duplicate in loop
@@ -182,10 +183,42 @@ class _DetailAssetState extends State<DetailAsset> {
     // });
   }
 
+  _testGetImage() {
+    print("widget.listImage : ${widget.listImage}");
+    widget.listImage.forEach((v) {
+      v.forEach((k, v) {
+        imageDataEachGroup
+            .add(ImageDataEachGroup(title: k, imageBase64: v, tempBase64: []));
+        // imageGroup
+        //     .add(ImageDataEachGroup(title: k, imageBase64: v, tempBase64: []));
+      });
+    });
+    imageDataEachGroup.forEach((v) async {
+      // print("v : ${v.imageBase64}");
+      v.imageBase64.forEach((key) async {
+        imageKey.add(key);
+        await ImageDataEachGroup.changeImageKeyToBase64(key).then((_base64) {
+          //addImage for show in widget
+          // print("filePool : $filePool");
+          imageData.add(_base64);
+          imageDataEachGroup[imageDataEachGroup.indexOf(v)]
+              .tempBase64
+              .add(_base64);
+          // print(
+          //     "<<<< TempBase64 : ${imageGroup[imageGroup.indexOf(v)].tempBase64.length} >>>>");
+        });
+      });
+    });
+
+    // imageGroup.forEach((b) {
+    //   print("b : ${b.tempBase64.length}");
+    // });
+  }
+
   void initState() {
     super.initState();
-    getImage();
-    // getImageUrl(widget.dataAsset);
+    // getImage();
+    _testGetImage();
     getProductCateName();
     getBrandName();
   }
@@ -197,6 +230,7 @@ class _DetailAssetState extends State<DetailAsset> {
       _tempFileAttach.addAll(v);
     });
     // print("<DetailAsset> fileAttach => $_tempFileAttach");
+    print("---------DetailPage : WTokenID : ${_data.wTokenID}");
     ecsLib.pushPage(
       context: context,
       pageWidget: EditDetailAsset(
@@ -464,6 +498,14 @@ class _DetailAssetState extends State<DetailAsset> {
           print("Duplicate");
           _data.wTokenID = "";
           _data.createType = "C";
+          if (imageDataEachGroup.length > 0) {
+            imageDataEachGroup.forEach((v) {
+              print(
+                  "<<<< ${v.title} have base64 : ${v.tempBase64.length} >>>>");
+            });
+          } else {
+            print("<<<< imageGroup.length < 0 >>>>");
+          }
           ecsLib.pushPage(
             context: context,
             pageWidget: FormDataAssetTest(
