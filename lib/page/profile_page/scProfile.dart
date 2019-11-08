@@ -37,6 +37,8 @@ class _ProfilePageState extends State<ProfilePage> {
   final CallsAndMessageService _service = CallsAndMessageService();
   bool checkInformationChange = false;
   ModelCustomers dataCust;
+  bool _usedTouchID = false;
+
   @override
   void initState() {
     super.initState();
@@ -46,6 +48,8 @@ class _ProfilePageState extends State<ProfilePage> {
   void getDataCustomers() async {
     var tempDataCust = await DBProviderCustomer.db.getDataCustomer();
     dataCust = tempDataCust;
+    setState(() => _usedTouchID = dataCust.specialPass == "Y" ? true : false);
+
     print("ID Customer => ${await DBProviderCustomer.db.getIDCustomer()}");
     print(
         "<=========================MAS_CUSTOMER=========================>\n${dataCust.toJson()}\n<================================================================>");
@@ -64,6 +68,11 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    Text textContent(String text) {
+      return TextBuilder.build(
+          title: text ?? "", style: TextStyleCustom.STYLE_CONTENT);
+    }
+
     return Scaffold(
         resizeToAvoidBottomInset: false,
         resizeToAvoidBottomPadding: false,
@@ -87,20 +96,16 @@ class _ProfilePageState extends State<ProfilePage> {
                 },
               ),
               actions: <Widget>[
-                FlatButton(
-                  child: Icon(
-                    Icons.lock_open,
-                    size: 30,
-                    color: ThemeColors.COLOR_WHITE,
-                  ),
-                  onPressed: () {
-                    MethodHelper.clearTimeZoneAndCountryCode();
-                    ecsLib.pushPageAndClearAllScene(
-                      context: context,
-                      pageWidget: SplashScreenPage(),
-                    );
-                  },
-                )
+                // FlatButton(
+                //   child: Icon(
+                //     Icons.lock_open,
+                //     size: 30,
+                //     color: ThemeColors.COLOR_WHITE,
+                //   ),
+                //   onPressed: () {
+
+                //   },
+                // )
               ],
               elevation: 5,
               forceElevated: true,
@@ -117,24 +122,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                     Align(
                       alignment: Alignment.center,
-                      child: Hero(
-                        child: Icon(Icons.person_pin,
-                            size: 100, color: Colors.white),
-                        // Container(
-                        //   width: 150,
-                        //   height: 150,
-                        //   decoration: BoxDecoration(
-                        //       shape: BoxShape.circle,
-                        //       border: Border.all(width: 3)),
-                        //   child: Center(
-                        //     child: FlutterLogo(
-                        //       size: 100,
-                        //       colors: ThemeColors.COLOR_THEME_APP,
-                        //     ),
-                        //   ),
-                        // ),
-                        tag: "PhotoProfile",
-                      ),
+                      child: buildHeroProfile(),
                     ),
                     Align(
                       alignment: Alignment.center,
@@ -153,119 +141,147 @@ class _ProfilePageState extends State<ProfilePage> {
               // snap: true,
               // floating: true,
               expandedHeight: 300,
-
-              // title: TextBuilder.build(
-              //     title: "Profile", style: TextStyleCustom.STYLE_APPBAR),
             ),
             SliverList(
                 delegate: SliverChildListDelegate([
-              // FormWidgetBuilder.formDropDown(
-              //     key: "test1",
-              //     title: "DropDowm",
-              //     validate: [
-              //       FormBuilderValidators.required(),
-              //     ],
-              //     items: [
-              //       1,
-              //       2,
-              //       3
-              //     ]),
               Container(
                 padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    TextBuilder.build(
+                    headLine("Profile"),
+                    listTile(
                         title: "Profile",
-                        style: TextStyleCustom.STYLE_LABEL.copyWith(
-                            fontSize: 25, color: ThemeColors.COLOR_THEME_APP)),
-                    ListTile(
-                      leading: Icon(
-                        Icons.account_circle,
-                        size: 40,
-                        color: ThemeColors.COLOR_BLACK,
-                      ),
-                      title: TextBuilder.build(title: "Account Details"),
-                      trailing: IconButton(
-                        icon: Icon(Icons.arrow_forward_ios),
-                        onPressed: () {},
-                      ),
-                    ),
+                        icons: Icons.account_circle,
+                        onPressed: () {}),
+                    listTile(
+                        title: "Your Address",
+                        icons: Icons.person_pin_circle,
+                        onPressed: () {}),
+                    Divider(),
+                    headLine("Security"),
+                    listTile(
+                        title: "Change PIN",
+                        icons: Icons.keyboard,
+                        onPressed: () {}),
+                    listTile(
+                        title: "Sign in with touch ID",
+                        icons: Icons.fingerprint,
+                        trailing: Switch(
+                          value: _usedTouchID,
+                          onChanged: (bool value) {
+                            setState(() => _usedTouchID = value);
+                          },
+                        )),
+                    Divider(),
+                    headLine("Setting app"),
+                    listTile(
+                        title: "Language",
+                        icons: Icons.g_translate,
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            textContent(allTranslations.currentLanguage == "en"
+                                ? "English"
+                                : "ภาษาไทย"),
+                            Icon(Icons.arrow_forward_ios)
+                          ],
+                        ),
+                        onPressed: () {}),
+                    listTile(
+                        title: "Feedback",
+                        icons: Icons.feedback,
+                        onPressed: () {}),
+                    Divider(),
+                    headLine("About warranzy"),
+                    listTile(
+                        title: "Customer Service",
+                        icons: Icons.call,
+                        trailing: textContent("02-330-9390"),
+                        onPressed: () => _service.call("02-330-9390")),
+                    listTile(
+                        title: "FAQ", icons: Icons.message, onPressed: () {}),
+                    listTile(
+                        title: "Privacy",
+                        icons: Icons.account_balance,
+                        onPressed: () {}),
+                    listTile(
+                        title: "Terms of Service",
+                        icons: Icons.account_balance,
+                        onPressed: () {}),
+                    Divider(),
+                    listTile(
+                        title: "Logout",
+                        icons: Icons.lock_open,
+                        onPressed: () {
+                          MethodHelper.clearTimeZoneAndCountryCode();
+                          ecsLib.pushPageAndClearAllScene(
+                            context: context,
+                            pageWidget: SplashScreenPage(),
+                          );
+                        }),
+                    Divider(),
                   ],
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: <Widget>[
-                  buttonContact(Icons.call, "Call Center", Colors.green,
-                      () => _service.call("0123456789")),
-                  buttonContact(Icons.sms, "Send Sms", Colors.blue,
-                      () => _service.sendSms("0123456789")),
-                  buttonContact(Icons.email, "Email us", Colors.redAccent,
-                      () => _service.sendEmail("wpoungchoo@gmail.com")),
-                ],
-              ),
-              RaisedButton(
-                child: Icon(Icons.check),
-                onPressed: () {
-                  _fbKey.currentState.save();
-                  if (_fbKey.currentState.validate()) {
-                    print(_fbKey.currentState.value);
-                  }
-                },
-              ),
-              RaisedButton(
-                child: Text("Send to cloud_firestore"),
-                onPressed: sendTocloudFireStore,
-              ),
-              RaisedButton(
-                child: Text("Test Loading"),
-                onPressed: () => ecsLib.showDialogLoadingLib(context),
-              ),
-              RaisedButton(
-                child: Text("GetCategory"),
-                onPressed: () => DBProviderInitialApp.db.getGroupCategory(),
-              ),
-              RaisedButton(
-                  child: Text("GetSubCategoryByGroup"),
-                  onPressed: () async {
-                    // DBProviderInitialApp.db
-                    //     .getSubCategoryByGroupID(groupID: "A");
-                    await DBProviderInitialApp.db.getAllSubCategory();
-                  }),
-              RaisedButton(
-                child: Text("GetAsset"),
-                onPressed: () async {
-                  // Map<String, dynamic> tempM = {};
-                  List<ModelDataAsset> modelData =
-                      await DBProviderAsset.db.getAllDataAsset();
-                  for (var temp in modelData) {
-                    print(temp.fileAttachID);
-                    //   Map<String, dynamic> jsonDecoder =
-                    //       jsonDecode(temp.fileAttachID);
-                    //   tempM = await getListImage(jsonDecoder);
-                    //   print(tempM);
-                    //   // print(jsonDecoder);
-                    //   print("---------------");
-                  }
-                  // await DBProviderAsset.db.getMainImage();
-                  await DBProviderAsset.db.getAllBrandName();
-                },
-              ),
-              RaisedButton(
-                child: Text("Clear SQLite"),
-                onPressed: () async {
-                  await DBProviderAsset.db.deleteAllAsset();
-                  // print(await DBProviderCustomer.db.getSpecialPass());
-                },
-              ),
-              RaisedButton(
-                child: Text("getImagePool"),
-                onPressed: () async {
-                  await DBProviderAsset.db.getAllDataFilePool();
-                  // print(await DBProviderCustomer.db.getSpecialPass());
-                },
-              ),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.spaceAround,
+              //   children: <Widget>[
+              //     buttonContact(Icons.call, "Call Center", Colors.green,
+              //         () => _service.call("0123456789")),
+              //     buttonContact(Icons.sms, "Send Sms", Colors.blue,
+              //         () => _service.sendSms("0123456789")),
+              //     buttonContact(Icons.email, "Email us", Colors.redAccent,
+              //         () => _service.sendEmail("wpoungchoo@gmail.com")),
+              //   ],
+              // ),
+              // RaisedButton(
+              //   child: Icon(Icons.check),
+              //   onPressed: () {
+              //     _fbKey.currentState.save();
+              //     if (_fbKey.currentState.validate()) {
+              //       print(_fbKey.currentState.value);
+              //     }
+              //   },
+              // ),
+              // RaisedButton(
+              //   child: Text("Send to cloud_firestore"),
+              //   onPressed: sendTocloudFireStore,
+              // ),
+              // RaisedButton(
+              //   child: Text("Test Loading"),
+              //   onPressed: () => ecsLib.showDialogLoadingLib(context),
+              // ),
+              // RaisedButton(
+              //   child: Text("GetCategory"),
+              //   onPressed: () => DBProviderInitialApp.db.getGroupCategory(),
+              // ),
+              // RaisedButton(
+              //     child: Text("GetSubCategoryByGroup"),
+              //     onPressed: () async {
+              //       // DBProviderInitialApp.db
+              //       //     .getSubCategoryByGroupID(groupID: "A");
+              //       await DBProviderInitialApp.db.getAllSubCategory();
+              //     }),
+              // RaisedButton(
+              //   child: Text("GetAsset"),
+              //   onPressed: () async {
+              //     // Map<String, dynamic> tempM = {};
+              //     List<ModelDataAsset> modelData =
+              //         await DBProviderAsset.db.getAllDataAsset();
+              //     for (var temp in modelData) {
+              //       print(temp.fileAttachID);
+              //       //   Map<String, dynamic> jsonDecoder =
+              //       //       jsonDecode(temp.fileAttachID);
+              //       //   tempM = await getListImage(jsonDecoder);
+              //       //   print(tempM);
+              //       //   // print(jsonDecoder);
+              //       //   print("---------------");
+              //     }
+              //     // await DBProviderAsset.db.getMainImage();
+              //     await DBProviderAsset.db.getAllBrandName();
+              //   },
+              // ),
               // RaisedButton(
               //   child: Text("Clear SQLite"),
               //   onPressed: () async {
@@ -273,23 +289,93 @@ class _ProfilePageState extends State<ProfilePage> {
               //     // print(await DBProviderCustomer.db.getSpecialPass());
               //   },
               // ),
+              // RaisedButton(
+              //   child: Text("getImagePool"),
+              //   onPressed: () async {
+              //     await DBProviderAsset.db.getAllDataFilePool();
+              //     // print(await DBProviderCustomer.db.getSpecialPass());
+              //   },
+              // ),
+              // // RaisedButton(
+              // //   child: Text("Clear SQLite"),
+              // //   onPressed: () async {
+              // //     await DBProviderAsset.db.deleteAllAsset();
+              // //     // print(await DBProviderCustomer.db.getSpecialPass());
+              // //   },
+              // // ),
             ])),
-            SliverFixedExtentList(
-              itemExtent: 150.0,
-              delegate: SliverChildListDelegate([
-                Container(color: Colors.red),
-                Container(color: Colors.green),
-                Container(color: Colors.blue),
-                Container(color: Colors.pink),
-                Container(color: Colors.yellow),
-                Container(color: Colors.orange),
-                Container(color: Colors.purple),
-                Container(color: Colors.black),
-                Container(color: Colors.grey),
-              ]),
-            )
+            // SliverFixedExtentList(
+            //   itemExtent: 150.0,
+            //   delegate: SliverChildListDelegate([
+            //     Container(color: Colors.red),
+            //     Container(color: Colors.green),
+            //     Container(color: Colors.blue),
+            //     Container(color: Colors.pink),
+            //     Container(color: Colors.yellow),
+            //     Container(color: Colors.orange),
+            //     Container(color: Colors.purple),
+            //     Container(color: Colors.black),
+            //     Container(color: Colors.grey),
+            //   ]),
+            // )
           ]),
         ));
+  }
+
+  Hero buildHeroProfile() {
+    return Hero(
+      child: Stack(
+        children: <Widget>[
+          Container(
+            width: 150,
+            height: 150,
+            decoration:
+                BoxDecoration(shape: BoxShape.circle, color: Colors.white),
+          ),
+          Positioned(
+            bottom: 20,
+            right: 0,
+            child: Container(
+              width: 50,
+              height: 50,
+              decoration:
+                  BoxDecoration(shape: BoxShape.circle, color: Colors.teal),
+              child: IconButton(
+                icon: Icon(Icons.add_a_photo, size: 30, color: Colors.white),
+                onPressed: () {},
+              ),
+            ),
+          )
+          // Icon(Icons.person_pin,
+          //     size: 100, color: Colors.white),
+        ],
+      ),
+      tag: "PhotoProfile",
+    );
+  }
+
+  Widget headLine([String title]) {
+    return TextBuilder.build(
+        title: title ?? "",
+        style: TextStyleCustom.STYLE_LABEL
+            .copyWith(fontSize: 20, color: ThemeColors.COLOR_THEME_APP));
+  }
+
+  Widget listTile(
+      {IconData icons, String title, Function onPressed, Widget trailing}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: ListTile(
+        leading: Icon(
+          icons,
+          size: 30,
+          color: ThemeColors.COLOR_BLACK,
+        ),
+        title: TextBuilder.build(title: title ?? ""),
+        trailing: trailing ?? Icon(Icons.arrow_forward_ios),
+        onTap: onPressed,
+      ),
+    );
   }
 
   // Future<Map<String, dynamic>> getListImage(Map<String, dynamic> map) async {
