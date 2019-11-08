@@ -324,31 +324,37 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Hero buildHeroProfile() {
     return Hero(
-      child: Stack(
-        children: <Widget>[
-          Container(
-            width: 150,
-            height: 150,
-            decoration:
-                BoxDecoration(shape: BoxShape.circle, color: Colors.white),
-          ),
-          Positioned(
-            bottom: 20,
-            right: 0,
-            child: Container(
-              width: 50,
-              height: 50,
+      child: Container(
+        width: 160,
+        height: 160,
+        child: Stack(
+          children: <Widget>[
+            Container(
+              width: 150,
+              height: 150,
               decoration:
-                  BoxDecoration(shape: BoxShape.circle, color: Colors.teal),
-              child: IconButton(
-                icon: Icon(Icons.add_a_photo, size: 30, color: Colors.white),
-                onPressed: () {},
-              ),
+                  BoxDecoration(shape: BoxShape.circle, color: Colors.white),
             ),
-          )
-          // Icon(Icons.person_pin,
-          //     size: 100, color: Colors.white),
-        ],
+            Positioned(
+              bottom: 20,
+              right: 0,
+              child: Container(
+                width: 50,
+                height: 50,
+                decoration:
+                    BoxDecoration(shape: BoxShape.circle, color: Colors.teal),
+                child: IconButton(
+                  icon: Icon(Icons.add_a_photo, size: 30, color: Colors.white),
+                  onPressed: () async {
+                    await buildShowModalBottomSheet(context);
+                  },
+                ),
+              ),
+            )
+            // Icon(Icons.person_pin,
+            //     size: 100, color: Colors.white),
+          ],
+        ),
       ),
       tag: "PhotoProfile",
     );
@@ -437,6 +443,42 @@ class _ProfilePageState extends State<ProfilePage> {
                 )
               : Container()
         ],
+      ),
+    );
+  }
+
+  Future buildShowModalBottomSheet(BuildContext context) {
+    return showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) => Container(
+        height: 200,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            ListTile(
+              leading: Icon(
+                Icons.edit,
+                color: ThemeColors.COLOR_BLACK,
+              ),
+              title: TextBuilder.build(title: "Edit Profile"),
+              onTap: () async {
+                print("Edit Profile");
+              },
+            ),
+            Divider(),
+            ListTile(
+              leading: Icon(
+                Icons.add_a_photo,
+                color: ThemeColors.COLOR_BLACK,
+                size: 35,
+              ),
+              title: TextBuilder.build(title: "Add Profile"),
+              onTap: () {
+                print("Add profile");
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
