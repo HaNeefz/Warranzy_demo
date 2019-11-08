@@ -14,6 +14,7 @@ import 'package:warranzy_demo/page/asset_page/add_assets_page/scAdd_image_demo.d
 import 'package:warranzy_demo/page/asset_page/detail_asset_page/scDetailAsset.dart';
 import 'package:warranzy_demo/services/api/api_service_assets.dart';
 import 'package:warranzy_demo/services/api/repository.dart';
+import 'package:warranzy_demo/services/method/auto_completed.dart';
 import 'package:warranzy_demo/services/method/scan_qr.dart';
 import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
@@ -52,6 +53,12 @@ class _FormDataAssetState extends State<FormDataAsset> {
   final GlobalKey<AutoCompleteTextFieldState<GetBrandName>> keyAutoComplete =
       GlobalKey();
   AutoCompleteTextField searchTextField;
+  final GlobalKey<AutoCompleteTextFieldState<String>> keyAutoCompleteGroup =
+      GlobalKey();
+  AutoCompleteTextField searchTextFieldGroup;
+  final GlobalKey<AutoCompleteTextFieldState<String>> keyAutoCompletePlace =
+      GlobalKey();
+  AutoCompleteTextField searchTextFieldPlace;
 
   TextEditingController txtAssetName;
   TextEditingController txtBrandName;
@@ -435,37 +442,79 @@ class _FormDataAssetState extends State<FormDataAsset> {
                 formWidget(
                     title: "Group",
                     necessary: true,
-                    child: dropdownFormfield(
-                      initalData: txtPdtGroup.text,
-                      items: [
-                        "Car",
-                        "Living Room",
-                        "Meeting Room",
-                        "Bed room",
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
+                            child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Container(
+                            height: 55,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[100],
+                            ),
+                            child:
+                                AutoCompletedCustom.autoCompleteTextFieldCustom(
+                                    key: keyAutoCompleteGroup,
+                                    controller: txtPdtGroup,
+                                    suggestions: _group,
+                                    returnWidget: searchTextFieldGroup,
+                                    onSubmit: (word) {
+                                      setState(() => txtPdtGroup.text = word);
+                                    }),
+                          ),
+                        )),
+                        // Expanded(
+                        //   child: dropdownFormfield(
+                        //     initalData: txtPdtGroup.text,
+                        //     items: _group,
+                        //     onChange: (value) {
+                        //       setState(() {
+                        //         txtPdtGroup.text = value;
+                        //       });
+                        //     },
+                        //   ),
+                        // ),
                       ],
-                      onChange: (value) {
-                        setState(() {
-                          txtPdtGroup.text = value;
-                        });
-                      },
                     )),
                 formWidget(
-                    title: "Place",
-                    necessary: true,
-                    child: dropdownFormfield(
-                      initalData: txtPdtPlace.text,
-                      items: [
-                        "Home",
-                        "Office",
-                        "School",
-                        "Kitchen",
-                      ],
-                      onChange: (value) {
-                        setState(() {
-                          txtPdtPlace.text = value;
-                        });
-                      },
+                  title: "Place",
+                  necessary: true,
+                  child: Row(children: <Widget>[
+                    Expanded(
+                        child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Container(
+                        height: 55,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[100],
+                        ),
+                        child: AutoCompletedCustom.autoCompleteTextFieldCustom(
+                            key: keyAutoCompletePlace,
+                            controller: txtPdtPlace,
+                            suggestions: _place,
+                            returnWidget: searchTextFieldPlace,
+                            onSubmit: (word) {
+                              setState(() => txtPdtPlace.text = word);
+                            }),
+                      ),
                     )),
+                  ]),
+                ),
+                // dropdownFormfield(
+                //   initalData: txtPdtPlace.text,
+                //   items: [
+                //     "Home",
+                //     "Office",
+                //     "School",
+                //     "Kitchen",
+                //   ],
+                //   onChange: (value) {
+                //     setState(() {
+                //       txtPdtPlace.text = value;
+                //     });
+                //   },
+                // ),
+
                 formWidget(
                     title: "Brand Name",
                     necessary: true,

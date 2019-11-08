@@ -23,6 +23,7 @@ import 'package:warranzy_demo/page/asset_page/detail_asset_page/scEditDetailAsse
 import 'package:warranzy_demo/page/main_page/scMain_page.dart';
 import 'package:warranzy_demo/services/api/api_service_assets.dart';
 import 'package:warranzy_demo/services/api/repository.dart';
+import 'package:warranzy_demo/services/method/auto_completed.dart';
 import 'package:warranzy_demo/services/method/scan_qr.dart';
 import 'package:warranzy_demo/services/sqflit/db_asset.dart';
 import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
@@ -71,6 +72,12 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
   final GlobalKey<AutoCompleteTextFieldState<GetBrandName>> keyAutoComplete =
       GlobalKey();
   AutoCompleteTextField searchTextField;
+  final GlobalKey<AutoCompleteTextFieldState<String>> keyAutoCompleteGroup =
+      GlobalKey();
+  AutoCompleteTextField searchTextFieldGroup;
+  final GlobalKey<AutoCompleteTextFieldState<String>> keyAutoCompletePlace =
+      GlobalKey();
+  AutoCompleteTextField searchTextFieldPlace;
 
   TextEditingController txtAssetName;
   TextEditingController txtBrandName;
@@ -1105,12 +1112,6 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
               });
           if (dataGroup != null) {
             onSelected(dataGroup);
-            // setState(() {
-            //   setSubCatMap(dataGroup);
-            //   txtPdtCat.text = dataGroup['CatCode'];
-            //   print("dataGroup => $dataGroup");
-            //   print("txtPdtCat.text => ${txtPdtCat.text}");
-            // });
           }
         });
   }
@@ -1133,122 +1134,6 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
             title: "Category", style: TextStyleCustom.STYLE_LABEL_BOLD),
         content: Column(
           children: <Widget>[
-            // formWidget(
-            //     title: "Category",
-            //     necessary: true,
-            //     child: ClipRRect(
-            //       borderRadius: BorderRadius.circular(10),
-            //       child: DropdownButtonFormField(
-            //           decoration: InputDecoration(
-            //               // border: InputBorder.none,
-            //               filled: true,
-            //               fillColor: Colors.grey[100]),
-            //           value: groupIDTest,
-            //           items: tempgroupCat.map((v) {
-            //             return DropdownMenuItem(
-            //               value: v['GroupID'],
-            //               child: showDataIndropdown(
-            //                   imgPath: v['Logo'],
-            //                   label:
-            //                       "${jsonDecode(v['GroupName'])['EN'] ?? ""}"),
-            //             );
-            //           }).toList(),
-            //           onChanged: (value) {
-            //             print(value);
-            //             setState(() {
-            //               // groupIDTest = value;
-            //               // print("valueChange => $value");
-            //               // tempSubCat = getDataCategoryInfo(
-            //               //     listMap: subCatAll, searchText: value);
-            //               // txtPdtCat.text = tempSubCat.first['CatCode'];
-            //               print(value);
-            //               setGroupCatMap(value);
-            //               tempSubCat = getDataCategoryInfo(
-            //                   listMap: subCatAll, searchText: value['GroupID']);
-            //               setSubCatMap(tempSubCat.first);
-            //               txtPdtCat.text = tempSubCat.first['CatCode'];
-            //             });
-            //           }),
-            //     )),
-            // formWidget(
-            //     title: "Sub - Category",
-            //     necessary: true,
-            //     child: ClipRRect(
-            //       borderRadius: BorderRadius.circular(10),
-            //       child: DropdownButtonFormField(
-            //           decoration: InputDecoration(
-            //               // border: InputBorder.none,
-            //               filled: true,
-            //               fillColor: Colors.grey[100]),
-            //           value: txtPdtCat.text,
-            //           items: tempSubCat.map((v) {
-            //             return DropdownMenuItem(
-            //               value: v['CatCode'],
-            //               child: showDataIndropdown(
-            //                   imgPath: v['Logo'],
-            //                   label:
-            //                       "${jsonDecode(v['CatName'])['EN'] ?? "Eieie"}"),
-            //             );
-            //           }).toList(),
-            //           onChanged: (value) {
-            //             print(value);
-            //             setState(() {
-            //               setGroupCatMap(value);
-            //               tempSubCat = getDataCategoryInfo(
-            //                   listMap: subCatAll, searchText: value['GroupID']);
-            //               setSubCatMap(tempSubCat.first);
-            //               txtPdtCat.text = tempSubCat.first['CatCode'];
-            //             });
-            //             // txtPdtCat.text = value;
-            //           }),
-            //     )),
-            //----------------
-            // formWidget(
-            //     title: "Category",
-            //     necessary: true,
-            //     child: ClipRRect(
-            //       borderRadius: BorderRadius.circular(10),
-            //       child: Container(
-            //         height: 50,
-            //         child: showAlertDropDownCustoms(
-            //             showContent: groupCatMap,
-            //             titleInDropdown: "Category",
-            //             dataOfDropdown: tempgroupCat,
-            //             onSelected: (data) {
-            //               setState(() {
-            //                 print(data);
-            //                 setGroupCatMap(data);
-            //                 tempSubCat = getDataCategoryInfo(
-            //                     listMap: subCatAll,
-            //                     searchText: data['GroupID']);
-            //                 setSubCatMap(tempSubCat.first);
-            //                 txtPdtCat.text = tempSubCat.first['CatCode'];
-            //               });
-            //             }),
-            //       ),
-            //     )),
-            // formWidget(
-            //     title: "Sub - Category",
-            //     necessary: true,
-            //     child: ClipRRect(
-            //       borderRadius: BorderRadius.circular(10),
-            //       child: Container(
-            //         height: 50,
-            //         child: showAlertDropDownCustoms(
-            //             showContent: subCatMap,
-            //             titleInDropdown: "Sub-Category",
-            //             dataOfDropdown: tempSubCat,
-            //             onSelected: (data) {
-            //               setState(() {
-            //                 setSubCatMap(data);
-            //                 txtPdtCat.text = data['CatCode'];
-            //                 print("dataGroup => $data");
-            //                 print("txtPdtCat.text => ${txtPdtCat.text}");
-            //               });
-            //             }),
-            //       ),
-            //     )),
-            //----------------
             formWidget(
                 title: "Category",
                 necessary: true,
@@ -1343,45 +1228,87 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
                   child: Container(
-                      height: 55,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                      ),
-                      child: autoCompleteTextField()),
+                    height: 55,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                    ),
+                    child: autoCompleteTextField(),
+                  ),
                 )),
             formWidget(
                 title: "Group",
                 necessary: true,
-                child: dropdownFormfield(
-                  initalData: txtPdtGroup.text,
-                  items: [
-                    "Car",
-                    "Living Room",
-                    "Meeting Room",
-                    "Bed room",
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                        child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Container(
+                        height: 55,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[100],
+                        ),
+                        child: AutoCompletedCustom.autoCompleteTextFieldCustom(
+                            key: keyAutoCompleteGroup,
+                            controller: txtPdtGroup,
+                            suggestions: _group,
+                            returnWidget: searchTextFieldGroup,
+                            onSubmit: (word) {
+                              setState(() => txtPdtGroup.text = word);
+                            }),
+                      ),
+                    )),
+                    // Expanded(
+                    //   child: dropdownFormfield(
+                    //     initalData: txtPdtGroup.text,
+                    //     items: _group,
+                    //     onChange: (value) {
+                    //       setState(() {
+                    //         txtPdtGroup.text = value;
+                    //       });
+                    //     },
+                    //   ),
+                    // ),
                   ],
-                  onChange: (value) {
-                    setState(() {
-                      txtPdtGroup.text = value;
-                    });
-                  },
                 )),
             formWidget(
                 title: "Place",
                 necessary: true,
-                child: dropdownFormfield(
-                  initalData: txtPdtPlace.text,
-                  items: [
-                    "Home",
-                    "Office",
-                    "School",
-                    "Kitchen",
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                        child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Container(
+                        height: 55,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[100],
+                        ),
+                        child: AutoCompletedCustom.autoCompleteTextFieldCustom(
+                            key: keyAutoCompletePlace,
+                            controller: txtPdtPlace,
+                            suggestions: _place,
+                            returnWidget: searchTextFieldPlace,
+                            onSubmit: (word) {
+                              setState(() => txtPdtPlace.text = word);
+                            }),
+                      ),
+                    )),
+                    // dropdownFormfield(
+                    //   initalData: txtPdtPlace.text,
+                    //   items: [
+                    //     "Home",
+                    //     "Office",
+                    //     "School",
+                    //     "Kitchen",
+                    //   ],
+                    //   onChange: (value) {
+                    //     setState(() {
+                    //       txtPdtPlace.text = value;
+                    //     });
+                    //   },
+                    // ),
                   ],
-                  onChange: (value) {
-                    setState(() {
-                      txtPdtPlace.text = value;
-                    });
-                  },
                 )),
           ],
         ),
