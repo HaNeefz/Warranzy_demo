@@ -239,8 +239,16 @@ class ResponseDetailOfAsset {
   ModelDataAsset data;
   ModelDataScan dataScan;
   String message;
+  WarranzyUsed warranzyUsed;
+  WarranzyLog warranzyLog;
 
-  ResponseDetailOfAsset({this.status, this.data, this.message, this.dataScan});
+  ResponseDetailOfAsset(
+      {this.status,
+      this.data,
+      this.message,
+      this.dataScan,
+      this.warranzyLog,
+      this.warranzyUsed});
 
   ResponseDetailOfAsset.fromJson(Map<String, dynamic> json) {
     status = json['Status'];
@@ -249,6 +257,12 @@ class ResponseDetailOfAsset {
         json['Data'] != null ? new ModelDataAsset.fromJson(json['Data']) : null;
     dataScan = json['Product'] != null
         ? new ModelDataScan.fromJson(json['Product'])
+        : null;
+    warranzyLog = json['WarranzyLog'] != null
+        ? WarranzyLog.fromJson(json['WarranzyLog'])
+        : null;
+    warranzyUsed = json['WarranzyUsed'] != null
+        ? WarranzyUsed.fromJson(json['WarranzyUsed'])
         : null;
   }
 
@@ -260,6 +274,10 @@ class ResponseDetailOfAsset {
       data['Data'] = this.data.toJson();
     }
     if (this.dataScan != null) data['Product'] = this.dataScan.toJson();
+    if (this.warranzyLog != null)
+      data['WarranzyLog'] = this.warranzyLog.toJson();
+    if (this.warranzyUsed != null)
+      data['WarranzyUsed'] = this.warranzyUsed.toJson();
     return data;
   }
 }

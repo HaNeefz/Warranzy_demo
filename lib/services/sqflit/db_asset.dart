@@ -174,12 +174,61 @@ BlockchainID */
     }).catchError((onError) => print("Error delete $tableFilePool : $onError"));
   }
 
-  Future<int> updateWarranzyLog({String wTokenID, String fileAttach}) async {
+  Future<bool> updateDetailDataAsset(
+      {String wTokenID,
+      WarranzyUsed warranzyUsed,
+      WarranzyLog warranzyLog}) async {
+    bool completedWzUsed = false;
+    bool completedWzLog = false;
+    try {
+      await updateDataWarranzyUsed(wTokenID: wTokenID, dataWzUsed: warranzyUsed)
+          .then((success) {
+        print("updateDataWarranzyUsed success : $success");
+        success >= 0 ? completedWzUsed = true : completedWzUsed = false;
+      });
+      await updateDataWarranzyLog(wTokenID: wTokenID, dataWzLog: warranzyLog)
+          .then((success) {
+        print("updateDataWarranzyLog success : $success");
+        success >= 0 ? completedWzLog = true : completedWzLog = false;
+      });
+      return completedWzUsed == true && completedWzLog == true ? true : false;
+    } catch (e) {
+      print("Catch updateDetailDataAsset : $e");
+      return false;
+    }
+  }
+
+  Future<int> updateDataWarranzyUsed(
+      {String wTokenID, WarranzyUsed dataWzUsed}) async {
+    final db = await database;
+    try {
+      return await db.rawUpdate(
+          "UPDATE $tableWarranzyUsed SET PdtCatCode = '${dataWzUsed.pdtCatCode}', PdtGroup = '${dataWzUsed.pdtGroup}',PdtPlace = '${dataWzUsed.pdtPlace}',BrandCode='${dataWzUsed.brandCode}',Title='${dataWzUsed.title}', SerialNo = '${dataWzUsed.serialNo}',LotNo='${dataWzUsed.lotNo}',SalesPrice='${dataWzUsed.salesPrice}',WarrantyNo ='${dataWzUsed.warrantyNo}',WarrantyExpire='${dataWzUsed.warrantyExpire}',CustRemark='${dataWzUsed.custRemark}',SLCName='${dataWzUsed.sLCName}',LastModiflyDate='${dataWzUsed.lastModiflyDate}'  WHERE WTokenID = '$wTokenID'");
+    } catch (e) {
+      print("catch updateDataWarranzyUsed : $e");
+      return null;
+    }
+  }
+
+  Future<int> updateFileAttachWarranzyLog(
+      {String wTokenID, String fileAttach}) async {
     final db = await database;
     try {
       return await db.rawUpdate(
           "UPDATE $tableWarranzyLog SET FileAttach_ID = '$fileAttach' WHERE WTokenID = '$wTokenID'");
     } catch (e) {
+      return null;
+    }
+  }
+
+  Future<int> updateDataWarranzyLog(
+      {String wTokenID, WarranzyLog dataWzLog}) async {
+    final db = await database;
+    try {
+      return await db.rawUpdate(
+          "UPDATE $tableWarranzyLog SET WarrantyNo = '${dataWzLog.warrantyNo}', WarranzyEndDate = '${dataWzLog.warranzyEndDate}' WHERE WTokenID = '$wTokenID'");
+    } catch (e) {
+      print("catch updateDataWarranzyLog : $e");
       return null;
     }
   }
@@ -234,19 +283,47 @@ BlockchainID */
     var res = await db.rawQuery(
         "SELECT * FROM $tableWarranzyUsed, $tableWarranzyLog WHERE $tableWarranzyUsed.WTokenID = $tableWarranzyLog.WTokenID ORDER BY $tableWarranzyUsed.LastModiflyDate DESC"); // $tableWarranzyLog, $tableFilePool
     // var filePool = await db.rawQuery("SE")
-    JsonEncoder encoder = JsonEncoder.withIndent(" ");
+    // JsonEncoder encoder = JsonEncoder.withIndent(" ");
     List<ModelDataAsset> temp = [];
     if (res.isNotEmpty) {
       print("--------------------");
       res.forEach((v) {
-        String prettyprint = encoder.convert(v);
-        print("DataAssetSQLite => $prettyprint");
+        // String prettyprint = encoder.convert(v);
+        // print("DataAssetSQLite => $prettyprint");
         temp.add(ModelDataAsset.fromJson(v));
       });
 
       return temp;
     } else {
       return [];
+    }
+  }
+
+  Future<ModelDataAsset> getDataAssetByWTokenID({String wTokenID}) async {
+    final db = await database;
+    try {
+      var res = await db.rawQuery(
+          "SELECT * FROM $tableWarranzyUsed, $tableWarranzyLog WHERE $tableWarranzyUsed.WTokenID = '$wTokenID'");
+      JsonEncoder encoder = JsonEncoder.withIndent(" ");
+      ModelDataAsset temp;
+      print("res : $res");
+      if (res.isNotEmpty) {
+        print("--------------------");
+        // res.forEach((v) {
+        String prettyprint = encoder.convert(res.first);
+        temp = ModelDataAsset.fromJson(res.first);
+        print("DataAssetSQLite at WTokenID $wTokenID \n=> $prettyprint");
+        //   temp.add(ModelDataAsset.fromJson(v));
+        // });
+
+        return temp;
+      } else {
+        print("Data is empty");
+        return null;
+      }
+    } catch (e) {
+      print("catch getDataAssetByWTokenID : $e");
+      return null;
     }
   }
 
@@ -266,7 +343,7 @@ BlockchainID */
     var tempImageValue = await db
         .rawQuery("SELECT * FROM $tableFilePool WHERE FileID = '$fileID'");
     if (tempImageValue.isNotEmpty) {
-      print("key : $fileID");
+      // print("key : $fileID");
       tempImageValue.forEach((v) => filePool.add(FilePool.fromJson(v)));
       return filePool;
     } else

@@ -9,6 +9,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:warranzy_demo/models/model_asset_data.dart';
 import 'package:warranzy_demo/models/model_image_data_each_group.dart';
@@ -26,6 +27,7 @@ import 'package:warranzy_demo/services/api_provider/api_bloc.dart';
 import 'package:warranzy_demo/services/api_provider/api_response.dart';
 import 'package:warranzy_demo/services/method/methode_helper.dart';
 import 'package:warranzy_demo/services/method/scan_qr.dart';
+import 'package:warranzy_demo/services/providers/asset_state.dart';
 import 'package:warranzy_demo/services/sqflit/db_asset.dart';
 import 'package:warranzy_demo/services/sqflit/db_customers.dart';
 import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
@@ -135,7 +137,7 @@ class _AssetPageState extends State<AssetPage> {
                     child: Hero(
                       child:
                           Icon(Icons.person_pin, size: 50, color: Colors.black),
-                      tag: "PhotoProfile",
+                      tag: "PhotoProfiles",
                     ),
                   ),
                 ),
@@ -146,18 +148,20 @@ class _AssetPageState extends State<AssetPage> {
       ),
       body: WillPopScope(
         child: Container(
-          child: ListView(
-            shrinkWrap: true,
-            children: <Widget>[
-              buildUserName(),
-              // buildHeaderAndProfile(),
-              CarouselWithIndicator(
-                height: 250,
-                items: ["1", "2", "3", "5"],
-              ),
-              buildLabelAndSeeAll(),
-              buildYourAssets(),
-            ],
+          child: SingleChildScrollView(
+            child: Column(
+              // shrinkWrap: true,
+              children: <Widget>[
+                buildUserName(),
+                // buildHeaderAndProfile(),
+                CarouselWithIndicator(
+                  height: 250,
+                  items: ["1", "2", "3", "5"],
+                ),
+                buildLabelAndSeeAll(),
+                buildYourAssets(),
+              ],
+            ),
           ),
         ),
         onWillPop: () async {
@@ -167,7 +171,7 @@ class _AssetPageState extends State<AssetPage> {
     );
   }
 
-  Column buildYourAssets() {
+  buildYourAssets() {
     /*body: {
       "CustUserID": "ca3f58b3a0214aaaa68a",
       "PINcode": "111111",
@@ -175,13 +179,51 @@ class _AssetPageState extends State<AssetPage> {
       "CountryCode": "TH",
       "TimeZone": "Asia/Bangkok"
     } */
+    // buildAssetOffine(),
 
-    return Column(
-      children: <Widget>[
-        buildAssetOffine(),
-        // MyAssetOffline(),
-        // buildAssetOnline(),
-      ],
+    return Consumer<AssetState>(
+      builder: (context, assetState, _) {
+        return FutureBuilder<List<ModelDataAsset>>(
+          future: assetState.allAssets,
+          builder: (BuildContext context,
+              AsyncSnapshot<List<ModelDataAsset>> snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              if (!(snapshot.hasError)) {
+                if (snapshot.data.isNotEmpty)
+                  return Padding(
+                      padding: const EdgeInsets.fromLTRB(10, 15, 10, 10),
+                      child: RefreshIndicator(
+                        onRefresh: () async {
+                          await assetState.refreshAsset();
+                        },
+                        child: Column(
+                          children: <Widget>[
+                            SingleChildScrollView(
+                              child: Column(
+                                  children: snapshot.data
+                                      .map((data) =>
+                                          new MyAssetFormSQLite(data: data))
+                                      .toList()),
+                            ),
+                          ],
+                        ),
+                      ));
+                else {
+                  return Center(
+                    child: TextBuilder.build(title: "Data offline is empty"),
+                  );
+                }
+              } else {
+                return Text("Error");
+              }
+            } else if (snapshot.connectionState == ConnectionState.waiting) {
+              return CircularProgressIndicator();
+            } else {
+              return Text("Something wrong.!!");
+            }
+          },
+        );
+      },
     );
   }
 
@@ -915,14 +957,14 @@ class _MyAssetFormSQLiteState extends State<MyAssetFormSQLite> {
       tempImages.forEach((String k, dynamic v) {
         imageName = k;
         List listTempKey = v as List;
-        print("New Value length : ${listTempKey.length}");
-        print("======== Name : $k");
+        // print("New Value length : ${listTempKey.length}");
+        // print("======== Name : $k");
         int index = 1;
         int listTempKeyLength = listTempKey.length;
         for (var key in listTempKey) {
           if (listTempKeyLength >= index) {
-            print("Value index No. $index");
-            print("========= KEY : $key");
+            // print("Value index No. $index");
+            // print("========= KEY : $key");
             tempKey.add(key);
           } else {
             // print("index $index");
@@ -933,9 +975,9 @@ class _MyAssetFormSQLiteState extends State<MyAssetFormSQLite> {
         keyImage.add({"$k": tempKey});
         tempKey = [];
       });
-      print("keyImage => $keyImage");
+      // print("keyImage => $keyImage");
       imageName = keyImage.first.keys.toList().first;
-      print("getImage by ${keyImage.first[imageName].first}");
+      // print("getImage by ${keyImage.first[imageName].first}");
       await DBProviderAsset.db
           .getImagePoolReturn(keyImage.first[imageName].first)
           .then((dataImage) {
@@ -948,11 +990,10 @@ class _MyAssetFormSQLiteState extends State<MyAssetFormSQLite> {
       tempImageDataEachGroup
           .add(ImageDataEachGroup(title: imageName, imageBase64: imageData));
       setState(() => imageDataEachGroup = List.of(tempImageDataEachGroup));
-      print("added ${imageDataEachGroup.length}");
-      // });
-      print("keyImage After Added => $keyImage ");
+      // print("added ${imageDataEachGroup.length}");
+
+      // print("keyImage After Added => $keyImage ");
     }
-    print("--------");
     return tempImageDataEachGroup;
   }
 

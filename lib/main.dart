@@ -5,6 +5,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get_it/get_it.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:provider/provider.dart';
+import 'package:warranzy_demo/services/providers/asset_state.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
 
@@ -41,6 +42,9 @@ void main() {
         providers: [
           ChangeNotifierProvider<NotificationState>(
             builder: (_) => NotificationState(),
+          ),
+          ChangeNotifierProvider<AssetState>(
+            builder: (_) => AssetState(),
           )
         ],
         child: Consumer<NotificationState>(

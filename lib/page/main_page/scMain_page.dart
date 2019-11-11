@@ -6,6 +6,7 @@ import 'package:warranzy_demo/page/asset_page/scAssets.dart';
 import 'package:warranzy_demo/page/notification_page/scNotification.dart';
 import 'package:warranzy_demo/page/service_page/scService.dart';
 import 'package:warranzy_demo/page/trade_page/scTrade.dart';
+import 'package:warranzy_demo/services/providers/asset_state.dart';
 import 'package:warranzy_demo/services/providers/notification_state.dart';
 import 'package:warranzy_demo/tools/assets.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';

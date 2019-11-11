@@ -25,7 +25,7 @@ class EditDetailAsset extends StatefulWidget {
   final bool editingImage;
   final ModelDataAsset modelDataAsset;
   final List<ImageDataEachGroup> imageDataEachGroup;
-  final Map<String, List<String>> fileAttach;
+  final List<Map<String, List<String>>> fileAttach;
 
   const EditDetailAsset(
       {Key key,
@@ -42,11 +42,15 @@ class _EditDetailAssetState extends State<EditDetailAsset> {
   bool get editor => widget.editingImage == true ? true : false;
   ModelDataAsset get _data => widget.modelDataAsset;
   List<ImageDataEachGroup> get imageDataEachGroup => widget.imageDataEachGroup;
+  Map<String, List<String>> fileAttach = {};
   @override
   @override
   void initState() {
     super.initState();
     print("<EditDetailAsset> fileAttach => ${widget.fileAttach}");
+    widget.fileAttach.forEach((v) {
+      fileAttach.addAll(v);
+    });
   }
 
   Widget build(BuildContext context) {
@@ -67,18 +71,21 @@ class _EditDetailAssetState extends State<EditDetailAsset> {
 
   Widget checkEdit(bool editorImage) {
     Widget child = Container();
+    print("fileAttach: $fileAttach");
     switch (editorImage) {
       case true:
         return EditImages(
           modelDataAsset: _data,
           imageEachGroup: imageDataEachGroup,
-          fileAttach: widget.fileAttach,
+          fileAttach: fileAttach,
         );
         break;
       case false:
         return FormDataAsset(
           actionPageForAdd: false,
           modelDataAsset: _data,
+          imageEachGroup: imageDataEachGroup,
+          fileAttach: widget.fileAttach,
         );
         break;
       default:
@@ -158,7 +165,7 @@ class _EditImagesState extends State<EditImages> {
       getProductCat();
       getImageToBase64();
     } else {
-      print("editImageForAdd => $editImageForAdd");
+      // print("editImageForAdd => $editImageForAdd");
       getProductCat(categoryID);
     }
   }
@@ -248,6 +255,7 @@ class ModifytImageState extends State<ModifyImage> {
   List<File> imageNew = [];
   List<Uint8List> imageOld = [];
   List<String> allImage = [];
+  List<String> oldImages = [];
 
   void initState() {
     super.initState();
@@ -257,39 +265,29 @@ class ModifytImageState extends State<ModifyImage> {
     print("listBase64 initState() : ${imageDataEachGroup.imageBase64}");
     print("tempBase64 initState() : ${imageDataEachGroup.tempBase64.length}");
     allImage = List.of(imageDataEachGroup.tempBase64);
+    oldImages = List.of(allImage);
     // tempImageLoading = getImageToBase64();
   }
 
-  Future<List<Uint8List>> getImageToBase64() async {
-    List<Uint8List> listImage = [];
-    // for (int i = 0; i < imageDataEachGroup.imageUrl.length; i++) {
-    //   try {
-    //     print("loading");
-    //     var response = await http.get(imageDataEachGroup.imageUrl[i]);
-    //     listImage.add(response.bodyBytes);
-    //     imageOld = listImage;
-    //   } catch (e) {
-    //     print(e);
-    //     return [];
-    //   }
-    // }
-    imageDataEachGroup?.imageBase64?.forEach((v) async {
-      final image = await DBProviderAsset.db.getImagePoolReturn(v);
-      if (image != null && image.length > 0) {
-        listImage.add(base64Decode(image.first.fileData));
-        setState(() => imageOld = listImage);
-      } else {
-        print("getImageFromDB return null");
-      }
-    });
+  // Future<List<Uint8List>> getImageToBase64() async {
+  //   List<Uint8List> listImage = [];
+  //   imageDataEachGroup?.imageBase64?.forEach((v) async {
+  //     final image = await DBProviderAsset.db.getImagePoolReturn(v);
+  //     if (image != null && image.length > 0) {
+  //       listImage.add(base64Decode(image.first.fileData));
+  //       setState(() => imageOld = listImage);
+  //     } else {
+  //       print("getImageFromDB return null");
+  //     }
+  //   });
 
-    return listImage;
-  }
+  //   return listImage;
+  // }
 
   alert({String title, String content}) => ecsLib.showDialogLib(context,
       content: content,
       textOnButton: allTranslations.text("close"),
-      title: "ERROR STATUS");
+      title: title ?? "ERROR STATUS");
 
   List returnImage = [];
   @override
@@ -311,7 +309,7 @@ class ModifytImageState extends State<ModifyImage> {
         actions: <Widget>[
           FlatButton(
               child: TextBuilder.build(title: "Edit"),
-              onPressed: submitUpdateImage)
+              onPressed: updateImage) //submitUpdateImage
         ],
       ),
       body: WillPopScope(
@@ -362,10 +360,10 @@ class ModifytImageState extends State<ModifyImage> {
               try {
                 var resPhoto = await ecsLib.getImage();
                 if (resPhoto != null)
-                  setState(() {
-                    imageNew.add(resPhoto);
-                    allImage.add(base64Encode(resPhoto.readAsBytesSync()));
-                  });
+                  allImage.add(await imageToBase64(resPhoto));
+                setState(() {
+                  imageNew.add(resPhoto);
+                });
               } catch (e) {
                 print(e);
               }
@@ -380,10 +378,10 @@ class ModifytImageState extends State<ModifyImage> {
               try {
                 var resPhoto = await ecsLib.getImageFromGallery();
                 if (resPhoto != null)
-                  setState(() {
-                    imageNew.add(resPhoto);
-                    allImage.add(base64Encode(resPhoto.readAsBytesSync()));
-                  });
+                  allImage.add(await imageToBase64(resPhoto));
+                setState(() {
+                  imageNew.add(resPhoto);
+                });
               } catch (e) {
                 print(e);
               }
@@ -392,6 +390,30 @@ class ModifytImageState extends State<ModifyImage> {
         ],
       ),
     );
+  }
+
+  updateImage() async {
+    if (allImage.length > 0) {
+      print(widget.image.imageBase64);
+      widget.image.imageBase64.forEach((key) async {
+        await DBProviderAsset.db.deleteImagePoolByKey(key);
+      });
+      ecsLib.showDialogLoadingLib(context, content: "Editing Image Asset");
+      Map<String, dynamic> postData = {
+        "WTokenID": "${assetData.wTokenID}",
+        "${imageDataEachGroup.title}": {}
+      };
+      allImage.forEach((v) {
+        postData["${imageDataEachGroup.title}"]
+            .addAll({"${allImage.indexOf(v)}": v});
+      });
+
+      // print(postData);
+      ecsLib.printJson(postData);
+      sendAPIUpdateImage(postData: postData);
+    } else {
+      await alert(content: "Image is Empty");
+    }
   }
 
   submitUpdateImage() async {
@@ -432,7 +454,7 @@ class ModifytImageState extends State<ModifyImage> {
             }
             ecsLib.cancelDialogLoadindLib(context);
             ecsLib.printJson(postData);
-            sendAPIUpdateImage(postData: postData);
+            // sendAPIUpdateImage(postData: postData);
           }
         });
       else {
@@ -449,11 +471,21 @@ class ModifytImageState extends State<ModifyImage> {
           }
           ecsLib.cancelDialogLoadindLib(context);
           ecsLib.printJson(postData);
-          sendAPIUpdateImage(postData: postData);
+          // sendAPIUpdateImage(postData: postData);
+          await Repository.updateImage(body: postData).then((resUpdateImage) {
+            if (resUpdateImage.status == true) {
+              ecsLib.showDialogLoadingLib(context,
+                  content: "Updating Image Asset");
+            } else if (resUpdateImage.status == false) {
+              alert(content: "${resUpdateImage.message}");
+            } else {
+              alert(content: "${resUpdateImage.message}");
+            }
+          });
         }
       }
     } else {
-      alert(content: "Image is empty. Please add Image.");
+      alert(title: "Edit Image", content: "Please add Image.");
     }
   }
 
@@ -477,7 +509,7 @@ class ModifytImageState extends State<ModifyImage> {
         widget.fileAttach.addAll(fileAttach);
         print("ManageFileAttach : ${widget.fileAttach}");
         await DBProviderAsset.db
-            .updateWarranzyLog(
+            .updateFileAttachWarranzyLog(
                 wTokenID: assetData.wTokenID,
                 fileAttach: jsonEncode(widget.fileAttach))
             .then((completed) async {
@@ -490,6 +522,7 @@ class ModifytImageState extends State<ModifyImage> {
             });
             print("ALL UPDATE COMPLETED");
             if (widget.assetData.createType == "C") {
+              Navigator.pop(context);
               Navigator.pop(context);
               Navigator.pop(context);
               Navigator.pop(context);
@@ -582,6 +615,18 @@ class ModifytImageState extends State<ModifyImage> {
     } else
       tempImage = [];
     return tempImage;
+  }
+
+  Future<String> imageToBase64(File path) async {
+    var tempDir = await getTemporaryDirectory();
+    var _newSize = await ecsLib.compressFile(
+      file: path,
+      targetPath: tempDir.path + "/${path.path.split("/").last}",
+      minWidth: 600,
+      minHeight: 480,
+      quality: 80,
+    );
+    return base64Encode(_newSize.readAsBytesSync()) ?? "";
   }
 
   // List<String> imageToBase64() {

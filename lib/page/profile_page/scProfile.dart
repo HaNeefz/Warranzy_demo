@@ -22,6 +22,8 @@ import 'package:warranzy_demo/tools/widget_ui_custom/form_input_data.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_field_builder.dart';
 
+import 'account_detail.dart';
+
 class ProfilePage extends StatefulWidget {
   final String heroTag;
 
@@ -129,7 +131,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: Padding(
                         padding: const EdgeInsets.only(top: 200.0),
                         child: TextBuilder.build(
-                            title: "Username",
+                            title: "${dataCust?.custName ?? ""}",
                             style: TextStyleCustom.STYLE_APPBAR
                                 .copyWith(color: ThemeColors.COLOR_WHITE)),
                       ),
@@ -153,11 +155,22 @@ class _ProfilePageState extends State<ProfilePage> {
                     listTile(
                         title: "Profile",
                         icons: Icons.account_circle,
-                        onPressed: () {}),
+                        onPressed: () {
+                          ecsLib.pushPage(
+                              context: context,
+                              pageWidget: AccountDetail(
+                                modelCustomers: dataCust,
+                              ));
+                        }),
                     listTile(
                         title: "Your Address",
                         icons: Icons.person_pin_circle,
-                        onPressed: () {}),
+                        onPressed: () async {
+                          // print("Tap Your Address");
+                          // await DBProviderAsset.db.getDataAssetByWTokenID(
+                          //     wTokenID: "ca3f5-TH-ef074218359d482fa68b517ed");
+                          await DBProviderAsset.db.deleteAllAsset();
+                        }),
                     Divider(),
                     headLine("Security"),
                     listTile(

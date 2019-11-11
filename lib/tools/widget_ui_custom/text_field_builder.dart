@@ -206,10 +206,14 @@ class TextFieldBuilder {
       {@required final TextEditingController controller,
       @required String title,
       bool borderOutLine = false,
+      TextStyle titleStyle,
       TextInputType keyboardType = TextInputType.text,
       int maxLength,
       int maxLine = 1,
       bool validate = true,
+      bool readOnly = false,
+      Widget leader,
+      Function(String) onChange,
       bool necessary = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -217,48 +221,60 @@ class TextFieldBuilder {
         Text(
           "${title ?? "title's empty"}${necessary == true ? "*" : ""} :",
           // textAlign: TextAlign.center,
-          style: TextStyleCustom.STYLE_CONTENT
-              .copyWith(fontSize: 14, color: Colors.teal),
+          style: titleStyle ??
+              TextStyleCustom.STYLE_CONTENT
+                  .copyWith(fontSize: 14, color: Colors.teal),
         ),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(10),
-          child: TextFormField(
-              controller: controller,
-              validator: (s) {
-                if (validate == true) if (s.isEmpty) {
-                  return "Invalide, Please enter data.";
-                }
-                return null;
-              },
-              maxLength: maxLength,
-              keyboardType: keyboardType,
-              maxLines: maxLine,
-              decoration: InputDecoration(
-                // hintText: title,
-                // hintStyle: TextStyleCustom.STYLE_LABEL
-                //     .copyWith(fontSize: 13, color: Colors.grey),
-                fillColor: Colors.grey[100],
-                filled: true,
-                contentPadding: EdgeInsets.all(15),
-                errorStyle: TextStyleCustom.STYLE_ERROR,
-                border: borderOutLine
-                    ? OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(color: Colors.teal[300]))
-                    : UnderlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(color: Colors.teal[300])),
-                // InputBorder.none,
-                errorBorder:
-                    // InputBorder.none,
-                    borderOutLine
-                        ? OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color: Colors.teal[300]))
-                        : UnderlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color: Colors.teal[300])),
-              )),
+        Row(
+          children: <Widget>[
+            leader ?? Container(),
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: TextFormField(
+                    controller: controller,
+                    readOnly: readOnly,
+                    validator: (s) {
+                      if (validate == true) if (s.isEmpty) {
+                        return "Invalide, Please enter data.";
+                      }
+                      return null;
+                    },
+                    maxLength: maxLength,
+                    keyboardType: keyboardType,
+                    maxLines: maxLine,
+                    onChanged: (text) => onChange(text),
+                    decoration: InputDecoration(
+                      // hintText: title,
+                      // hintStyle: TextStyleCustom.STYLE_LABEL
+                      //     .copyWith(fontSize: 13, color: Colors.grey),
+                      fillColor: Colors.grey[100],
+                      filled: true,
+                      contentPadding: EdgeInsets.all(15),
+                      errorStyle: TextStyleCustom.STYLE_ERROR,
+                      border: borderOutLine
+                          ? OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(color: Colors.teal[300]))
+                          : UnderlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(color: Colors.teal[300])),
+                      // InputBorder.none,
+                      errorBorder:
+                          // InputBorder.none,
+                          borderOutLine
+                              ? OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide:
+                                      BorderSide(color: Colors.teal[300]))
+                              : UnderlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide:
+                                      BorderSide(color: Colors.teal[300])),
+                    )),
+              ),
+            ),
+          ],
         ),
         Divider()
       ],

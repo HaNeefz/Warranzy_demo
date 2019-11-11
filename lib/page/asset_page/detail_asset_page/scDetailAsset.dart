@@ -185,7 +185,7 @@ class _DetailAssetState extends State<DetailAsset> {
 
   _testGetImage() {
     print("widget.listImage : ${widget.listImage}");
-    widget.listImage.forEach((v) {
+    widget?.listImage?.forEach((v) {
       v.forEach((k, v) {
         imageDataEachGroup
             .add(ImageDataEachGroup(title: k, imageBase64: v, tempBase64: []));
@@ -226,7 +226,7 @@ class _DetailAssetState extends State<DetailAsset> {
   goToEditPageForEditImage(bool editImage) {
     // if (editImage == true)
     Map<String, List<String>> _tempFileAttach = {};
-    widget.listImage.forEach((v) {
+    widget?.listImage?.forEach((v) {
       _tempFileAttach.addAll(v);
     });
     // print("<DetailAsset> fileAttach => $_tempFileAttach");
@@ -237,7 +237,7 @@ class _DetailAssetState extends State<DetailAsset> {
         editingImage: editImage,
         modelDataAsset: _data,
         imageDataEachGroup: imageDataEachGroup,
-        fileAttach: _tempFileAttach,
+        fileAttach: widget.listImage,
       ),
     );
   }
@@ -295,9 +295,11 @@ class _DetailAssetState extends State<DetailAsset> {
                 items: widget.dataScan == null &&
                         widget.dataAsset.createType == "C"
                     ? imageData != null && imageData.length > 0
-                        ? showProductImage(imageData, isImageBase64: true)
+                        ? showProductImage(
+                            imgPath: imageData, isImageBase64: true)
                         : Iterable.generate(4, (i) => testImage()).toList()
-                    : showProductImage(widget?.dataScan?.fileImageID ?? null)),
+                    : showProductImage(
+                        imgPath: widget?.dataScan?.fileImageID ?? null)),
           ),
           SliverList(
             delegate: SliverChildListDelegate([
@@ -614,7 +616,8 @@ class _DetailAssetState extends State<DetailAsset> {
             child: ListView(
               shrinkWrap: true,
               scrollDirection: Axis.horizontal,
-              children: showProductImage(imageData,
+              children: showProductImage(
+                  imgPath: imageData,
                   isImageBase64: true,
                   width: 250,
                   height: 250,
@@ -757,8 +760,9 @@ class _DetailAssetState extends State<DetailAsset> {
     return tempImageDataEachGroup;
   }
 
-  List showProductImage(List<dynamic> imgPath,
-      {double width = 150,
+  List showProductImage(
+      {List<dynamic> imgPath = const [],
+      double width = 150,
       double height = 150,
       EdgeInsetsGeometry padding,
       bool isImageBase64 = false}) {
@@ -774,7 +778,7 @@ class _DetailAssetState extends State<DetailAsset> {
                         image: imgPath,
                         heroTag: "image$i",
                         currentIndex: i,
-                        isImageBase64: true,
+                        isImageBase64: isImageBase64,
                       )));
             },
             child: isImageBase64 == false

@@ -93,6 +93,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
   TextEditingController txtLotNo;
   TextEditingController txtNote;
   TextEditingController txtSLCName;
+  TextEditingController txtGeoLocation;
 
   String geoLocation = '';
   String brandActive = "N";
@@ -260,6 +261,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
         txtLotNo = TextEditingController(text: _data?.lotNo ?? "");
         txtNote = TextEditingController(text: _data?.custRemark ?? "");
         txtSLCName = TextEditingController(text: _data?.slcName ?? "");
+        txtGeoLocation = TextEditingController(text: _data?.geoLocation ?? "");
         initialCategoryTest(_data?.pdtCatCode);
       });
     } else {
@@ -279,6 +281,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
         txtLotNo = TextEditingController(text: "");
         txtNote = TextEditingController(text: "");
         txtSLCName = TextEditingController(text: "");
+        txtGeoLocation = TextEditingController(text: "");
         initialCategoryTest("A");
       });
     }

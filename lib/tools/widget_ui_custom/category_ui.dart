@@ -33,8 +33,9 @@ class _CategoryUIState extends State<CategoryUI> {
   void initState() {
     super.initState();
     widget.category.forEach((v) {
-      print(v['Logo']);
-      setState(() => imagePath.add(v['Logo']));
+      // print(v['Logo']);
+      // setState(() => )
+      imagePath.add(v['Logo']);
     });
   }
 
@@ -55,8 +56,8 @@ class _CategoryUIState extends State<CategoryUI> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 ListTile(
-                  leading: ImageView.show(
-                      path: imagePath[widget.category.indexOf(v)]),
+                  // leading: ImageView.show(
+                  //     path: v['Logo']), //imagePath[widget.category.indexOf(v)]
                   // Image.asset("${v['Logo']}",
                   //     width: 30, height: 30, fit: BoxFit.contain),
                   title: Row(

@@ -8,14 +8,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_picker/flutter_picker.dart';
 import 'package:keyboard_avoider/keyboard_avoider.dart';
 import 'package:warranzy_demo/models/model_get_brand_name.dart';
+import 'package:warranzy_demo/models/model_image_data_each_group.dart';
+import 'package:warranzy_demo/models/model_repository_asset_scan.dart';
 import 'package:warranzy_demo/models/model_repository_init_app.dart';
 import 'package:warranzy_demo/models/model_respository_asset.dart';
+import 'package:warranzy_demo/models/model_user.dart';
 import 'package:warranzy_demo/page/asset_page/add_assets_page/scAdd_image_demo.dart';
 import 'package:warranzy_demo/page/asset_page/detail_asset_page/scDetailAsset.dart';
 import 'package:warranzy_demo/services/api/api_service_assets.dart';
 import 'package:warranzy_demo/services/api/repository.dart';
 import 'package:warranzy_demo/services/method/auto_completed.dart';
 import 'package:warranzy_demo/services/method/scan_qr.dart';
+import 'package:warranzy_demo/services/sqflit/db_asset.dart';
 import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
@@ -33,11 +37,15 @@ class FormDataAsset extends StatefulWidget {
   final ModelDataAsset modelDataAsset;
   final bool actionPageForAdd;
   final PageAction onClickAddAssetPage;
+  final List<ImageDataEachGroup> imageEachGroup;
+  final List<Map<String, List<String>>> fileAttach;
   FormDataAsset(
       {Key key,
       this.modelDataAsset,
       this.actionPageForAdd,
-      this.onClickAddAssetPage})
+      this.onClickAddAssetPage,
+      this.imageEachGroup,
+      this.fileAttach})
       : super(key: key);
 
   _FormDataAssetState createState() => _FormDataAssetState();
@@ -74,6 +82,7 @@ class _FormDataAssetState extends State<FormDataAsset> {
   TextEditingController txtLotNo;
   TextEditingController txtNote;
   TextEditingController txtSLCName;
+  TextEditingController txtGeoLocation;
 
   String brandActive = "N";
   var valueBrandName = "DysonElectric";
@@ -231,7 +240,6 @@ class _FormDataAssetState extends State<FormDataAsset> {
 
   @override
   void initState() {
-    getProductCategory = DBProviderInitialApp.db.getAllDataProductCategory();
     if (_data != null) {
       brandActive = _data?.brandCode != null ? "Y" : "N";
       txtAssetName = TextEditingController(text: _data?.title ?? "");
@@ -252,6 +260,7 @@ class _FormDataAssetState extends State<FormDataAsset> {
       txtLotNo = TextEditingController(text: _data?.lotNo ?? "");
       txtNote = TextEditingController(text: _data?.custRemark ?? "");
       txtSLCName = TextEditingController(text: _data?.slcName ?? "");
+      txtGeoLocation = TextEditingController(text: _data?.geoLocation ?? "");
       initialCategoryTest(_data?.pdtCatCode);
     } else {
       initialCategoryTest("A");
@@ -270,6 +279,7 @@ class _FormDataAssetState extends State<FormDataAsset> {
       txtLotNo = TextEditingController(text: "");
       txtNote = TextEditingController(text: "");
       txtSLCName = TextEditingController(text: "");
+      txtGeoLocation = TextEditingController(text: "");
     }
 
     Future.delayed(Duration(milliseconds: 1500), () {
@@ -863,12 +873,17 @@ class _FormDataAssetState extends State<FormDataAsset> {
     });
   }
 
-  alerModel(String title, String content) {
+  alerModel([String title, String content]) {
     ecsLib.showDialogLib(context,
-        title: "Warranzy",
+        title: title ?? "Warranzy",
         content: content ?? "",
         textOnButton: allTranslations.text("close"));
   }
+
+  alert({String title, String content}) => ecsLib.showDialogLib(context,
+      content: content,
+      textOnButton: allTranslations.text("close"),
+      title: "ERROR STATUS");
 
   Widget formWidget({String title, Widget child, bool necessary = false}) {
     return Column(
@@ -956,23 +971,70 @@ class _FormDataAssetState extends State<FormDataAsset> {
         ecsLib.cancelDialogLoadindLib(context);
         if (resEdit?.status == true) {
           ecsLib.showDialogLoadingLib(context, content: "Upload Detail Asset");
-          await Repository.getDetailAseet(
-              body: {"WTokenID": "${_data.wTokenID}"}).then((resDetail) {
-            ecsLib.cancelDialogLoadindLib(context);
-            if (resDetail?.status == true) {
-              ecsLib.cancelDialogLoadindLib(context);
-              ecsLib.pushPageReplacement(
-                context: context,
-                pageWidget: DetailAsset(
-                  dataAsset: resDetail.data,
-                  dataScan: resDetail.dataScan,
-                  showDetailOnline: true,
-                ),
-              );
-            } else if (resDetail?.status == false) {
-              alerModel("Warranzy", resDetail.message);
+          await DBProviderAsset.db
+              .updateDetailDataAsset(
+                  wTokenID: _data.wTokenID,
+                  warranzyUsed: resEdit.warranzyUsed,
+                  warranzyLog: resEdit.warranzyLog)
+              .then((resUpdated) async {
+            if (resUpdated == true) {
+              if (_data.createType == "C") {
+                await DBProviderAsset.db
+                    .getDataAssetByWTokenID(wTokenID: "${_data.wTokenID}")
+                    .then((dataAsset) async {
+                  if (dataAsset != null) {
+                    Navigator.pop(context);
+                    Navigator.pop(context);
+                    await ecsLib.pushPageReplacement(
+                        context: context,
+                        pageWidget: DetailAsset(
+                          dataAsset: dataAsset,
+                          showDetailOnline: true,
+                          dataScan: null,
+                          listImage: widget.fileAttach,
+                        ));
+                  }
+                });
+              } else {
+                try {
+                  await Repository.getDetailAseet(
+                      body: {"WTokenID": _data.wTokenID}).then((res) async {
+                    ecsLib.cancelDialogLoadindLib(context);
+                    if (res?.status == true) {
+                      Navigator.pop(context);
+                      Navigator.pop(context);
+                      ecsLib.pushPageReplacement(
+                        context: context,
+                        pageWidget: DetailAsset(
+                          dataAsset: res.data,
+                          showDetailOnline: true,
+                          dataScan: res.dataScan,
+                          listImage: widget.fileAttach,
+                        ),
+                      );
+                    } else if (res.status == false) {
+                      alerModel(
+                          "status false : " + res?.message ?? "status false");
+                    } else {
+                      Navigator.pop(context);
+                      Navigator.pop(context);
+                      await ecsLib.pushPageReplacement(
+                          context: context,
+                          pageWidget: DetailAsset(
+                            dataAsset: _data,
+                            showDetailOnline: true,
+                            dataScan: ModelDataScan(fileImageID: []),
+                            listImage: widget.fileAttach,
+                          ));
+                    }
+                  });
+                } catch (e) {
+                  alerModel("CATCH ERROR", "catch : $e");
+                }
+              }
             } else {
-              alerModel("Warranzy", resDetail.message);
+              await alerModel("Update fail", "Update incompleted.");
+              print("update incompleted");
             }
           });
         } else if (resEdit?.status == false) {
@@ -982,7 +1044,7 @@ class _FormDataAssetState extends State<FormDataAsset> {
         }
       });
     } catch (e) {
-      print("Catch => $e");
+      print("Catch outerSide=> $e");
     }
   }
 
