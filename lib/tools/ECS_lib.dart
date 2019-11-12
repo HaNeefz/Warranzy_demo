@@ -509,6 +509,21 @@ class ECSLib {
     }
     return numbNew;
   }
+
+  bool checkOTPTimeOut({String dateFormatted, int timeOut = 120}) {
+    var createOTPTime = DateTime.parse(dateFormatted);
+    var dateTimeNow = DateTime.now();
+    print("dateTimeNow : $dateTimeNow");
+    print("createOTPTime : ${DateTime.parse(dateFormatted)}");
+    print("CompareDate : ${dateTimeNow.difference(createOTPTime)}");
+    if (dateTimeNow.difference(createOTPTime).inSeconds > timeOut) {
+      print("Time out");
+      return true;
+    } else {
+      print("In time ${dateTimeNow.compareTo(createOTPTime)} < $timeOut");
+      return false;
+    }
+  }
 }
 
 class DialogCustoms extends StatelessWidget {

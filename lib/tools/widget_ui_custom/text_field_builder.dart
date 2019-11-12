@@ -211,6 +211,7 @@ class TextFieldBuilder {
       int maxLength,
       int maxLine = 1,
       bool validate = true,
+      Function(String) onValidate,
       bool readOnly = false,
       Widget leader,
       Function(String) onChange,
@@ -234,12 +235,14 @@ class TextFieldBuilder {
                 child: TextFormField(
                     controller: controller,
                     readOnly: readOnly,
-                    validator: (s) {
-                      if (validate == true) if (s.isEmpty) {
-                        return "Invalide, Please enter data.";
-                      }
-                      return null;
-                    },
+                    validator: onValidate == null
+                        ? (s) {
+                            if (validate == true) if (s.isEmpty) {
+                              return "Invalide, Please enter data.";
+                            }
+                            return null;
+                          }
+                        : (s) => onValidate(s),
                     maxLength: maxLength,
                     keyboardType: keyboardType,
                     maxLines: maxLine,

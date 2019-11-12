@@ -30,6 +30,17 @@ class Repository {
     }
   }
 
+  static Future<ModelVerifyNumber> apiVerifyNumberUsedEditAccount(
+      {dynamic body}) async {
+    try {
+      final response = await _helper.post("/User/VerifyNumber", body);
+
+      return ModelVerifyNumber.fromJson(response);
+    } catch (e) {
+      return ModelVerifyNumber(message: "$e");
+    }
+  }
+
   static Future<ModelVerifyNumber> apiVerifyNumberTryRequest(
       {dynamic body}) async {
     try {
@@ -105,7 +116,7 @@ class Repository {
   static Future<RepositoryOfAsset> addAsset({dynamic body}) async {
     try {
       final response = await _helper.postDio("/Asset/AddAsset", body);
-    
+
       return RepositoryOfAsset.fromJson(response);
     } catch (e) {
       return RepositoryOfAsset(message: "$e");
@@ -160,7 +171,7 @@ class Repository {
       return RepositoryAssetScan.fromJson(response);
     } catch (e) {
       print("$e");
-      return RepositoryAssetScan(message :e);
+      return RepositoryAssetScan(message: e);
     }
   }
 }

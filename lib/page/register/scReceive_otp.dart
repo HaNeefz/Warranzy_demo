@@ -169,7 +169,7 @@ class _ReceiveOTPState extends State<ReceiveOTP> {
   }
 
   void sendOTP(BuildContext context) {
-    if (checkOTPTimeOut() == false) {
+    if (checkOTPTimeOut(dateFormatted: modelVerifyData.createDate) == false) {
       // false ยังไม่หมดเวลา
       if (controller.text == modelVerifyData?.codeVerify.toString()) {
         print("Verify Done.");
@@ -194,10 +194,8 @@ class _ReceiveOTPState extends State<ReceiveOTP> {
     }
   }
 
-  bool checkOTPTimeOut() {
-    var createOTPTime = DateTime.parse(modelVerifyData.createDate);
-    var dateTimeNow = DateTime.now();
-    if (dateTimeNow.compareTo(createOTPTime) > otpTimeOut)
+  bool checkOTPTimeOut({String dateFormatted}) {
+    if (ecsLib.checkOTPTimeOut(dateFormatted: dateFormatted) == true)
       return true;
     else
       return false;
