@@ -150,6 +150,7 @@ class _AssetPageState extends State<AssetPage> {
         child: Container(
           child: SingleChildScrollView(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               // shrinkWrap: true,
               children: <Widget>[
                 buildUserName(),
@@ -938,7 +939,7 @@ class _MyAssetFormSQLiteState extends State<MyAssetFormSQLite> {
   @override
   void initState() {
     super.initState();
-    print("Asset Type : ${widget.data.createType}");
+    // print("Asset Type : ${widget.data.createType}");
     getProductCateName();
     separateImage(widget.data);
   }
@@ -950,9 +951,9 @@ class _MyAssetFormSQLiteState extends State<MyAssetFormSQLite> {
     List<String> tempKey = [];
     String imageName = '';
     if (images.fileAttachID != null) {
-      print("======== WTOKENID => ${images.wTokenID} ========");
+      // print("======== WTOKENID => ${images.wTokenID} ========");
       tempImages = jsonDecode(images.fileAttachID);
-      print("images.fileAttachID => ${images.fileAttachID}");
+      // print("images.fileAttachID => ${images.fileAttachID}");
 
       tempImages.forEach((String k, dynamic v) {
         imageName = k;

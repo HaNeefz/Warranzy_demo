@@ -85,6 +85,7 @@ class _FormDataAssetState extends State<FormDataAsset> {
   TextEditingController txtGeoLocation;
 
   String brandActive = "N";
+  String keepOldBrand = "";
   var valueBrandName = "DysonElectric";
   List<GetBrandName> listBrandName = [];
   List<String> listBrandID = [];
@@ -156,20 +157,8 @@ class _FormDataAssetState extends State<FormDataAsset> {
         await DBProviderInitialApp.db.getAllGroupCategoryTypeListMap();
     subCatAll = await DBProviderInitialApp.db.getAllSubCategoryTypeListMap();
     if (code.length > 1) {
+      //SubCat
       print("code > 1");
-      // var getGroupCatID = getDataCategoryInfo(
-      //         listMap: subCat,
-      //         searchText:
-      //             code) //getGroupCat by search from subcat.catcode return groupID
-      //     .first['GroupID'];
-      // setState(() {
-      //   groupIDTest = getGroupCatID;
-      //   tempgroupCat = List.of(groupCat);
-      //   print("tempgroupCat => $tempgroupCat");
-      //   tempSubCat =
-      //       getDataCategoryInfo(listMap: subCat, searchText: groupIDTest);
-      // });
-
       var _tempSubCat =
           getDataCategoryInfo(listMap: subCatAll, searchText: code);
       setState(() {
@@ -181,31 +170,9 @@ class _FormDataAssetState extends State<FormDataAsset> {
             listMap: subCatAll, searchText: _tempSubCat.first['GroupID']);
         setSubCatMap(_tempSubCat.first);
       });
-      // var _tempSubCat =
-      //     getDataCategoryInfo(listMap: subCatAll, searchText: code);
-      // print("tempSubCat => $_tempSubCat");
-      // setSubCatMap(_tempSubCat.first);
-      // tempSubCat = List.of(_tempSubCat);
-      // print("SubCarMap => $subCatMap");
-      // var tempGroupCat = getDataCategoryInfo(
-      //     listMap: groupCatAll, searchText: tempSubCat.first['GroupID']);
-      // print("tempGroupCat => $tempGroupCat");
-      // setGroupCatMap(tempGroupCat.first);
-      // print("GroupCarMap => $groupCatMap");
-      // tempgroupCat = List.of(groupCatAll);
-
     } else {
+      //Cat
       print("code < 1");
-      //   setState(() {
-      //     groupIDTest = code;
-      //     tempgroupCat = List.of(groupCat);
-      //     // print("groupIDTest => $groupIDTest");
-      //     // print("groupCat => $groupCat length => ${groupCat.length}");
-      //     tempSubCat =
-      //         getDataCategoryInfo(listMap: subCat, searchText: groupIDTest);
-      //     print("value => ${txtPdtCat.text}");
-      //     print("tempSubCat => ${tempSubCat.length}");
-      //   });
       setState(() {
         groupIDTest = code;
         tempgroupCat = List.of(groupCatAll);
@@ -241,45 +208,49 @@ class _FormDataAssetState extends State<FormDataAsset> {
   @override
   void initState() {
     if (_data != null) {
-      brandActive = _data?.brandCode != null ? "Y" : "N";
-      txtAssetName = TextEditingController(text: _data?.title ?? "");
-      txtBrandName = TextEditingController(text: "");
-      txtBrandCode = TextEditingController(text: _data?.brandCode ?? "");
-      txtWarranzyNo = TextEditingController(text: _data?.warrantyNo ?? "");
-      ButtonDatePickerCustom.setShowDate = _data?.warrantyExpire ?? "";
-      txtWarranzyExpire =
-          TextEditingController(text: ButtonDatePickerCustom.showDate);
-      dataTime = txtWarranzyExpire.text;
-      txtAlertDate =
-          TextEditingController(text: _data?.alertDateNo?.toString() ?? "60");
-      txtPdtCat = TextEditingController(text: _data?.pdtCatCode ?? "");
-      txtPdtGroup = TextEditingController(text: _data?.pdtGroup ?? "");
-      txtPdtPlace = TextEditingController(text: _data?.pdtPlace ?? "");
-      txtPrice = TextEditingController(text: _data?.salesPrice ?? "");
-      txtSerialNo = TextEditingController(text: _data?.serialNo ?? "");
-      txtLotNo = TextEditingController(text: _data?.lotNo ?? "");
-      txtNote = TextEditingController(text: _data?.custRemark ?? "");
-      txtSLCName = TextEditingController(text: _data?.slcName ?? "");
-      txtGeoLocation = TextEditingController(text: _data?.geoLocation ?? "");
-      initialCategoryTest(_data?.pdtCatCode);
+      setState(() {
+        initialCategoryTest(_data?.pdtCatCode);
+        brandActive = _data?.brandCode != null ? "Y" : "N";
+        txtAssetName = TextEditingController(text: _data?.title ?? "");
+        txtBrandName = TextEditingController(text: "");
+        txtBrandCode = TextEditingController(text: _data?.brandCode ?? "");
+        txtWarranzyNo = TextEditingController(text: _data?.warrantyNo ?? "");
+        ButtonDatePickerCustom.setShowDate = _data?.warrantyExpire ?? "";
+        txtWarranzyExpire =
+            TextEditingController(text: ButtonDatePickerCustom.showDate);
+        dataTime = txtWarranzyExpire.text;
+        txtAlertDate =
+            TextEditingController(text: _data?.alertDateNo?.toString() ?? "60");
+        txtPdtCat = TextEditingController(text: _data?.pdtCatCode ?? "");
+        txtPdtGroup = TextEditingController(text: _data?.pdtGroup ?? "");
+        txtPdtPlace = TextEditingController(text: _data?.pdtPlace ?? "");
+        txtPrice = TextEditingController(text: _data?.salesPrice ?? "");
+        txtSerialNo = TextEditingController(text: _data?.serialNo ?? "");
+        txtLotNo = TextEditingController(text: _data?.lotNo ?? "");
+        txtNote = TextEditingController(text: _data?.custRemark ?? "");
+        txtSLCName = TextEditingController(text: _data?.slcName ?? "");
+        txtGeoLocation = TextEditingController(text: _data?.geoLocation ?? "");
+      });
     } else {
-      initialCategoryTest("A");
-      brandActive = _data?.brandCode != null ? "Y" : "N";
-      txtAssetName = TextEditingController(text: "");
-      txtBrandName = TextEditingController(text: "");
-      txtBrandCode = TextEditingController(text: "");
-      txtWarranzyNo = TextEditingController(text: "");
-      txtWarranzyExpire = TextEditingController(text: "");
-      txtAlertDate = TextEditingController(text: "60");
-      txtPdtCat = TextEditingController(text: "A001");
-      txtPdtGroup = TextEditingController(text: _group.elementAt(0));
-      txtPdtPlace = TextEditingController(text: _place.elementAt(0));
-      txtPrice = TextEditingController(text: "");
-      txtSerialNo = TextEditingController(text: "");
-      txtLotNo = TextEditingController(text: "");
-      txtNote = TextEditingController(text: "");
-      txtSLCName = TextEditingController(text: "");
-      txtGeoLocation = TextEditingController(text: "");
+      setState(() {
+        initialCategoryTest("A");
+        brandActive = _data?.brandCode != null ? "Y" : "N";
+        txtAssetName = TextEditingController(text: "");
+        txtBrandName = TextEditingController(text: "");
+        txtBrandCode = TextEditingController(text: "");
+        txtWarranzyNo = TextEditingController(text: "");
+        txtWarranzyExpire = TextEditingController(text: "");
+        txtAlertDate = TextEditingController(text: "60");
+        txtPdtCat = TextEditingController(text: "A001");
+        txtPdtGroup = TextEditingController(text: _group.elementAt(0));
+        txtPdtPlace = TextEditingController(text: _place.elementAt(0));
+        txtPrice = TextEditingController(text: "");
+        txtSerialNo = TextEditingController(text: "");
+        txtLotNo = TextEditingController(text: "");
+        txtNote = TextEditingController(text: "");
+        txtSLCName = TextEditingController(text: "");
+        txtGeoLocation = TextEditingController(text: "");
+      });
     }
 
     Future.delayed(Duration(milliseconds: 1500), () {
@@ -304,6 +275,7 @@ class _FormDataAssetState extends State<FormDataAsset> {
     txtSerialNo?.dispose();
     txtSLCName?.dispose();
     txtLotNo?.dispose();
+    txtGeoLocation.dispose();
     super.dispose();
   }
 
@@ -1075,7 +1047,21 @@ class _FormDataAssetState extends State<FormDataAsset> {
               item.modelBrandName.modelEN.en;
           txtBrandName.text = item.modelBrandName.modelEN.en;
           brandActive = item.brandActive;
+          keepOldBrand = txtBrandName.text;
         });
+      },
+      textChanged: (text) {
+        // print(text);
+        // print(keepOldBrand);
+        if (keepOldBrand == text) {
+          brandActive = "Y";
+          print("=");
+          print("brandActive $brandActive");
+        } else {
+          brandActive = "N";
+          print("!=");
+          print("brandActive $brandActive");
+        }
       },
     );
   }

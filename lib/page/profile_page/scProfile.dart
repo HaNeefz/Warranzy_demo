@@ -169,7 +169,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           // print("Tap Your Address");
                           // await DBProviderAsset.db.getDataAssetByWTokenID(
                           //     wTokenID: "ca3f5-TH-ef074218359d482fa68b517ed");
-                          await DBProviderAsset.db.deleteAllAsset();
+                          // await DBProviderAsset.db.deleteAllAsset();
                         }),
                     Divider(),
                     headLine("Security"),

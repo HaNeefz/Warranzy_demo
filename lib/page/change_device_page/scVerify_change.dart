@@ -140,17 +140,6 @@ class _VerifyChangeDeviceState extends State<VerifyChangeDevice> {
                         checkOTPCorrect(context);
                       }),
                 ),
-                // Padding(
-                //   padding: EdgeInsets.only(top: 32),
-                //   child: ButtonBuilder.buttonCustom(
-                //       context: context,
-                //       paddingValue: 20,
-                //       label: "Delete User and Asset",
-                //       onPressed: () async {
-                //         await DBProviderCustomer.db.deleteAllDataOfCustomer();
-                //         await DBProviderAsset.db.deleteAllAsset();
-                //       }),
-                // ),
               ],
             ),
           ),

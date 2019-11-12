@@ -97,6 +97,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
 
   String geoLocation = '';
   String brandActive = "N";
+  String keepOldBrand = "";
   var valueBrandName = "DysonElectric";
   List<GetBrandName> listBrandName = [];
   List<String> listBrandID = [];
@@ -404,6 +405,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
     txtSerialNo?.dispose();
     txtSLCName?.dispose();
     txtLotNo?.dispose();
+    txtGeoLocation.dispose();
     super.dispose();
   }
 
@@ -509,10 +511,10 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
                   postData,
                 ).then((body) async {
                   ecsLib.printJson(body);
-                  await sendApiAddAsset(
-                      body: body,
-                      whenCompleted: () => ecsLib.pushPageAndClearAllScene(
-                          context: context, pageWidget: MainPage()));
+                  // await sendApiAddAsset(
+                  //     body: body,
+                  //     whenCompleted: () => ecsLib.pushPageAndClearAllScene(
+                  //         context: context, pageWidget: MainPage()));
                 });
               } else if (response == "S") {
                 print(response);
@@ -520,16 +522,16 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
                   postData,
                 ).then((body) async {
                   ecsLib.printJson(body);
-                  await sendApiAddAsset(
-                      body: body,
-                      whenCompleted: () async {
-                        await ecsLib.showDialogLib(
-                          context,
-                          title: "Warranzy",
-                          content: "Added asset and Duplicated data.",
-                          textOnButton: allTranslations.text("ok"),
-                        );
-                      });
+                  // await sendApiAddAsset(
+                  //     body: body,
+                  //     whenCompleted: () async {
+                  //       await ecsLib.showDialogLib(
+                  //         context,
+                  //         title: "Warranzy",
+                  //         content: "Added asset and Duplicated data.",
+                  //         textOnButton: allTranslations.text("ok"),
+                  //       );
+                  //     });
                 });
               } else {
                 print(response);
@@ -955,12 +957,27 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
       itemSubmitted: (item) {
         setState(() {
           txtBrandCode.text = item.brandCode;
-          print("BrandCode => ${txtBrandCode.text}");
           searchTextField.textField.controller.text =
               item.modelBrandName.modelEN.en;
           txtBrandName.text = item.modelBrandName.modelEN.en;
-          brandActive = item.brandActive;
+          keepOldBrand = txtBrandName.text;
+          brandActive = item.brandActive ?? "N";
+          print("BrandCode => ${txtBrandCode.text}");
+          print("brandActive => $brandActive");
         });
+      },
+      textChanged: (text) {
+        // print(text);
+        // print(keepOldBrand);
+        if (keepOldBrand == text) {
+          brandActive = "Y";
+          print("=");
+          print("brandActive $brandActive");
+        } else {
+          brandActive = "N";
+          print("!=");
+          print("brandActive $brandActive");
+        }
       },
     );
   }

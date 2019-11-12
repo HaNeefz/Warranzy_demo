@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:warranzy_demo/models/model_user.dart';
+import 'package:warranzy_demo/services/method/methode_helper.dart';
+import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
@@ -24,11 +26,12 @@ class _AccountDetailState extends State<AccountDetail> {
   TextEditingController _mobileNo;
   TextEditingController _address;
 
-  bool _changeNoMobile = false;
+  String prefix = '';
+  bool onEdit = false;
 
-  @override
-  void initState() {
-    super.initState();
+  getDataCustomer() async {
+    prefix = await DBProviderInitialApp.db
+        .getPrefixCountry(await MethodHelper.countryCode);
     if (modelCustomers != null) {
       setState(() {
         _userID = TextEditingController(text: modelCustomers.custUserID);
@@ -36,10 +39,16 @@ class _AccountDetailState extends State<AccountDetail> {
         _email = TextEditingController(text: modelCustomers.custEmail);
         _mobileNo = TextEditingController(
             text: modelCustomers.mobilePhone
-                .substring(2, modelCustomers.mobilePhone.length));
+                .substring(prefix.length, modelCustomers.mobilePhone.length));
         _address = TextEditingController(text: modelCustomers.homeAddress);
       });
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getDataCustomer();
   }
 
   @override
@@ -61,7 +70,31 @@ class _AccountDetailState extends State<AccountDetail> {
         actions: <Widget>[
           FlatButton(
             child: TextBuilder.build(title: allTranslations.text("save")),
-            onPressed: () {},
+            onPressed: () async {
+              if (_formKey.currentState.validate()) {
+                if (await checkNumberChange() == false) {
+                  //To do something
+
+                  print("No Change Number");
+                } else {
+                  //Change nubmer, Could verify number before edit
+                  print("Change Number");
+                  ecsLib
+                      .showDialogAction(context,
+                          title: "Edit Account",
+                          content:
+                              "The Mobile No. has changed, You should verify Number before editing.",
+                          textOk: allTranslations.text("ok"),
+                          textCancel: allTranslations.text("cancel"))
+                      .then((onClick) {
+                    if (onClick == true) {
+                      print("verify Number");
+                      //apiVerify
+                    }
+                  });
+                }
+              }
+            },
           )
         ],
       ),
@@ -79,37 +112,26 @@ class _AccountDetailState extends State<AccountDetail> {
                   showDetail(
                       title: "Full Name",
                       controller: _fullName,
-                      onChange: (text) =>
-                          setState(() => _fullName.text = text)),
+                      onChange: (text) => _fullName.text = text),
                   showDetail(
                       title: "Email",
                       controller: _email,
-                      onChange: (text) => setState(() => _email.text = text)),
+                      onChange: (text) => _email.text = text),
                   showDetail(
                       title: "Address",
                       controller: _address,
-                      onChange: (text) => setState(() => _address.text = text)),
+                      onChange: (text) => _address.text = text),
                   showDetail(
-                      title: "Mobile No",
-                      controller: _mobileNo,
-                      leader: Container(
-                        margin: EdgeInsets.only(right: 5),
-                        padding:
-                            EdgeInsets.symmetric(vertical: 8, horizontal: 5),
-                        // decoration: BoxDecoration(
-                        //     border: Border.all(width: 0.7),
-                        //     borderRadius: BorderRadius.circular(5)),
-                        child: TextBuilder.build(
-                            title:
-                                "+ ${modelCustomers.mobilePhone.substring(0, 2)}"),
-                      ),
-                      onChange: (text) {
-                        if (modelCustomers.mobilePhone == _mobileNo.text) {
-                          _changeNoMobile = false;
-                        } else
-                          _changeNoMobile = true;
-                        print("Text : $text , change : $_changeNoMobile");
-                      }),
+                    title: "Mobile No",
+                    controller: _mobileNo,
+                    leader: Container(
+                      margin: EdgeInsets.only(right: 5),
+                      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 5),
+                      child: TextBuilder.build(
+                          title:
+                              "+ ${modelCustomers.mobilePhone.substring(0, 2)}"),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -147,5 +169,18 @@ class _AccountDetailState extends State<AccountDetail> {
         )
       ],
     );
+  }
+
+  Future<bool> checkNumberChange() async {
+    String inputNumber = ecsLib.chenkNumberStartWith(_mobileNo.text);
+
+    String oldNumber = modelCustomers.mobilePhone
+        .substring(prefix.length, modelCustomers.mobilePhone.length);
+    print("inputNumber : $inputNumber");
+    print("oldNumber : $oldNumber");
+    if (inputNumber == oldNumber)
+      return false; // No change
+    else
+      return true; // Change
   }
 }

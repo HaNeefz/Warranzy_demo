@@ -500,6 +500,15 @@ class ECSLib {
       Navigator.of(context).pop();
     }
   }
+
+  String chenkNumberStartWith(String numb) {
+    String numbNew = numb;
+    if (numbNew.startsWith(RegExp(r'0')) == true) {
+      print("numberStartWith Zero is true");
+      numbNew = numbNew.replaceFirst(RegExp(r'0'), '');
+    }
+    return numbNew;
+  }
 }
 
 class DialogCustoms extends StatelessWidget {

@@ -10,6 +10,7 @@ import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
 
 import 'page/splash_screen/scSplash_screen.dart';
+import 'services/providers/network_provider.dart';
 import 'services/providers/notification_state.dart';
 
 var getIt = GetIt();
@@ -28,12 +29,13 @@ setupApp() {
 
 void main() {
   Provider.debugCheckInvalidValueType = null;
-  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: Colors.black,
-      statusBarBrightness: Brightness.dark,
-      systemNavigationBarColor: Colors.white,
-      statusBarIconBrightness: Brightness.dark,
-      systemNavigationBarIconBrightness: Brightness.dark));
+  // SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+  //     statusBarColor: Colors.black,
+  //     statusBarBrightness: Brightness.dark,
+  //     systemNavigationBarColor: Colors.white,
+  //     statusBarIconBrightness: Brightness.dark,
+  //     systemNavigationBarIconBrightness: Brightness.dark)
+  //     );
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]).then((_) async {
@@ -45,11 +47,15 @@ void main() {
           ),
           ChangeNotifierProvider<AssetState>(
             builder: (_) => AssetState(),
-          )
+          ),
         ],
-        child: Consumer<NotificationState>(
-          builder: (BuildContext context, _notitState, _) => MyHomePage(
-            notiState: _notitState,
+        child: StreamProvider<ConnectivityStatus>(
+          builder: (context) =>
+              ConnectivityService().connectionStatusController.stream,
+          child: Consumer<NotificationState>(
+            builder: (BuildContext context, _notitState, _) => MyHomePage(
+              notiState: _notitState,
+            ),
           ),
         )));
   });

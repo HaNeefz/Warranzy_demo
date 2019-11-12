@@ -13,6 +13,7 @@ dependencies:
   cupertino_icons: ^0.1.2
   cached_network_image: ^1.1.1
   auto_size_text: ^2.1.0
+  connectivity: ^0.4.5+3
 
   onesignal: ^1.1.0
   intl: ^0.15.8

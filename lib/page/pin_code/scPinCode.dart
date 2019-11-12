@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:warranzy_demo/models/model_cust_temp_data.dart';
 import 'package:warranzy_demo/models/model_user.dart';
@@ -17,6 +18,7 @@ import 'package:warranzy_demo/services/api_provider/api_bloc.dart';
 import 'package:warranzy_demo/services/api_provider/api_bloc_widget.dart';
 import 'package:warranzy_demo/services/api_provider/api_response.dart';
 import 'package:warranzy_demo/services/method/methode_helper.dart';
+import 'package:warranzy_demo/services/providers/network_provider.dart';
 import 'package:warranzy_demo/services/sqflit/db_customers.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/const.dart';
@@ -82,9 +84,6 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
 
   void sendApiLogin() async {
     SharedPreferences pref = await _pref;
-    // ModelCustomers dataCust = await DBProviderCustomer.db.getDataCustomer();
-    // var pinCIde = dataCust?.pINcode;
-    // var custID = dataCust?.custUserID;
     var postData = {
       "DeviceID": pref?.getString("DeviceID"),
       "PINcode": pref?.getString("PinCode"),

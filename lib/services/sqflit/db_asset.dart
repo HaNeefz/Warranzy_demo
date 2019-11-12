@@ -286,7 +286,7 @@ BlockchainID */
     // JsonEncoder encoder = JsonEncoder.withIndent(" ");
     List<ModelDataAsset> temp = [];
     if (res.isNotEmpty) {
-      print("--------------------");
+      // print("--------------------");
       res.forEach((v) {
         // String prettyprint = encoder.convert(v);
         // print("DataAssetSQLite => $prettyprint");
@@ -308,7 +308,7 @@ BlockchainID */
       ModelDataAsset temp;
       print("res : $res");
       if (res.isNotEmpty) {
-        print("--------------------");
+        // print("--------------------");
         // res.forEach((v) {
         String prettyprint = encoder.convert(res.first);
         temp = ModelDataAsset.fromJson(res.first);

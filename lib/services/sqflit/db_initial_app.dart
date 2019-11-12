@@ -190,6 +190,24 @@ class DBProviderInitialApp {
     }
   }
 
+  Future<String> getPrefixCountry(String code) async {
+    final db = await database;
+    try {
+      var res = await db.query(tableCountry,
+          columns: ['Prefix'], where: "Code = ?", whereArgs: [code]);
+      // JsonEncoder encoder = JsonEncoder.withIndent(" ");
+      // res.forEach((v) {
+      //   String prettyprint = encoder.convert(v);
+      //   print("$tableCountry => " + prettyprint);
+      // });
+      // print("+ ${res.first.values.first}");
+      return res.first.values.first;
+    } catch (e) {
+      print("Error $tableCountry => $e");
+      return null;
+    }
+  }
+
   Future getAllDataTimeZone() async {
     final db = await database;
     try {
