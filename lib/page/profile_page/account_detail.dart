@@ -3,6 +3,7 @@ import 'package:warranzy_demo/models/model_user.dart';
 import 'package:warranzy_demo/models/model_verify_phone.dart';
 import 'package:warranzy_demo/services/api/repository.dart';
 import 'package:warranzy_demo/services/method/methode_helper.dart';
+import 'package:warranzy_demo/services/sqflit/db_customers.dart';
 import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/const.dart';
@@ -90,7 +91,7 @@ class _AccountDetailState extends State<AccountDetail> {
                       textCancel: allTranslations.text("no"),
                       textOk: allTranslations.text('ok'))
                   .then((onClick) {
-                if (onClick == false) Navigator.pop(context);
+                if (onClick == false) Navigator.pop(context, false);
               });
             } else
               Navigator.pop(context);
@@ -185,17 +186,13 @@ class _AccountDetailState extends State<AccountDetail> {
                                   if (await checkNumberChange() == false) {
                                     //No Change Number To do something
                                     print("No Change Number");
-
-                                    print("FullName : ${_fullName.text}");
-                                    print("email : ${_email.text}");
-                                    print("address : ${_address.text}");
-                                    print("mobile : ${_mobileNo.text}");
+                                    await onSendAPIEditProfile();
                                   } else {
                                     //Change nubmer, Could verify number before edit
                                     if (isVerify == true) {
-                                      onVerifyNumber();
+                                      await onVerifyNumber();
                                     } else {
-                                      onRequestOTP();
+                                      await onRequestOTP();
                                     }
                                   }
                                 }
@@ -214,17 +211,10 @@ class _AccountDetailState extends State<AccountDetail> {
                                     colorsButton: Colors.red.withOpacity(0.4),
                                     label: "Try Request OTP",
                                     onPressed: () async {
-                                      var body = {
-                                        "MobilePhone":
-                                            "${prefix + ecsLib.chenkNumberStartWith(_mobileNo.text)}",
-                                        "Country":
-                                            await MethodHelper.countryCode,
-                                        "TimeZone": await MethodHelper.timeZone,
-                                      };
                                       ecsLib.showDialogLoadingLib(context,
                                           content: "Try Request OTP");
                                       Repository.apiVerifyNumberUsedEditAccount(
-                                              body: body)
+                                              body: await setBodyToRequestOTP())
                                           .then((response) {
                                         if (response.status == true) {
                                           modelVerifyNumber = response;
@@ -326,11 +316,12 @@ class _AccountDetailState extends State<AccountDetail> {
       return true; // Change
   }
 
-  onVerifyNumber() {
+  onVerifyNumber() async {
     if (ecsLib.checkOTPTimeOut(dateFormatted: modelVerifyNumber.createDate) ==
         false) {
       if (_verifyNumber.text == modelVerifyNumber.codeVerify.toString()) {
         //api Edit account
+        await Repository.apiEditProfile(body: "").then((response) {});
         print("Pass");
       } else {
         alert(title: "Verify OTP", content: "OTP Incorrect.");
@@ -338,6 +329,16 @@ class _AccountDetailState extends State<AccountDetail> {
     } else {
       alert(title: "OTP TIME OUT.", content: "Please try requset OTP again.");
     }
+  }
+
+  Future<Map<String, String>> setBodyToRequestOTP() async {
+    var body = {
+      "MobilePhone": "${prefix + ecsLib.chenkNumberStartWith(_mobileNo.text)}",
+      "Country": await MethodHelper.countryCode,
+      "TimeZone": await MethodHelper.timeZone,
+    };
+    print("body : $body");
+    return body;
   }
 
   onRequestOTP() async {
@@ -352,16 +353,9 @@ class _AccountDetailState extends State<AccountDetail> {
         .then((onClick) async {
       if (onClick == true) {
         print("verify Number");
-
-        var body = {
-          "MobilePhone":
-              "${prefix + ecsLib.chenkNumberStartWith(_mobileNo.text)}",
-          "Country": await MethodHelper.countryCode,
-          "TimeZone": await MethodHelper.timeZone,
-        };
-        print(body);
         ecsLib.showDialogLoadingLib(context, content: "Request OTP");
-        await Repository.apiVerifyNumberUsedEditAccount(body: body)
+        await Repository.apiVerifyNumberUsedEditAccount(
+                body: await setBodyToRequestOTP())
             .then((response) {
           ecsLib.cancelDialogLoadindLib(context);
           if (response.status == true) {
@@ -384,6 +378,44 @@ class _AccountDetailState extends State<AccountDetail> {
         });
         // apiVerify
       }
+    });
+  }
+
+  Map<String, dynamic> setBodyToEditProfile() {
+    Map<String, dynamic> body = {};
+    body.addAll({
+      "CustUserID": "${_userID.text}",
+      "CustName": "${_fullName.text}",
+      "HomeAddress": "${_address.text}",
+      "CustEmail": "${_email.text}",
+      "MobilePhone": "${prefix + ecsLib.chenkNumberStartWith(_mobileNo.text)}"
+    });
+
+    print(body);
+    return body;
+  }
+
+  onSendAPIEditProfile() async {
+    ecsLib.showDialogLoadingLib(context, content: "Edit Account");
+    await Repository.apiEditProfile(body: setBodyToEditProfile())
+        .then((response) async {
+      ecsLib.cancelDialogLoadindLib(context);
+      if (response == true) {
+        await DBProviderCustomer.db
+            .updateCustomerUsedEditProfile(
+                custUserID: _userID.text, values: setBodyToEditProfile())
+            .then((resEdit) {
+          if (resEdit == true)
+            Navigator.pop(context, true);
+          else
+            alert(
+                title: "EDIT PROFILE FAIL",
+                content: "fail something when update in sqlite!.");
+        });
+      } else {
+        alert(title: "EDIT PROFILE FAIL", content: "Something wrong!.");
+      }
+      print("response : $response");
     });
   }
 }

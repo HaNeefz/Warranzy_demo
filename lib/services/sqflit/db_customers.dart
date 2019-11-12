@@ -147,6 +147,20 @@ class DBProviderCustomer {
     return res;
   }
 
+  updateCustomerUsedEditProfile(
+      {String custUserID, Map<String, dynamic> values}) async {
+    final db = await database;
+    var res;
+    try {
+      res = await db.update(tableCustomer, values,
+          where: '$columnCustUserID = ?', whereArgs: [custUserID]);
+      print("Update Used For Edit Profile : $res");
+      return res > 0 ? true : false;
+    } catch (e) {
+      return false;
+    }
+  }
+
   Future<bool> updateCustomerFieldPinCode(ModelCustomers data) async {
     final db = await database;
     var row = {columnPINcode: data.pINcode};

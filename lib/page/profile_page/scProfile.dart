@@ -155,12 +155,16 @@ class _ProfilePageState extends State<ProfilePage> {
                     listTile(
                         title: "Profile",
                         icons: Icons.account_circle,
-                        onPressed: () {
-                          ecsLib.pushPage(
-                              context: context,
-                              pageWidget: AccountDetail(
-                                modelCustomers: dataCust,
-                              ));
+                        onPressed: () async {
+                          await ecsLib
+                              .pushPage(
+                                  context: context,
+                                  pageWidget: AccountDetail(
+                                    modelCustomers: dataCust,
+                                  ))
+                              .then((comback) {
+                            if (comback == true) getDataCustomers();
+                          });
                         }),
                     listTile(
                         title: "Your Address",
@@ -396,22 +400,6 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
-
-  // Future<Map<String, dynamic>> getListImage(Map<String, dynamic> map) async {
-  //   Map<String, dynamic> mapImage = {};
-  //   map.forEach((k, v) async {
-  //     mapImage.addAll({"$k": []});
-  //     List vv = v as List;
-  //     print("$k | ${vv.length}");
-  //     List<String> img = [];
-  //     for (var list in vv) {
-  //       var tempImagePool = await DBProviderAsset.db.getImagePool(list);
-  //       img.add(tempImagePool);
-  //     }
-  //     mapImage["$k"] = img;
-  //   });
-  //   return mapImage.isNotEmpty ? mapImage : {};
-  // }
 
   Widget buttonContact(
       [IconData icons, String title, Color colors, Function onPressed]) {

@@ -93,6 +93,17 @@ class Repository {
     }
   }
 
+  static Future<bool> apiEditProfile({dynamic body}) async {
+    try {
+      final response = await _helper.post("/User/EditProfile", body);
+      return response;
+      // return ModelVerifyLogin.fromJson(response);
+    } catch (e) {
+      return false;
+      // return ModelVerifyLogin(message: "$e");
+    }
+  }
+
   //--------------------------------------------Asset------------------------
   static Future<RepositoryInitalApp> initialApplication() async {
     try {
