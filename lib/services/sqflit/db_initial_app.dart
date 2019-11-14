@@ -311,7 +311,7 @@ class DBProviderInitialApp {
           "SELECT * FROM $tableProductSubCategory ORDER BY $tableProductSubCategory.CatCode ASC");
       JsonEncoder encoder = JsonEncoder.withIndent(" ");
       String prettyprint = encoder.convert(res);
-      print("$tableGroupCategory => " + prettyprint);
+      // print("$tableGroupCategory => " + prettyprint);
       return res.isNotEmpty ? res : [];
     } catch (e) {
       return [];

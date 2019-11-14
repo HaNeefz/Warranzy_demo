@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:warranzy_demo/models/model_repository_init_app.dart';
 import 'package:warranzy_demo/models/model_respository_asset.dart';
 import 'package:warranzy_demo/models/model_user.dart';
 // import 'package:warranzy_demo/models/model_mas_cust.dart';
 import 'package:warranzy_demo/page/login_first/scLogin.dart';
+import 'package:warranzy_demo/page/profile_page/testCat.dart';
 import 'package:warranzy_demo/page/splash_screen/scSplash_screen.dart';
 import 'package:warranzy_demo/services/calls_and_message/calls_and_message.dart';
 import 'package:warranzy_demo/services/method/methode_helper.dart';
@@ -23,6 +25,7 @@ import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_field_builder.dart';
 
 import 'account_detail.dart';
+import 'change_pin_code.dart';
 
 class ProfilePage extends StatefulWidget {
   final String heroTag;
@@ -166,21 +169,26 @@ class _ProfilePageState extends State<ProfilePage> {
                             if (comback == true) getDataCustomers();
                           });
                         }),
-                    listTile(
-                        title: "Your Address",
-                        icons: Icons.person_pin_circle,
-                        onPressed: () async {
-                          // print("Tap Your Address");
-                          // await DBProviderAsset.db.getDataAssetByWTokenID(
-                          //     wTokenID: "ca3f5-TH-ef074218359d482fa68b517ed");
-                          // await DBProviderAsset.db.deleteAllAsset();
-                        }),
                     Divider(),
                     headLine("Security"),
                     listTile(
                         title: "Change PIN",
                         icons: Icons.keyboard,
-                        onPressed: () {}),
+                        onPressed: () async {
+                          await ecsLib
+                              .pushPage(
+                                  context: context,
+                                  pageWidget: ChangPINcodePage(
+                                    modelCustomer: dataCust,
+                                  ))
+                              .then((comback) {
+                            if (comback == true) getDataCustomers();
+                          });
+                          // Navigator.push(
+                          //     context,
+                          //     MaterialPageRoute(
+                          //         builder: (context) => TestCategory()));
+                        }),
                     listTile(
                         title: "Sign in with touch ID",
                         icons: Icons.fingerprint,

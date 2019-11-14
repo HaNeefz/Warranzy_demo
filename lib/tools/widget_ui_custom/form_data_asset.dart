@@ -777,12 +777,13 @@ class _FormDataAssetState extends State<FormDataAsset> {
       width: 180,
       child: Row(
         children: <Widget>[
-          Image.asset(
-            imgPath,
-            width: 30,
-            height: 30,
-            fit: BoxFit.contain,
-          ),
+          // imgPath.length>0?
+          // Image.asset(
+          //   imgPath,
+          //   width: 30,
+          //   height: 30,
+          //   fit: BoxFit.contain,
+          // ): Icon(Icons.error, color: Colors.red),
           // CachedNetworkImage(
           //   imageUrl: imgUrl,
           //   imageBuilder: (context, imageProvider) => Container(
@@ -802,7 +803,7 @@ class _FormDataAssetState extends State<FormDataAsset> {
           //   ),
           //   errorWidget: (context, url, error) => Icon(Icons.error),
           // ),
-          SizedBox(width: 10),
+          // SizedBox(width: 10),
           Container(
             width: 140,
             child: AutoSizeText(

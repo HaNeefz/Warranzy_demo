@@ -33,9 +33,9 @@ class _CategoryUIState extends State<CategoryUI> {
   void initState() {
     super.initState();
     widget.category.forEach((v) {
-      // print(v['Logo']);
-      // setState(() => )
-      imagePath.add(v['Logo']);
+      print(v['Logo']);
+      // // setState(() => )
+      // imagePath.add(v['Logo']);
     });
   }
 

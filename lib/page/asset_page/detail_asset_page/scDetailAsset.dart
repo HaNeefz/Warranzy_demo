@@ -221,6 +221,12 @@ class _DetailAssetState extends State<DetailAsset> {
     _testGetImage();
     getProductCateName();
     getBrandName();
+    // print(DateTime.parse(_data.warrantyExpire));
+    // print(DateTime.parse(_data.alertDate));
+    // print(DateTime.parse(_data.warrantyExpire)
+    //     .difference(DateTime.parse(_data.alertDate))
+    //     .inDays
+    //     .toString());
   }
 
   goToEditPageForEditImage(bool editImage) {
@@ -566,7 +572,10 @@ class _DetailAssetState extends State<DetailAsset> {
                 textTitleWithData(
                     title: "AlerDate",
                     data: _data.alertDate != null
-                        ? _data.alertDate.split(" ").first
+                        ? DateTime.parse(_data.warrantyExpire)
+                            .difference(DateTime.parse(_data.alertDate))
+                            .inDays
+                            .toString() //_data.alertDate.split(" ").first
                         : "-"),
                 textTitleWithData(
                     title: "Alert Date No.", data: "${_data.alertDateNo}"),

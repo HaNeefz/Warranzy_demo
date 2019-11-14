@@ -511,10 +511,10 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
                   postData,
                 ).then((body) async {
                   ecsLib.printJson(body);
-                  // await sendApiAddAsset(
-                  //     body: body,
-                  //     whenCompleted: () => ecsLib.pushPageAndClearAllScene(
-                  //         context: context, pageWidget: MainPage()));
+                  await sendApiAddAsset(
+                      body: body,
+                      whenCompleted: () => ecsLib.pushPageAndClearAllScene(
+                          context: context, pageWidget: MainPage()));
                 });
               } else if (response == "S") {
                 print(response);
@@ -522,16 +522,16 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
                   postData,
                 ).then((body) async {
                   ecsLib.printJson(body);
-                  // await sendApiAddAsset(
-                  //     body: body,
-                  //     whenCompleted: () async {
-                  //       await ecsLib.showDialogLib(
-                  //         context,
-                  //         title: "Warranzy",
-                  //         content: "Added asset and Duplicated data.",
-                  //         textOnButton: allTranslations.text("ok"),
-                  //       );
-                  //     });
+                  await sendApiAddAsset(
+                      body: body,
+                      whenCompleted: () async {
+                        await ecsLib.showDialogLib(
+                          context,
+                          title: "Warranzy",
+                          content: "Added asset and Duplicated data.",
+                          textOnButton: allTranslations.text("ok"),
+                        );
+                      });
                 });
               } else {
                 print(response);
@@ -799,15 +799,15 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
       width: 180,
       child: Row(
         children: <Widget>[
-          imgPath.length > 0
-              ? Image.asset(
-                  imgPath,
-                  width: 30,
-                  height: 30,
-                  fit: BoxFit.contain,
-                )
-              : Icon(Icons.error, color: Colors.red),
-          SizedBox(width: 10),
+          // imgPath.length > 0
+          //     ? Image.asset(
+          //         imgPath,
+          //         width: 30,
+          //         height: 30,
+          //         fit: BoxFit.contain,
+          //       )
+          //     : Icon(Icons.error, color: Colors.red),
+          // SizedBox(width: 10),
           Container(
             width: 140,
             child: AutoSizeText(

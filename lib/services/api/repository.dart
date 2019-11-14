@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:warranzy_demo/models/model_repository_asset_scan.dart';
 import 'package:warranzy_demo/models/model_repository_init_app.dart';
+import 'package:warranzy_demo/models/model_response_boolean.dart';
 import 'package:warranzy_demo/models/model_respository_asset.dart';
 import 'package:warranzy_demo/models/model_user.dart';
 import 'package:warranzy_demo/models/model_verify_login.dart';
@@ -93,14 +94,21 @@ class Repository {
     }
   }
 
-  static Future<bool> apiEditProfile({dynamic body}) async {
+  static Future<ModelReturnBoolean> apiEditProfile({dynamic body}) async {
     try {
       final response = await _helper.post("/User/EditProfile", body);
-      return response;
-      // return ModelVerifyLogin.fromJson(response);
+      return ModelReturnBoolean.fromJson(response);
     } catch (e) {
-      return false;
-      // return ModelVerifyLogin(message: "$e");
+      return ModelReturnBoolean(message: "$e");
+    }
+  }
+
+  static Future<ModelReturnBoolean> apiChangePINCode({dynamic body}) async {
+    try {
+      final response = await _helper.post("/User/ChangePincode", body);
+      return ModelReturnBoolean.fromJson(response);
+    } catch (e) {
+      return ModelReturnBoolean(message: "$e");
     }
   }
 

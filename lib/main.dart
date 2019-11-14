@@ -45,9 +45,6 @@ void main() {
           ChangeNotifierProvider<NotificationState>(
             builder: (_) => NotificationState(),
           ),
-          ChangeNotifierProvider<AssetState>(
-            builder: (_) => AssetState(),
-          ),
         ],
         child: StreamProvider<ConnectivityStatus>(
           builder: (context) =>

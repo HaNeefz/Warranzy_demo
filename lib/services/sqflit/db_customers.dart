@@ -147,6 +147,14 @@ class DBProviderCustomer {
     return res;
   }
 
+  updatePinCode(ModelCustomers data) async {
+    final db = await database;
+    var res = await db.update(tableCustomer, {"PINcode": data.pINcode},
+        where: '$columnCustUserID = ?', whereArgs: [data.custUserID]);
+    print("update PINCODE : $res");
+    return res;
+  }
+
   updateCustomerUsedEditProfile(
       {String custUserID, Map<String, dynamic> values}) async {
     final db = await database;

@@ -158,6 +158,7 @@ class _AssetPageState extends State<AssetPage> {
                 CarouselWithIndicator(
                   height: 250,
                   items: ["1", "2", "3", "5"],
+                  autoPlay: false,
                 ),
                 buildLabelAndSeeAll(),
                 buildYourAssets(),
@@ -182,49 +183,53 @@ class _AssetPageState extends State<AssetPage> {
     } */
     // buildAssetOffine(),
 
-    return Consumer<AssetState>(
-      builder: (context, assetState, _) {
-        return FutureBuilder<List<ModelDataAsset>>(
-          future: assetState.allAssets,
-          builder: (BuildContext context,
-              AsyncSnapshot<List<ModelDataAsset>> snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              if (!(snapshot.hasError)) {
-                if (snapshot.data.isNotEmpty)
-                  return Padding(
-                      padding: const EdgeInsets.fromLTRB(10, 15, 10, 10),
-                      child: RefreshIndicator(
-                        onRefresh: () async {
-                          await assetState.refreshAsset();
-                        },
-                        child: Column(
-                          children: <Widget>[
-                            SingleChildScrollView(
-                              child: Column(
-                                  children: snapshot.data
-                                      .map((data) =>
-                                          new MyAssetFormSQLite(data: data))
-                                      .toList()),
-                            ),
-                          ],
-                        ),
-                      ));
-                else {
-                  return Center(
-                    child: TextBuilder.build(title: "Data offline is empty"),
-                  );
+    return ChangeNotifierProvider<AssetState>(
+      builder: (_) => AssetState(),
+      child: Consumer<AssetState>(
+        builder: (context, assetState, _) {
+          print("render");
+          return FutureBuilder<List<ModelDataAsset>>(
+            future: getModelData,
+            builder: (BuildContext context,
+                AsyncSnapshot<List<ModelDataAsset>> snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                if (!(snapshot.hasError)) {
+                  if (snapshot.data.isNotEmpty)
+                    return Padding(
+                        padding: const EdgeInsets.fromLTRB(10, 15, 10, 10),
+                        child: RefreshIndicator(
+                          onRefresh: () async {
+                            await assetState.refreshAsset();
+                          },
+                          child: Column(
+                            children: <Widget>[
+                              SingleChildScrollView(
+                                child: Column(
+                                    children: snapshot.data
+                                        .map((data) =>
+                                            new MyAssetFormSQLite(data: data))
+                                        .toList()),
+                              ),
+                            ],
+                          ),
+                        ));
+                  else {
+                    return Center(
+                      child: TextBuilder.build(title: "Data offline is empty"),
+                    );
+                  }
+                } else {
+                  return Text("Error");
                 }
+              } else if (snapshot.connectionState == ConnectionState.waiting) {
+                return CircularProgressIndicator();
               } else {
-                return Text("Error");
+                return Text("Something wrong.!!");
               }
-            } else if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator();
-            } else {
-              return Text("Something wrong.!!");
-            }
-          },
-        );
-      },
+            },
+          );
+        },
+      ),
     );
   }
 

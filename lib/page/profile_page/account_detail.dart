@@ -320,9 +320,8 @@ class _AccountDetailState extends State<AccountDetail> {
     if (ecsLib.checkOTPTimeOut(dateFormatted: modelVerifyNumber.createDate) ==
         false) {
       if (_verifyNumber.text == modelVerifyNumber.codeVerify.toString()) {
-        //api Edit account
-        await Repository.apiEditProfile(body: "").then((response) {});
         print("Pass");
+        await onSendAPIEditProfile();
       } else {
         alert(title: "Verify OTP", content: "OTP Incorrect.");
       }
@@ -400,7 +399,7 @@ class _AccountDetailState extends State<AccountDetail> {
     await Repository.apiEditProfile(body: setBodyToEditProfile())
         .then((response) async {
       ecsLib.cancelDialogLoadindLib(context);
-      if (response == true) {
+      if (response.status == true) {
         await DBProviderCustomer.db
             .updateCustomerUsedEditProfile(
                 custUserID: _userID.text, values: setBodyToEditProfile())
@@ -413,9 +412,8 @@ class _AccountDetailState extends State<AccountDetail> {
                 content: "fail something when update in sqlite!.");
         });
       } else {
-        alert(title: "EDIT PROFILE FAIL", content: "Something wrong!.");
+        alert(title: "EDIT PROFILE FAIL", content: "${response.message}");
       }
-      print("response : $response");
     });
   }
 }
