@@ -112,6 +112,15 @@ class Repository {
     }
   }
 
+  static Future<ModelReturnBoolean> apiChangeSpecialPass({dynamic body}) async {
+    try {
+      final response = await _helper.post("/User/ChangeSpecialPass", body);
+      return ModelReturnBoolean.fromJson(response);
+    } catch (e) {
+      return ModelReturnBoolean(message: "$e");
+    }
+  }
+
   //--------------------------------------------Asset------------------------
   static Future<RepositoryInitalApp> initialApplication() async {
     try {

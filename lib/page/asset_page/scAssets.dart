@@ -187,7 +187,6 @@ class _AssetPageState extends State<AssetPage> {
       builder: (_) => AssetState(),
       child: Consumer<AssetState>(
         builder: (context, assetState, _) {
-          print("render");
           return FutureBuilder<List<ModelDataAsset>>(
             future: getModelData,
             builder: (BuildContext context,

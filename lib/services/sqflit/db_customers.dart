@@ -24,6 +24,7 @@ class DBProviderCustomer {
   final String columnSpecialPass = "SpecialPass";
   final String columnPackageType = "PackageType";
   final String columnCreateType = "CreateDate";
+  final String columnImageProfile = "ImageProfile";
 
   Future<Database> get database async {
     if (_database != null) return _database;
@@ -56,7 +57,8 @@ class DBProviderCustomer {
         "$columnBirthYear TEXT,"
         "$columnSpecialPass TEXT,"
         "$columnPackageType TEXT,"
-        "$columnCreateType"
+        "$columnCreateType TEXT,"
+        "$columnImageProfile TEXT"
         ")");
   }
 
@@ -153,6 +155,14 @@ class DBProviderCustomer {
         where: '$columnCustUserID = ?', whereArgs: [data.custUserID]);
     print("update PINCODE : $res");
     return res;
+  }
+
+  Future<bool> updateSpecialPass(ModelCustomers data) async {
+    final db = await database;
+    var res = await db.update(tableCustomer, {"SpecialPass": data.specialPass},
+        where: '$columnCustUserID = ?', whereArgs: [data.custUserID]);
+    print("update SpecialPass : $res");
+    return res > 0;
   }
 
   updateCustomerUsedEditProfile(

@@ -32,11 +32,11 @@ class _CategoryUIState extends State<CategoryUI> {
   @override
   void initState() {
     super.initState();
-    widget.category.forEach((v) {
-      print(v['Logo']);
-      // // setState(() => )
-      // imagePath.add(v['Logo']);
-    });
+    // widget.category.forEach((v) {
+    //   print(v['Logo']);
+    //   // // setState(() => )
+    //   // imagePath.add(v['Logo']);
+    // });
   }
 
   @override

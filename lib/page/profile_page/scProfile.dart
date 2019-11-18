@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:warranzy_demo/models/model_repository_init_app.dart';
 import 'package:warranzy_demo/models/model_respository_asset.dart';
 import 'package:warranzy_demo/models/model_user.dart';
@@ -11,6 +12,7 @@ import 'package:warranzy_demo/models/model_user.dart';
 import 'package:warranzy_demo/page/login_first/scLogin.dart';
 import 'package:warranzy_demo/page/profile_page/testCat.dart';
 import 'package:warranzy_demo/page/splash_screen/scSplash_screen.dart';
+import 'package:warranzy_demo/services/api/repository.dart';
 import 'package:warranzy_demo/services/calls_and_message/calls_and_message.dart';
 import 'package:warranzy_demo/services/method/methode_helper.dart';
 import 'package:warranzy_demo/services/sqflit/db_asset.dart';
@@ -69,6 +71,13 @@ class _ProfilePageState extends State<ProfilePage> {
     } catch (e) {
       print(e);
     }
+  }
+
+  showAlert({String title, String content}) {
+    ecsLib.showDialogLib(context,
+        title: title ?? "Title is empty",
+        content: content ?? "Content is empty",
+        textOnButton: allTranslations.text("close"));
   }
 
   @override
@@ -194,8 +203,18 @@ class _ProfilePageState extends State<ProfilePage> {
                         icons: Icons.fingerprint,
                         trailing: Switch(
                           value: _usedTouchID,
-                          onChanged: (bool value) {
-                            setState(() => _usedTouchID = value);
+                          onChanged: (bool value) async {
+                            await ecsLib
+                                .showDialogAction(context,
+                                    title:
+                                        "Change Sign in with touch ID or FaceID",
+                                    content:
+                                        "Are you sure to change SpecialPass ?",
+                                    textOk: allTranslations.text("ok"),
+                                    textCancel: allTranslations.text("cancel"))
+                                .then((onClick) {
+                              if (onClick == true) changeSpecialPass(value);
+                            });
                           },
                         )),
                     Divider(),
@@ -345,6 +364,34 @@ class _ProfilePageState extends State<ProfilePage> {
             // )
           ]),
         ));
+  }
+
+  changeSpecialPass(value) async {
+    dataCust.specialPass = value == true ? "Y" : "N";
+    print("dataCust.specialPass :${dataCust.specialPass}");
+    var body = {
+      "CustUserID": dataCust.custUserID,
+      "SpecialPass": dataCust.specialPass
+    };
+    ecsLib.showDialogLoadingLib(context, content: "Changing SpecialPass");
+    await Repository.apiChangeSpecialPass(body: body).then((response) async {
+      ecsLib.cancelDialogLoadindLib(context);
+      if (response.status == true) {
+        await DBProviderCustomer.db
+            .updateSpecialPass(dataCust)
+            .then((update) async {
+          if (update == true) {
+            setState(() => _usedTouchID = value);
+          }
+        });
+      } else if (response.status == false) {
+        showAlert(
+            title: "Update SpecialPass fail", content: "${response.message}");
+      } else {
+        showAlert(
+            title: "Update SpecialPass fail", content: "${response.message}");
+      }
+    });
   }
 
   Hero buildHeroProfile() {
