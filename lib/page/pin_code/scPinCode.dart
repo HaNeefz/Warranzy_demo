@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -27,6 +29,7 @@ import 'package:warranzy_demo/tools/localAuth.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/app_bar_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/button_builder.dart';
+import 'package:warranzy_demo/tools/widget_ui_custom/manage_image_profile.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 
 class PinCodePageUpdate extends StatefulWidget {
@@ -58,6 +61,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
   bool get usedPin => widget.usedPin;
   ModelMasCustomer get modelMasCustomer => widget.modelMasCustomer;
   ApiBlocGetAllAsset<ModelVerifyLogin> _loginBloc;
+  String imageProfile;
 
   getDataCustomer() async {
     SharedPreferences pref = await _pref;
@@ -76,9 +80,12 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
     pref.setString("PackageType", dataCust.packageType);
     pref.setString("PinCode", dataCust.pINcode);
     pref.setString("SpecialPass", dataCust.specialPass);
+    pref.setString("ImageProfile", dataCust?.imageProfile);
 
     setState(() {
       username = pref.getString("UserName") ?? dataCust.custName;
+      imageProfile = pref.getString("ImageProfile") ?? dataCust?.imageProfile;
+      print("imageProfile : $imageProfile");
     });
   }
 
@@ -263,49 +270,53 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
                 context: context,
                 label: allTranslations.text("continue"),
                 onPressed: () async {
-                  await ecsLib.showDialogLib(context,
-                      title: "SUCCESS!",
-                      content: "Create your account successfully.",
-                      textOnButton: allTranslations.text("ok"));
-                  await ecsLib
-                      .showDialogAction(
-                    context,
-                    title: "Use Scan to Authen",
-                    content: "Do you need to Scan for sign in.",
-                    textOk: "Yes, I do",
-                    textCancel: "Later",
-                  )
-                      .then((response) async {
-                    String pinCode =
-                        "${listPinTemp[0]}${listPinTemp[1]}${listPinTemp[2]}${listPinTemp[3]}${listPinTemp[4]}${listPinTemp[5]}";
+                  ecsLib.pushPage(
+                    context: context,
+                    pageWidget: ImageProfile(
+                      hasImage: false,
+                      onContinue: (map) async {
+                        // await ecsLib.showDialogLib(context,
+                        //     title: "SUCCESS!",
+                        //     content: "Create your account successfully.",
+                        //     textOnButton: allTranslations.text("ok"));
 
-                    if (response == true) {
-                      ecsLib.showDialogLoadingLib(
-                        context,
-                      );
-                      var data =
-                          postDataCutomers(pinCode: pinCode, specialPass: "Y");
-                      print("Data before send : $data");
-                      // ModelCustomers temp =
-                      //     await DBProviderCustomer.db.getDataCustomer();
-                      // print(temp?.toJson());
-                      sendApiRegister(data, pinCode);
-                    } else {
-                      ecsLib.showDialogLoadingLib(
-                        context,
-                      );
-                      var data =
-                          postDataCutomers(pinCode: pinCode, specialPass: "N");
-                      print("Data before send : $data");
-                      // ModelCustomers temp =
-                      //     await DBProviderCustomer.db.getDataCustomer();
-                      // print(temp.toJson());
-                      sendApiRegister(data, pinCode);
-                    }
-                  });
-                  // await _onAlert2ButtonsPressed(context).then((_) async {
-                  //   await _onAlertButtonPressed(context);
-                  // });
+                        await ecsLib
+                            .showDialogAction(
+                          context,
+                          title: "Use Scan to Authen",
+                          content: "Do you need to Scan for sign in.",
+                          textOk: "Yes, I do",
+                          textCancel: "Later",
+                        )
+                            .then((response) async {
+                          String pinCode =
+                              "${listPinTemp[0]}${listPinTemp[1]}${listPinTemp[2]}${listPinTemp[3]}${listPinTemp[4]}${listPinTemp[5]}";
+
+                          if (response == true) {
+                            ecsLib.showDialogLoadingLib(
+                              context,
+                            );
+                            var data = postDataCutomers(
+                                pinCode: pinCode, specialPass: "Y");
+                            map.remove("CustUserID");
+                            data.addAll(map);
+                            print("Data before send : $data");
+                            sendApiRegister(data, pinCode);
+                          } else {
+                            ecsLib.showDialogLoadingLib(
+                              context,
+                            );
+                            var data = postDataCutomers(
+                                pinCode: pinCode, specialPass: "N");
+                            map.remove("CustUserID");
+                            data.addAll(map);
+                            print("Data before send : $data");
+                            sendApiRegister(data, pinCode);
+                          }
+                        });
+                      },
+                    ),
+                  );
                 }),
           );
         else
@@ -321,12 +332,16 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
   Future sendApiRegister(Map data, String pinCode) async {
     Repository.apiRegister(body: data).then((response) async {
       if (response?.status == true) {
+        response.data.pINcode = pinCode;
+        response.data.imageProfile = data['ImageProfile'];
         if (await DBProviderCustomer.db.addDataCustomer(response.data) ==
             true) {
           var dataCust = await DBProviderCustomer.db.getDataCustomer();
-          await DBProviderCustomer.db.updateCustomerFieldPinCode(ModelCustomers(
-              pINcode: pinCode, custUserID: dataCust.custUserID));
-          dataCust = await DBProviderCustomer.db.getDataCustomer();
+          // await DBProviderCustomer.db.updateCustomerFieldPinCode(ModelCustomers(
+          //     pINcode: pinCode,
+          //     custUserID: dataCust.custUserID,
+          //     imageProfile: data['ImageProfile']));
+          // dataCust = await DBProviderCustomer.db.getDataCustomer();
           print(
               "===========Information Customer============\n${dataCust.toJson()}\n============");
           ecsLib.cancelDialogLoadindLib(context);
@@ -574,23 +589,49 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
     );
   }
 
+  Widget showImage() {
+    return CircleAvatar(
+      radius: 50,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(50),
+        child: imageProfile.startsWith("A") == true
+            ? Image.asset(
+                "assets/icons/avatars/$imageProfile.png",
+                width: 100,
+                height: 100,
+                fit: BoxFit.cover,
+              )
+            : Image.memory(
+                base64Decode(
+                  imageProfile,
+                ),
+                width: 100,
+                height: 100,
+                fit: BoxFit.cover,
+              ),
+      ),
+    );
+  }
+
   Widget getProfile() {
     return Padding(
       padding: const EdgeInsets.only(top: 8.0),
-      child: Container(
-        width: 100,
-        height: 100,
-        decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(width: 2),
-            color: ThemeColors.COLOR_WHITE),
-        child: Center(
-          child: Icon(
-            Icons.account_circle,
-            size: 50.0,
-          ),
-        ),
-      ),
+      child: imageProfile != null
+          ? showImage()
+          : Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(width: 2),
+                  color: ThemeColors.COLOR_WHITE),
+              child: Center(
+                child: Icon(
+                  Icons.account_circle,
+                  size: 50.0,
+                ),
+              ),
+            ),
     );
   }
 

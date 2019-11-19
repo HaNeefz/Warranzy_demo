@@ -23,7 +23,8 @@ class DBProviderCustomer {
   final String columnBirthYear = "BirthYear";
   final String columnSpecialPass = "SpecialPass";
   final String columnPackageType = "PackageType";
-  final String columnCreateType = "CreateDate";
+  final String columnCreateDate = "CreateDate";
+  final String columnLastUpdate = "LastUpdate";
   final String columnImageProfile = "ImageProfile";
 
   Future<Database> get database async {
@@ -57,7 +58,8 @@ class DBProviderCustomer {
         "$columnBirthYear TEXT,"
         "$columnSpecialPass TEXT,"
         "$columnPackageType TEXT,"
-        "$columnCreateType TEXT,"
+        "$columnCreateDate TEXT,"
+        "$columnLastUpdate TEXT,"
         "$columnImageProfile TEXT"
         ")");
   }
@@ -71,9 +73,9 @@ class DBProviderCustomer {
       res = await db.insert(tableCustomer, data.toJson());
       print(res);
     } catch (e) {
-      print("Can't insert data customer");
+      print("Can't insert data customer $e");
     }
-    return res > 0 ? true : false;
+    return res > 0;
   }
 
   Future<String> getNameCustomer() async {

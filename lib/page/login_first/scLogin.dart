@@ -154,15 +154,15 @@ class _LoginPageState extends State<LoginPage> {
               //         print("Image is null");
               //     });
 
-                  // setState(() => _image = newImage);
-                  // var filePath = await imageSaver.ImagePickerSaver.saveFile(
-                  //     fileData: newImage.readAsBytesSync());
-                  // print("Saved path $filePath");
+              // setState(() => _image = newImage);
+              // var filePath = await imageSaver.ImagePickerSaver.saveFile(
+              //     fileData: newImage.readAsBytesSync());
+              // print("Saved path $filePath");
 
-                  // var filePath = await imageSaver.ImagePickerSaver.saveFile(
-                  //     fileData: r.readAsBytesSync());
-                  // print("filePath => $filePath");
-                  // setState(() => _image = r);
+              // var filePath = await imageSaver.ImagePickerSaver.saveFile(
+              //     fileData: r.readAsBytesSync());
+              // print("filePath => $filePath");
+              // setState(() => _image = r);
               //   },
               // ),
               // RaisedButton(
@@ -195,7 +195,8 @@ class _LoginPageState extends State<LoginPage> {
               // RaisedButton(
               //   child: Text("getDataTimeZone"),
               //   onPressed: () async {
-              //     await DBProviderInitialApp.db.getAllDataTimeZone();
+              //     // await DBProviderInitialApp.db.getAllDataTimeZone();
+              //     await DBProviderCustomer.db.deleteAllDataOfCustomer();
               //   },
               // ),
               // RaisedButton(

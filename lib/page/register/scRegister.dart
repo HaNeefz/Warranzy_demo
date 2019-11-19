@@ -124,10 +124,10 @@ class _RegisterState extends State<Register> {
           ..addAll(modelCountry.toMap())
           ..addAll(modelBirthYear.toMap())
           ..addAll(deviceIDAndPlayerIDAndTimeZone);
-        print(masCustomersData);
+        // print(masCustomersData);
 
         var dataCustomers = ModelMasCustomer.fromJson(masCustomersData);
-        ecsLib.showDialogLoadingLib(context, barrierDismissible: false);
+        ecsLib.showDialogLoadingLib(context);
         var data = {
           "Email": dataCustomers.email,
           "MobilePhone":
@@ -135,6 +135,8 @@ class _RegisterState extends State<Register> {
           "Country": dataCustomers.countryCode,
           "TimeZone": dataCustomers.timeZone,
         };
+        // print(data);
+        ecsLib.printJson(data);
         // ecsLib.pushPage(
         //   context: context,
         //   pageWidget: PinCodePageUpdate(

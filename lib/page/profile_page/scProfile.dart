@@ -23,6 +23,7 @@ import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/form_input_data.dart';
+import 'package:warranzy_demo/tools/widget_ui_custom/manage_image_profile.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_field_builder.dart';
 
@@ -394,6 +395,14 @@ class _ProfilePageState extends State<ProfilePage> {
     });
   }
 
+  ImageProvider<dynamic> showImage() {
+    if (dataCust.imageProfile.startsWith("A") == true) {
+      return AssetImage("assets/icons/avatars/${dataCust.imageProfile}.png");
+    } else {
+      return MemoryImage(base64Decode(dataCust.imageProfile));
+    }
+  }
+
   Hero buildHeroProfile() {
     return Hero(
       child: Container(
@@ -404,8 +413,12 @@ class _ProfilePageState extends State<ProfilePage> {
             Container(
               width: 150,
               height: 150,
-              decoration:
-                  BoxDecoration(shape: BoxShape.circle, color: Colors.white),
+              decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                  image: dataCust?.imageProfile != null
+                      ? DecorationImage(image: showImage())
+                      : null),
             ),
             Positioned(
               bottom: 20,
@@ -418,7 +431,18 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: IconButton(
                   icon: Icon(Icons.add_a_photo, size: 30, color: Colors.white),
                   onPressed: () async {
-                    await buildShowModalBottomSheet(context);
+                    ecsLib.pushPage(
+                      context: context,
+                      pageWidget: ImageProfile(
+                        hasImage: true,
+                        imagesMySelf: dataCust.imageProfile,
+                        modelCustomer: dataCust,
+                        onContinue: (map) {
+                          print("map: $map");
+                        },
+                      ),
+                    );
+                    // await buildShowModalBottomSheet(context);
                   },
                 ),
               ),

@@ -46,7 +46,9 @@ class ModelCustomers {
   String birthYear;
   String specialPass;
   String createDate;
+  String lastUpdate;
   String custUserID;
+  String imageProfile;
 
   ModelCustomers(
       {this.custName,
@@ -62,7 +64,9 @@ class ModelCustomers {
       this.birthYear,
       this.specialPass,
       this.createDate,
-      this.custUserID});
+      this.lastUpdate,
+      this.custUserID,
+      this.imageProfile});
 
   ModelCustomers.fromJson(Map<String, dynamic> json) {
     custName = json['CustName'];
@@ -78,7 +82,9 @@ class ModelCustomers {
     birthYear = json['BirthYear'];
     specialPass = json['SpecialPass'];
     createDate = json['CreateDate'];
+    lastUpdate = json['LastUpdate'];
     custUserID = json['CustUserID'];
+    imageProfile = json['ImageProfile'];
   }
 
   Map<String, dynamic> toJson() {
@@ -96,7 +102,9 @@ class ModelCustomers {
     data['BirthYear'] = this.birthYear;
     data['SpecialPass'] = this.specialPass;
     data['CreateDate'] = this.createDate;
+    data['LastUpdate'] = this.lastUpdate;
     data['CustUserID'] = this.custUserID;
+    data['ImageProfile'] = this.imageProfile;
     return data;
   }
 }

@@ -23,8 +23,7 @@ class Repository {
 
   static Future<ModelVerifyNumber> apiVerifyNumber({dynamic body}) async {
     try {
-      final response = await _helper.post("/User/CheckVerifyPhone", body);
-
+      final response = await _helper.postNoJWT("/User/CheckVerifyPhone", body);
       return ModelVerifyNumber.fromJson(response);
     } catch (e) {
       return ModelVerifyNumber(message: "$e");
@@ -55,7 +54,7 @@ class Repository {
 
   static Future<RepositoryUser> apiRegister({dynamic body}) async {
     try {
-      final response = await _helper.post("/User/UserRegister", body);
+      final response = await _helper.postNoJWT("/User/UserRegister", body);
 
       return RepositoryUser.fromJson(response);
     } catch (e) {
