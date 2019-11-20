@@ -24,6 +24,7 @@ import 'package:warranzy_demo/page/main_page/scMain_page.dart';
 import 'package:warranzy_demo/services/api/api_service_assets.dart';
 import 'package:warranzy_demo/services/api/repository.dart';
 import 'package:warranzy_demo/services/method/auto_completed.dart';
+import 'package:warranzy_demo/services/method/geolocator_helper.dart';
 import 'package:warranzy_demo/services/method/scan_qr.dart';
 import 'package:warranzy_demo/services/sqflit/db_asset.dart';
 import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
@@ -227,17 +228,27 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
     return tempgroup.isNotEmpty ? tempgroup : [];
   }
 
+  getGeoLocation() async {
+    print("Trying getLocation");
+    await GeoLocationHelper.getLocation().then((v) {
+      print("getLocation Completed : $v");
+      geoLocation = v;
+    });
+  }
+
   @override
   void initState() {
     // if (SchedulerBinding.instance.schedulerPhase ==
     //     SchedulerPhase.persistentCallbacks) {}
-    listImageEachGroup.forEach((v) {
-      print("title : ${v.title}");
-      print("imageList : ${v.imagesList}");
-      print("imageBase64 : ${v.imageBase64}");
-      print("tempBase64 : ${v.tempBase64.length}");
-      print("-----------");
-    });
+
+    // listImageEachGroup.forEach((v) {
+    //   print("title : ${v.title}");
+    //   print("imageList : ${v.imagesList}");
+    //   print("imageBase64 : ${v.imageBase64}");
+    //   print("tempBase64 : ${v.tempBase64.length}");
+    //   print("-----------");
+    // });
+    getGeoLocation();
     listTempData = List.of(listImageEachGroup ?? []);
     if (_data != null) {
       setState(() {
@@ -746,28 +757,32 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
   }
 
   getBrandName() {
-    Firestore.instance.collection('BrandName').snapshots().listen((onData) {
-      for (var temp in onData.documents) {
-        String docID = temp.documentID;
-        temp.data.addAll({"DocumentID": docID});
-        listBrandName.add(GetBrandName.fromJson(temp.data));
-        listBrandName[onData.documents.indexOf(temp)].brandCode =
-            temp.documentID;
-        if (_data != null) {
-          if (temp.documentID == _data.brandCode) {
-            print(listBrandName[onData.documents.indexOf(temp)]
-                .modelBrandName
-                .modelEN
-                .en);
-            setState(() {
+    Firestore.instance.collection('BrandName').getDocuments().then((onData) {
+      if (listBrandName.length == 0) {
+        print("FireStore add data");
+        for (var temp in onData.documents) {
+          String docID = temp.documentID;
+          temp.data.addAll({"DocumentID": docID});
+          listBrandName.add(GetBrandName.fromJson(temp.data));
+          listBrandName[onData.documents.indexOf(temp)].brandCode =
+              temp.documentID;
+          if (_data != null) {
+            if (temp.documentID == _data.brandCode) {
+              print(listBrandName[onData.documents.indexOf(temp)]
+                  .modelBrandName
+                  .modelEN
+                  .en);
+
               txtBrandName.text = listBrandName[onData.documents.indexOf(temp)]
                   .modelBrandName
                   .modelEN
                   .en;
-            });
+            }
           }
         }
-      }
+        setState(() {});
+      } else
+        print("listBrandName has data: ${listBrandName.length}");
     });
   }
 
@@ -799,15 +814,15 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
       width: 180,
       child: Row(
         children: <Widget>[
-          // imgPath.length > 0
-          //     ? Image.asset(
-          //         imgPath,
-          //         width: 30,
-          //         height: 30,
-          //         fit: BoxFit.contain,
-          //       )
-          //     : Icon(Icons.error, color: Colors.red),
-          // SizedBox(width: 10),
+          imgPath.length > 0
+              ? Image.asset(
+                  imgPath,
+                  width: 30,
+                  height: 30,
+                  fit: BoxFit.contain,
+                )
+              : Icon(Icons.error, color: Colors.red),
+          SizedBox(width: 10),
           Container(
             width: 140,
             child: AutoSizeText(

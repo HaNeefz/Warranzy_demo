@@ -42,8 +42,8 @@ void main() {
     setupApp();
     runApp(MultiProvider(
         providers: [
-          ChangeNotifierProvider<NotificationState>(
-            builder: (_) => NotificationState(),
+          ChangeNotifierProvider<NotificationState>.value(
+            value: NotificationState(),
           ),
         ],
         child: StreamProvider<ConnectivityStatus>(

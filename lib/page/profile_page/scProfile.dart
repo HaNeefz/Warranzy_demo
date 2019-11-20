@@ -1,31 +1,21 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:warranzy_demo/models/model_repository_init_app.dart';
-import 'package:warranzy_demo/models/model_respository_asset.dart';
 import 'package:warranzy_demo/models/model_user.dart';
-// import 'package:warranzy_demo/models/model_mas_cust.dart';
-import 'package:warranzy_demo/page/login_first/scLogin.dart';
-import 'package:warranzy_demo/page/profile_page/testCat.dart';
 import 'package:warranzy_demo/page/splash_screen/scSplash_screen.dart';
 import 'package:warranzy_demo/services/api/repository.dart';
 import 'package:warranzy_demo/services/calls_and_message/calls_and_message.dart';
 import 'package:warranzy_demo/services/method/methode_helper.dart';
-import 'package:warranzy_demo/services/sqflit/db_asset.dart';
 import 'package:warranzy_demo/services/sqflit/db_customers.dart';
-import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
 import 'package:warranzy_demo/tools/assets.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
-import 'package:warranzy_demo/tools/widget_ui_custom/form_input_data.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/manage_image_profile.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
-import 'package:warranzy_demo/tools/widget_ui_custom/text_field_builder.dart';
 
 import 'account_detail.dart';
 import 'change_pin_code.dart';
@@ -260,6 +250,8 @@ class _ProfilePageState extends State<ProfilePage> {
                         icons: Icons.lock_open,
                         onPressed: () {
                           MethodHelper.clearTimeZoneAndCountryCode();
+
+                          imageCache.clear();
                           ecsLib.pushPageAndClearAllScene(
                             context: context,
                             pageWidget: SplashScreenPage(),
