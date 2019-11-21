@@ -47,7 +47,8 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
             } else
               lang = "th";
             await sqfliteDB
-                .addDataLanguage(ModelLanguage(name: lang))
+                .addDataLanguage(ModelLanguage(
+                    prefix: lang, name: picker.getSelectedValues().first))
                 .then((res) async {
               if (res == true) {
                 print("ADDED ${picker.getSelectedValues()}");

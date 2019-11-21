@@ -53,14 +53,21 @@ class _ImageProfileState extends State<ImageProfile> {
   @override
   void initState() {
     super.initState();
+    print("imagesMySelf : ${widget?.imagesMySelf}");
     if (hasImage == false)
       defaultImage = pathAvatar.elementAt(0);
     else {
-      imageMySelf = true;
-      if (widget.imagesMySelf.startsWith("A") == true) {
-        defaultImage = "assets/icons/avatars/${widget.imagesMySelf}.png";
+      if (widget?.imagesMySelf != null) {
+        if (widget?.imagesMySelf?.startsWith("A") == true) {
+          imageMySelf = false;
+          defaultImage = "assets/icons/avatars/${widget.imagesMySelf}.png";
+        } else {
+          imageMySelf = true;
+          imageBase64 = widget.imagesMySelf;
+        }
       } else {
-        imageBase64 = widget.imagesMySelf;
+        imageMySelf = false;
+        defaultImage = pathAvatar.elementAt(0);
       }
     }
   }

@@ -30,6 +30,7 @@ class DBProviderLanguage {
   void languageDb(Database database, int version) async {
     await database.execute('''create table $tableName ( 
   id integer primary key autoincrement, 
+  prefix text,
   name text not null)''');
   }
 

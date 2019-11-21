@@ -67,7 +67,7 @@ class DBProviderInitialApp {
       GroupName TEXT,
       LastUpdate TEXT,
       Logo TEXT,
-      KeepLogo TEXT
+      LogoAsset TEXT
     )""");
     await database.execute("""CREATE TABLE $tableProductSubCategory(
       CatCode TEXT PRIMARY KEY,
@@ -84,7 +84,7 @@ class DBProviderInitialApp {
       LastUpdate TEXT,
       GroupID TEXT,
       Logo TEXT,
-      KeepLogo TEXT
+      LogoAsset TEXT
     )""");
   }
 
@@ -148,7 +148,7 @@ class DBProviderInitialApp {
     // var byte = getContentLogo.bodyBytes;
     // var base64 = base64Encode(byte);
     var res = await db.rawUpdate(
-        "UPDATE $tableGroupCategory SET Logo =  'assets/icons/icons_category/${data.groupID}000.png' WHERE GroupID = '${data.groupID}'");
+        "UPDATE $tableGroupCategory SET LogoAsset =  'assets/icons/icons_category/${data.groupID}000.png' WHERE GroupID = '${data.groupID}'");
     if (res == 1) {
       print("UpdateLogo $tableGroupCategory complete");
       return true;
@@ -167,7 +167,7 @@ class DBProviderInitialApp {
     else
       path = data.catCode;
     var res = await db.rawUpdate(
-        "UPDATE $tableProductSubCategory SET Logo =  'assets/icons/icons_category/$path.png' WHERE CatCode = '${data.catCode}'");
+        "UPDATE $tableProductSubCategory SET LogoAsset =  'assets/icons/icons_category/$path.png' WHERE CatCode = '${data.catCode}'");
     if (res == 1) {
       print("UpdateLogo $tableProductSubCategory complete");
       return true;

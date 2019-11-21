@@ -217,16 +217,13 @@ class _DetailAssetState extends State<DetailAsset> {
 
   void initState() {
     super.initState();
-    // getImage();
     _testGetImage();
     getProductCateName();
     getBrandName();
-    // print(DateTime.parse(_data.warrantyExpire));
-    // print(DateTime.parse(_data.alertDate));
-    // print(DateTime.parse(_data.warrantyExpire)
-    //     .difference(DateTime.parse(_data.alertDate))
-    //     .inDays
-    //     .toString());
+    print("warrantyExpire: ${DateTime.parse(_data.warrantyExpire)}");
+    print("alertDate: ${DateTime.parse(_data.alertDate)}");
+    print(
+        "Alert Date: ${DateTime.parse(_data.warrantyExpire).difference(DateTime.parse(_data.alertDate)).inDays.toString()}");
   }
 
   goToEditPageForEditImage(bool editImage) {

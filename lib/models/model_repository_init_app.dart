@@ -167,7 +167,7 @@ class ProductCategory {
   String lastUpdate;
   String groupID;
   String logo;
-  String keepLogo;
+  String logoAsset;
 
   ProductCategory(
       {this.catCode,
@@ -185,7 +185,7 @@ class ProductCategory {
       this.lastUpdate,
       this.groupID,
       this.logo,
-      this.keepLogo});
+      this.logoAsset});
 
   ProductCategory.fromJson(Map<String, dynamic> json) {
     catCode = json['CatCode'];
@@ -223,6 +223,7 @@ class ProductCategory {
     data['LastUpdate'] = this.lastUpdate;
     data['GroupID'] = this.groupID;
     data['Logo'] = this.logo;
+    data['LogoAsset'] = this.logoAsset;
     return data;
   }
 }

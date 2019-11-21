@@ -283,12 +283,11 @@ BlockchainID */
     var res = await db.rawQuery(
         "SELECT * FROM $tableWarranzyUsed, $tableWarranzyLog WHERE $tableWarranzyUsed.WTokenID = $tableWarranzyLog.WTokenID ORDER BY $tableWarranzyUsed.LastModiflyDate DESC"); // $tableWarranzyLog, $tableFilePool
     // var filePool = await db.rawQuery("SE")
-    // JsonEncoder encoder = JsonEncoder.withIndent(" ");
+    JsonEncoder encoder = JsonEncoder.withIndent(" ");
     List<ModelDataAsset> temp = [];
     if (res.isNotEmpty) {
-      // print("--------------------");
       res.forEach((v) {
-        // String prettyprint = encoder.convert(v);
+        String prettyprint = encoder.convert(v);
         // print("DataAssetSQLite => $prettyprint");
         temp.add(ModelDataAsset.fromJson(v));
       });

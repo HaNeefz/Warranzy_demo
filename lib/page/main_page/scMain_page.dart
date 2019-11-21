@@ -30,19 +30,22 @@ class _MainPageState extends State<MainPage>
   set setPage(newPage) => widget.currentPage = newPage;
   // int currentPageBar = 0;
   PageController pagesController;
-  final List<Widget> pageTabBar = [
-    AssetPage(),
-    ClaimAndServicePage(),
-    TradePage(),
-    NotificationPage()
-  ];
 
   @override
   Widget build(BuildContext context) {
     final NotificationState notiState = Provider.of<NotificationState>(context);
+    final AssetState assetState = Provider.of<AssetState>(context);
     var textStyle = TextStyleCustom.STYLE_LABEL_BOLD.copyWith(fontSize: 14);
     double _width = 30;
     double _height = 30;
+    final List<Widget> pageTabBar = [
+      AssetPage(
+        assetState: assetState,
+      ),
+      ClaimAndServicePage(),
+      TradePage(),
+      NotificationPage()
+    ];
     return Scaffold(
         body: pageTabBar[currentPage],
         bottomNavigationBar: BottomNavigationBar(

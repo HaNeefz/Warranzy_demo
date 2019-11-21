@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
@@ -11,8 +12,10 @@ class CategoryUI extends StatefulWidget {
   final String title;
   final List<Map<String, dynamic>> category;
   final Map<String, dynamic> selected;
+  final bool showLogo;
 
-  CategoryUI({Key key, this.title, this.category, this.selected})
+  CategoryUI(
+      {Key key, this.title, this.category, this.selected, this.showLogo = true})
       : super(key: key);
   @override
   _CategoryUIState createState() => _CategoryUIState();
@@ -21,22 +24,38 @@ class CategoryUI extends StatefulWidget {
 class _CategoryUIState extends State<CategoryUI> {
   final ecsLib = getIt.get<ECSLib>();
   final allTranslations = getIt.get<GlobalTranslations>();
-  final Future<SharedPreferences> _pref = SharedPreferences.getInstance();
-
-  checkTempPreference() async {
-    final pref = await _pref;
-    // pref.
-  }
-
   List<String> imagePath = [];
+  List<Image> images = List<Image>();
   @override
   void initState() {
     super.initState();
-    // widget.category.forEach((v) {
-    //   print(v['Logo']);
-    //   // // setState(() => )
-    //   // imagePath.add(v['Logo']);
-    // });
+    print("initState");
+    widget.category.forEach((v) {
+      images.add(Image.asset(
+        v['Logo'],
+        fit: BoxFit.contain,
+        width: 30,
+        height: 30,
+      ));
+    });
+  }
+
+  // @override
+  // void didChangeDependencies() {
+  //   super.didChangeDependencies();
+  //   print("didChangeDependencies");
+  //   images.forEach((v) {
+  //     precacheImage(v.image, context);
+  //   });
+  // }
+
+  @override
+  void dispose() {
+    images.clear();
+    imageCache.clear();
+    print("images clear , dispose()");
+
+    super.dispose();
   }
 
   @override
@@ -56,8 +75,21 @@ class _CategoryUIState extends State<CategoryUI> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 ListTile(
-                  leading: ImageView.show(
-                      path: v['Logo']), //imagePath[widget.category.indexOf(v)]
+                  // leading: widget.showLogo == true
+                  //     ? CachedNetworkImage(
+                  //         imageUrl: v['Logo'],
+                  //         placeholder: (context, path) =>
+                  //             CircularProgressIndicator(),
+                  //         errorWidget: (context, path, object) =>
+                  //             Icon(Icons.error, color: Colors.red),
+                  //         width: 30,
+                  //         height: 30,
+                  //         fit: BoxFit.contain,
+                  //       )
+                  //     : Container(),
+                  // images[widget.category.indexOf(v)],
+                  // ImageView.show(
+                  //     path: v['Logo']), //imagePath[widget.category.indexOf(v)]
                   // Image.asset("${v['Logo']}",
                   //     width: 30, height: 30, fit: BoxFit.contain),
                   title: Row(

@@ -55,6 +55,7 @@ class _FormDataAssetState extends State<FormDataAsset> {
   final ecsLib = getIt.get<ECSLib>();
   final allTranslations = getIt.get<GlobalTranslations>();
   final _formKey = GlobalKey<FormState>();
+  final Firestore firestore = Firestore();
   final ScrollController _scrollController = ScrollController();
   ModelDataAsset get _data => widget.modelDataAsset;
   bool get actionPageForAdd => widget.actionPageForAdd;
@@ -253,9 +254,11 @@ class _FormDataAssetState extends State<FormDataAsset> {
       });
     }
 
-    Future.delayed(Duration(milliseconds: 1500), () {
-      getBrandName();
-    });
+    if (listBrandName.length == 0) {
+      Future.delayed(Duration(milliseconds: 1500), () {
+        getBrandName();
+      });
+    }
     super.initState();
   }
 
@@ -324,6 +327,7 @@ class _FormDataAssetState extends State<FormDataAsset> {
                                         title: "Category",
                                         category: tempgroupCat,
                                         selected: groupCatMap,
+                                        showLogo: false,
                                       ));
                               if (dataReturn != null) {
                                 setState(() {
@@ -364,6 +368,7 @@ class _FormDataAssetState extends State<FormDataAsset> {
                                         title: "Sub - Category",
                                         category: tempSubCat,
                                         selected: subCatMap,
+                                        showLogo: false,
                                       ));
                               if (dataReturn != null) {
                                 setState(() {
@@ -821,28 +826,31 @@ class _FormDataAssetState extends State<FormDataAsset> {
   }
 
   getBrandName() {
-    Firestore.instance.collection('BrandName').snapshots().listen((onData) {
-      for (var temp in onData.documents) {
-        listBrandName.add(GetBrandName.fromJson(temp.data));
-        listBrandName[onData.documents.indexOf(temp)].brandCode =
-            temp.documentID;
-        if (_data != null) {
-          if (temp.documentID == _data.brandCode) {
-            print(listBrandName[onData.documents.indexOf(temp)]
-                .modelBrandName
-                .modelEN
-                .en);
-            setState(() {
+    firestore.collection('BrandName').getDocuments().then((onData) {
+      if (listBrandName.length == 0) {
+        print("FireStore add data");
+        for (var temp in onData.documents) {
+          String docID = temp.documentID;
+          temp.data.addAll({"DocumentID": docID});
+          listBrandName.add(GetBrandName.fromJson(temp.data));
+          listBrandName[onData.documents.indexOf(temp)].brandCode =
+              temp.documentID;
+          if (_data != null) {
+            if (temp.documentID == _data.brandCode) {
+              print(listBrandName[onData.documents.indexOf(temp)]
+                  .modelBrandName
+                  .modelEN
+                  .en);
+
               txtBrandName.text = listBrandName[onData.documents.indexOf(temp)]
                   .modelBrandName
                   .modelEN
                   .en;
-            });
+            }
           }
         }
-        // print(
-        //     "${listBrandName[onData.documents.indexOf(temp)].brandID} | ${listBrandName[onData.documents.indexOf(temp)].modelBrandName.modelEN.en}");
-      }
+      } else
+        print("listBrandName has data: ${listBrandName.length}");
     });
   }
 
@@ -932,6 +940,7 @@ class _FormDataAssetState extends State<FormDataAsset> {
       "SLCName": txtSLCName.text,
       "AlertDate": txtAlertDate.text,
       "CustRemark": txtNote.text,
+      "Geolocation": txtGeoLocation.text,
     };
     ecsLib.printJson(postData);
     sendApiEdit(postData: postData);

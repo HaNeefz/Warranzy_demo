@@ -42,20 +42,35 @@ void main() {
     setupApp();
     runApp(MultiProvider(
         providers: [
-          ChangeNotifierProvider<NotificationState>.value(
-            value: NotificationState(),
+          ChangeNotifierProvider<NotificationState>(
+            builder: (context) => NotificationState(),
           ),
+          ChangeNotifierProvider<AssetState>(
+            builder: (context) => AssetState(),
+          )
         ],
         child: StreamProvider<ConnectivityStatus>(
-          builder: (context) =>
-              ConnectivityService().connectionStatusController.stream,
-          child: Consumer<NotificationState>(
-            builder: (BuildContext context, _notitState, _) => MyHomePage(
-              notiState: _notitState,
-            ),
-          ),
-        )));
+            builder: (context) =>
+                ConnectivityService().connectionStatusController.stream,
+            child: HomeSetup()
+            // Consumer<NotificationState>(
+            //   builder: (BuildContext context, _notitState, _) => MyHomePage(
+            //     notiState: _notitState,
+            //   ),
+            //   child: MyHomePage(notiState: null,),
+            // ),
+            )));
   });
+}
+
+class HomeSetup extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final notiState = Provider.of<NotificationState>(context);
+    return MyHomePage(
+      notiState: notiState,
+    );
+  }
 }
 
 class MyHomePage extends StatefulWidget {

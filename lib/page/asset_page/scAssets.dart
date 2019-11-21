@@ -38,6 +38,7 @@ import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/carouselImage.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/loading_api.dart';
+import 'package:warranzy_demo/tools/widget_ui_custom/show_image_profile.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/error_api.dart';
 import 'package:http/http.dart' as http;
@@ -46,6 +47,9 @@ import 'add_assets_page/scAdd_image_demo.dart';
 import 'detail_asset_page/scDetailAsset.dart';
 
 class AssetPage extends StatefulWidget {
+  final AssetState assetState;
+
+  const AssetPage({Key key, this.assetState}) : super(key: key);
   @override
   _AssetPageState createState() => _AssetPageState();
 }
@@ -57,6 +61,7 @@ class _AssetPageState extends State<AssetPage> {
   Future getAssetOnline;
   Future<List<ModelDataAsset>> getModelData;
   String username = "Username";
+  String profile;
 
   List<ModelAssetsData> listAssetData;
   ApiBlocGetAllAsset<ResponseAssetOnline> getAllAssetBloc;
@@ -69,6 +74,7 @@ class _AssetPageState extends State<AssetPage> {
   @override
   void initState() {
     super.initState();
+    widget.assetState.fetchData();
     // var url = "/Asset/getMyAsset";
     // getAllAssetBloc = ApiBlocGetAllAsset<ResponseAssetOnline>(
     //   url: url,
@@ -79,9 +85,10 @@ class _AssetPageState extends State<AssetPage> {
   }
 
   getUsername() async {
-    await SharedPreferences.getInstance().then((name) {
+    await SharedPreferences.getInstance().then((value) {
       setState(() {
-        username = name.getString("UserName");
+        username = value.getString("UserName");
+        profile = value.getString("ImageProfile");
       });
     });
   }
@@ -135,9 +142,15 @@ class _AssetPageState extends State<AssetPage> {
                   },
                   child: Center(
                     child: Hero(
-                      child:
-                          Icon(Icons.person_pin, size: 50, color: Colors.black),
-                      tag: "PhotoProfiles",
+                      child: profile == null
+                          ? Icon(Icons.person_pin,
+                              size: 50, color: Colors.black)
+                          : ShowImageProfile(
+                              imagePath: profile,
+                              borderColor: Colors.black,
+                              radius: 30,
+                            ),
+                      tag: "PhotoProfile",
                     ),
                   ),
                 ),
@@ -174,62 +187,26 @@ class _AssetPageState extends State<AssetPage> {
   }
 
   buildYourAssets() {
-    /*body: {
-      "CustUserID": "ca3f58b3a0214aaaa68a",
-      "PINcode": "111111",
-      "DeviceID": "7BAE0E71-C3C2-4532-8C99-DCA7BB713A69",
-      "CountryCode": "TH",
-      "TimeZone": "Asia/Bangkok"
-    } */
     // buildAssetOffine(),
-
-    return ChangeNotifierProvider<AssetState>(
-      builder: (_) => AssetState(),
-      child: Consumer<AssetState>(
-        builder: (context, assetState, _) {
-          return FutureBuilder<List<ModelDataAsset>>(
-            future: getModelData,
-            builder: (BuildContext context,
-                AsyncSnapshot<List<ModelDataAsset>> snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                if (!(snapshot.hasError)) {
-                  if (snapshot.data.isNotEmpty)
-                    return Padding(
-                        padding: const EdgeInsets.fromLTRB(10, 15, 10, 10),
-                        child: RefreshIndicator(
-                          onRefresh: () async {
-                            await assetState.refreshAsset();
-                          },
-                          child: Column(
-                            children: <Widget>[
-                              SingleChildScrollView(
-                                child: Column(
-                                    children: snapshot.data
-                                        .map((data) =>
-                                            new MyAssetFormSQLite(data: data))
-                                        .toList()),
-                              ),
-                            ],
-                          ),
-                        ));
-                  else {
-                    return Center(
-                      child: TextBuilder.build(title: "Data offline is empty"),
-                    );
-                  }
-                } else {
-                  return Text("Error");
-                }
-              } else if (snapshot.connectionState == ConnectionState.waiting) {
-                return CircularProgressIndicator();
-              } else {
-                return Text("Something wrong.!!");
-              }
-            },
-          );
-        },
-      ),
-    );
+    if (widget.assetState.assets.length > 0) {
+      if (widget.assetState.isFecthing == true) {
+        return Column(
+          children: <Widget>[
+            SingleChildScrollView(
+              child: Column(
+                  children: widget.assetState.assets
+                      .map((data) => new MyAssetFormSQLite(data: data))
+                      .toList()),
+            ),
+          ],
+        );
+      } else {
+        return Center(child: CircularProgressIndicator());
+      }
+    } else
+      return Center(
+        child: TextBuilder.build(title: "Data offline is empty"),
+      );
   }
 
   insertIntiSQLite(RepositoryOfAsset res) async {
@@ -599,6 +576,55 @@ class _AssetPageState extends State<AssetPage> {
         ),
       ),
     );
+  }
+}
+
+class ShowMyAsset extends StatelessWidget {
+  final AssetState assetState;
+
+  const ShowMyAsset({Key key, this.assetState}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    // FutureBuilder<List<ModelDataAsset>>(
+    //   future: assetState.allAssets,
+    //   builder:
+    //       (BuildContext context, AsyncSnapshot<List<ModelDataAsset>> snapshot) {
+    //     if (snapshot.connectionState == ConnectionState.done) {
+    //       if (!(snapshot.hasError)) {
+    //         if (snapshot.data.isNotEmpty)
+    //           return Padding(
+    //               padding: const EdgeInsets.fromLTRB(10, 15, 10, 10),
+    //               child: RefreshIndicator(
+    //                 onRefresh: () async {
+    //                   await assetState.refreshAsset();
+    //                 },
+    //                 child: Column(
+    //                   children: <Widget>[
+    //                     SingleChildScrollView(
+    //                       child: Column(
+    //                           children: snapshot.data
+    //                               .map((data) =>
+    //                                   new MyAssetFormSQLite(data: data))
+    //                               .toList()),
+    //                     ),
+    //                   ],
+    //                 ),
+    //               ));
+    //         else {
+    //           return Center(
+    //             child: TextBuilder.build(title: "Data offline is empty"),
+    //           );
+    //         }
+    //       } else {
+    //         return Text("Error");
+    //       }
+    //     } else if (snapshot.connectionState == ConnectionState.waiting) {
+    //       return CircularProgressIndicator();
+    //     } else {
+    //       return Text("Something wrong.!!");
+    //     }
+    //   },
+    // );
   }
 }
 

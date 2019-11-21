@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:simple_animations/simple_animations.dart';
 import 'package:warranzy_demo/models/model_user.dart';
 import 'package:warranzy_demo/page/splash_screen/scSplash_screen.dart';
 import 'package:warranzy_demo/services/api/repository.dart';
@@ -15,6 +16,7 @@ import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/manage_image_profile.dart';
+import 'package:warranzy_demo/tools/widget_ui_custom/show_image_profile.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 
 import 'account_detail.dart';
@@ -44,6 +46,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void getDataCustomers() async {
+    dataCust = null;
     var tempDataCust = await DBProviderCustomer.db.getDataCustomer();
     dataCust = tempDataCust;
     setState(() => _usedTouchID = dataCust.specialPass == "Y" ? true : false);
@@ -388,63 +391,95 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   ImageProvider<dynamic> showImage() {
-    if (dataCust.imageProfile.startsWith("A") == true) {
-      return AssetImage("assets/icons/avatars/${dataCust.imageProfile}.png");
+    if (dataCust?.imageProfile?.startsWith("A") == true) {
+      return AssetImage("assets/icons/avatars/${dataCust?.imageProfile}.png");
     } else {
       return MemoryImage(base64Decode(dataCust.imageProfile));
     }
   }
 
-  Hero buildHeroProfile() {
-    return Hero(
-      child: Container(
-        width: 160,
-        height: 160,
-        child: Stack(
-          children: <Widget>[
-            Container(
-              width: 150,
-              height: 150,
-              decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white,
-                  image: dataCust?.imageProfile != null
-                      ? DecorationImage(image: showImage())
-                      : null),
+  Widget buildHeroProfile() {
+    return Container(
+      width: 160,
+      height: 160,
+      // color: Colors.red,
+      child: Stack(
+        children: <Widget>[
+          Hero(
+            child: ShowImageProfile(
+              imagePath: dataCust?.imageProfile,
+              radius: 80,
             ),
-            Positioned(
-              bottom: 20,
-              right: 0,
-              child: Container(
-                width: 50,
-                height: 50,
-                decoration:
-                    BoxDecoration(shape: BoxShape.circle, color: Colors.teal),
-                child: IconButton(
-                  icon: Icon(Icons.add_a_photo, size: 30, color: Colors.white),
-                  onPressed: () async {
-                    ecsLib.pushPage(
-                      context: context,
-                      pageWidget: ImageProfile(
-                        hasImage: true,
-                        imagesMySelf: dataCust.imageProfile,
-                        modelCustomer: dataCust,
-                        onContinue: (map) {
-                          print("map: $map");
-                        },
-                      ),
-                    );
-                    // await buildShowModalBottomSheet(context);
-                  },
+            tag: widget.heroTag,
+          ),
+          Positioned(
+            right: 0,
+            bottom: 10,
+            child: ControlledAnimation(
+              duration: Duration(milliseconds: 800),
+              tween: Tween(begin: 0.0, end: 1.0),
+              builder: (context, scale) => Opacity(
+                opacity: scale,
+                child: Container(
+                  width: 50,
+                  height: 50,
+                  decoration:
+                      BoxDecoration(shape: BoxShape.circle, color: Colors.teal),
+                  child: IconButton(
+                    icon:
+                        Icon(Icons.add_a_photo, size: 30, color: Colors.white),
+                    onPressed: () async {
+                      ecsLib.pushPage(
+                        context: context,
+                        pageWidget: ImageProfile(
+                          hasImage: true,
+                          imagesMySelf: dataCust?.imageProfile,
+                          modelCustomer: dataCust,
+                          onContinue: (map) async {
+                            print("map: $map");
+                            ecsLib.showDialogLoadingLib(context,
+                                content: "Update Image Profile");
+                            await Repository.apiUpdateImageProfile(body: map)
+                                .then((responseUpdate) async {
+                              ecsLib.cancelDialogLoadindLib(context);
+                              if (responseUpdate.status == true) {
+                                ModelCustomers model = ModelCustomers()
+                                  ..custUserID = map['CustUserID']
+                                  ..imageProfile = map['ImageProfile'];
+                                await DBProviderCustomer.db
+                                    .updateUpdateImageProfile(model)
+                                    .then((update) {
+                                  if (update == true) {
+                                    Navigator.pop(context);
+                                    getDataCustomers();
+                                  } else {
+                                    showAlert(content: "Update Sqlite fail");
+                                  }
+                                });
+                              } else if (responseUpdate.status == false) {
+                                showAlert(
+                                    title: "Upload Fail",
+                                    content: "${responseUpdate.message}");
+                              } else {
+                                showAlert(
+                                    title: "Upload Fail",
+                                    content: "${responseUpdate.message}");
+                              }
+                            });
+                          },
+                        ),
+                      );
+                      // await buildShowModalBottomSheet(context);
+                    },
+                  ),
                 ),
               ),
-            )
-            // Icon(Icons.person_pin,
-            //     size: 100, color: Colors.white),
-          ],
-        ),
+            ),
+          )
+          // Icon(Icons.person_pin,
+          //     size: 100, color: Colors.white),
+        ],
       ),
-      tag: "PhotoProfile",
     );
   }
 

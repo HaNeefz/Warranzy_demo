@@ -120,6 +120,16 @@ class Repository {
     }
   }
 
+  static Future<ModelReturnBoolean> apiUpdateImageProfile(
+      {dynamic body}) async {
+    try {
+      final response = await _helper.post("/User/UpdateImageProfile", body);
+      return ModelReturnBoolean.fromJson(response);
+    } catch (e) {
+      return ModelReturnBoolean(message: "$e");
+    }
+  }
+
   //--------------------------------------------Asset------------------------
   static Future<RepositoryInitalApp> initialApplication() async {
     try {

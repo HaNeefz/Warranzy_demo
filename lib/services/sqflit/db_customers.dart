@@ -167,6 +167,15 @@ class DBProviderCustomer {
     return res > 0;
   }
 
+  Future<bool> updateUpdateImageProfile(ModelCustomers data) async {
+    final db = await database;
+    var res = await db.update(
+        tableCustomer, {"ImageProfile": data.imageProfile},
+        where: '$columnCustUserID = ?', whereArgs: [data.custUserID]);
+    print("update ImageProfile : $res");
+    return res > 0;
+  }
+
   updateCustomerUsedEditProfile(
       {String custUserID, Map<String, dynamic> values}) async {
     final db = await database;

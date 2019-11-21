@@ -65,6 +65,8 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
   final ecsLib = getIt.get<ECSLib>();
   final allTranslations = getIt.get<GlobalTranslations>();
   final _formKey = GlobalKey<FormState>();
+  final Firestore firestore = Firestore.instance;
+  final ImageCache cache = ImageCache();
   final ScrollController _scrollController = ScrollController();
   ModelDataAsset get _data => widget.modelDataAsset;
   bool get actionPageForAdd => widget.actionPageForAdd;
@@ -135,7 +137,8 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
   Map<String, dynamic> groupCatMap = {
     "GroupID": "",
     "GroupName": "",
-    "Logo": ""
+    "Logo": "",
+    "LogoAsset": ""
   };
 
   setGroupCatMap(Map<String, dynamic> map) {
@@ -143,6 +146,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
       groupCatMap['GroupID'] = map['GroupID'];
       groupCatMap['GroupName'] = map['GroupName'];
       groupCatMap['Logo'] = map['Logo'];
+      groupCatMap['LogoAsset'] = map['LogoAsset'];
 
       labelCategory = jsonDecode(groupCatMap['GroupName'])["EN"];
       print("groupCatMap => $labelCategory");
@@ -150,16 +154,22 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
     });
   }
 
-  Map<String, dynamic> subCatMap = {"CatCode": "", "CatName": "", "Logo": ""};
+  Map<String, dynamic> subCatMap = {
+    "CatCode": "",
+    "CatName": "",
+    "Logo": "",
+    "LogoAsset": "",
+  };
 
   setSubCatMap(Map<String, dynamic> map) {
     setState(() {
       subCatMap['CatCode'] = map['CatCode'];
       subCatMap['CatName'] = map['CatName'];
       subCatMap['Logo'] = map['Logo'];
+      subCatMap['LogoAsset'] = map['LogoAsset'];
       labelSubCategory = jsonDecode(subCatMap['CatName'])["EN"];
-      print("subCatMap => $labelSubCategory");
       pathLogo = subCatMap['Logo'];
+      print("subCatMap => $labelSubCategory");
     });
   }
 
@@ -248,7 +258,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
     //   print("tempBase64 : ${v.tempBase64.length}");
     //   print("-----------");
     // });
-    getGeoLocation();
+
     listTempData = List.of(listImageEachGroup ?? []);
     if (_data != null) {
       setState(() {
@@ -318,9 +328,12 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
         });
       }
     });
-    Future.delayed(Duration(milliseconds: 1500), () {
-      getBrandName();
-    });
+    if (listBrandName.length == 0) {
+      Future.delayed(Duration(milliseconds: 1500), () {
+        getGeoLocation();
+        getBrandName();
+      });
+    }
 
     super.initState();
   }
@@ -757,7 +770,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
   }
 
   getBrandName() {
-    Firestore.instance.collection('BrandName').getDocuments().then((onData) {
+    firestore.collection('BrandName').getDocuments().then((onData) {
       if (listBrandName.length == 0) {
         print("FireStore add data");
         for (var temp in onData.documents) {
@@ -780,7 +793,6 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
             }
           }
         }
-        setState(() {});
       } else
         print("listBrandName has data: ${listBrandName.length}");
     });
@@ -814,14 +826,23 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
       width: 180,
       child: Row(
         children: <Widget>[
-          imgPath.length > 0
-              ? Image.asset(
-                  imgPath,
-                  width: 30,
-                  height: 30,
-                  fit: BoxFit.contain,
-                )
-              : Icon(Icons.error, color: Colors.red),
+          // CachedNetworkImage(
+          //   imageUrl: imgPath,
+          //   placeholder: (context, path) => CircularProgressIndicator(),
+          //   errorWidget: (context, path, object) =>
+          //       Icon(Icons.error, color: Colors.red),
+          //   width: 30,
+          //   height: 30,
+          //   fit: BoxFit.contain,
+          // ),
+          // imgPath.length > 0
+          //     ? Image.asset(
+          //         imgPath,
+          //         width: 30,
+          //         height: 30,
+          //         fit: BoxFit.contain,
+          //       )
+          //     : Icon(Icons.error, color: Colors.red),
           SizedBox(width: 10),
           Container(
             width: 140,
@@ -1032,6 +1053,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
       "CustRemark": txtNote.text,
       "SLCName": txtSLCName.text,
       "CreateType": widget.pageType == PageType.MANUAL ? "C" : "T",
+      "Geolocation": geoLocation,
     };
     return mapData;
   }
@@ -1195,6 +1217,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
                                     title: "Category",
                                     category: tempgroupCat,
                                     selected: groupCatMap,
+                                    showLogo: false,
                                   ));
                           if (dataReturn != null) {
                             setState(() {
@@ -1235,6 +1258,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
                                     title: "Sub - Category",
                                     category: tempSubCat,
                                     selected: subCatMap,
+                                    showLogo: false,
                                   ));
                           if (dataReturn != null) {
                             setState(() {
