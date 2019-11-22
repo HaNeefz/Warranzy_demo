@@ -56,6 +56,16 @@ class DBProviderLanguage {
     return data.first.name;
   }
 
+  Future<ModelLanguage> getAllLanguage() async {
+    final db = await database;
+    var res = await db.query(tableName);
+    ModelLanguage data = res.isNotEmpty
+        ? res.map((data) => ModelLanguage.fromJson(data)).toList().first
+        : null;
+
+    return data;
+  }
+
   getDataLanguageByID(int id) async {
     final db = await database;
     var res = await db.query(tableName, where: 'id = ?', whereArgs: [id]);
@@ -78,6 +88,14 @@ class DBProviderLanguage {
         where: 'id = ?', whereArgs: [data.id]);
 
     return res;
+  }
+
+  Future<bool> rawUpdateLanguage(ModelLanguage data) async {
+    final db = await database;
+    var res = await db.update(tableName, data.toJson(),
+        where: "id = ?", whereArgs: [data.id]);
+    print("rawUpdateLanguage: $res");
+    return res > 0;
   }
 
   deleteLanguage(int id) async {

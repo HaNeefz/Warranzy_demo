@@ -21,6 +21,7 @@ import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 
 import 'account_detail.dart';
 import 'change_pin_code.dart';
+import 'language.dart';
 
 class ProfilePage extends StatefulWidget {
   final String heroTag;
@@ -225,7 +226,12 @@ class _ProfilePageState extends State<ProfilePage> {
                             Icon(Icons.arrow_forward_ios)
                           ],
                         ),
-                        onPressed: () {}),
+                        onPressed: () {
+                          ecsLib.pushPage(
+                            context: context,
+                            pageWidget: LanguagePage(),
+                          );
+                        }),
                     listTile(
                         title: "Feedback",
                         icons: Icons.feedback,
@@ -437,33 +443,48 @@ class _ProfilePageState extends State<ProfilePage> {
                           modelCustomer: dataCust,
                           onContinue: (map) async {
                             print("map: $map");
-                            ecsLib.showDialogLoadingLib(context,
-                                content: "Update Image Profile");
-                            await Repository.apiUpdateImageProfile(body: map)
-                                .then((responseUpdate) async {
-                              ecsLib.cancelDialogLoadindLib(context);
-                              if (responseUpdate.status == true) {
-                                ModelCustomers model = ModelCustomers()
-                                  ..custUserID = map['CustUserID']
-                                  ..imageProfile = map['ImageProfile'];
-                                await DBProviderCustomer.db
-                                    .updateUpdateImageProfile(model)
-                                    .then((update) {
-                                  if (update == true) {
-                                    Navigator.pop(context);
-                                    getDataCustomers();
+                            await ecsLib
+                                .showDialogAction(context,
+                                    title: "IMAGE PROFILE",
+                                    content:
+                                        "Are you sure to change Image profile ?",
+                                    textOk: allTranslations.text("ok"),
+                                    textCancel: allTranslations.text("cancel"))
+                                .then((onClick) async {
+                              if (onClick == true) {
+                                ecsLib.showDialogLoadingLib(context,
+                                    content: "Update Image Profile");
+                                await Repository.apiUpdateImageProfile(
+                                        body: map)
+                                    .then((responseUpdate) async {
+                                  ecsLib.cancelDialogLoadindLib(context);
+                                  if (responseUpdate.status == true) {
+                                    ModelCustomers model = ModelCustomers()
+                                      ..custUserID = map['CustUserID']
+                                      ..imageProfile = map['ImageProfile'];
+                                    await DBProviderCustomer.db
+                                        .updateUpdateImageProfile(model)
+                                        .then((update) {
+                                      if (update == true) {
+                                        Navigator.pop(context);
+                                        getDataCustomers();
+                                      } else {
+                                        showAlert(
+                                            content: "Update Sqlite fail");
+                                      }
+                                    });
+                                  } else if (responseUpdate.status == false) {
+                                    showAlert(
+                                        title: "Upload Fail",
+                                        content: "${responseUpdate.message}");
                                   } else {
-                                    showAlert(content: "Update Sqlite fail");
+                                    showAlert(
+                                        title: "Upload Fail",
+                                        content: "${responseUpdate.message}");
                                   }
                                 });
-                              } else if (responseUpdate.status == false) {
-                                showAlert(
-                                    title: "Upload Fail",
-                                    content: "${responseUpdate.message}");
                               } else {
-                                showAlert(
-                                    title: "Upload Fail",
-                                    content: "${responseUpdate.message}");
+                                Navigator.pop(context);
                               }
                             });
                           },

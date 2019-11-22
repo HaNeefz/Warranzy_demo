@@ -151,9 +151,6 @@ class _ChangPINcodePageState extends State<ChangPINcodePage> {
       if (update.status == true) {
         await DBProviderCustomer.db.updatePinCode(modelCustomer).then((v) {
           if (v > 0) {
-            // Scaffold.of(context).showSnackBar(SnackBar(
-            //   content: Text("Update completed."),
-            // ));
             Navigator.pop(context, true);
             showAlert(title: "Update PIN", content: "Update completed.");
           } else {
