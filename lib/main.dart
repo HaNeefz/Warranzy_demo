@@ -13,6 +13,7 @@ import 'package:warranzy_demo/tools/theme_color.dart';
 
 import 'page/profile_page/theme_mode.dart';
 import 'page/splash_screen/scSplash_screen.dart';
+import 'services/providers/customer_state.dart';
 import 'services/providers/network_provider.dart';
 import 'services/providers/notification_state.dart';
 import 'services/providers/theme_state.dart';
@@ -57,6 +58,9 @@ void main() {
             ChangeNotifierProvider<ThemeNotifier>(
               builder: (context) =>
                   ThemeNotifier(darkModeOn ? darkTheme : lightTheme),
+            ),
+            ChangeNotifierProvider<CustomerState>(
+              builder: (context) => CustomerState.initial(),
             )
           ],
           child: StreamProvider<ConnectivityStatus>(

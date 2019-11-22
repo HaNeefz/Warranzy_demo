@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:warranzy_demo/models/model_user.dart';
 import 'package:warranzy_demo/models/model_verify_phone.dart';
 import 'package:warranzy_demo/services/api/repository.dart';
 import 'package:warranzy_demo/services/method/methode_helper.dart';
+import 'package:warranzy_demo/services/providers/customer_state.dart';
 import 'package:warranzy_demo/services/sqflit/db_customers.dart';
 import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
@@ -77,6 +79,7 @@ class _AccountDetailState extends State<AccountDetail> {
 
   @override
   Widget build(BuildContext context) {
+    final customerState = Provider.of<CustomerState>(context);
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -186,11 +189,11 @@ class _AccountDetailState extends State<AccountDetail> {
                                   if (await checkNumberChange() == false) {
                                     //No Change Number To do something
                                     print("No Change Number");
-                                    await onSendAPIEditProfile();
+                                    await onSendAPIEditProfile(customerState);
                                   } else {
                                     //Change nubmer, Could verify number before edit
                                     if (isVerify == true) {
-                                      await onVerifyNumber();
+                                      await onVerifyNumber(customerState);
                                     } else {
                                       await onRequestOTP();
                                     }
@@ -316,12 +319,12 @@ class _AccountDetailState extends State<AccountDetail> {
       return true; // Change
   }
 
-  onVerifyNumber() async {
+  onVerifyNumber(CustomerState customerState) async {
     if (ecsLib.checkOTPTimeOut(dateFormatted: modelVerifyNumber.createDate) ==
         false) {
       if (_verifyNumber.text == modelVerifyNumber.codeVerify.toString()) {
         print("Pass");
-        await onSendAPIEditProfile();
+        await onSendAPIEditProfile(customerState);
       } else {
         alert(title: "Verify OTP", content: "OTP Incorrect.");
       }
@@ -394,7 +397,7 @@ class _AccountDetailState extends State<AccountDetail> {
     return body;
   }
 
-  onSendAPIEditProfile() async {
+  onSendAPIEditProfile(CustomerState customerState) async {
     ecsLib.showDialogLoadingLib(context, content: "Edit Account");
     await Repository.apiEditProfile(body: setBodyToEditProfile())
         .then((response) async {
@@ -404,9 +407,10 @@ class _AccountDetailState extends State<AccountDetail> {
             .updateCustomerUsedEditProfile(
                 custUserID: _userID.text, values: setBodyToEditProfile())
             .then((resEdit) {
-          if (resEdit == true)
+          if (resEdit == true) {
+            customerState.changDataProfile = setBodyToEditProfile();
             Navigator.pop(context, true);
-          else
+          } else
             alert(
                 title: "EDIT PROFILE FAIL",
                 content: "fail something when update in sqlite!.");

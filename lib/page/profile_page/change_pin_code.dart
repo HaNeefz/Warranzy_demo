@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:warranzy_demo/models/model_user.dart';
 import 'package:warranzy_demo/services/api/repository.dart';
+import 'package:warranzy_demo/services/providers/customer_state.dart';
 import 'package:warranzy_demo/services/sqflit/db_customers.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
@@ -36,6 +38,7 @@ class _ChangPINcodePageState extends State<ChangPINcodePage> {
 
   @override
   Widget build(BuildContext context) {
+    final customerState = Provider.of<CustomerState>(context);
     return Scaffold(
       appBar: AppBarThemes.appBarStyle(
         context: context,
@@ -85,7 +88,7 @@ class _ChangPINcodePageState extends State<ChangPINcodePage> {
                             textCancel: allTranslations.text("no"))
                         .then((onClick) async {
                       if (onClick == true) {
-                        await sendAPIChangePIN(newPin);
+                        await sendAPIChangePIN(newPin, customerState);
                       } else {
                         Navigator.pop(context, false);
                       }
@@ -97,15 +100,6 @@ class _ChangPINcodePageState extends State<ChangPINcodePage> {
                 }
               },
             ),
-            // if (isContinueSecond == true)
-            //   ButtonBuilder.buttonCustom(
-            //       context: context,
-            //       colorsButton: ThemeColors.COLOR_MAJOR.withAlpha(200),
-            //       labelStyle: TextStyleCustom.STYLE_LABEL_BOLD
-            //           .copyWith(color: ThemeColors.COLOR_WHITE),
-            //       paddingValue: 50,
-            //       label: allTranslations.text("continue"),
-            //       onPressed: () async {}),
           ],
         ),
       ),
@@ -138,7 +132,7 @@ class _ChangPINcodePageState extends State<ChangPINcodePage> {
       return "Enter your current PIN";
   }
 
-  sendAPIChangePIN(String newPIN) async {
+  sendAPIChangePIN(String newPIN, CustomerState customerState) async {
     ModelCustomers modelCustomer = ModelCustomers(
         custUserID: widget.modelCustomer.custUserID, pINcode: newPIN);
     var body = {
@@ -152,6 +146,7 @@ class _ChangPINcodePageState extends State<ChangPINcodePage> {
         await DBProviderCustomer.db.updatePinCode(modelCustomer).then((v) {
           if (v > 0) {
             Navigator.pop(context, true);
+            customerState.changPinCode = newPIN;
             showAlert(title: "Update PIN", content: "Update completed.");
           } else {
             showAlert(title: "Update PIN fail", content: "Update Incompleted.");

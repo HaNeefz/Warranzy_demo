@@ -28,6 +28,7 @@ import 'package:warranzy_demo/services/api_provider/api_response.dart';
 import 'package:warranzy_demo/services/method/methode_helper.dart';
 import 'package:warranzy_demo/services/method/scan_qr.dart';
 import 'package:warranzy_demo/services/providers/asset_state.dart';
+import 'package:warranzy_demo/services/providers/customer_state.dart';
 import 'package:warranzy_demo/services/sqflit/db_asset.dart';
 import 'package:warranzy_demo/services/sqflit/db_customers.dart';
 import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
@@ -61,7 +62,6 @@ class _AssetPageState extends State<AssetPage> {
   Future getAssetOnline;
   Future<List<ModelDataAsset>> getModelData;
   String username = "Username";
-  String profile;
 
   List<ModelAssetsData> listAssetData;
   ApiBlocGetAllAsset<ResponseAssetOnline> getAllAssetBloc;
@@ -79,30 +79,8 @@ class _AssetPageState extends State<AssetPage> {
     // getAllAssetBloc = ApiBlocGetAllAsset<ResponseAssetOnline>(
     //   url: url,
     // );
-    getUsername();
     getModelData = getModelDataAsset();
     // getAssetOnline = getUrlAssetOnline();
-  }
-
-  getUsername() async {
-    await SharedPreferences.getInstance().then((value) {
-      setState(() {
-        username = value.getString("UserName");
-        profile = value.getString("ImageProfile");
-      });
-    });
-  }
-
-  Widget buildUserName() {
-    return Padding(
-      padding: const EdgeInsets.only(left: 10.0, bottom: 15),
-      child: TextBuilder.build(
-          title: "Hello, $username",
-          style: TextStyleCustom.STYLE_TITLE
-              .copyWith(color: ThemeColors.COLOR_GREY, letterSpacing: 1.5),
-          maxLine: 1,
-          textOverflow: TextOverflow.ellipsis),
-    );
   }
 
   Future<Null> _onRefresh() async {
@@ -131,28 +109,8 @@ class _AssetPageState extends State<AssetPage> {
               children: <Widget>[
                 TextBuilder.build(
                     title: date, style: TextStyleCustom.STYLE_LABEL_BOLD),
-                GestureDetector(
-                  onTap: () {
-                    ecsLib.pushPage(
-                      context: context,
-                      pageWidget: ProfilePage(
-                        heroTag: "PhotoProfile",
-                      ),
-                    );
-                  },
-                  child: Center(
-                    child: Hero(
-                      child: profile == null
-                          ? Icon(Icons.person_pin,
-                              size: 50, color: Colors.black)
-                          : ShowImageProfile(
-                              imagePath: profile,
-                              borderColor: Colors.black,
-                              radius: 30,
-                            ),
-                      tag: "PhotoProfile",
-                    ),
-                  ),
+                new ShowProfile(
+                  ecsLib: ecsLib,
                 ),
               ],
             ),
@@ -166,7 +124,7 @@ class _AssetPageState extends State<AssetPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               // shrinkWrap: true,
               children: <Widget>[
-                buildUserName(),
+                ShowCustomerName(),
                 // buildHeaderAndProfile(),
                 CarouselWithIndicator(
                   height: 250,
@@ -573,6 +531,62 @@ class _AssetPageState extends State<AssetPage> {
               },
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class ShowCustomerName extends StatelessWidget {
+  const ShowCustomerName({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final customerState = Provider.of<CustomerState>(context);
+    return Padding(
+      padding: const EdgeInsets.only(left: 10.0, bottom: 15),
+      child: TextBuilder.build(
+          title: "Hello, ${customerState.dataCustomer.custName ?? ""}",
+          style: TextStyleCustom.STYLE_TITLE
+              .copyWith(color: ThemeColors.COLOR_GREY, letterSpacing: 1.5),
+          maxLine: 1,
+          textOverflow: TextOverflow.ellipsis),
+    );
+  }
+}
+
+class ShowProfile extends StatelessWidget {
+  ShowProfile({
+    Key key,
+    @required this.ecsLib,
+  }) : super(key: key);
+
+  final ECSLib ecsLib;
+
+  @override
+  Widget build(BuildContext context) {
+    final customerState = Provider.of<CustomerState>(context);
+    return GestureDetector(
+      onTap: () {
+        ecsLib.pushPage(
+          context: context,
+          pageWidget: ProfilePage(
+            heroTag: "PhotoProfile",
+          ),
+        );
+      },
+      child: Center(
+        child: Hero(
+          child: customerState.dataCustomer.imageProfile == null
+              ? Icon(Icons.person_pin, size: 50, color: Colors.black)
+              : ShowImageProfile(
+                  imagePath: customerState.dataCustomer.imageProfile,
+                  borderColor: Colors.black,
+                  radius: 30,
+                ),
+          tag: "PhotoProfile",
         ),
       ),
     );

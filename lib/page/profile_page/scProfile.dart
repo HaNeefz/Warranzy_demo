@@ -11,6 +11,7 @@ import 'package:warranzy_demo/page/splash_screen/scSplash_screen.dart';
 import 'package:warranzy_demo/services/api/repository.dart';
 import 'package:warranzy_demo/services/calls_and_message/calls_and_message.dart';
 import 'package:warranzy_demo/services/method/methode_helper.dart';
+import 'package:warranzy_demo/services/providers/customer_state.dart';
 import 'package:warranzy_demo/services/sqflit/db_customers.dart';
 import 'package:warranzy_demo/tools/assets.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
@@ -40,36 +41,6 @@ class _ProfilePageState extends State<ProfilePage> {
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
   final CallsAndMessageService _service = CallsAndMessageService();
   bool checkInformationChange = false;
-  ModelCustomers dataCust;
-  bool _usedTouchID = false;
-
-  @override
-  void initState() {
-    super.initState();
-    getDataCustomers();
-  }
-
-  void getDataCustomers() async {
-    dataCust = null;
-    var tempDataCust = await DBProviderCustomer.db.getDataCustomer();
-    dataCust = tempDataCust;
-    setState(() => _usedTouchID = dataCust.specialPass == "Y" ? true : false);
-
-    print("ID Customer => ${await DBProviderCustomer.db.getIDCustomer()}");
-    print(
-        "<=========================MAS_CUSTOMER=========================>\n${dataCust.toJson()}\n<================================================================>");
-  }
-
-  sendTocloudFireStore() async {
-    try {
-      print("Click");
-      Firestore.instance.collection('BrandName').snapshots().listen((data) {
-        for (var list in data.documents) print(list.data);
-      });
-    } catch (e) {
-      print(e);
-    }
-  }
 
   showAlert({String title, String content}) {
     ecsLib.showDialogLib(context,
@@ -80,6 +51,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final customerState = Provider.of<CustomerState>(context);
     Text textContent(String text) {
       return TextBuilder.build(
           title: text ?? "", style: TextStyleCustom.STYLE_CONTENT);
@@ -107,18 +79,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   Navigator.pop(context);
                 },
               ),
-              actions: <Widget>[
-                // FlatButton(
-                //   child: Icon(
-                //     Icons.lock_open,
-                //     size: 30,
-                //     color: ThemeColors.COLOR_WHITE,
-                //   ),
-                //   onPressed: () {
-
-                //   },
-                // )
-              ],
+              actions: <Widget>[],
               elevation: 5,
               forceElevated: true,
               flexibleSpace: Container(
@@ -134,14 +95,15 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                     Align(
                       alignment: Alignment.center,
-                      child: buildHeroProfile(),
+                      child: buildHeroProfile(customerState),
                     ),
                     Align(
                       alignment: Alignment.center,
                       child: Padding(
                         padding: const EdgeInsets.only(top: 200.0),
                         child: TextBuilder.build(
-                            title: "${dataCust?.custName ?? ""}",
+                            title:
+                                "${customerState.dataCustomer.custName ?? ""}",
                             style: TextStyleCustom.STYLE_APPBAR
                                 .copyWith(color: ThemeColors.COLOR_WHITE)),
                       ),
@@ -166,15 +128,11 @@ class _ProfilePageState extends State<ProfilePage> {
                         title: "Profile",
                         icons: Icons.account_circle,
                         onPressed: () async {
-                          await ecsLib
-                              .pushPage(
-                                  context: context,
-                                  pageWidget: AccountDetail(
-                                    modelCustomers: dataCust,
-                                  ))
-                              .then((comback) {
-                            if (comback == true) getDataCustomers();
-                          });
+                          await ecsLib.pushPage(
+                              context: context,
+                              pageWidget: AccountDetail(
+                                modelCustomers: customerState.dataCustomer,
+                              ));
                         }),
                     Divider(),
                     headLine("Theme"),
@@ -185,15 +143,11 @@ class _ProfilePageState extends State<ProfilePage> {
                         title: "Change PIN",
                         icons: Icons.keyboard,
                         onPressed: () async {
-                          await ecsLib
-                              .pushPage(
-                                  context: context,
-                                  pageWidget: ChangPINcodePage(
-                                    modelCustomer: dataCust,
-                                  ))
-                              .then((comback) {
-                            if (comback == true) getDataCustomers();
-                          });
+                          await ecsLib.pushPage(
+                              context: context,
+                              pageWidget: ChangPINcodePage(
+                                modelCustomer: customerState.dataCustomer,
+                              ));
                           // Navigator.push(
                           //     context,
                           //     MaterialPageRoute(
@@ -202,22 +156,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     listTile(
                         title: "Sign in with touch ID",
                         icons: Icons.fingerprint,
-                        trailing: Switch(
-                          value: _usedTouchID,
-                          onChanged: (bool value) async {
-                            await ecsLib
-                                .showDialogAction(context,
-                                    title:
-                                        "Change Sign in with touch ID or FaceID",
-                                    content:
-                                        "Are you sure to change SpecialPass ?",
-                                    textOk: allTranslations.text("ok"),
-                                    textCancel: allTranslations.text("cancel"))
-                                .then((onClick) {
-                              if (onClick == true) changeSpecialPass(value);
-                            });
-                          },
-                        )),
+                        trailing: ChangeSpecialPass()),
                     Divider(),
                     headLine("Setting app"),
                     listTile(
@@ -374,55 +313,15 @@ class _ProfilePageState extends State<ProfilePage> {
         ));
   }
 
-  changeSpecialPass(value) async {
-    dataCust.specialPass = value == true ? "Y" : "N";
-    print("dataCust.specialPass :${dataCust.specialPass}");
-    var body = {
-      "CustUserID": dataCust.custUserID,
-      "SpecialPass": dataCust.specialPass
-    };
-    ecsLib.showDialogLoadingLib(context, content: "Changing SpecialPass");
-    await Repository.apiChangeSpecialPass(body: body).then((response) async {
-      ecsLib.cancelDialogLoadindLib(context);
-      if (response.status == true) {
-        await DBProviderCustomer.db
-            .updateSpecialPass(dataCust)
-            .then((update) async {
-          if (update == true) {
-            setState(() => _usedTouchID = value);
-          }
-        });
-      } else if (response.status == false) {
-        showAlert(
-            title: "Update SpecialPass fail", content: "${response.message}");
-      } else {
-        showAlert(
-            title: "Update SpecialPass fail", content: "${response.message}");
-      }
-    });
-  }
-
-  ImageProvider<dynamic> showImage() {
-    if (dataCust?.imageProfile?.startsWith("A") == true) {
-      return AssetImage("assets/icons/avatars/${dataCust?.imageProfile}.png");
-    } else {
-      return MemoryImage(base64Decode(dataCust.imageProfile));
-    }
-  }
-
-  Widget buildHeroProfile() {
+  Widget buildHeroProfile(CustomerState customerState) {
     return Container(
       width: 160,
       height: 160,
       // color: Colors.red,
       child: Stack(
         children: <Widget>[
-          Hero(
-            child: ShowImageProfile(
-              imagePath: dataCust?.imageProfile,
-              radius: 80,
-            ),
-            tag: widget.heroTag,
+          ShowProfile(
+            tagHero: widget.heroTag,
           ),
           Positioned(
             right: 0,
@@ -445,8 +344,8 @@ class _ProfilePageState extends State<ProfilePage> {
                         context: context,
                         pageWidget: ImageProfile(
                           hasImage: true,
-                          imagesMySelf: dataCust?.imageProfile,
-                          modelCustomer: dataCust,
+                          imagesMySelf: customerState.dataCustomer.imageProfile,
+                          modelCustomer: customerState.dataCustomer,
                           onContinue: (map) async {
                             print("map: $map");
                             await ecsLib
@@ -472,8 +371,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                         .updateUpdateImageProfile(model)
                                         .then((update) {
                                       if (update == true) {
+                                        customerState.changProfile =
+                                            map['ImageProfile'];
                                         Navigator.pop(context);
-                                        getDataCustomers();
                                       } else {
                                         showAlert(
                                             content: "Update Sqlite fail");
@@ -615,5 +515,87 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
       ),
     );
+  }
+}
+
+class ShowProfile extends StatelessWidget {
+  final String tagHero;
+
+  const ShowProfile({Key key, this.tagHero}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    final customerState = Provider.of<CustomerState>(context);
+    return Hero(
+      child: ShowImageProfile(
+        imagePath: customerState.dataCustomer.imageProfile,
+        radius: 80,
+      ),
+      tag: tagHero,
+    );
+  }
+}
+
+class ChangeSpecialPass extends StatelessWidget {
+  final ecsLib = getIt.get<ECSLib>();
+  final allTranslations = getIt.get<GlobalTranslations>();
+
+  @override
+  Widget build(BuildContext context) {
+    final customerState = Provider.of<CustomerState>(context);
+    bool _usedTouchID =
+        customerState.dataCustomer.specialPass == "Y" ? true : false;
+    return Switch(
+      value: _usedTouchID,
+      onChanged: (bool value) async {
+        await ecsLib
+            .showDialogAction(context,
+                title: "Change Sign in with touch ID or FaceID",
+                content: "Are you sure to change SpecialPass ?",
+                textOk: allTranslations.text("ok"),
+                textCancel: allTranslations.text("cancel"))
+            .then((onClick) {
+          if (onClick == true) changeSpecialPass(context, value, customerState);
+        });
+      },
+    );
+  }
+
+  showAlert(BuildContext context, {String title, String content}) {
+    ecsLib.showDialogLib(context,
+        title: title ?? "Title is empty",
+        content: content ?? "Content is empty",
+        textOnButton: allTranslations.text("close"));
+  }
+
+  changeSpecialPass(context, value, CustomerState customerState) async {
+    var specialPass = value == true ? "Y" : "N";
+    print("Status change : $value");
+    print("SpecialPass Now :${customerState.dataCustomer.specialPass}");
+    ModelCustomers modelCustomer = ModelCustomers()
+      ..custUserID = customerState.dataCustomer.custUserID
+      ..specialPass = specialPass;
+    var body = {
+      "CustUserID": customerState.dataCustomer.custUserID,
+      "SpecialPass": specialPass
+    };
+    ecsLib.showDialogLoadingLib(context, content: "Changing SpecialPass");
+    await Repository.apiChangeSpecialPass(body: body).then((response) async {
+      ecsLib.cancelDialogLoadindLib(context);
+      if (response.status == true) {
+        await DBProviderCustomer.db
+            .updateSpecialPass(modelCustomer)
+            .then((update) async {
+          if (update == true) {
+            customerState.changSpecialPass = specialPass;
+          }
+        });
+      } else if (response.status == false) {
+        showAlert(context,
+            title: "Update SpecialPass fail", content: "${response.message}");
+      } else {
+        showAlert(context,
+            title: "Update SpecialPass fail", content: "${response.message}");
+      }
+    });
   }
 }

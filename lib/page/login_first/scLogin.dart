@@ -7,11 +7,13 @@ import 'package:image_picker/image_picker.dart';
 // import 'package:image_picker_saver/image_picker_saver.dart' as imageSaver;
 // import 'package:gallery_saver/gallery_saver.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:warranzy_demo/page/asset_page/add_assets_page/scAdd_image_demo.dart';
 import 'package:warranzy_demo/page/change_device_page/scChange_device.dart';
 import 'package:warranzy_demo/page/pin_code/scPinCode.dart';
 import 'package:warranzy_demo/services/method/methode_helper.dart';
+import 'package:warranzy_demo/services/providers/customer_state.dart';
 import 'package:warranzy_demo/services/providers/notification_state.dart';
 import 'package:warranzy_demo/services/sqflit/db_customers.dart';
 import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
@@ -76,12 +78,13 @@ class _LoginPageState extends State<LoginPage> {
         pageWidget: Register(),
       );
 
-  gotoPinCodePage() => ecsLib.pushPage(
+  gotoPinCodePage(CustomerState customerState) => ecsLib.pushPage(
         context: context,
         pageWidget: PinCodePageUpdate(
-          type: PageType.login,
-          usedPin: true,
-        ),
+            type: PageType.login,
+            usedPin: true,
+            specialPass:
+                customerState.dataCustomer.specialPass == "Y" ? true : false),
       );
   gotoChangeDevicePage() => ecsLib.pushPage(
         context: context,
@@ -91,6 +94,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final customerState = Provider.of<CustomerState>(context);
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.only(top: 80.0),
@@ -117,7 +121,7 @@ class _LoginPageState extends State<LoginPage> {
                       : allTranslations.text("register"),
                   onPressed: () {
                     if (hasAccount == true) {
-                      gotoPinCodePage();
+                      gotoPinCodePage(customerState);
                     } else {
                       gotoRegisterPage();
                     }

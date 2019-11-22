@@ -32,12 +32,12 @@ final darkTheme = ThemeData(
 );
 
 final lightTheme = ThemeData(
-  appBarTheme: AppBarTheme(brightness: Brightness.light),
+  appBarTheme: AppBarTheme(brightness: Brightness.light, color: Colors.teal),
   iconTheme: IconThemeData(color: ThemeColors.COLOR_THEME_APP),
   primarySwatch: Colors.teal,
   primaryColor: Colors.white,
   brightness: Brightness.light,
-  backgroundColor: const Color(0xFFE5E5E5),
+  backgroundColor: Colors.white, //const Color(0xFFE5E5E5),
   accentColor: Colors.black,
   accentIconTheme: IconThemeData(color: Colors.white),
   dividerColor: Colors.white54,

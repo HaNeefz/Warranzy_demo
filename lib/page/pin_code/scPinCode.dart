@@ -20,6 +20,7 @@ import 'package:warranzy_demo/services/api_provider/api_bloc.dart';
 import 'package:warranzy_demo/services/api_provider/api_bloc_widget.dart';
 import 'package:warranzy_demo/services/api_provider/api_response.dart';
 import 'package:warranzy_demo/services/method/methode_helper.dart';
+import 'package:warranzy_demo/services/providers/customer_state.dart';
 import 'package:warranzy_demo/services/providers/network_provider.dart';
 import 'package:warranzy_demo/services/sqflit/db_customers.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
@@ -35,12 +36,14 @@ import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 class PinCodePageUpdate extends StatefulWidget {
   final PageType type;
   final ModelMasCustomer modelMasCustomer;
+  final bool specialPass;
   bool usedPin;
   PinCodePageUpdate(
       {Key key,
       @required this.type,
       this.usedPin = true,
-      this.modelMasCustomer})
+      this.modelMasCustomer,
+      this.specialPass})
       : super(key: key);
   @override
   _PinCodePageUpdateState createState() => _PinCodePageUpdateState();
@@ -81,12 +84,6 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
     pref.setString("PinCode", dataCust.pINcode);
     pref.setString("SpecialPass", dataCust.specialPass);
     pref.setString("ImageProfile", dataCust?.imageProfile);
-
-    setState(() {
-      username = pref.getString("UserName") ?? dataCust.custName;
-      imageProfile = pref.getString("ImageProfile") ?? dataCust?.imageProfile;
-      print("imageProfile : $imageProfile");
-    });
   }
 
   void sendApiLogin() async {
@@ -172,18 +169,9 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
         pageWidget: MainPage(),
       );
 
-  Future<bool> loginBySettingOfCustomer() async {
-    try {
-      return DBProviderCustomer.db.getSpecialPass();
-    } catch (e) {
-      print("$e");
-      return false;
-    }
-  }
-
   initMethodLogin() async {
     if (usedPin == true && type == PageType.login) {
-      if (await loginBySettingOfCustomer() == true) _localAuth();
+      if (widget.specialPass == true) _localAuth();
     } else {
       print(modelMasCustomer?.fullName);
       print(modelMasCustomer?.address);
@@ -442,7 +430,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
         widgetLogo = ecsLib.logoApp(width: 150, height: 150);
         break;
       default:
-        widgetLogo = getProfile();
+        widgetLogo = ShowProfile();
     }
     return widgetLogo;
   }
@@ -869,6 +857,57 @@ class _NewApiStructureState extends State<NewApiStructure> {
           }
           return Container();
         },
+      ),
+    );
+  }
+}
+
+class ShowProfile extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final customerState = Provider.of<CustomerState>(context);
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: customerState.dataCustomer.imageProfile != null
+          ? showImage(customerState)
+          : Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(width: 2),
+                  color: ThemeColors.COLOR_WHITE),
+              child: Center(
+                child: Icon(
+                  Icons.account_circle,
+                  size: 50.0,
+                ),
+              ),
+            ),
+    );
+  }
+
+  Widget showImage(CustomerState customerState) {
+    var path = customerState.dataCustomer.imageProfile;
+    return CircleAvatar(
+      radius: 50,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(50),
+        child: path.startsWith("A") == true
+            ? Image.asset(
+                "assets/icons/avatars/$path.png",
+                width: 100,
+                height: 100,
+                fit: BoxFit.cover,
+              )
+            : Image.memory(
+                base64Decode(
+                  path,
+                ),
+                width: 100,
+                height: 100,
+                fit: BoxFit.cover,
+              ),
       ),
     );
   }

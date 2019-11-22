@@ -4,15 +4,39 @@ import 'package:warranzy_demo/services/sqflit/db_customers.dart';
 
 class CustomerState extends ChangeNotifier {
   ModelCustomers _dataCustomer;
-  bool _isFetchingData = false;
-
-  bool get isFetchingData => _isFetchingData;
+  CustomerState.initial() {
+    getDataCustomer();
+  }
 
   getDataCustomer() async {
-    _dataCustomer = await DBProviderCustomer.db.getDataCustomer();
-    _dataCustomer != null ? _isFetchingData = true : _isFetchingData = false;
+    if (_dataCustomer == null) {
+      _dataCustomer = await DBProviderCustomer.db.getDataCustomer();
+      notifyListeners();
+    }
+  }
+
+  ModelCustomers get dataCustomer => _dataCustomer;
+
+  set changPinCode(String newPinCode) {
+    _dataCustomer.pINcode = newPinCode;
     notifyListeners();
   }
 
-  changePinCode() async {}
+  set changSpecialPass(String newSpecialPass) {
+    _dataCustomer.specialPass = newSpecialPass;
+    notifyListeners();
+  }
+
+  set changProfile(String newProfile) {
+    _dataCustomer.imageProfile = newProfile;
+    notifyListeners();
+  }
+
+  set changDataProfile(Map<String, dynamic> newDataProfile) {
+    _dataCustomer.custName = newDataProfile["CustName"];
+    _dataCustomer.homeAddress = newDataProfile["HomeAddress"];
+    _dataCustomer.custEmail = newDataProfile["CustEmail"];
+    _dataCustomer.mobilePhone = newDataProfile["MobilePhone"];
+    notifyListeners();
+  }
 }
