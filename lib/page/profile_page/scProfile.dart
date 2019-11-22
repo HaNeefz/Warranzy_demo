@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:provider/provider.dart';
 import 'package:simple_animations/simple_animations.dart';
 import 'package:warranzy_demo/models/model_user.dart';
 import 'package:warranzy_demo/page/splash_screen/scSplash_screen.dart';
@@ -13,6 +14,7 @@ import 'package:warranzy_demo/services/method/methode_helper.dart';
 import 'package:warranzy_demo/services/sqflit/db_customers.dart';
 import 'package:warranzy_demo/tools/assets.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
+import 'package:warranzy_demo/tools/const.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/manage_image_profile.dart';
@@ -22,6 +24,7 @@ import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 import 'account_detail.dart';
 import 'change_pin_code.dart';
 import 'language.dart';
+import 'theme_mode.dart';
 
 class ProfilePage extends StatefulWidget {
   final String heroTag;
@@ -173,6 +176,9 @@ class _ProfilePageState extends State<ProfilePage> {
                             if (comback == true) getDataCustomers();
                           });
                         }),
+                    Divider(),
+                    headLine("Theme"),
+                    ThemePage(title: "Dark Mode"),
                     Divider(),
                     headLine("Security"),
                     listTile(

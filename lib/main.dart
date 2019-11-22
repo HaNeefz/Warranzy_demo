@@ -5,13 +5,17 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get_it/get_it.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:warranzy_demo/services/providers/asset_state.dart';
+import 'package:warranzy_demo/tools/const.dart';
 import 'package:warranzy_demo/tools/export_lib.dart';
 import 'package:warranzy_demo/tools/theme_color.dart';
 
+import 'page/profile_page/theme_mode.dart';
 import 'page/splash_screen/scSplash_screen.dart';
 import 'services/providers/network_provider.dart';
 import 'services/providers/notification_state.dart';
+import 'services/providers/theme_state.dart';
 
 var getIt = GetIt();
 
@@ -40,26 +44,33 @@ void main() {
     DeviceOrientation.portraitUp,
   ]).then((_) async {
     setupApp();
-    runApp(MultiProvider(
-        providers: [
-          ChangeNotifierProvider<NotificationState>(
-            builder: (context) => NotificationState(),
-          ),
-          ChangeNotifierProvider<AssetState>(
-            builder: (context) => AssetState(),
-          )
-        ],
-        child: StreamProvider<ConnectivityStatus>(
-            builder: (context) =>
-                ConnectivityService().connectionStatusController.stream,
-            child: HomeSetup()
-            // Consumer<NotificationState>(
-            //   builder: (BuildContext context, _notitState, _) => MyHomePage(
-            //     notiState: _notitState,
-            //   ),
-            //   child: MyHomePage(notiState: null,),
-            // ),
-            )));
+    SharedPreferences.getInstance().then((pref) {
+      var darkModeOn = pref.getBool("darkMode") ?? false;
+      runApp(MultiProvider(
+          providers: [
+            ChangeNotifierProvider<NotificationState>(
+              builder: (context) => NotificationState(),
+            ),
+            ChangeNotifierProvider<AssetState>(
+              builder: (context) => AssetState(),
+            ),
+            ChangeNotifierProvider<ThemeNotifier>(
+              builder: (context) =>
+                  ThemeNotifier(darkModeOn ? darkTheme : lightTheme),
+            )
+          ],
+          child: StreamProvider<ConnectivityStatus>(
+              builder: (context) =>
+                  ConnectivityService().connectionStatusController.stream,
+              child: HomeSetup()
+              // Consumer<NotificationState>(
+              //   builder: (BuildContext context, _notitState, _) => MyHomePage(
+              //     notiState: _notitState,
+              //   ),
+              //   child: MyHomePage(notiState: null,),
+              // ),
+              )));
+    });
   });
 }
 
@@ -113,6 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
     return MaterialApp(
       // showPerformanceOverlay: true,
 
@@ -124,16 +136,16 @@ class _MyHomePageState extends State<MyHomePage> {
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
       title: 'Flutter Demo',
-      theme: ThemeData(
-          primarySwatch: Colors.teal,
-          brightness: Brightness.light,
-          // primaryColor: Colors.white,
-          scaffoldBackgroundColor: Colors.white,
-          appBarTheme: AppBarTheme(brightness: Brightness.light),
-          iconTheme: IconThemeData(color: ThemeColors.COLOR_THEME_APP)
-          // fontFamily: "Ekkamai"
-          ), //Supermarket
-      darkTheme: ThemeData(brightness: Brightness.dark),
+      theme: themeNotifier.getTheme(),
+      // ThemeData(
+      //     primarySwatch: Colors.teal,
+      //     brightness: Brightness.light,
+      //     scaffoldBackgroundColor: Colors.white,
+      //     appBarTheme: AppBarTheme(brightness: Brightness.light),
+      //     iconTheme: IconThemeData(color: ThemeColors.COLOR_THEME_APP)
+      //     // fontFamily: "Ekkamai"
+      //     ), //Supermarket
+      // darkTheme: ThemeData(brightness: Brightness.dark),
       home: SplashScreenPage(),
     );
   }
