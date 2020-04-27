@@ -51,7 +51,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    final customerState = Provider.of<CustomerState>(context);
+    // final customerState = Provider.of<CustomerState>(context);
     Text textContent(String text) {
       return TextBuilder.build(
           title: text ?? "", style: TextStyleCustom.STYLE_CONTENT);
@@ -95,17 +95,19 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                     Align(
                       alignment: Alignment.center,
-                      child: buildHeroProfile(customerState),
+                      child: buildHeroProfile(),
                     ),
                     Align(
                       alignment: Alignment.center,
                       child: Padding(
                         padding: const EdgeInsets.only(top: 200.0),
-                        child: TextBuilder.build(
-                            title:
-                                "${customerState.dataCustomer.custName ?? ""}",
-                            style: TextStyleCustom.STYLE_APPBAR
-                                .copyWith(color: ThemeColors.COLOR_WHITE)),
+                        child: Consumer<CustomerState>(
+                          builder: (context, customerState, _) => TextBuilder.build(
+                              title:
+                                  "${customerState.dataCustomer.custName ?? ""}",
+                              style: TextStyleCustom.STYLE_APPBAR
+                                  .copyWith(color: ThemeColors.COLOR_WHITE)),
+                        ),
                       ),
                     )
                   ])
@@ -130,13 +132,16 @@ class _ProfilePageState extends State<ProfilePage> {
                         onPressed: () async {
                           await ecsLib.pushPage(
                               context: context,
-                              pageWidget: AccountDetail(
-                                modelCustomers: customerState.dataCustomer,
+                              pageWidget: Consumer<CustomerState>(
+                                builder: (context, customerState, _) =>
+                                    AccountDetail(
+                                  modelCustomers: customerState.dataCustomer,
+                                ),
                               ));
                         }),
                     Divider(),
                     headLine("Theme"),
-                    ThemePage(title: "Dark Mode"),
+                    // ThemePage(title: "Dark Mode"),
                     Divider(),
                     headLine("Security"),
                     listTile(
@@ -145,8 +150,11 @@ class _ProfilePageState extends State<ProfilePage> {
                         onPressed: () async {
                           await ecsLib.pushPage(
                               context: context,
-                              pageWidget: ChangPINcodePage(
-                                modelCustomer: customerState.dataCustomer,
+                              pageWidget: Consumer<CustomerState>(
+                                builder: (_, customerState, __) =>
+                                    ChangPINcodePage(
+                                  modelCustomer: customerState.dataCustomer,
+                                ),
                               ));
                           // Navigator.push(
                           //     context,
@@ -313,7 +321,7 @@ class _ProfilePageState extends State<ProfilePage> {
         ));
   }
 
-  Widget buildHeroProfile(CustomerState customerState) {
+  Widget buildHeroProfile() {
     return Container(
       width: 160,
       height: 160,
@@ -342,58 +350,62 @@ class _ProfilePageState extends State<ProfilePage> {
                     onPressed: () async {
                       ecsLib.pushPage(
                         context: context,
-                        pageWidget: ImageProfile(
-                          hasImage: true,
-                          imagesMySelf: customerState.dataCustomer.imageProfile,
-                          modelCustomer: customerState.dataCustomer,
-                          onContinue: (map) async {
-                            print("map: $map");
-                            await ecsLib
-                                .showDialogAction(context,
-                                    title: "IMAGE PROFILE",
-                                    content:
-                                        "Are you sure to change Image profile ?",
-                                    textOk: allTranslations.text("ok"),
-                                    textCancel: allTranslations.text("cancel"))
-                                .then((onClick) async {
-                              if (onClick == true) {
-                                ecsLib.showDialogLoadingLib(context,
-                                    content: "Update Image Profile");
-                                await Repository.apiUpdateImageProfile(
-                                        body: map)
-                                    .then((responseUpdate) async {
-                                  ecsLib.cancelDialogLoadindLib(context);
-                                  if (responseUpdate.status == true) {
-                                    ModelCustomers model = ModelCustomers()
-                                      ..custUserID = map['CustUserID']
-                                      ..imageProfile = map['ImageProfile'];
-                                    await DBProviderCustomer.db
-                                        .updateUpdateImageProfile(model)
-                                        .then((update) {
-                                      if (update == true) {
-                                        customerState.changProfile =
-                                            map['ImageProfile'];
-                                        Navigator.pop(context);
-                                      } else {
-                                        showAlert(
-                                            content: "Update Sqlite fail");
-                                      }
-                                    });
-                                  } else if (responseUpdate.status == false) {
-                                    showAlert(
-                                        title: "Upload Fail",
-                                        content: "${responseUpdate.message}");
-                                  } else {
-                                    showAlert(
-                                        title: "Upload Fail",
-                                        content: "${responseUpdate.message}");
-                                  }
-                                });
-                              } else {
-                                Navigator.pop(context);
-                              }
-                            });
-                          },
+                        pageWidget: Consumer<CustomerState>(
+                          builder: (context, customerState, _) => ImageProfile(
+                            hasImage: true,
+                            imagesMySelf:
+                                customerState?.dataCustomer?.imageProfile,
+                            modelCustomer: customerState.dataCustomer,
+                            onContinue: (map) async {
+                              print("map: $map");
+                              await ecsLib
+                                  .showDialogAction(context,
+                                      title: "IMAGE PROFILE",
+                                      content:
+                                          "Are you sure to change Image profile ?",
+                                      textOk: allTranslations.text("ok"),
+                                      textCancel:
+                                          allTranslations.text("cancel"))
+                                  .then((onClick) async {
+                                if (onClick == true) {
+                                  ecsLib.showDialogLoadingLib(context,
+                                      content: "Update Image Profile");
+                                  await Repository.apiUpdateImageProfile(
+                                          body: map)
+                                      .then((responseUpdate) async {
+                                    ecsLib.cancelDialogLoadindLib(context);
+                                    if (responseUpdate.status == true) {
+                                      ModelCustomers model = ModelCustomers()
+                                        ..custUserID = map['CustUserID']
+                                        ..imageProfile = map['ImageProfile'];
+                                      await DBProviderCustomer.db
+                                          .updateUpdateImageProfile(model)
+                                          .then((update) {
+                                        if (update == true) {
+                                          customerState.changProfile =
+                                              map['ImageProfile'];
+                                          Navigator.pop(context);
+                                        } else {
+                                          showAlert(
+                                              content: "Update Sqlite fail");
+                                        }
+                                      });
+                                    } else if (responseUpdate.status == false) {
+                                      showAlert(
+                                          title: "Upload Fail",
+                                          content: "${responseUpdate.message}");
+                                    } else {
+                                      showAlert(
+                                          title: "Upload Fail",
+                                          content: "${responseUpdate.message}");
+                                    }
+                                  });
+                                } else {
+                                  Navigator.pop(context);
+                                }
+                              });
+                            },
+                          ),
                         ),
                       );
                       // await buildShowModalBottomSheet(context);
@@ -527,7 +539,7 @@ class ShowProfile extends StatelessWidget {
     final customerState = Provider.of<CustomerState>(context);
     return Hero(
       child: ShowImageProfile(
-        imagePath: customerState.dataCustomer.imageProfile,
+        imagePath: customerState?.dataCustomer?.imageProfile,
         radius: 80,
       ),
       tag: tagHero,

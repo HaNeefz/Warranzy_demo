@@ -7,6 +7,7 @@ import 'package:warranzy_demo/tools/theme_color.dart';
 import 'package:warranzy_demo/tools/widget_ui_custom/text_builder.dart';
 
 class NotificationPage extends StatefulWidget {
+  const NotificationPage({Key key}) : super(key: key);
   @override
   _NotificationPageState createState() => _NotificationPageState();
 }

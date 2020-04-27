@@ -9,12 +9,14 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:warranzy_demo/models/model_language.dart';
 import 'package:warranzy_demo/page/asset_page/add_assets_page/scAdd_image_demo.dart';
 import 'package:warranzy_demo/page/change_device_page/scChange_device.dart';
 import 'package:warranzy_demo/page/pin_code/scPinCode.dart';
 import 'package:warranzy_demo/services/method/methode_helper.dart';
 import 'package:warranzy_demo/services/providers/customer_state.dart';
 import 'package:warranzy_demo/services/providers/notification_state.dart';
+import 'package:warranzy_demo/services/sqflit/db_asset.dart';
 import 'package:warranzy_demo/services/sqflit/db_customers.dart';
 import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
 import 'package:warranzy_demo/services/sqflit/db_language.dart';
@@ -200,7 +202,21 @@ class _LoginPageState extends State<LoginPage> {
               //   child: Text("getDataTimeZone"),
               //   onPressed: () async {
               //     // await DBProviderInitialApp.db.getAllDataTimeZone();
-              //     await DBProviderCustomer.db.deleteAllDataOfCustomer();
+              //     // await DBProviderCustomer.db.deleteAllDataOfCustomer();
+              //   },
+              // ),
+              // RaisedButton(
+              //   child: Text("deleteAllAsset"),
+              //   onPressed: () async {
+              //     await DBProviderAsset.db.deleteAllAsset();
+              //   },
+              // ),
+              // RaisedButton(
+              //   child: Text("getAssetByID"),
+              //   onPressed: () async {
+              //     await DBProviderAsset.db.getAllDataAsset();
+              //     // await DBProviderAsset.db.getDataAssetByWTokenID(
+              //     //     wTokenID: "ca3f5-TH-605b2ebf24274ee29b1cf4547");
               //   },
               // ),
               // RaisedButton(
@@ -208,7 +224,9 @@ class _LoginPageState extends State<LoginPage> {
               //   onPressed: () async {
               //     // await DBProviderInitialApp.db.getAllDataProductCategory();
               //     // await DBProviderInitialApp.db.deleteAllDataIn3Table();
-              //     await DBProviderLanguage.db.deleteAllLanguage();
+              //     // await DBProviderLanguage.db.deleteAllLanguage();
+              //     // await DBProviderLanguage.db.addDataLanguage(
+              //     //     ModelLanguage(name: "English", prefix: "en"));
               //   },
               // ),
             ],

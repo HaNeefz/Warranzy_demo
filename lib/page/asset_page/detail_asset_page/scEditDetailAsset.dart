@@ -6,11 +6,13 @@ import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:warranzy_demo/models/model_image_data_each_group.dart';
 import 'package:warranzy_demo/models/model_repository_init_app.dart';
 import 'package:warranzy_demo/models/model_respository_asset.dart';
 import 'package:warranzy_demo/page/asset_page/add_assets_page/scAdd_image_demo.dart';
 import 'package:warranzy_demo/services/api/repository.dart';
+import 'package:warranzy_demo/services/providers/asset_state.dart';
 import 'package:warranzy_demo/services/sqflit/db_asset.dart';
 import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
@@ -394,11 +396,11 @@ class ModifytImageState extends State<ModifyImage> {
 
   updateImage() async {
     if (allImage.length > 0) {
-      print(widget.image.imageBase64);
-      widget.image.imageBase64.forEach((key) async {
-        await DBProviderAsset.db.deleteImagePoolByKey(key);
-      });
-      ecsLib.showDialogLoadingLib(context, content: "Editing Image Asset");
+      // print(widget.image.imageBase64);
+      // widget.image.imageBase64.forEach((key) async {
+      //   await DBProviderAsset.db.deleteImagePoolByKey(key);
+      // });
+      // ecsLib.showDialogLoadingLib(context, content: "Editing Image Asset");
       Map<String, dynamic> postData = {
         "WTokenID": "${assetData.wTokenID}",
         "${imageDataEachGroup.title}": {}
@@ -408,86 +410,86 @@ class ModifytImageState extends State<ModifyImage> {
             .addAll({"${allImage.indexOf(v)}": v});
       });
 
-      // print(postData);
-      ecsLib.printJson(postData);
+      // // print(postData);
+      // ecsLib.printJson(postData);
       sendAPIUpdateImage(postData: postData);
     } else {
       await alert(content: "Image is Empty");
     }
   }
 
-  submitUpdateImage() async {
-    if (imageOld.isNotEmpty || imageNew.isNotEmpty) {
-      print("this if imageOld.isNotEmpty || imageNew.isNotEmpty");
-      ecsLib.showDialogLoadingLib(context, content: "compressing photo");
-      Map<String, dynamic> postData = {
-        "WTokenID": "${assetData.wTokenID}",
-        "${imageDataEachGroup.title}": {}
-      };
-      int counter = imageOld.length + imageNew.length;
-      List<String> imageTobase64 = [];
-      if (imageNew.length > 0)
-        imageNew.forEach((v) async {
-          if (imageNew.indexOf(v) == 0) {
-            print("index ${imageNew.indexOf(v)}");
-            imageOld.forEach((v) {
-              imageTobase64.add(base64.encode(v));
-            });
-          }
-          var tempDir = await getTemporaryDirectory();
-          var _newSize = await ecsLib.compressFile(
-            file: v,
-            targetPath: tempDir.path + "/${v.path.split("/").last}",
-            minWidth: 600,
-            minHeight: 480,
-            quality: 80,
-          );
-          var imageByte = _newSize.readAsBytesSync();
-          imageTobase64.add(base64Encode(imageByte));
+  // submitUpdateImage() async {
+  //   if (imageOld.isNotEmpty || imageNew.isNotEmpty) {
+  //     print("this if imageOld.isNotEmpty || imageNew.isNotEmpty");
+  //     ecsLib.showDialogLoadingLib(context, content: "compressing photo");
+  //     Map<String, dynamic> postData = {
+  //       "WTokenID": "${assetData.wTokenID}",
+  //       "${imageDataEachGroup.title}": {}
+  //     };
+  //     int counter = imageOld.length + imageNew.length;
+  //     List<String> imageTobase64 = [];
+  //     if (imageNew.length > 0)
+  //       imageNew.forEach((v) async {
+  //         if (imageNew.indexOf(v) == 0) {
+  //           print("index ${imageNew.indexOf(v)}");
+  //           imageOld.forEach((v) {
+  //             imageTobase64.add(base64.encode(v));
+  //           });
+  //         }
+  //         var tempDir = await getTemporaryDirectory();
+  //         var _newSize = await ecsLib.compressFile(
+  //           file: v,
+  //           targetPath: tempDir.path + "/${v.path.split("/").last}",
+  //           minWidth: 600,
+  //           minHeight: 480,
+  //           quality: 80,
+  //         );
+  //         var imageByte = _newSize.readAsBytesSync();
+  //         imageTobase64.add(base64Encode(imageByte));
 
-          if (imageTobase64.length == counter) {
-            print("imageToBase64 length => ${imageTobase64.length}");
-            for (var data in imageTobase64) {
-              postData["${imageDataEachGroup.title}"].addAll({
-                "${imageTobase64.indexOf(data)}": data,
-              });
-            }
-            ecsLib.cancelDialogLoadindLib(context);
-            ecsLib.printJson(postData);
-            // sendAPIUpdateImage(postData: postData);
-          }
-        });
-      else {
-        print("this else imageOld.isNotEmpty || imageNew.isNotEmpty");
-        imageOld.forEach((v) {
-          imageTobase64.add(base64.encode(v));
-        });
-        if (imageTobase64.length == counter) {
-          print("imageToBase64 length => ${imageTobase64.length}");
-          for (var data in imageTobase64) {
-            postData["${imageDataEachGroup.title}"].addAll({
-              "${imageTobase64.indexOf(data)}": data,
-            });
-          }
-          ecsLib.cancelDialogLoadindLib(context);
-          ecsLib.printJson(postData);
-          // sendAPIUpdateImage(postData: postData);
-          await Repository.updateImage(body: postData).then((resUpdateImage) {
-            if (resUpdateImage.status == true) {
-              ecsLib.showDialogLoadingLib(context,
-                  content: "Updating Image Asset");
-            } else if (resUpdateImage.status == false) {
-              alert(content: "${resUpdateImage.message}");
-            } else {
-              alert(content: "${resUpdateImage.message}");
-            }
-          });
-        }
-      }
-    } else {
-      alert(title: "Edit Image", content: "Please add Image.");
-    }
-  }
+  //         if (imageTobase64.length == counter) {
+  //           print("imageToBase64 length => ${imageTobase64.length}");
+  //           for (var data in imageTobase64) {
+  //             postData["${imageDataEachGroup.title}"].addAll({
+  //               "${imageTobase64.indexOf(data)}": data,
+  //             });
+  //           }
+  //           ecsLib.cancelDialogLoadindLib(context);
+  //           ecsLib.printJson(postData);
+  //           // sendAPIUpdateImage(postData: postData);
+  //         }
+  //       });
+  //     else {
+  //       print("this else imageOld.isNotEmpty || imageNew.isNotEmpty");
+  //       imageOld.forEach((v) {
+  //         imageTobase64.add(base64.encode(v));
+  //       });
+  //       if (imageTobase64.length == counter) {
+  //         print("imageToBase64 length => ${imageTobase64.length}");
+  //         for (var data in imageTobase64) {
+  //           postData["${imageDataEachGroup.title}"].addAll({
+  //             "${imageTobase64.indexOf(data)}": data,
+  //           });
+  //         }
+  //         ecsLib.cancelDialogLoadindLib(context);
+  //         ecsLib.printJson(postData);
+  //         // sendAPIUpdateImage(postData: postData);
+  //         await Repository.updateImage(body: postData).then((resUpdateImage) {
+  //           if (resUpdateImage.status == true) {
+  //             ecsLib.showDialogLoadingLib(context,
+  //                 content: "Updating Image Asset");
+  //           } else if (resUpdateImage.status == false) {
+  //             alert(content: "${resUpdateImage.message}");
+  //           } else {
+  //             alert(content: "${resUpdateImage.message}");
+  //           }
+  //         });
+  //       }
+  //     }
+  //   } else {
+  //     alert(title: "Edit Image", content: "Please add Image.");
+  //   }
+  // }
 
   sendAPIUpdateImage({dynamic postData}) async {
     ecsLib.showDialogLoadingLib(context, content: "Editing Image Asset");
@@ -522,7 +524,6 @@ class ModifytImageState extends State<ModifyImage> {
             });
             print("ALL UPDATE COMPLETED");
             if (widget.assetData.createType == "C") {
-              Navigator.pop(context);
               Navigator.pop(context);
               Navigator.pop(context);
               Navigator.pop(context);

@@ -39,6 +39,8 @@
 	<string>Camera permission is required for take a photo and scaning QR code.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Please use the faceID for safety</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>This app needs access to location when open and in the background.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>This app needs access to location when in the background.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
@@ -49,12 +51,6 @@
 	<string>PhotoLibrary permission is required for add Picture.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>PhotoLibrary permission is required for get Picture.</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>This app needs access to location when open.</string>
-	<key>NSLocationAlwaysUsageDescription</key>
-	<string>This app needs access to location when in the background.</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>This app needs access to location when open and in the background.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>

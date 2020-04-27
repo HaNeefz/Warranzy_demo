@@ -294,6 +294,7 @@ BlockchainID */
 
       return temp;
     } else {
+      print("asset is Empty");
       return [];
     }
   }
@@ -301,21 +302,30 @@ BlockchainID */
   Future<ModelDataAsset> getDataAssetByWTokenID({String wTokenID}) async {
     final db = await database;
     try {
+      // var res = await db.rawQuery(
+      //     "SELECT * FROM $tableWarranzyUsed, $tableWarranzyLog WHERE $tableWarranzyUsed.WTokenID = '$wTokenID' and  $tableWarranzyLog.WTokenID = '$wTokenID'");
       var res = await db.rawQuery(
-          "SELECT * FROM $tableWarranzyUsed, $tableWarranzyLog WHERE $tableWarranzyUsed.WTokenID = '$wTokenID'");
+          "SELECT * FROM $tableWarranzyUsed, $tableWarranzyLog WHERE $tableWarranzyUsed.WTokenID = $tableWarranzyLog.WTokenID ORDER BY $tableWarranzyUsed.LastModiflyDate DESC");
       JsonEncoder encoder = JsonEncoder.withIndent(" ");
       ModelDataAsset temp;
       print("res : $res");
       if (res.isNotEmpty) {
         // print("--------------------");
         // res.forEach((v) {
-        String prettyprint = encoder.convert(res.first);
-        temp = ModelDataAsset.fromJson(res.first);
-        print("DataAssetSQLite at WTokenID $wTokenID \n=> $prettyprint");
-        //   temp.add(ModelDataAsset.fromJson(v));
-        // });
 
-        return temp;
+        var tempAsset = res.where((asset) => asset['WTokenID'] == wTokenID);
+        if (tempAsset.length > 0) {
+          temp = ModelDataAsset.fromJson(tempAsset.first);
+          String prettyprint = encoder.convert(tempAsset.first);
+          print("DataAssetSQLite at WTokenID $wTokenID \n=> $prettyprint");
+          // temp.add(ModelDataAsset.fromJson(v));
+          // });
+
+          return temp;
+        } else {
+          print("tempAsset.length < 0");
+          return null;
+        }
       } else {
         print("Data is empty");
         return null;

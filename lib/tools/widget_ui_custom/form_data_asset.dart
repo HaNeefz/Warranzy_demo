@@ -83,7 +83,6 @@ class _FormDataAssetState extends State<FormDataAsset> {
   TextEditingController txtLotNo;
   TextEditingController txtNote;
   TextEditingController txtSLCName;
-  TextEditingController txtGeoLocation;
 
   String brandActive = "N";
   String keepOldBrand = "";
@@ -91,6 +90,7 @@ class _FormDataAssetState extends State<FormDataAsset> {
   List<GetBrandName> listBrandName = [];
   List<String> listBrandID = [];
   String dataTime = '';
+  String geoLocation;
   List<String> _place = [
     "Home",
     "Office",
@@ -230,7 +230,7 @@ class _FormDataAssetState extends State<FormDataAsset> {
         txtLotNo = TextEditingController(text: _data?.lotNo ?? "");
         txtNote = TextEditingController(text: _data?.custRemark ?? "");
         txtSLCName = TextEditingController(text: _data?.slcName ?? "");
-        txtGeoLocation = TextEditingController(text: _data?.geoLocation ?? "");
+        geoLocation = _data?.geoLocation ?? "";
       });
     } else {
       setState(() {
@@ -250,7 +250,7 @@ class _FormDataAssetState extends State<FormDataAsset> {
         txtLotNo = TextEditingController(text: "");
         txtNote = TextEditingController(text: "");
         txtSLCName = TextEditingController(text: "");
-        txtGeoLocation = TextEditingController(text: "");
+        geoLocation = "";
       });
     }
 
@@ -278,7 +278,6 @@ class _FormDataAssetState extends State<FormDataAsset> {
     txtSerialNo?.dispose();
     txtSLCName?.dispose();
     txtLotNo?.dispose();
-    txtGeoLocation.dispose();
     super.dispose();
   }
 
@@ -940,13 +939,13 @@ class _FormDataAssetState extends State<FormDataAsset> {
       "SLCName": txtSLCName.text,
       "AlertDate": txtAlertDate.text,
       "CustRemark": txtNote.text,
-      "Geolocation": txtGeoLocation.text,
+      "Geolocation": geoLocation,
     };
     ecsLib.printJson(postData);
     sendApiEdit(postData: postData);
   }
 
-  sendApiEdit({postData}) async {
+  sendApiEdit({Map<String, dynamic> postData}) async {
     try {
       ecsLib.showDialogLoadingLib(context, content: "Editing Detail Asset");
       await Repository.updateData(body: postData).then((resEdit) async {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:pin_code_text_field/pin_code_text_field.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:warranzy_demo/models/model_cust_temp_data.dart';
 import 'package:warranzy_demo/models/model_user.dart';
@@ -10,6 +11,7 @@ import 'package:warranzy_demo/page/login_first/scLogin.dart';
 import 'package:warranzy_demo/page/pin_code/scPinCode.dart';
 import 'package:warranzy_demo/services/api/api_services_user.dart';
 import 'package:warranzy_demo/services/api/repository.dart';
+import 'package:warranzy_demo/services/providers/customer_state.dart';
 import 'package:warranzy_demo/services/sqflit/db_asset.dart';
 import 'package:warranzy_demo/services/sqflit/db_customers.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
@@ -181,9 +183,12 @@ class _VerifyChangeDeviceState extends State<VerifyChangeDevice> {
               await DBProviderCustomer.db.deleteAllDataOfCustomer();
               await DBProviderAsset.db.deleteAllAsset();
             }
+            response.data.imageProfile =
+                response.data.imageProfile.split("/").last.substring(0, 2);
             if (await DBProviderCustomer.db.addDataCustomer(response.data) ==
                 true) {
               if (await updatePINcode() == true) {
+                Provider.of<CustomerState>(context).getDataCustomer();
                 if (response.dataAssetUsed.warranzyUsed.length > 0) {
                   //check has Asset
                   try {

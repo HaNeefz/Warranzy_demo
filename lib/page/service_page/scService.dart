@@ -7,6 +7,7 @@ import 'scHistory.dart';
 import 'scProcess.dart';
 
 class ClaimAndServicePage extends StatefulWidget {
+  const ClaimAndServicePage({Key key}) : super(key: key);
   @override
   _ClaimAndServicePageState createState() => _ClaimAndServicePageState();
 }

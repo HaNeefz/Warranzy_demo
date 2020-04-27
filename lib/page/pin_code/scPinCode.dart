@@ -570,11 +570,7 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
 
 //------get Profile And Username
   Widget showUsername() {
-    return Container(
-      child: TextBuilder.build(
-          title: username,
-          style: TextStyleCustom.STYLE_TITLE.copyWith(letterSpacing: 2)),
-    );
+    return new ShowUsername();
   }
 
   Widget showImage() {
@@ -784,6 +780,22 @@ class _PinCodePageUpdateState extends State<PinCodePageUpdate> {
   }
 }
 
+class ShowUsername extends StatelessWidget {
+  const ShowUsername({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<CustomerState>(
+      builder: (context, customerState, _) => Container(
+          child: TextBuilder.build(
+              title: customerState.dataCustomer.custName,
+              style: TextStyleCustom.STYLE_TITLE.copyWith(letterSpacing: 2))),
+    );
+  }
+}
+
 class NewApiStructure extends StatefulWidget {
   NewApiStructure({
     Key key,
@@ -865,30 +877,31 @@ class _NewApiStructureState extends State<NewApiStructure> {
 class ShowProfile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final customerState = Provider.of<CustomerState>(context);
-    return Padding(
-      padding: const EdgeInsets.only(top: 8.0),
-      child: customerState.dataCustomer.imageProfile != null
-          ? showImage(customerState)
-          : Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(width: 2),
-                  color: ThemeColors.COLOR_WHITE),
-              child: Center(
-                child: Icon(
-                  Icons.account_circle,
-                  size: 50.0,
+    return Consumer<CustomerState>(
+      builder: (context, customerState, _) => Padding(
+        padding: const EdgeInsets.only(top: 8.0),
+        child: customerState?.dataCustomer?.imageProfile != null
+            ? showImage(customerState)
+            : Container(
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(width: 2),
+                    color: ThemeColors.COLOR_WHITE),
+                child: Center(
+                  child: Icon(
+                    Icons.account_circle,
+                    size: 50.0,
+                  ),
                 ),
               ),
-            ),
+      ),
     );
   }
 
   Widget showImage(CustomerState customerState) {
-    var path = customerState.dataCustomer.imageProfile;
+    var path = customerState?.dataCustomer?.imageProfile;
     return CircleAvatar(
       radius: 50,
       child: ClipRRect(

@@ -2,6 +2,7 @@ import 'package:badges/badges.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:warranzy_demo/models/model_respository_asset.dart';
 import 'package:warranzy_demo/page/asset_page/scAssets.dart';
 import 'package:warranzy_demo/page/notification_page/scNotification.dart';
 import 'package:warranzy_demo/page/service_page/scService.dart';
@@ -30,24 +31,28 @@ class _MainPageState extends State<MainPage>
   set setPage(newPage) => widget.currentPage = newPage;
   // int currentPageBar = 0;
   PageController pagesController;
+  AssetStateTest _assetState = AssetStateTest();
+  final List<Widget> pageTabBar = [
+    AssetPage(
+      key: PageStorageKey("AssetPage"),
+    ),
+    ClaimAndServicePage(key: PageStorageKey("ClaimAndServicePage")),
+    TradePage(key: PageStorageKey("TradePage")),
+    NotificationPage(key: PageStorageKey("NotificationPage"))
+  ];
 
+  final PageStorageBucket bucket = PageStorageBucket();
   @override
   Widget build(BuildContext context) {
     final NotificationState notiState = Provider.of<NotificationState>(context);
-    final AssetState assetState = Provider.of<AssetState>(context);
     var textStyle = TextStyleCustom.STYLE_LABEL_BOLD.copyWith(fontSize: 14);
     double _width = 30;
     double _height = 30;
-    final List<Widget> pageTabBar = [
-      AssetPage(
-        assetState: assetState,
-      ),
-      ClaimAndServicePage(),
-      TradePage(),
-      NotificationPage()
-    ];
     return Scaffold(
-        body: pageTabBar[currentPage],
+        body: PageStorage(
+          child: pageTabBar[currentPage],
+          bucket: bucket,
+        ),
         bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           // selectedLabelStyle:

@@ -11,6 +11,7 @@ import 'scSearch_trade.dart';
 import 'scTrade_detail.dart';
 
 class TradePage extends StatefulWidget {
+  const TradePage({Key key}) : super(key: key);
   @override
   _TradePageState createState() => _TradePageState();
 }

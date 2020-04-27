@@ -30,14 +30,15 @@ class _CategoryUIState extends State<CategoryUI> {
   void initState() {
     super.initState();
     print("initState");
-    widget.category.forEach((v) {
-      images.add(Image.asset(
-        v['Logo'],
-        fit: BoxFit.contain,
-        width: 30,
-        height: 30,
-      ));
-    });
+    print(widget.category.first);
+    // widget.category.forEach((v) {
+    //   images.add(Image.asset(
+    //     v['Logo'],
+    //     fit: BoxFit.contain,
+    //     width: 30,
+    //     height: 30,
+    //   ));
+    // });
   }
 
   // @override
@@ -75,23 +76,25 @@ class _CategoryUIState extends State<CategoryUI> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 ListTile(
-                  // leading: widget.showLogo == true
-                  //     ? CachedNetworkImage(
-                  //         imageUrl: v['Logo'],
-                  //         placeholder: (context, path) =>
-                  //             CircularProgressIndicator(),
-                  //         errorWidget: (context, path, object) =>
-                  //             Icon(Icons.error, color: Colors.red),
-                  //         width: 30,
-                  //         height: 30,
-                  //         fit: BoxFit.contain,
-                  //       )
-                  //     : Container(),
-                  // images[widget.category.indexOf(v)],
-                  // ImageView.show(
-                  //     path: v['Logo']), //imagePath[widget.category.indexOf(v)]
-                  // Image.asset("${v['Logo']}",
-                  //     width: 30, height: 30, fit: BoxFit.contain),
+                  // leading:
+                      //widget.showLogo == true
+                      //     ? CachedNetworkImage(
+                      //         imageUrl: v['Logo'],
+                      //         placeholder: (context, path) =>
+                      //             CircularProgressIndicator(),
+                      //         errorWidget: (context, path, object) =>
+                      //             Icon(Icons.error, color: Colors.red),
+                      //         width: 30,
+                      //         height: 30,
+                      //         fit: BoxFit.contain,
+                      //       )
+                      //     : Container(),
+                      // images[widget.category.indexOf(v)],
+                      // ImageView.show(
+                      //     path: v[
+                      // 'LogoAsset']), //imagePath[widget.category.indexOf(v)]
+                      // Image.asset("${v['LogoAsset']}",
+                      //     width: 30, height: 30, fit: BoxFit.contain),
                   title: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[

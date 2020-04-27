@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:simple_animations/simple_animations.dart';
 import 'package:warranzy_demo/models/model_image_data_each_group.dart';
 import 'package:warranzy_demo/models/model_repository_asset_scan.dart';
@@ -13,6 +14,7 @@ import 'package:warranzy_demo/page/main_page/scMain_page.dart';
 import 'package:warranzy_demo/services/api/repository.dart';
 import 'package:warranzy_demo/services/api_provider/api_bloc.dart';
 import 'package:warranzy_demo/services/api_provider/api_response.dart';
+import 'package:warranzy_demo/services/providers/asset_state.dart';
 import 'package:warranzy_demo/services/sqflit/db_asset.dart';
 import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
 import 'package:warranzy_demo/tools/config/text_style.dart';
@@ -119,6 +121,7 @@ class DetailAsset extends StatefulWidget {
 class _DetailAssetState extends State<DetailAsset> {
   final ecsLib = getIt.get<ECSLib>();
   final allTranslations = getIt.get<GlobalTranslations>();
+  final AssetStateTest _assetStateTest = AssetStateTest();
   ModelDataAsset get _data => widget.dataAsset;
   List<ImageDataEachGroup> imageDataEachGroup = [];
   List<ImageDataEachGroup> imageGroup = [];
@@ -217,6 +220,8 @@ class _DetailAssetState extends State<DetailAsset> {
 
   void initState() {
     super.initState();
+    print(
+        "<<<<< WTOKENID : ${_data.wTokenID} >>>>> | <<<<< Name : ${_data.title} >>>>>");
     _testGetImage();
     getProductCateName();
     getBrandName();
@@ -340,7 +345,8 @@ class _DetailAssetState extends State<DetailAsset> {
                 children: <Widget>[
                   buildButtonDuplicate(context),
                   SizedBox(height: 10),
-                  buildButtonDelete(context),
+                  // ButtonDelete(imageKey: imageKey, data: _data),
+                  buttonDelete(),
                 ],
               )
           ],
@@ -359,7 +365,8 @@ class _DetailAssetState extends State<DetailAsset> {
                 children: <Widget>[
                   buildButtonDuplicate(context),
                   SizedBox(height: 10),
-                  buildButtonDelete(context),
+                  // ButtonDelete(imageKey: imageKey, data: _data),
+                  buttonDelete(),
                   SizedBox(height: 10),
                 ],
               )
@@ -369,6 +376,75 @@ class _DetailAssetState extends State<DetailAsset> {
       default:
         return child;
     }
+  }
+
+  Widget buttonDelete() {
+    return ButtonBuilder.buttonCustom(
+        paddingValue: 0,
+        colorsButton: Colors.red[200],
+        labelStyle:
+            TextStyleCustom.STYLE_LABEL_BOLD.copyWith(color: Colors.white),
+        context: context,
+        label: allTranslations.text("delete"),
+        onPressed: () async {
+          await ecsLib
+              .showDialogAction(
+            context,
+            title: "DELETE ASSET",
+            content: "Are you sure to delete asset ?",
+            textOk: allTranslations.text("ok"),
+            textCancel: allTranslations.text("cancel"),
+          )
+              .then((response) async {
+            if (response == true) {
+              if (_data.wTokenID != null && _data.wTokenID != "") {
+                try {
+                  print("WTokenID after delete : ${_data.wTokenID}");
+                  ecsLib.showDialogLoadingLib(context);
+                  await Repository.deleteAseet(
+                          body: {"WTokenID": "${_data.wTokenID}"})
+                      .then((res) async {
+                    ecsLib.cancelDialogLoadindLib(context);
+                    if (res?.status == true) {
+                      print("Data => ${res.data}");
+                      print("WTokenID before delete : ${_data.wTokenID}");
+                      await DBProviderAsset.db.deleteAssetByWToken(
+                          wTokenID: _data.wTokenID, imageKey: imageKey);
+                      // assetState.deletedAsset(wTokenID: _data.wTokenID);
+                      // _assetStateTest.removeAsset(_data.wTokenID);
+                      // Navigator.of(context).pop();
+                      ecsLib.pushPageAndClearAllScene(
+                          context: context, pageWidget: MainPage());
+                      // ecsLib.pushPageAndClearAllScene(
+                      //   context: context,
+                      //   pageWidget: MainPage(),
+                      // );
+                    } else if (res.status == false) {
+                      print("status == false");
+                      ecsLib.showDialogLib(context,
+                          title: "DELETE ASSET FAIL.",
+                          content: res?.message ?? "status false",
+                          textOnButton: allTranslations.text("close"));
+                    } else {
+                      print("something wrong");
+                      ecsLib.showDialogLib(context,
+                          title: "DELETE ASSET FAIL.",
+                          content: res?.message ?? "status false",
+                          textOnButton: allTranslations.text("close"));
+                    }
+                  });
+                } catch (e) {
+                  print("catch => $e");
+                }
+              } else {
+                ecsLib.showDialogLib(context,
+                    title: "DELETE ASSET FAIL.",
+                    content: "WTokenID is Null or \" \" .",
+                    textOnButton: allTranslations.text("close"));
+              }
+            }
+          });
+        });
   }
 
   Row buildHeader(BuildContext context) {
@@ -447,53 +523,6 @@ class _DetailAssetState extends State<DetailAsset> {
     );
   }
 
-  Widget buildButtonDelete(BuildContext context) {
-    return ButtonBuilder.buttonCustom(
-        paddingValue: 0,
-        colorsButton: Colors.red[200],
-        labelStyle:
-            TextStyleCustom.STYLE_LABEL_BOLD.copyWith(color: Colors.white),
-        context: context,
-        label: allTranslations.text("delete"),
-        onPressed: () async {
-          await ecsLib
-              .showDialogAction(
-            context,
-            title: "DELETE ASSET",
-            content: "Are you sure to delete asset ?",
-            textOk: allTranslations.text("ok"),
-            textCancel: allTranslations.text("cancel"),
-          )
-              .then((response) async {
-            if (response == true) {
-              try {
-                ecsLib.showDialogLoadingLib(context);
-                await Repository.deleteAseet(
-                    body: {"WTokenID": "${_data.wTokenID}"}).then((res) async {
-                  ecsLib.cancelDialogLoadindLib(context);
-                  if (res?.status == true) {
-                    print("Data => ${res.data}");
-                    await DBProviderAsset.db.deleteAssetByWToken(
-                        wTokenID: _data.wTokenID, imageKey: imageKey);
-                    // await DBProviderAsset.db.
-                    ecsLib.pushPageAndClearAllScene(
-                      context: context,
-                      pageWidget: MainPage(),
-                    );
-                  } else if (res.status == false) {
-                    print("status == false");
-                  } else {
-                    print("something wrong");
-                  }
-                });
-              } catch (e) {
-                print("catch => $e");
-              }
-            }
-          });
-        });
-  }
-
   Widget buildButtonDuplicate(BuildContext context) {
     return ButtonBuilder.buttonCustom(
         paddingValue: 0,
@@ -517,6 +546,7 @@ class _DetailAssetState extends State<DetailAsset> {
                 modelDataAsset: _data,
                 categoryID: null,
                 actionPageForAdd: true,
+                isDuplicated: true,
                 pageType:
                     _data.createType == "C" ? PageType.MANUAL : PageType.SCANQR,
                 listImageDataEachGroup: imageDataEachGroup),
@@ -824,6 +854,91 @@ class _DetailAssetState extends State<DetailAsset> {
       ).toList();
     } else
       return Iterable.generate(4, (i) => testImage()).toList();
+  }
+}
+
+class ButtonDelete extends StatelessWidget {
+  final ecsLib = getIt.get<ECSLib>();
+  final allTranslations = getIt.get<GlobalTranslations>();
+  ButtonDelete({
+    Key key,
+    @required this.imageKey,
+    @required this.data,
+  }) : super(key: key);
+
+  final List<String> imageKey;
+  final ModelDataAsset data;
+
+  ModelDataAsset get _data => data;
+
+  @override
+  Widget build(BuildContext context) {
+    final assetState = Provider.of<AssetState>(context);
+    return ButtonBuilder.buttonCustom(
+        paddingValue: 0,
+        colorsButton: Colors.red[200],
+        labelStyle:
+            TextStyleCustom.STYLE_LABEL_BOLD.copyWith(color: Colors.white),
+        context: context,
+        label: allTranslations.text("delete"),
+        onPressed: () async {
+          await ecsLib
+              .showDialogAction(
+            context,
+            title: "DELETE ASSET",
+            content: "Are you sure to delete asset ?",
+            textOk: allTranslations.text("ok"),
+            textCancel: allTranslations.text("cancel"),
+          )
+              .then((response) async {
+            if (response == true) {
+              if (_data.wTokenID != null && _data.wTokenID != "") {
+                try {
+                  print("WTokenID after delete : ${_data.wTokenID}");
+                  ecsLib.showDialogLoadingLib(context);
+                  await Repository.deleteAseet(
+                          body: {"WTokenID": "${_data.wTokenID}"})
+                      .then((res) async {
+                    ecsLib.cancelDialogLoadindLib(context);
+                    if (res?.status == true) {
+                      print("Data => ${res.data}");
+                      print("WTokenID before delete : ${_data.wTokenID}");
+                      await DBProviderAsset.db.deleteAssetByWToken(
+                          wTokenID: _data.wTokenID, imageKey: imageKey);
+                      // assetState.deletedAsset(wTokenID: _data.wTokenID);
+                      // Navigator.of(context).pop();
+                      ecsLib.pushPageAndClearAllScene(
+                          context: context, pageWidget: MainPage());
+                      // ecsLib.pushPageAndClearAllScene(
+                      //   context: context,
+                      //   pageWidget: MainPage(),
+                      // );
+                    } else if (res.status == false) {
+                      print("status == false");
+                      ecsLib.showDialogLib(context,
+                          title: "DELETE ASSET FAIL.",
+                          content: res?.message ?? "status false",
+                          textOnButton: allTranslations.text("close"));
+                    } else {
+                      print("something wrong");
+                      ecsLib.showDialogLib(context,
+                          title: "DELETE ASSET FAIL.",
+                          content: res?.message ?? "status false",
+                          textOnButton: allTranslations.text("close"));
+                    }
+                  });
+                } catch (e) {
+                  print("catch => $e");
+                }
+              } else {
+                ecsLib.showDialogLib(context,
+                    title: "DELETE ASSET FAIL.",
+                    content: "WTokenID is Null or \" \" .",
+                    textOnButton: allTranslations.text("close"));
+              }
+            }
+          });
+        });
   }
 }
 

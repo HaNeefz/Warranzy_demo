@@ -52,40 +52,28 @@ void main() {
             ChangeNotifierProvider<NotificationState>(
               builder: (context) => NotificationState(),
             ),
-            ChangeNotifierProvider<AssetState>(
-              builder: (context) => AssetState(),
-            ),
             ChangeNotifierProvider<ThemeNotifier>(
               builder: (context) =>
                   ThemeNotifier(darkModeOn ? darkTheme : lightTheme),
             ),
+            // ChangeNotifierProvider<AssetState>(
+            //   builder: (context) => AssetState(),
+            // ),
             ChangeNotifierProvider<CustomerState>(
               builder: (context) => CustomerState.initial(),
             )
           ],
           child: StreamProvider<ConnectivityStatus>(
-              builder: (context) =>
-                  ConnectivityService().connectionStatusController.stream,
-              child: HomeSetup()
-              // Consumer<NotificationState>(
-              //   builder: (BuildContext context, _notitState, _) => MyHomePage(
-              //     notiState: _notitState,
-              //   ),
-              //   child: MyHomePage(notiState: null,),
-              // ),
-              )));
+            builder: (context) =>
+                ConnectivityService().connectionStatusController.stream,
+            child: Consumer<NotificationState>(
+              builder: (BuildContext context, _notitState, _) => MyHomePage(
+                notiState: _notitState,
+              ),
+            ),
+          )));
     });
   });
-}
-
-class HomeSetup extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final notiState = Provider.of<NotificationState>(context);
-    return MyHomePage(
-      notiState: notiState,
-    );
-  }
 }
 
 class MyHomePage extends StatefulWidget {

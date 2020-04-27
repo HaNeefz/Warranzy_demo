@@ -162,11 +162,6 @@ class _DataScanOfProductState extends State<DataScanOfProduct> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //     centerTitle: true,
-      //     elevation: 0,
-      //     title: TextBuilder.build(
-      //         title: "Detail Product", style: TextStyleCustom.STYLE_APPBAR)),
       body: CustomScrollView(
         slivers: <Widget>[
           SliverAppBar(

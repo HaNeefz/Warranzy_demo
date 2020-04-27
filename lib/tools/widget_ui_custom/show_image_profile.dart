@@ -23,11 +23,16 @@ class ShowImageProfile extends StatelessWidget {
       : super(key: key);
 
   getImage() {
-    if (imagePath != null) {
-      if (imagePath.startsWith("A") == true) {
-        return AssetImage("assets/icons/avatars/$imagePath.png");
+    var path = imagePath;
+    if (path.startsWith("h") == true) {
+      // check for changeDevice imagePath maybe url startWith 'http'
+      path = path.split("/").last.substring(0, 2);
+    }
+    if (path != null) {
+      if (path.startsWith("A") == true) {
+        return AssetImage("assets/icons/avatars/$path.png");
       } else {
-        return MemoryImage(base64Decode(imagePath));
+        return MemoryImage(base64Decode(path));
       }
     } else
       return null;

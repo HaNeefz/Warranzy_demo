@@ -47,10 +47,233 @@ import 'package:http/http.dart' as http;
 import 'add_assets_page/scAdd_image_demo.dart';
 import 'detail_asset_page/scDetailAsset.dart';
 
-class AssetPage extends StatefulWidget {
-  final AssetState assetState;
+class AssetPageNew extends StatelessWidget {
+  final ecsLib = getIt.get<ECSLib>();
+  final allTranslations = getIt.get<GlobalTranslations>();
 
-  const AssetPage({Key key, this.assetState}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    var dateTime = DateTime.now();
+    String date = DateFormat('EEEE, d MMMM').format(dateTime);
+    return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        automaticallyImplyLeading: false,
+        flexibleSpace: Container(
+          height: 100,
+          decoration: BoxDecoration(
+              gradient: LinearGradient(colors: [
+            ThemeColors.COLOR_THEME_APP,
+            ThemeColors.COLOR_WHITE
+          ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(10, 50, 10, 0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                TextBuilder.build(
+                    title: date, style: TextStyleCustom.STYLE_LABEL_BOLD),
+                ShowProfile(
+                  ecsLib: ecsLib,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      body: WillPopScope(
+        child: Container(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              // shrinkWrap: true,
+              children: <Widget>[
+                ShowCustomerName(),
+                // buildHeaderAndProfile(),
+                CarouselWithIndicator(
+                  height: 250,
+                  items: ["1", "2", "3", "5"],
+                  autoPlay: false,
+                ),
+                buildLabelAndSeeAll(context),
+                buildYourAssets(),
+              ],
+            ),
+          ),
+        ),
+        onWillPop: () async {
+          return false;
+        },
+      ),
+    );
+  }
+
+  buildYourAssets() {
+    return ShowAsset();
+  }
+
+  Row buildLabelAndSeeAll(BuildContext context) {
+    List<String> _popUpItem = ["Search", "Sort"];
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: <Widget>[
+        Expanded(
+            child: Padding(
+          padding: const EdgeInsets.only(left: 10),
+          child: TextBuilder.build(
+              title: "Your Asset",
+              style: TextStyleCustom.STYLE_TITLE.copyWith(letterSpacing: 1.5)),
+        )),
+        Expanded(
+            child: Padding(
+          padding: const EdgeInsets.only(right: 5.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              RaisedButton.icon(
+                color: ThemeColors.COLOR_THEME_APP,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20)),
+                icon: Icon(
+                  Icons.add_circle,
+                  color: ThemeColors.COLOR_WHITE,
+                ),
+                label: Text(
+                  "Add asset",
+                  style: TextStyleCustom.STYLE_LABEL
+                      .copyWith(color: ThemeColors.COLOR_WHITE),
+                ),
+                onPressed: () async {
+                  await buildShowModalBottomSheet(context);
+                  // await checkSessionExpired();
+                },
+              ),
+              Expanded(
+                child: PopupMenuButton(
+                  icon: Icon(Icons.more_vert),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                  elevation: 5,
+                  itemBuilder: (BuildContext context) {
+                    return _popUpItem.map((String choice) {
+                      return PopupMenuItem(
+                        value: choice,
+                        child: GestureDetector(
+                            child: Text(choice),
+                            onTap: () {
+                              // setState(() {});
+                              // print(allTranslations.currentLanguage);
+                            }),
+                      );
+                    }).toList();
+                  },
+                ),
+              ),
+              // Expanded(
+              //   child: IconButton(
+              //     icon: Icon(Icons.clear_all),
+              //     onPressed: () async {
+              //       try {
+              //         await DBProviderAsset.db
+              //             .deleteAllAsset()
+              //             .whenComplete(() => setState(() {
+              //                   getModelData = getModelDataAsset();
+              //                 }));
+              //       } catch (e) {}
+              //     },
+              //   ),
+              // )
+            ],
+          ),
+        )),
+      ],
+    );
+  }
+
+  Future buildShowModalBottomSheet(BuildContext context) {
+    return showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) => Container(
+        height: 200,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            ListTile(
+              leading: SizedBox(
+                width: 30,
+                height: 30,
+                child: Image.asset(Assets.ICON_SCANNER),
+              ),
+              title: TextBuilder.build(title: "Scan QR Code"),
+              onTap: () async {
+                var res = await MethodLib.scanQR(context);
+                print("Scan QR Code $res");
+
+                if (res.isNotEmpty) {
+                  ecsLib.showDialogLoadingLib(context);
+                  await Repository.getDataFromQRofAsset(body: {"WTokenID": res})
+                      .then((response) async {
+                    ecsLib.cancelDialogLoadindLib(context);
+                    if (response.status == true) {
+                      await ecsLib
+                          .pushPage(
+                        context: context,
+                        pageWidget: FillInformation(
+                          onClickAddAssetPage: PageAction.SCAN_QR_CODE,
+                          hasDataAssetAlready: false,
+                          dataScan: response,
+                        ),
+                      )
+                          .whenComplete(() {
+                        Navigator.pop(context);
+                      });
+                    } else if (response.status == false) {
+                      await ecsLib
+                          .showDialogLib(
+                            context,
+                            title: "WARRANZY",
+                            content: response.message ?? "",
+                            textOnButton: allTranslations.text("close"),
+                          )
+                          .whenComplete(() => Navigator.pop(context));
+                    }
+                  });
+                } else {
+                  ecsLib.showDialogLib(context,
+                      content: "Not Found.",
+                      textOnButton: allTranslations.text("close"),
+                      title: "ERROR DATA SCAN");
+                }
+              },
+            ),
+            Divider(),
+            ListTile(
+              leading: Icon(
+                Icons.playlist_add,
+                color: ThemeColors.COLOR_BLACK,
+                size: 35,
+              ),
+              title: TextBuilder.build(title: "Manaul Add Asset"),
+              onTap: () {
+                print("Manual Add Asset");
+                Navigator.pop(context);
+                ecsLib.pushPage(
+                  context: context,
+                  pageWidget: FillInformation(
+                    onClickAddAssetPage: PageAction.MANUAL_ADD,
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class AssetPage extends StatefulWidget {
+  const AssetPage({Key key}) : super(key: key);
   @override
   _AssetPageState createState() => _AssetPageState();
 }
@@ -61,9 +284,9 @@ class _AssetPageState extends State<AssetPage> {
   final Dio dio = Dio();
   Future getAssetOnline;
   Future<List<ModelDataAsset>> getModelData;
+  List<ModelDataAsset> listModelDataAsset = [];
   String username = "Username";
 
-  List<ModelAssetsData> listAssetData;
   ApiBlocGetAllAsset<ResponseAssetOnline> getAllAssetBloc;
 
   Future<List<ModelDataAsset>> getModelDataAsset() async {
@@ -71,20 +294,19 @@ class _AssetPageState extends State<AssetPage> {
     return await DBProviderAsset.db.getAllDataAsset();
   }
 
+  // AssetStateTest _assetState = AssetStateTest();
+
   @override
   void initState() {
     super.initState();
-    widget.assetState.fetchData();
+    // widget.assetState.fetchData();
+    // getAllAsset();
     // var url = "/Asset/getMyAsset";
     // getAllAssetBloc = ApiBlocGetAllAsset<ResponseAssetOnline>(
     //   url: url,
     // );
     getModelData = getModelDataAsset();
     // getAssetOnline = getUrlAssetOnline();
-  }
-
-  Future<Null> _onRefresh() async {
-    // setState(() => getModelData = getModelDataAsset());
   }
 
   @override
@@ -144,27 +366,10 @@ class _AssetPageState extends State<AssetPage> {
     );
   }
 
-  buildYourAssets() {
-    // buildAssetOffine(),
-    if (widget.assetState.assets.length > 0) {
-      if (widget.assetState.isFecthing == true) {
-        return Column(
-          children: <Widget>[
-            SingleChildScrollView(
-              child: Column(
-                  children: widget.assetState.assets
-                      .map((data) => new MyAssetFormSQLite(data: data))
-                      .toList()),
-            ),
-          ],
-        );
-      } else {
-        return Center(child: CircularProgressIndicator());
-      }
-    } else
-      return Center(
-        child: TextBuilder.build(title: "Data offline is empty"),
-      );
+  buildYourAssets({AssetState assetState}) {
+    return
+        // LoadingDataAsset(assetState: assetState);
+        buildAssetOffine();
   }
 
   insertIntiSQLite(RepositoryOfAsset res) async {
@@ -537,6 +742,89 @@ class _AssetPageState extends State<AssetPage> {
   }
 }
 
+class ShowAsset extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<AssetState>(
+        builder: (context, assetState, _) =>
+            // assetState.isFecthing == false
+            //     ? Center(child: CircularProgressIndicator())
+            //     :
+            Column(
+              children: <Widget>[
+                if (assetState.assets.length > 0)
+                  SingleChildScrollView(
+                    child: Column(
+                        children: assetState.assets.reversed
+                            .map((data) => new MyAssetFormSQLite(data: data))
+                            .toList()),
+                  )
+                else
+                  Center(
+                    child: TextBuilder.build(title: "Data offline is empty"),
+                  )
+              ],
+            ));
+  }
+}
+
+class LoadingDataAsset extends StatefulWidget {
+  final AssetState assetState;
+  const LoadingDataAsset({
+    Key key,
+    this.assetState,
+  }) : super(key: key);
+
+  @override
+  _LoadingDataAssetState createState() => _LoadingDataAssetState();
+}
+
+class _LoadingDataAssetState extends State<LoadingDataAsset> {
+  AssetState get assetState => widget.assetState;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.assetState.fetchData();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final assetState = Provider.of<AssetState>(context);
+    return assetState.isFecthing == false
+        ? Center(child: CircularProgressIndicator())
+        : Column(
+            children: <Widget>[
+              if (assetState.assets.length > 0)
+                SingleChildScrollView(
+                  child: Column(
+                      children: assetState.assets
+                          .map((data) => new MyAssetFormSQLite(data: data))
+                          .toList()),
+                )
+              else
+                Center(
+                  child: TextBuilder.build(title: "Data offline is empty"),
+                )
+              // if (assetState.assets.length > 0)
+              //   if (assetState.isFecthing == true)
+              //     SingleChildScrollView(
+              //       child: Column(
+              //           children: assetState.assets
+              //               .map((data) => new MyAssetFormSQLite(data: data))
+              //               .toList()),
+              //     )
+              //   else
+              //     Center(child: CircularProgressIndicator())
+              // else
+              //   Center(
+              //     child: TextBuilder.build(title: "Data offline is empty"),
+              //   )
+            ],
+          );
+  }
+}
+
 class ShowCustomerName extends StatelessWidget {
   const ShowCustomerName({
     Key key,
@@ -567,7 +855,6 @@ class ShowProfile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final customerState = Provider.of<CustomerState>(context);
     return GestureDetector(
       onTap: () {
         ecsLib.pushPage(
@@ -577,70 +864,72 @@ class ShowProfile extends StatelessWidget {
           ),
         );
       },
-      child: Center(
-        child: Hero(
-          child: customerState.dataCustomer.imageProfile == null
-              ? Icon(Icons.person_pin, size: 50, color: Colors.black)
-              : ShowImageProfile(
-                  imagePath: customerState.dataCustomer.imageProfile,
-                  borderColor: Colors.black,
-                  radius: 30,
-                ),
-          tag: "PhotoProfile",
+      child: Consumer<CustomerState>(
+        builder: (context, customerState, _) => Center(
+          child: Hero(
+            child: customerState?.dataCustomer?.imageProfile == null
+                ? Icon(Icons.person_pin, size: 50, color: Colors.black)
+                : ShowImageProfile(
+                    imagePath: customerState?.dataCustomer?.imageProfile,
+                    borderColor: Colors.black,
+                    radius: 30,
+                  ),
+            tag: "PhotoProfile",
+          ),
         ),
       ),
     );
   }
 }
 
-class ShowMyAsset extends StatelessWidget {
-  final AssetState assetState;
+// class ShowMyAsset extends StatelessWidget {
+//   final AssetState assetState;
 
-  const ShowMyAsset({Key key, this.assetState}) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    // FutureBuilder<List<ModelDataAsset>>(
-    //   future: assetState.allAssets,
-    //   builder:
-    //       (BuildContext context, AsyncSnapshot<List<ModelDataAsset>> snapshot) {
-    //     if (snapshot.connectionState == ConnectionState.done) {
-    //       if (!(snapshot.hasError)) {
-    //         if (snapshot.data.isNotEmpty)
-    //           return Padding(
-    //               padding: const EdgeInsets.fromLTRB(10, 15, 10, 10),
-    //               child: RefreshIndicator(
-    //                 onRefresh: () async {
-    //                   await assetState.refreshAsset();
-    //                 },
-    //                 child: Column(
-    //                   children: <Widget>[
-    //                     SingleChildScrollView(
-    //                       child: Column(
-    //                           children: snapshot.data
-    //                               .map((data) =>
-    //                                   new MyAssetFormSQLite(data: data))
-    //                               .toList()),
-    //                     ),
-    //                   ],
-    //                 ),
-    //               ));
-    //         else {
-    //           return Center(
-    //             child: TextBuilder.build(title: "Data offline is empty"),
-    //           );
-    //         }
-    //       } else {
-    //         return Text("Error");
-    //       }
-    //     } else if (snapshot.connectionState == ConnectionState.waiting) {
-    //       return CircularProgressIndicator();
-    //     } else {
-    //       return Text("Something wrong.!!");
-    //     }
-    //   },
-    // );
-  }
-}
+//   const ShowMyAsset({Key key, this.assetState}) : super(key: key);
+//   @override
+//   Widget build(BuildContext context) {
+// FutureBuilder<List<ModelDataAsset>>(
+//   future: assetState.allAssets,
+//   builder:
+//       (BuildContext context, AsyncSnapshot<List<ModelDataAsset>> snapshot) {
+//     if (snapshot.connectionState == ConnectionState.done) {
+//       if (!(snapshot.hasError)) {
+//         if (snapshot.data.isNotEmpty)
+//           return Padding(
+//               padding: const EdgeInsets.fromLTRB(10, 15, 10, 10),
+//               child: RefreshIndicator(
+//                 onRefresh: () async {
+//                   await assetState.refreshAsset();
+//                 },
+//                 child: Column(
+//                   children: <Widget>[
+//                     SingleChildScrollView(
+//                       child: Column(
+//                           children: snapshot.data
+//                               .map((data) =>
+//                                   new MyAssetFormSQLite(data: data))
+//                               .toList()),
+//                     ),
+//                   ],
+//                 ),
+//               ));
+//         else {
+//           return Center(
+//             child: TextBuilder.build(title: "Data offline is empty"),
+//           );
+//         }
+//       } else {
+//         return Text("Error");
+//       }
+//     } else if (snapshot.connectionState == ConnectionState.waiting) {
+//       return CircularProgressIndicator();
+//     } else {
+//       return Text("Something wrong.!!");
+//     }
+//   },
+// );
+//   }
+// }
 
 // class MyAssetOffline extends StatefulWidget {
 //   @override
@@ -1044,6 +1333,7 @@ class _MyAssetFormSQLiteState extends State<MyAssetFormSQLite> {
 
   @override
   Widget build(BuildContext context) {
+    // final assetState = Provider.of<AssetState>(context);
     alert({String title, String content}) => ecsLib.showDialogLib(context,
         content: content,
         textOnButton: allTranslations.text("close"),
@@ -1056,9 +1346,9 @@ class _MyAssetFormSQLiteState extends State<MyAssetFormSQLite> {
         child: ListTile(
           title: Row(
             children: <Widget>[
-              if (widget.data.imageMain != null)
+              if (widget?.data?.imageMain != null)
                 CachedNetworkImage(
-                  imageUrl: widget.data.imageMain,
+                  imageUrl: widget?.data?.imageMain,
                   imageBuilder: (context, imageProvider) => Container(
                     width: 100,
                     height: 100,

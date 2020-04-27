@@ -13,6 +13,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_picker/flutter_picker.dart';
 import 'package:keyboard_avoider/keyboard_avoider.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:warranzy_demo/models/model_get_brand_name.dart';
 import 'package:warranzy_demo/models/model_image_data_each_group.dart';
 import 'package:warranzy_demo/models/model_repository_init_app.dart';
@@ -26,6 +27,7 @@ import 'package:warranzy_demo/services/api/repository.dart';
 import 'package:warranzy_demo/services/method/auto_completed.dart';
 import 'package:warranzy_demo/services/method/geolocator_helper.dart';
 import 'package:warranzy_demo/services/method/scan_qr.dart';
+import 'package:warranzy_demo/services/providers/asset_state.dart';
 import 'package:warranzy_demo/services/sqflit/db_asset.dart';
 import 'package:warranzy_demo/services/sqflit/db_initial_app.dart';
 import 'package:warranzy_demo/tools/assets.dart';
@@ -47,6 +49,7 @@ class FormDataAssetTest extends StatefulWidget {
   final PageType pageType;
   final bool editImageForAdd;
   final String categoryID;
+  final bool isDuplicated;
   final List<ImageDataEachGroup> listImageDataEachGroup;
   FormDataAssetTest(
       {Key key,
@@ -55,7 +58,8 @@ class FormDataAssetTest extends StatefulWidget {
       this.pageType = PageType.MANUAL,
       this.listImageDataEachGroup = const [],
       this.editImageForAdd,
-      this.categoryID})
+      this.categoryID,
+      this.isDuplicated = false})
       : super(key: key);
 
   _FormDataAssetTestState createState() => _FormDataAssetTestState();
@@ -96,7 +100,6 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
   TextEditingController txtLotNo;
   TextEditingController txtNote;
   TextEditingController txtSLCName;
-  TextEditingController txtGeoLocation;
 
   String geoLocation = '';
   String brandActive = "N";
@@ -246,6 +249,8 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
     });
   }
 
+  final AssetStateTest assetStateTest = AssetStateTest();
+
   @override
   void initState() {
     // if (SchedulerBinding.instance.schedulerPhase ==
@@ -283,7 +288,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
         txtLotNo = TextEditingController(text: _data?.lotNo ?? "");
         txtNote = TextEditingController(text: _data?.custRemark ?? "");
         txtSLCName = TextEditingController(text: _data?.slcName ?? "");
-        txtGeoLocation = TextEditingController(text: _data?.geoLocation ?? "");
+        geoLocation = _data?.geoLocation ?? "";
         initialCategoryTest(_data?.pdtCatCode);
       });
     } else {
@@ -303,7 +308,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
         txtLotNo = TextEditingController(text: "");
         txtNote = TextEditingController(text: "");
         txtSLCName = TextEditingController(text: "");
-        txtGeoLocation = TextEditingController(text: "");
+        geoLocation = "";
         initialCategoryTest("A");
       });
     }
@@ -429,13 +434,12 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
     txtSerialNo?.dispose();
     txtSLCName?.dispose();
     txtLotNo?.dispose();
-    txtGeoLocation.dispose();
     super.dispose();
   }
 
   int _currentStep = 0;
   bool complete = false;
-  next() {
+  next([assetState]) {
     if (actionPageForAdd == true) {
       if (_currentStep + 1 != _myStepForAdd().length)
         goTo(_currentStep + 1);
@@ -444,7 +448,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
           complete = true;
         });
         print("Completed, check fields.");
-        saveInformation();
+        saveInformation(assetState);
       }
     } else {
       // if (_currentStep + 1 != _myStepForEdit().length)
@@ -459,7 +463,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
     }
   }
 
-  void saveInformation() async {
+  void saveInformation([AssetState assetState]) async {
     _formKey.currentState.save();
     if (_formKey.currentState.validate()) {
       print(txtBrandName.text);
@@ -530,6 +534,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
             )
                 .then((response) async {
               if (response == "F") {
+                int completed = 1;
                 print(response);
                 await setFormatDataBeforSendApi(
                   postData,
@@ -537,10 +542,28 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
                   ecsLib.printJson(body);
                   await sendApiAddAsset(
                       body: body,
-                      whenCompleted: () => ecsLib.pushPageAndClearAllScene(
-                          context: context, pageWidget: MainPage()));
+                      whenCompleted: (length, wTokenID) async {
+                        if (length == completed) {
+                          // var temp = await DBProviderAsset.db
+                          //     .getDataAssetByWTokenID(wTokenID: wTokenID);
+
+                          // assetState.addDataAsset(temp, temp.wTokenID);
+                          // assetStateTest.addAsset(temp);
+                          // if (widget.isDuplicated == true) {
+                          //   Navigator.pop(context);
+                          //   Navigator.pop(context);
+                          ecsLib.pushPageAndClearAllScene(
+                              context: context, pageWidget: MainPage());
+                          // } else
+                          //   Navigator.pop(context);
+                          // ecsLib.pushPageAndClearAllScene(
+                          //     context: context, pageWidget: MainPage());
+                        } else
+                          completed++;
+                      });
                 });
               } else if (response == "S") {
+                int completed = 1;
                 print(response);
                 await setFormatDataBeforSendApi(
                   postData,
@@ -548,13 +571,25 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
                   ecsLib.printJson(body);
                   await sendApiAddAsset(
                       body: body,
-                      whenCompleted: () async {
-                        await ecsLib.showDialogLib(
-                          context,
-                          title: "Warranzy",
-                          content: "Added asset and Duplicated data.",
-                          textOnButton: allTranslations.text("ok"),
-                        );
+                      whenCompleted: (length, wTokenID) async {
+                        print("completed : $completed , length : $length");
+                        if (completed == length) {
+                          var temp = await DBProviderAsset.db
+                              .getDataAssetByWTokenID(wTokenID: wTokenID);
+                          assetStateTest.addAsset(temp);
+                          ecsLib.showDialogLib(
+                            context,
+                            title: "Warranzy",
+                            content: "Added asset and Duplicated data.",
+                            textOnButton: allTranslations.text("ok"),
+                          );
+                          // print("wTokenID before : $wTokenID");
+                          // var temp = await DBProviderAsset.db
+                          //     .getDataAssetByWTokenID(wTokenID: wTokenID);
+                          // print("wTokenID after : ${temp.wTokenID}");
+                          // assetState.addDataAsset(temp, temp.wTokenID);
+                        } else
+                          completed++;
                       });
                 });
               } else {
@@ -599,7 +634,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
     return dataPost;
   }
 
-  Future sendApiAddAsset({body, Function whenCompleted}) async {
+  Future sendApiAddAsset({body, Function(int, String) whenCompleted}) async {
     ecsLib.showDialogLoadingLib(context, content: "Adding assets");
     try {
       await Repository.addAsset(body: body).then((res) async {
@@ -633,11 +668,13 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
               await DBProviderAsset.db
                   .insertDataFilePool(data)
                   .catchError((onError) => print("filePool $onError"))
-                  .whenComplete(whenCompleted);
+                  .whenComplete(() => whenCompleted(
+                      res.filePool.length, res.warranzyUsed.wTokenID));
             } catch (e) {
               print("insertDataFilePool => $e");
             }
           });
+          print("insert Asset completed.");
         } else if (res.status == false) {
           ecsLib.showDialogLib(context,
               title: "FAIL ADD ASSET",
@@ -695,15 +732,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
       appBar: AppBar(
         title: TextBuilder.build(
             title: titleAppBar, style: TextStyleCustom.STYLE_APPBAR),
-        actions: <Widget>[
-          // RaisedButton(
-          //   child: Text("Clear SQLite"),
-          //   onPressed: () async {
-          //     await DBProviderAsset.db.deleteAllAsset();
-          //     // print(await DBProviderCustomer.db.getSpecialPass());
-          //   },
-          // ),
-        ],
+        actions: <Widget>[],
       ),
       body: Container(
         margin: EdgeInsets.all(15),
@@ -715,10 +744,18 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
             child: KeyboardAvoider(
               child: Stepper(
                   currentStep: _currentStep,
-                  onStepContinue: next,
+                  onStepContinue: () => next(),
                   onStepCancel: cancel,
                   onStepTapped: (step) => goTo(step),
                   steps: _myStepForAdd()),
+              // Consumer<AssetState>(
+              //   builder: (context, assetState, _) => Stepper(
+              //       currentStep: _currentStep,
+              //       onStepContinue: () => next(assetState: assetState),
+              //       onStepCancel: cancel,
+              //       onStepTapped: (step) => goTo(step),
+              //       steps: _myStepForAdd()),
+              // ),
             ),
           ),
         ),
@@ -770,6 +807,7 @@ class _FormDataAssetTestState extends State<FormDataAssetTest> {
   }
 
   getBrandName() {
+    listBrandName.clear();
     firestore.collection('BrandName').getDocuments().then((onData) {
       if (listBrandName.length == 0) {
         print("FireStore add data");
